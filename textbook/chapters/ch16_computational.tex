@@ -1,0 +1,253 @@
+% Chapter 16: Computational vs. Information-Theoretic Learnability
+% Centerpiece: the Kearns-Valiant 1994 gap — classes with finite VC dim
+% that are NOT efficiently learnable (under cryptographic assumptions).
+% Concepts: computational_hardness, proper_improper_separation, requires_assumption edges.
+% SHORT chapter (~3-4 pages).
+
+\chapter{Computational vs.\ Information-Theoretic Learnability}
+\label{ch:computational}
+
+The Fundamental Theorem of \Cref{ch:pac} characterizes learnability in
+information-theoretic terms: $\mathcal{H}$ is PAC learnable if and only if
+$\VC(\mathcal{H}) < \infty$.  The characterization is silent about
+\emph{computation}.  It guarantees the \emph{existence} of a sample size
+$m(\varepsilon, \delta)$ and a learner $A$ that achieves accuracy $\varepsilon$
+with confidence $1 - \delta$, but it says nothing about how long $A$ takes to
+run.
+
+This silence conceals a gap.  There exist hypothesis classes with finite VC
+dimension---hence information-theoretically learnable---that no polynomial-time
+algorithm can PAC learn, unless widely believed cryptographic assumptions are
+false.  The gap between what is \emph{learnable} and what is \emph{efficiently
+learnable} is the subject of this chapter.  It is a negative result, but a
+structurally important one: it shows that information-theoretic
+characterizations, however elegant, do not tell the whole story.
+
+\medskip
+
+The chapter has three sections.
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{The information--computation gap} (\Cref{sec:gap}): the
+  Kearns--Valiant result and the cryptographic assumptions it requires.
+\item \textbf{Proper vs.\ improper learning} (\Cref{sec:proper-improper}): the
+  separation between proper and improper learnability, and why the
+  representation matters.
+\item \textbf{The \rel{requires\_assumption} edges}
+  (\Cref{sec:requires-assumption}): what this edge type means structurally in
+  the concept graph.
+\end{enumerate}
+
+
+% ================================================================
+% SECTION 1: THE INFORMATION--COMPUTATION GAP
+% ================================================================
+
+\section{The Information--Computation Gap}
+\label{sec:gap}
+
+\begin{graphnode}[title={Graph Node: \nde{computational\_hardness}}]
+Layer: \texttt{meta}.  Incoming edges:
+$\edge{computational\_hardness}{requires\_assumption}{inductive\_bias}$.
+This node represents the structural fact that efficient learnability requires
+assumptions beyond finite VC dimension.
+\end{graphnode}
+
+The central result is due to Kearns and Valiant~\cite{KearnsValiant1994}.
+
+\begin{thm}[Kearns--Valiant 1994]
+\label{thm:kearns-valiant}
+Under the assumption that certain cryptographic problems are hard (specifically,
+that the decisional composite residuosity assumption, the hardness of factoring,
+or the learning with errors assumption holds), there exist concept classes
+$\mathcal{C}$ with:
+\begin{enumerate}[leftmargin=*,nosep]
+\item $\VC(\mathcal{C}) < \infty$, so that $\mathcal{C}$ is PAC learnable
+  (information-theoretically), but
+\item no polynomial-time algorithm PAC learns $\mathcal{C}$.
+\end{enumerate}
+\end{thm}
+
+The original construction uses Boolean formulae: the class of polynomial-size
+Boolean formulae has VC dimension polynomial in the number of variables, yet
+PAC learning this class is at least as hard as breaking certain public-key
+cryptosystems.  The reduction goes through the construction of
+\emph{cryptographic pseudorandom function families}: if a learner could
+efficiently distinguish the target concept from random, it could break the
+cryptographic assumption.
+
+\begin{remark}[The structure of the reduction]
+\label{rmk:kv-reduction}
+The Kearns--Valiant reduction is from a cryptographic primitive to a learning
+problem, not from a worst-case problem.  The learner is given random examples
+$(x, c(x))$ where $x$ is drawn from a distribution and $c$ is the target
+concept.  If the learner succeeds in learning, it implicitly solves the
+cryptographic problem on random instances.  This is why the hardness is
+\emph{average-case}, not worst-case.
+\end{remark}
+
+\subsection{Why P $\neq$ NP Does Not Suffice}
+
+One might hope that the information--computation gap follows from
+$\mathrm{P} \neq \mathrm{NP}$.  It does not.  Applebaum, Barak, and
+Xiao~\cite{ApplebaumBarakXiao2008} showed the following.
+
+\begin{thm}[Applebaum--Barak--Xiao 2008]
+\label{thm:abx}
+There is no \emph{black-box} reduction from $\mathrm{NP}$-hardness to the
+hardness of PAC learning.  Specifically, if PAC learning a class $\mathcal{C}$
+is hard, this hardness cannot be established by a reduction that treats the
+learner as an oracle, unless $\mathrm{NP} \subseteq \mathrm{coAM}$.
+\end{thm}
+
+The reason is structural.  PAC learning is an \emph{average-case} problem: the
+learner receives random examples from a distribution and must generalize.
+$\mathrm{NP}$-hardness is a \emph{worst-case} notion.  Reductions from
+worst-case to average-case problems are notoriously difficult and, in many
+settings, provably impossible via relativizing techniques.
+
+\subsection{The Necessary Assumptions}
+
+The assumptions used in the literature fall into three families, in
+roughly increasing order of generality:
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Factoring and RSA.}  The original Kearns--Valiant result
+  assumes that factoring $n$-bit integers requires super-polynomial time.
+  This is the most classical assumption but also the most fragile: it is
+  broken by quantum computers (Shor's algorithm).
+
+\item \textbf{Decisional Composite Residuosity (DCRA).}  Used in subsequent
+  refinements, DCRA assumes that it is hard to distinguish $n$th residues
+  modulo $n^2$.  Like factoring, this is vulnerable to quantum attacks.
+
+\item \textbf{Learning With Errors (LWE).}  Introduced by
+  Regev~\cite{Regev2005}, the LWE assumption states that it is hard to recover
+  a secret vector $\mathbf{s}$ from noisy inner products
+  $\langle \mathbf{a}_i, \mathbf{s} \rangle + e_i \pmod{q}$.  LWE is
+  believed to resist quantum computers and has become the standard assumption
+  in modern hardness-of-learning results~\cite{Daniely2021}.
+\end{enumerate}
+
+\begin{obstbox}
+The information--computation gap is an \emph{obstruction} in the concept
+graph: the edge
+$\edge{vc\_dimension}{characterizes}{pac\_learnability}$ is
+information-theoretically valid, but the analogous computational edge does
+not exist.  No combinatorial dimension characterizes efficient PAC
+learnability.  This is the deepest structural gap in the theory.
+\end{obstbox}
+
+
+% ================================================================
+% SECTION 2: PROPER VS. IMPROPER LEARNING
+% ================================================================
+
+\section{Proper vs.\ Improper Learning}
+\label{sec:proper-improper}
+
+The information--computation gap has a subtler cousin: the gap between
+\emph{proper} and \emph{improper} learning.
+
+\begin{defn}[Proper and Improper Learning]
+\label{def:proper-improper}
+A PAC learner for $\mathcal{H}$ is \emph{proper} if it always outputs a
+hypothesis $h \in \mathcal{H}$.  It is \emph{improper} if it may output any
+efficiently evaluable function $h$, not necessarily in $\mathcal{H}$.
+\end{defn}
+
+The distinction matters because the \emph{representation} of hypotheses affects
+computational complexity.
+
+\begin{thm}[Proper--Improper Separation]
+\label{thm:proper-improper}
+There exist concept classes $\mathcal{C}$ such that:
+\begin{enumerate}[leftmargin=*,nosep]
+\item proper PAC learning of $\mathcal{C}$ is $\mathrm{NP}$-hard, but
+\item there exists a polynomial-time improper learner for $\mathcal{C}$.
+\end{enumerate}
+\end{thm}
+
+The canonical example is the class of $3$-term DNF formulae.  Finding a
+consistent $3$-term DNF is $\mathrm{NP}$-hard~\cite{PittValiant1988}, but the
+class of $3$-term DNFs is contained in the class of $3$-CNF formulae, which
+\emph{is} efficiently learnable.  An improper learner simply outputs a $3$-CNF
+formula that is consistent with the data.  The hypothesis is not a DNF, but it
+classifies correctly.
+
+\begin{remark}[Representation vs.\ class]
+\label{rmk:representation}
+The proper--improper separation illustrates a principle that runs throughout
+computational learning theory: what matters for computational complexity is not
+the \emph{set of functions} $\mathcal{H} \subseteq \{0,1\}^X$ but the
+\emph{representation} of those functions.  Two representations of the same set
+of Boolean functions can have dramatically different computational properties.
+This is why the VC dimension---which depends only on the set
+$\mathcal{H}$---cannot capture computational learnability.
+\end{remark}
+
+The structural consequence is that efficient learnability is a property of
+\emph{represented} hypothesis classes, not of hypothesis classes as sets.  The
+concept graph captures this through the node \nde{proper\_improper\_separation},
+which has type \texttt{separation} and connects to
+\nde{computational\_hardness} via a \rel{motivates} edge.
+
+
+% ================================================================
+% SECTION 3: THE REQUIRES_ASSUMPTION EDGES
+% ================================================================
+
+\section{The \rel{requires\_assumption} Edges}
+\label{sec:requires-assumption}
+
+The concept graph contains several edges of type \rel{requires\_assumption}.
+These edges encode a specific logical structure: the source node's validity
+depends on an assumption that is not provable from the axioms of the theory
+alone.
+
+\begin{defn}[The \rel{requires\_assumption} edge type]
+\label{def:requires-assumption}
+An edge $\edge{A}{requires\_assumption}{B}$ means: the result or property
+associated with node $A$ holds \emph{conditional on} the assumption encoded
+by node $B$.  If $B$ is falsified, the status of $A$ becomes indeterminate.
+\end{defn}
+
+The principal instances in the graph are:
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item $\edge{computational\_hardness}{requires\_assumption}{inductive\_bias}$.
+  The information--computation gap of \Cref{thm:kearns-valiant} holds only
+  under cryptographic assumptions.  Without them, it remains conceivable that
+  every class with finite VC dimension is efficiently learnable.  The
+  \nde{inductive\_bias} node here encodes the structural assumption that the
+  learner's hypothesis space is constrained---without which the hardness
+  results are vacuous.
+
+\item $\edge{posterior\_consistency}{requires\_assumption}{bayesian\_inference}$.
+  Posterior consistency (\Cref{ch:agents}, \Cref{sec:bayesian-pac}) holds under
+  conditions on the prior and the model class.  When these conditions
+  fail---for example, when the prior assigns zero mass to neighborhoods of
+  the true parameter---posterior consistency fails
+  (Diaconis--Freedman~\cite{DiaconisFreedman1986}).  The edge records this
+  conditional dependence.
+\end{enumerate}
+
+\begin{remark}[Structural meaning]
+\label{rmk:requires-assumption-structure}
+The \rel{requires\_assumption} edge type is the graph's mechanism for
+representing \emph{conditional} theorems.  Unlike \rel{implies} edges, which
+are unconditional, a \rel{requires\_assumption} edge signals that the source
+node's content is only as secure as the target node's assumption.  This is
+the graph-theoretic encoding of the phrase ``under the assumption that\ldots''
+that pervades computational learning theory.
+\end{remark}
+
+\bigskip
+
+This chapter has established the structural gap between
+information-theoretic and computational learnability.  The gap is real---it
+produces classes that are provably learnable but (conditionally) not
+efficiently learnable.  It is also irreducible: no known combinatorial
+dimension characterizes efficient PAC learnability.  The next chapter
+examines a different kind of gap: the distance between binary classification
+and the richer learning settings that require new mathematical primitives.

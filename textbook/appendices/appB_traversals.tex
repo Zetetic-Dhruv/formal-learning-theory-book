@@ -1,0 +1,236 @@
+% ============================================================
+% APPENDIX B: Graph Traversal Demonstrations
+% ============================================================
+\chapter{Graph Traversal Demonstrations}
+\label{app:traversals}
+
+These 15 tasks demonstrate the graph's utility for cross-paradigm reasoning.
+Each traversal states a query, lists the sequence of edges traversed, and assembles an answer from the path.
+Edge notation: $\edge{source}{relation}{target}$.
+
+% ----------------------------------------------------------
+% T01
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T01: Prerequisite retrieval for VC dimension.}\par\medskip
+\emph{Query:} What concepts must be defined before $\VC$ can be stated?\par
+\emph{Path:}\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{vc\_dimension}{defined\_using}{shatters}$
+  \item $\edge{shatters}{defined\_using}{concept\_class}$ (via \nde{shatters} prerequisites)
+  \item $\edge{concept\_class}{defined\_using}{concept}$
+  \item $\edge{concept}{defined\_using}{domain}$
+  \item $\edge{concept}{defined\_using}{label}$
+\end{enumerate}
+\emph{Answer:} The prerequisite chain is: \nde{domain}, \nde{label} $\to$ \nde{concept} $\to$ \nde{concept\_class} $\to$ \nde{shatters} $\to$ \nde{vc\_dimension}. In the graph, the single direct \rel{defined\_using} edge from \nde{vc\_dimension} targets \nde{shatters}.
+\end{traversal}
+
+% ----------------------------------------------------------
+% T02
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T02: What characterizes PAC learnability?}\par\medskip
+\emph{Query:} What are all known characterizations of PAC learnability?\par
+\emph{Path:} Collect all nodes $X$ where $\edge{X}{characterizes}{pac\_learning}$.\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{vc\_characterization}{characterizes}{pac\_learning}$
+  \item $\edge{vc\_dimension}{characterizes}{pac\_learning}$ (via \nde{vc\_characterization})
+  \item $\edge{ds\_dimension}{characterizes}{pac\_learning}$
+  \item $\edge{fundamental\_theorem}{characterizes}{pac\_learning}$
+  \item $\edge{occam\_algorithm}{characterizes}{pac\_learning}$
+\end{enumerate}
+\emph{Answer:} Five nodes characterize PAC learnability: \nde{vc\_dimension}, \nde{vc\_characterization}, \nde{ds\_dimension}, \nde{fundamental\_theorem}, and \nde{occam\_algorithm}.
+\end{traversal}
+
+% ----------------------------------------------------------
+% T03
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T03: Is a PAC-learnable class online-learnable?}\par\medskip
+\emph{Query:} Is a PAC-learnable class necessarily online-learnable with finite mistakes?\par
+\emph{Path:}\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{pac\_learning}{does\_not\_imply}{mistake\_bounded}$
+\end{enumerate}
+\emph{Answer:} No. The edge carries witness: thresholds on $\R$ have $\VC = 1$ but $\Ldim = \infty$ \cite{Littlestone1988}.
+\end{traversal}
+
+% ----------------------------------------------------------
+% T04
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T04: Upper bounds on generalization error.}\par\medskip
+\emph{Query:} What generalization bounds are available and what do they each depend on?\par
+\emph{Path:} Find all $X$ with $\edge{X}{upper\_bounds}{generalization\_error}$, then follow \rel{defined\_using} from each.\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{rademacher\_complexity}{upper\_bounds}{generalization\_error}$ \cite{BartlettMendelson2002}
+  \item $\edge{pac\_bayes\_bound}{upper\_bounds}{generalization\_error}$ \cite{McAllester1999}
+  \item $\edge{information\_theoretic\_bound}{upper\_bounds}{generalization\_error}$ \cite{XuRaginsky2017}
+  \item $\edge{margin\_theory}{upper\_bounds}{generalization\_error}$ \cite{BartlettFosterTelgarsky2017}
+\end{enumerate}
+\emph{Answer:} Four bound families provide upper bounds on generalization error: Rademacher complexity, PAC-Bayes, information-theoretic, and margin-based bounds. Each has distinct \rel{defined\_using} dependencies (e.g., Rademacher complexity depends on the growth function and hypothesis space).
+\end{traversal}
+
+% ----------------------------------------------------------
+% T05
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T05: Cross-paradigm Bayesian--multiclass reasoning.}\par\medskip
+\emph{Query:} Can a Bayesian learner be PAC-Bayes analyzed for a multiclass problem where $\Ndim < \infty$ but the class is not learnable?\par
+\emph{Path:}\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{bayesian\_learner}{instance\_of}{learner}$
+  \item $\edge{pac\_bayes\_bound}{upper\_bounds}{generalization\_error}$
+  \item $\edge{natarajan\_dimension}{does\_not\_imply}{pac\_learning}$
+  \item $\edge{ds\_dimension}{characterizes}{pac\_learning}$
+\end{enumerate}
+\emph{Answer:} PAC-Bayes bounds apply to any posterior $Q$ (edge~2), so a Bayesian learner (edge~1) can be analyzed.  However, finite Natarajan dimension does not imply PAC learnability (edge~3); the DS dimension is the correct multiclass characterization (edge~4).  If $\DSdim = \infty$, the bounds may be vacuous despite $\Ndim < \infty$.
+\end{traversal}
+
+% ----------------------------------------------------------
+% T06
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T06: $\BC \supsetneq \Ex \supsetneq \FIN$ hierarchy.}\par\medskip
+\emph{Query:} What is the strict power hierarchy among success criteria in Gold's model?\par
+\emph{Path:}\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{bc\_learning}{restricts}{ex\_learning}$ \cite{CaseSmith1983}
+  \item $\edge{ex\_learning}{strictly\_stronger}{finite\_learning}$ \cite{Gold1967}
+\end{enumerate}
+\emph{Answer:} $\BC \supsetneq \Ex \supsetneq \FIN$.  BC generalizes Ex by removing the syntactic convergence requirement (edge~1). Ex is strictly stronger than FIN because some classes require unbounded mind changes (edge~2).
+\end{traversal}
+
+% ----------------------------------------------------------
+% T07
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T07: Why concept drift $\neq$ online learning (obstruction).}\par\medskip
+\emph{Query:} Why is the analogy between concept drift and online learning not a formal theorem?\par
+\emph{Path:}\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{concept\_drift}{analogy}{online\_learning}$, obstruction type: \texttt{data\_model\_mismatch}
+\end{enumerate}
+\emph{Answer:} Data model mismatch: drift uses i.i.d.\ draws per step from a slowly changing distribution; online learning uses adversarially chosen instances from a fixed class.
+\end{traversal}
+
+% ----------------------------------------------------------
+% T08
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T08: Which generalizations of VC dimension required new primitives?}\par\medskip
+\emph{Query:} Which generalizations of $\VC$ required inventing new formal primitives?\par
+\emph{Path:} Find all $X$ with $\edge{X}{extends\_grammar}{vc\_dimension}$.\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{pseudodimension}{extends\_grammar}{vc\_dimension}$
+  \item $\edge{natarajan\_dimension}{extends\_grammar}{vc\_dimension}$
+  \item $\edge{ordinal\_vc\_dim}{extends\_grammar}{vc\_dimension}$
+\end{enumerate}
+\emph{Answer:} Three nodes extend VC grammar: pseudodimension (witness thresholds for real-valued functions), Natarajan dimension (two-coloring for multiclass), and ordinal VC dimension (transfinite generalization).
+\end{traversal}
+
+% ----------------------------------------------------------
+% T09
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T09: What prevents efficient PAC learning even when $\VC < \infty$?}\par\medskip
+\emph{Query:} What prevents efficient PAC learning even when the VC dimension is finite?\par
+\emph{Path:}\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{computational\_hardness}{lower\_bounds}{pac\_learning}$ \cite{KearnsValiant1994}
+  \item $\edge{computational\_hardness}{used\_in\_proof}{vc\_dimension}$
+  \item $\edge{computational\_hardness}{requires\_assumption}{inductive\_bias}$ \cite{ApplebaumBarakXiao2008}
+  \item $\edge{vc\_dimension}{does\_not\_imply}{computational\_hardness}$ \cite{KearnsValiant1994}
+\end{enumerate}
+\emph{Answer:} Computational hardness results (edge~1) show that under cryptographic assumptions (edge~3), polynomial-size circuits have finite $\VC$ but are not efficiently PAC-learnable. Finite $\VC$ alone does not imply tractability (edge~4).
+\end{traversal}
+
+% ----------------------------------------------------------
+% T10
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T10: Curriculum ordering for PAC learning.}\par\medskip
+\emph{Query:} Generate a reading order for learning PAC theory from scratch.\par
+\emph{Path:} Topological sort of the \rel{defined\_using} subgraph restricted to PAC-related nodes.\par
+\emph{Answer:} One valid ordering:\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item \nde{domain}, \nde{label}
+  \item \nde{concept} (depends on domain, label)
+  \item \nde{shatters}, \nde{iid\_sample}
+  \item \nde{concept\_class}, \nde{hypothesis\_space}
+  \item \nde{pac\_learning}, \nde{generalization\_error}
+  \item \nde{sample\_complexity}
+  \item \nde{vc\_dimension}
+  \item \nde{vc\_characterization}
+  \item \nde{fundamental\_theorem}
+\end{enumerate}
+Multiple valid topological orderings exist; the key constraint is that each node appears after all its \rel{defined\_using} targets.
+\end{traversal}
+
+% ----------------------------------------------------------
+% T11
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T11: Is reinforcement learning covered in this graph?}\par\medskip
+\emph{Query:} Is reinforcement learning covered in this graph?\par
+\emph{Path:} Check for \nde{scope\_boundary\_rl} node.\par
+\emph{Answer:} Explicitly excluded. The node \nde{scope\_boundary\_rl} states that RL extends bandits to sequential decision-making with a different problem structure (MDP, policy, value function). No edges connect to kernel nodes.
+\end{traversal}
+
+% ----------------------------------------------------------
+% T12
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T12: Count separation results.}\par\medskip
+\emph{Query:} List all known separations between learning paradigms with their witnesses.\par
+\emph{Path:} Collect all \rel{does\_not\_imply} and \rel{strictly\_stronger} edges.\par
+\emph{Answer:} 9 \rel{does\_not\_imply} edges $+$ 4 \rel{strictly\_stronger} edges $= 13$ total separation results.  Each carries a \texttt{witness} field and a \texttt{citation}. See Tables~\ref{tab:does-not-imply} and~\ref{tab:strictly-stronger} in Appendix~A.
+\end{traversal}
+
+% ----------------------------------------------------------
+% T13
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T13: How do $\VC$, $\Ldim$, $\SQdim$, and star number relate?}\par\medskip
+\emph{Query:} How do VCdim, Littlestone dim, SQ dim, and star number relate to each other?\par
+\emph{Path:}\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{star\_number}{characterizes}{vc\_dimension}$ \cite{Hanneke2024b}
+  \item $\edge{littlestone\_dimension}{upper\_bounds}{vc\_dimension}$ \cite{Littlestone1988}
+  \item $\edge{sq\_dimension}{analogy}{vc\_dimension}$ (exponential gap possible: parities)
+  \item $\edge{sq\_dimension}{does\_not\_imply}{vc\_dimension}$ (parities: $\VC = n$, $\SQdim = 2^n$)
+\end{enumerate}
+\emph{Answer:} Star number is equivalent to $\VC$ (edge~1). Finite $\Ldim$ implies finite $\VC$ but the gap can be infinite (edge~2). SQ dimension is structurally analogous but formally independent, with exponential separations (edges~3--4).
+\end{traversal}
+
+% ----------------------------------------------------------
+% T14
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T14: Real-valued extension of VC dimension.}\par\medskip
+\emph{Query:} What changes when moving from binary classification to real-valued prediction?\par
+\emph{Path:}\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item $\edge{pseudodimension}{extends\_grammar}{vc\_dimension}$
+  \item $\edge{pseudodimension}{restricts}{fat\_shattering\_dimension}$
+  \item $\edge{fat\_shattering\_dimension}{characterizes}{real\_valued\_pac}$ (via appropriate node)
+\end{enumerate}
+\emph{Answer:} Pseudodimension extends VC grammar by introducing witness thresholds for real-valued functions (edge~1). It removes the scale-sensitivity from fat-shattering dimension (edge~2, constraint removal). Fat-shattering adds a margin parameter $\gamma$ and characterizes real-valued PAC learnability.  Three nodes in total extend the VC grammar: \nde{pseudodimension}, \nde{natarajan\_dimension}, \nde{ordinal\_vc\_dim}.
+\end{traversal}
+
+% ----------------------------------------------------------
+% T15
+% ----------------------------------------------------------
+\begin{traversal}
+\textbf{T15: Does the fundamental theorem extend to multiclass?}\par\medskip
+\emph{Query:} Does the fundamental theorem of statistical learning extend to multiclass?\par
+\emph{Path:}\par
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item Check: \nde{fundamental\_theorem} has no direct edges to multiclass-specific nodes.
+  \item $\edge{natarajan\_dimension}{does\_not\_imply}{pac\_learning}$ --- finite $\Ndim$ insufficient when $|Y| = \infty$.
+  \item $\edge{ds\_dimension}{characterizes}{pac\_learning}$ \cite{BrukhimCarmonDinurMoranYehudayoff2022}
+  \item $\edge{natarajan\_dimension}{extends\_grammar}{vc\_dimension}$
+  \item $\edge{ds\_dimension}{strictly\_stronger}{natarajan\_dimension}$ \cite{BrukhimCarmonDinurMoranYehudayoff2022}
+\end{enumerate}
+\emph{Answer:} The fundamental theorem ($\VC \leftrightarrow$ PAC) is specific to binary classification (no multiclass edges from edge~1).  For multiclass: Natarajan dimension gives bounds with a $\log k$ gap but does not characterize learnability when $|Y| = \infty$ (edge~2).  The DS dimension is the correct multiclass characterization (edge~3), and it is strictly stronger than Natarajan dimension (edge~5).
+\end{traversal}

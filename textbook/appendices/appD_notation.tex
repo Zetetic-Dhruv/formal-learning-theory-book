@@ -1,0 +1,275 @@
+% ============================================================
+% APPENDIX D: Notation Index
+% ============================================================
+\chapter{Notation Index}
+\label{app:notation}
+
+This appendix collects all notation used in the text, organized by category.
+The \emph{Introduced} column gives the chapter of first use.
+Symbols defined by \LaTeX\ macros in \texttt{main.tex} are marked with the macro name in the \emph{Notes} column.
+
+% ----------------------------------------------------------
+\section*{D.1\quad Sets and Spaces}
+\label{sec:notation-sets}
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+$X$ & Domain (input space).  Typically $\{0,1\}^n$, $\R^d$, or a countable set. & Ch.~1 \\
+$Y$ & Label space (output space).  $\{0,1\}$ for binary, finite set for multiclass, $\R$ for regression. & Ch.~1 \\
+$\Sigma$ & Alphabet (finite, nonempty set of symbols). & Ch.~3 \\
+$\Sigma^*$ & Free monoid: all finite strings over $\Sigma$. & Ch.~3 \\
+$\mathcal{C}$ & Concept class: a collection of concepts $c : X \to Y$. & Ch.~1 \\
+$\mathcal{H}$ & Hypothesis space: the set from which the learner selects hypotheses. & Ch.~1 \\
+$\mathcal{F}$ & Real-valued function class $\mathcal{F} \subseteq Y^X$ (typically $Y = \R$). & Ch.~10 \\
+$S = \{(x_i, y_i)\}_{i=1}^m$ & Training sample of $m$ labeled examples. & Ch.~2 \\
+$D$ & Distribution on $X \times Y$ (or on $X$ in the realizable setting). & Ch.~2 \\
+$\N$ & Natural numbers $\{0,1,2,\ldots\}$. & Ch.~1 \\
+$\Z$ & Integers. & Ch.~1 \\
+$\R$ & Real numbers. & Ch.~1 \\
+$\{0,1\}^n$ & Binary strings of length $n$. & Ch.~1 \\
+$\mathcal{B}_\varepsilon(x)$ & Open ball of radius $\varepsilon$ centered at $x$. & Ch.~10 \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{D.2\quad Complexity Measures}
+\label{sec:notation-complexity}
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+$\VC(\mathcal{H})$ & Vapnik--Chervonenkis dimension: largest set shattered by $\mathcal{H}$. Macro: \verb|\VC|. & Ch.~5 \\
+$\Ldim(\mathcal{H})$ & Littlestone dimension: depth of deepest mistake tree for $\mathcal{H}$. Macro: \verb|\Ldim|. & Ch.~6 \\
+$\DSdim(\mathcal{H})$ & DS dimension (Daniely--Shalev-Shwartz): multiclass PAC characterization. Macro: \verb|\DSdim|. & Ch.~17 \\
+$\Ndim(\mathcal{H})$ & Natarajan dimension: multiclass generalization of VC dimension via two-colorings. Macro: \verb|\Ndim|. & Ch.~17 \\
+$\Pdim(\mathcal{F})$ & Pseudodimension: VC dimension of the subgraph class $\{(x,t) : f(x) \geq t\}$. Macro: \verb|\Pdim|. & Ch.~10 \\
+$\fatshat_\gamma(\mathcal{F})$ & Fat-shattering dimension at scale $\gamma > 0$. Macro: \verb|\fatshat|. & Ch.~10 \\
+$\SQdim(\mathcal{C})$ & Statistical query dimension. Macro: \verb|\SQdim|. & Ch.~10 \\
+$\Rad_n(\mathcal{H})$ & Empirical Rademacher complexity: $\E_\sigma\bigl[\sup_{h \in \mathcal{H}} \frac{1}{n}\sum_{i=1}^n \sigma_i h(x_i)\bigr]$. Macro: \verb|\Rad|. & Ch.~12 \\
+$\growth_\mathcal{H}(n)$ & Growth function (Sauer--Shelah): $\max_{|S|=n} |\{h|_S : h \in \mathcal{H}\}|$. Macro: \verb|\growth|. & Ch.~10 \\
+$\KL(P \| Q)$ & Kullback--Leibler divergence between distributions $P$ and $Q$. Macro: \verb|\KL|. & Ch.~12 \\
+$\mathcal{N}(\varepsilon, \mathcal{F}, d)$ & Covering number: minimum $\varepsilon$-net size under metric $d$. & Ch.~10 \\
+$K(x)$ & Kolmogorov complexity of string $x$. & Ch.~13 \\
+$\mathrm{dl}(h)$ & Description length of hypothesis $h$. & Ch.~11 \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{D.3\quad Learning Parameters}
+\label{sec:notation-params}
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+$\varepsilon$ & Accuracy parameter: $\risk(h) \leq \varepsilon$ or $\risk(h) \leq \risk(h^*) + \varepsilon$. & Ch.~5 \\
+$\delta$ & Confidence parameter: bounds hold with probability $\geq 1 - \delta$. & Ch.~5 \\
+$m$ & Sample size (number of training examples). & Ch.~2 \\
+$m(\varepsilon, \delta)$ & Sample complexity: minimum $m$ sufficient for $(\varepsilon, \delta)$-learning. & Ch.~5 \\
+$T$ & Number of rounds in online learning or time horizon. & Ch.~6 \\
+$\gamma$ & Margin parameter (for fat-shattering dimension and margin bounds). & Ch.~10 \\
+$k$ & Number of labels $|Y|$ in multiclass settings. & Ch.~17 \\
+$n$ & Input dimensionality $|x|$ or sample subset size, depending on context. & Ch.~1 \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{D.4\quad Risk and Loss}
+\label{sec:notation-risk}
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+$\ell(h(x), y)$ & Loss function (0-1 loss unless otherwise stated). & Ch.~5 \\
+$\risk(h)$ & True (population) risk: $\E_{(x,y) \sim D}[\ell(h(x),y)]$. Macro: \verb|\risk|. & Ch.~5 \\
+$\emprisk(h)$ or $\emprisk_S(h)$ & Empirical risk: $\frac{1}{m}\sum_{i=1}^m \ell(h(x_i),y_i)$. Macro: \verb|\emprisk|. & Ch.~5 \\
+$\risk(h) - \emprisk(h)$ & Generalization gap. & Ch.~12 \\
+$R_T$ & Cumulative regret over $T$ rounds. & Ch.~6 \\
+$M_T$ & Mistake count over $T$ rounds. & Ch.~6 \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{D.5\quad Distributions and Probability}
+\label{sec:notation-prob}
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+$D$ & Data-generating distribution on $X \times Y$. & Ch.~2 \\
+$D_X$ & Marginal distribution on $X$. & Ch.~5 \\
+$\Pr(\cdot)$ or $\mathbb{P}(\cdot)$ & Probability measure. Macro: \verb|\Pr|. & Ch.~2 \\
+$\E[\cdot]$ & Expectation. Macro: \verb|\E|. & Ch.~2 \\
+$\ind_A$ or $\ind[\text{event}]$ & Indicator function / indicator random variable. Macro: \verb|\ind|. & Ch.~2 \\
+$\sigma_i$ & Rademacher random variable: $\Pr(\sigma_i = +1) = \Pr(\sigma_i = -1) = \tfrac{1}{2}$. & Ch.~12 \\
+$Q$ & Posterior distribution (PAC-Bayes) or generic distribution over $\mathcal{H}$. & Ch.~12 \\
+$P$ & Prior distribution over $\mathcal{H}$ (PAC-Bayes). & Ch.~12 \\
+$S \sim D^m$ & Sample drawn i.i.d.\ from $D$. & Ch.~2 \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{D.6\quad Ordinals and Mind-Changes}
+\label{sec:notation-ordinals}
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+$\omega$ & First infinite ordinal; cardinality of $\N$. & Ch.~7 \\
+$\omega^k$ & Ordinal exponentiation (iterated $\omega$). & Ch.~13 \\
+$\omega^\omega$ & First epsilon-unreachable ordinal power (limit of $\omega, \omega^2, \omega^3, \ldots$). & Ch.~13 \\
+$\alpha, \beta$ & Arbitrary ordinals. & Ch.~13 \\
+$\mathrm{MC}(L, \mathcal{C})$ & Mind-change count: maximum number of hypothesis changes by learner $L$ on class $\mathcal{C}$. & Ch.~7 \\
+$\mathrm{MC}_\alpha$ & Ordinal mind-change bound at level $\alpha$. & Ch.~13 \\
+$\omega\text{-}\VC$ & Ordinal VC dimension (transfinite extension). & Ch.~13 \\
+$\Delta^0_2$ & Arithmetic hierarchy class: limits of computable functions. & Ch.~7 \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{D.7\quad Information-Theoretic Quantities}
+\label{sec:notation-info}
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+$H(X)$ & Shannon entropy of random variable $X$. & Ch.~12 \\
+$H(X \mid Y)$ & Conditional Shannon entropy. & Ch.~12 \\
+$I(X; Y)$ & Mutual information between $X$ and $Y$: $H(X) - H(X \mid Y)$. & Ch.~12 \\
+$\KL(P \| Q)$ & Kullback--Leibler divergence: $\E_P[\log(P/Q)]$. Macro: \verb|\KL|. & Ch.~12 \\
+$I(S; A(S))$ & Input--output mutual information of algorithm $A$ on sample $S$ (Xu--Raginsky framework). & Ch.~12 \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{D.8\quad Learning Criteria and Algorithms}
+\label{sec:notation-criteria}
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+$\Ex$ & Explanatory learning (Gold-style identification in the limit). Macro: \verb|\Ex|. & Ch.~7 \\
+$\BC$ & Behaviorally correct learning. Macro: \verb|\BC|. & Ch.~7 \\
+$\FIN$ & Finite identification (the learner eventually stops and is correct). Macro: \verb|\FIN|. & Ch.~7 \\
+$\ERM$ & Empirical risk minimization. Macro: \verb|\ERM|. & Ch.~5 \\
+$\SOA$ & Standard optimal algorithm (online prediction). Macro: \verb|\SOA|. & Ch.~6 \\
+$L^*$ & Angluin's $L^*$ algorithm for learning regular languages from queries. & Ch.~8 \\
+CEGIS & Counterexample-guided inductive synthesis. & Ch.~8 \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{D.9\quad Functions and Maps}
+\label{sec:notation-functions}
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+$c : X \to Y$ & Target concept (the function the learner aims to identify). & Ch.~1 \\
+$h : X \to Y$ & Hypothesis produced by the learner. & Ch.~1 \\
+$h^* \in \mathcal{H}$ & Best hypothesis in $\mathcal{H}$: $h^* = \arg\min_{h \in \mathcal{H}} \risk(h)$. & Ch.~5 \\
+$A : (X \times Y)^m \to \mathcal{H}$ & Learning algorithm (maps a sample to a hypothesis). & Ch.~4 \\
+$\varphi_e$ & Partial computable function with G\"odel number $e$. & Ch.~3 \\
+$W_e$ & Domain of $\varphi_e$ (recursively enumerable set with index $e$). & Ch.~3 \\
+$h|_S$ & Restriction of $h$ to the set $S$: the behavior pattern of $h$ on points in $S$. & Ch.~5 \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{D.10\quad Graph-Theoretic Notation}
+\label{sec:notation-graph}
+
+The following notation is specific to the knowledge graph structure described in this book.
+
+\begin{longtable}{lp{7.5cm}l}
+\toprule
+\textbf{Symbol / Macro} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol / Macro} & \textbf{Description} & \textbf{Introduced} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\verb|\nde{id}| $\to$ \nde{id} & Graph node identifier (sans-serif). & Preface \\
+\verb|\rel{R}| $\to$ \rel{R} & Relation type label (monospaced). & Preface \\
+$\edge{A}{R}{B}$ & Typed directed edge from \nde{A} to \nde{B} via \rel{R}. Macro: \verb|\edge{A}{R}{B}|. & Preface \\
+Layer $\ell \in \{0, \ldots, 7\}$ & Stratification of nodes: 0~=~formal objects, 1~=~base types, 2~=~data presentations, 3~=~learner types, 4~=~success criteria, 5~=~complexity measures, 6~=~characterizations/impossibilities, 7~=~processes/scope boundaries. & Ch.~1 \\
+Kernel node & A node with status \texttt{defined} or \texttt{proved} (133 of 142). & Preface \\
+Deferred node & A node with status \texttt{deferred} (6 of 142). & Preface \\
+Scope boundary & A node with status \texttt{scope\_note} marking an explicit exclusion (3 of 142). & Preface \\
+\end{longtable}
+
+\bigskip
+\noindent\textbf{Complete symbol list.}\quad
+This appendix covers the most frequently used symbols.  Additional notation local to a single proof or example is defined at the point of use.  All \LaTeX\ macros are defined in the preamble of \texttt{main.tex}; see \S\ref{sec:notation-graph} above for the graph-specific macros \verb|\nde|, \verb|\rel|, and \verb|\edge|.

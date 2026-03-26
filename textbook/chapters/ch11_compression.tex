@@ -1,0 +1,816 @@
+% Chapter 11: Sample Complexity, Compression, and Occam's Razor
+% sample_complexity = Profile B-light, unlabeled_compression = Profile D (Negative),
+% occam_algorithm = Profile B-light, description_length/kolmogorov/kl = Profile A,
+% covering_number = Profile A-plus.
+%
+% Texture: question-driven. The open conjecture (compression ≈ VC dimension)
+% is the gravitational center. Everything else orbits it: sample complexity
+% provides the motivation, Occam's razor provides the algorithmic bridge,
+% information-theoretic notions provide the vocabulary. The chapter should
+% feel like a detective story where the case remains unsolved.
+
+\chapter{Sample Complexity, Compression, and Occam's Razor}
+\label{ch:compression}
+
+The Fundamental Theorem of \Cref{ch:pac} answers the qualitative question:
+\emph{which} classes are PAC learnable?  This chapter turns to the quantitative
+question: \emph{how many samples} does learning require, and what structural
+properties of the hypothesis class control the answer?
+
+The quantitative question leads, unexpectedly, to an open problem.  The tight
+sample complexity bounds (\Cref{sec:sample-bounds}) show that the VC dimension
+$d$ determines the sample complexity up to constant factors.  Compression
+schemes (\Cref{sec:compression}) provide a different explanation of
+learnability: a class is learnable if and only if the training data can be
+``compressed'' to a small subset that determines the hypothesis.  The natural
+conjecture---that compression of size $O(d)$ always suffices---has been open
+since 1986.  It is one of the oldest and most embarrassing open problems in
+learning theory, and it is the centerpiece of this chapter.
+
+Occam's razor (\Cref{sec:occam}) provides the bridge between compression and
+generalization: any algorithm that finds a ``short'' description of the data
+generalizes.  The information-theoretic notions of
+\Cref{sec:info-foundations}---description length, Kolmogorov complexity,
+covering numbers---supply the vocabulary for making ``short'' precise.
+
+\medskip
+
+The chapter is organized around a single question:
+
+\begin{center}
+\itshape
+Does every concept class of VC dimension $d$ admit a compression scheme of
+size $O(d)$?
+\end{center}
+
+Everything we prove either approaches this question or illuminates why it
+resists resolution.
+
+
+% ================================================================
+% SECTION 1: TIGHT SAMPLE COMPLEXITY BOUNDS
+% Profile B-light. State the bounds, give proof sketch for upper bound.
+% ================================================================
+
+\section{Tight Sample Complexity Bounds}
+\label{sec:sample-bounds}
+
+The sample complexity of PAC learning was bounded in \Cref{ch:pac} through the
+VC characterization.  Here we state the tight bounds precisely.
+
+\begin{thm}[Realizable PAC sample complexity {\cite{Hanneke2016,SimonZilles2015}}]
+\label{thm:sample-realizable}
+Let $\mathcal{H}$ be a hypothesis class with $\VC(\mathcal{H}) = d < \infty$.
+In the realizable setting, the optimal sample complexity of PAC learning
+$\mathcal{H}$ satisfies
+\[
+  m(\varepsilon, \delta) = \Theta\!\left(\frac{d}{\varepsilon}
+    + \frac{\log(1/\delta)}{\varepsilon}\right).
+\]
+The upper bound is achieved by any consistent learner (including $\ERM$); the
+lower bound holds for every learner.
+\end{thm}
+
+\begin{remark}[History of the tight bound]
+\label{rmk:sample-history}
+The classical upper bound of Blumer et al.~\cite{BlumerEhrenfeuchtHausslerWarmuth1989}
+gave $O\!\bigl(\frac{d}{\varepsilon}\log\frac{1}{\varepsilon} +
+\frac{1}{\varepsilon}\log\frac{1}{\delta}\bigr)$, with a logarithmic overhead
+in the $d/\varepsilon$ term.  Removing this overhead---proving that the correct
+dependence on $d$ is linear, not $d \log(1/\varepsilon)$---required substantial
+effort.  The matching lower bound was established by Ehrenfeucht et
+al.~\cite{EhrenfeuchtHausslerKearnsValiant1989}.  The tight upper bound without
+the logarithmic factor was completed by Simon and Zilles~\cite{SimonZilles2015}
+and, in a sharper form addressing the constant, by
+Hanneke~\cite{Hanneke2016}.  Hanneke's result shows that \emph{any} consistent
+learner achieves the optimal bound---no algorithmic cleverness beyond
+consistency is needed.
+\end{remark}
+
+\begin{proof}[Proof sketch of the upper bound]
+The argument proceeds in two stages.  First, one establishes the \emph{double
+sampling} bound: the probability that $\ERM$ returns a hypothesis with error
+$> \varepsilon$ is at most
+\[
+  \Pr[\exists h \in \mathcal{H} : \emprisk_S(h) = 0 \text{ and }
+    \risk_D(h) > \varepsilon]
+  \;\leq\; 2\,\growth_\mathcal{H}(2m) \cdot 2^{-\varepsilon m / 2},
+\]
+where $\growth_\mathcal{H}(n) \leq (en/d)^d$ by the Sauer--Shelah lemma
+(\Cref{lem:sauer-shelah}).  Setting the right-hand side $\leq \delta$ and
+solving for $m$ gives $m = O\!\bigl(\frac{d}{\varepsilon}
+\log\frac{1}{\varepsilon} + \frac{1}{\varepsilon}\log\frac{1}{\delta}\bigr)$.
+
+The removal of the $\log(1/\varepsilon)$ factor uses a more delicate argument.
+One decomposes the hypothesis class into subsets of bounded ``disagreement mass''
+and applies uniform convergence separately to each piece.  The key insight
+(Hanneke~\cite{Hanneke2016}) is that the number of effectively distinct
+hypotheses at accuracy scale $\varepsilon$ is controlled by the \emph{star
+number} of $\mathcal{H}$, which is $O(d)$ rather than $O(d \log(1/\varepsilon))$.
+\end{proof}
+
+In the agnostic setting, the sample complexity worsens:
+
+\begin{thm}[Agnostic PAC sample complexity]
+\label{thm:sample-agnostic}
+In the agnostic setting, the optimal sample complexity satisfies
+\[
+  m(\varepsilon, \delta) = \Theta\!\left(\frac{d}{\varepsilon^2}
+    + \frac{\log(1/\delta)}{\varepsilon^2}\right).
+\]
+\end{thm}
+
+The gap between $d/\varepsilon$ (realizable) and $d/\varepsilon^2$ (agnostic)
+is the ``$\varepsilon^2$ price'' discussed in \Cref{sec:agnostic} of
+\Cref{ch:pac}.  It is not an artifact of loose analysis: the lower bound
+matches.
+
+
+% ================================================================
+% SECTION 2: COMPRESSION SCHEMES
+% Profile F (Open Frontier). CENTERPIECE of the chapter.
+% ================================================================
+
+\section{Compression Schemes}
+\label{sec:compression}
+
+Sample complexity tells us \emph{how much data} learning requires.  Compression
+asks a different question: \emph{how little of the data does the learner
+actually need to remember?}
+
+\begin{defn}[Sample Compression Scheme {\cite{LittlestoneWarmuth1986,FloydWarmuth1995}}]
+\label{def:compression-scheme}
+A \emph{sample compression scheme} of size $k$ for a hypothesis class
+$\mathcal{H}$ over domain $X$ consists of two maps:
+\begin{enumerate}[leftmargin=*, itemsep=2pt]
+\item A \emph{compression function} $\kappa$ that, given any sample $S$
+  consistent with some $h \in \mathcal{H}$, selects a subsample
+  $\kappa(S) \subseteq S$ with $|\kappa(S)| \leq k$.
+\item A \emph{reconstruction function} $\rho$ that, given $\kappa(S)$, produces
+  a hypothesis $\rho(\kappa(S))$ consistent with $S$.
+\end{enumerate}
+The reconstruction function $\rho$ sees \emph{only} the compressed subsample
+$\kappa(S)$; it has no access to the remaining points.
+\end{defn}
+
+\begin{example}[Support vectors as compression]
+\label{ex:svm-compression}
+A support vector machine in $\R^d$ with a hard margin computes a
+hyperplane determined by at most $d+1$ support vectors.  These support vectors
+form a compression scheme of size $d+1$: the subsample $\kappa(S)$ consists of
+the support vectors, and the reconstruction function $\rho$ returns the
+maximum-margin hyperplane through them.
+\end{example}
+
+The fundamental connection between compression and learnability was established
+by Littlestone and Warmuth:
+
+\begin{thm}[Compression implies learnability {\cite{LittlestoneWarmuth1986,FloydWarmuth1995}}]
+\label{thm:compression-pac}
+If $\mathcal{H}$ admits a sample compression scheme of size $k$, then
+$\mathcal{H}$ is PAC learnable with sample complexity
+\[
+  m(\varepsilon, \delta) = O\!\left(\frac{k}{\varepsilon}
+    \log\frac{k}{\varepsilon} + \frac{1}{\varepsilon}\log\frac{1}{\delta}\right).
+\]
+\end{thm}
+
+\begin{proof}[Proof sketch]
+Fix a sample $S$ of size $m$ drawn i.i.d.\ from $D$.  The compression function
+selects a subsample $\kappa(S)$ of size $\leq k$.  The number of possible
+subsamples is $\binom{m}{k} \leq m^k$.  For each fixed subsample, the
+reconstruction $\rho(\kappa(S))$ is a fixed hypothesis, and by a Hoeffding
+bound, a single fixed hypothesis with empirical risk zero on the remaining
+$m - k$ points has true risk $> \varepsilon$ with probability at most
+$e^{-\varepsilon(m-k)}$.  Taking a union bound over all $m^k$ possible
+subsamples:
+\[
+  \Pr[\risk_D(\rho(\kappa(S))) > \varepsilon] \leq m^k \cdot e^{-\varepsilon(m-k)}.
+\]
+Setting this $\leq \delta$ and solving for $m$ gives the stated bound.
+\end{proof}
+
+The converse direction---does learnability imply compression?---is where the
+story becomes a forty-year open problem.
+
+\subsection{The Compression Conjecture}
+
+\begin{openprob}[Sample Compression Conjecture {\cite{LittlestoneWarmuth1986,FloydWarmuth1995}}]
+\label{op:compression}
+Does every concept class $\mathcal{H}$ with $\VC(\mathcal{H}) = d$ admit a
+sample compression scheme of size $O(d)$?
+\end{openprob}
+
+This conjecture, stated by Littlestone and Warmuth in 1986, remains open.  It
+asks for the converse of \Cref{thm:compression-pac}: if a class is learnable
+(which, by the Fundamental Theorem, is equivalent to finite VC dimension $d$),
+can the learner always compress its evidence to $O(d)$ points?
+
+Four decades.  The statement is clean, the motivation is immediate, and
+every natural proof strategy fails.  Topological arguments reach $2^{O(d)}$
+but not $O(d)$.  Algebraic approaches founder on classes with no linear
+structure.  The gap between what compression \emph{exists} and what the
+conjecture \emph{demands} has not narrowed since the question was posed.
+It is not known whether the obstacle is technical or fundamental.
+
+\begin{thm}[Exponential compression exists {\cite{MoranYehudayoff2016}}]
+\label{thm:moran-yehudayoff}
+Every concept class $\mathcal{H}$ with $\VC(\mathcal{H}) = d$ admits a sample
+compression scheme of size $2^{O(d)}$.
+\end{thm}
+
+This landmark result of Moran and Yehudayoff~\cite{MoranYehudayoff2016}
+established that compression schemes \emph{exist} for every learnable class---a
+fact that was itself unknown before 2016.  The exponential bound $2^{O(d)}$ is,
+however, vastly larger than the conjectured $O(d)$.
+
+\begin{proof}[Proof sketch]
+The proof uses a topological argument.  By a result of
+Radon, any set of $d+1$ points in a $d$-dimensional space admits a Radon
+partition.  Moran and Yehudayoff generalize this to VC classes via a
+``staircase'' construction: they build a sequence of hypothesis classes of
+increasing VC dimension and show that each admits a compression scheme, using
+the Sauer--Shelah lemma (\Cref{lem:sauer-shelah}) to control the growth of
+the compression size.  The exponential blowup arises from iterating this
+construction $d$ times.
+\end{proof}
+
+\begin{remark}[The gap]
+\label{rmk:compression-gap}
+The gap between the conjecture ($O(d)$) and the best known upper bound
+($2^{O(d)}$) is enormous.  For $d = 20$, the conjecture predicts compression to
+$\sim 20$ points; the Moran--Yehudayoff bound gives $\sim 10^6$.  No
+polynomial-in-$d$ bound is known for general classes.
+\end{remark}
+
+\subsection{The One-Inclusion Graph}
+\label{sec:one-inclusion}
+
+The Moran--Yehudayoff proof rests on a combinatorial object that deserves
+explicit treatment, both because it illuminates why maximum classes are
+special and because it localizes the difficulty of the conjecture at a
+precise structural point.
+
+\begin{defn}[One-Inclusion Graph {\cite{HausslerLittlestonWarmuth1994}}]
+\label{def:one-inclusion-graph}
+Let $\mathcal{H}$ be a concept class over domain $X$, and let
+$S = (x_1, \ldots, x_m)$ be a sequence of points from $X$.  The
+\emph{one-inclusion graph} $G(\mathcal{H}, S)$ is the graph whose
+vertex set is
+$\{(h(x_1), \ldots, h(x_m)) : h \in \mathcal{H}\}$
+(the distinct restrictions of $\mathcal{H}$ to $S$)
+and whose edge set connects pairs of restrictions that differ on
+exactly one coordinate.
+\end{defn}
+
+The one-inclusion graph mediates between the VC dimension and
+compression.  The key property is that its density---specifically, the
+minimum over all orientations of the maximum in-degree---controls
+whether a compression scheme of size $d$ exists.
+
+\begin{thm}[One-Inclusion Graph Orientation {\cite{RubinsteinKroese2007,KuzminWarmuth2007}}]
+\label{thm:one-inclusion-orientation}
+Let $\mathcal{H}$ be a \emph{maximum class} of VC dimension $d$
+(i.e., $\growth_\mathcal{H}(m) = \sum_{i=0}^d \binom{m}{i}$ for all
+$m$).  Then for any sample $S$ of size $m \geq d$, the one-inclusion
+graph $G(\mathcal{H}, S)$ can be oriented so that every vertex has
+in-degree at most $d$.
+\end{thm}
+
+This orientation directly yields a compression scheme of size $d$.
+Given a sample $S$ consistent with concept $h^*$, the vertex
+$v = h^*|_S$ in the oriented one-inclusion graph has at most $d$
+incoming edges.  Each incoming edge corresponds to a sample point
+$x_i$ where some neighboring concept $h'$ disagrees with $h^*$.
+The compressed subsample $\kappa(S)$ consists of these $\leq d$
+``witness points.''  The reconstruction function $\rho$ recovers
+$h^*$ from the witness points using the acyclicity of the oriented
+graph: the witness points uniquely determine $h^*$ among all
+concepts in $\mathcal{H}$ consistent with $S$.
+
+\begin{example}[One-inclusion graph for intervals]
+\label{ex:oig-intervals}
+Let $\mathcal{H}$ be the class of intervals $[a, b] \subseteq [0, 1]$
+(labeling $x$ as $1$ iff $x \in [a,b]$), with $\VC(\mathcal{H}) = 2$.
+This is a maximum class.  Given a sorted sample
+$S = (x_1 < x_2 < \cdots < x_m)$, each concept restricts to a binary
+string of the form $0^i 1^j 0^k$ (a contiguous block of 1s flanked by
+0s).  The one-inclusion graph connects patterns that differ in a single
+bit, which can only happen at the boundaries of the block: either the
+leftmost $1$ becomes $0$ or the rightmost $1$ becomes $0$ (or the
+reverse).  The graph can be oriented so that each vertex points toward
+its two boundary points.  The compressed subsample consists of the two
+boundary points of the interval---exactly the information needed to
+reconstruct $[a, b]$ on the sample.
+
+The mechanism is subtle: it is not the \emph{endpoints} of the
+interval in $[0,1]$ that matter (which would require real-valued
+parameters), but the two \emph{sample points} at the boundary of the
+positive region.  The one-inclusion graph identifies these boundary
+points combinatorially, without reference to the underlying geometry.
+\end{example}
+
+For general (non-maximum) classes, the one-inclusion graph does
+\emph{not} admit an orientation with in-degree $\leq d$.  This is
+the precise technical point where the conjecture resists.
+
+\begin{remark}[The maximum-to-general gap]
+\label{rmk:max-general-gap}
+Moran and Yehudayoff's strategy is to reduce the general case to the
+maximum case.  Any class $\mathcal{H}$ of VC dimension $d$ can be
+``fattened'' to a maximum class $\mathcal{M}$ with
+$\VC(\mathcal{M}) = d$ by adding concepts until the Sauer--Shelah
+bound is achieved with equality.  The maximum class has compression of
+size $d$, and the compression scheme can in principle be pulled back to
+$\mathcal{H}$.  However, the fattening introduces auxiliary
+concepts---the reconstruction function, given a compressed subsample,
+must decide which of many $\mathcal{M}$-consistent concepts actually
+belongs to $\mathcal{H}$.  The number of such choices is exponential
+in $d$, and encoding this choice inflates the compression size to
+$2^{O(d)}$.
+
+Closing the gap to $O(d)$ requires either working directly with
+non-maximum classes (for which no orientation theorem is known) or
+proving that the reconstruction ambiguity can be resolved with
+$O(d)$ additional bits rather than $2^{O(d)}$.
+\end{remark}
+
+
+The conjecture has been verified for specific class families:
+
+\begin{enumerate}[leftmargin=*, itemsep=3pt]
+\item \textbf{Maximum classes.}  A class $\mathcal{H}$ with
+  $\growth_\mathcal{H}(n) = \sum_{i=0}^d \binom{n}{i}$ for all $n$ (achieving
+  the Sauer--Shelah bound with equality) admits a compression scheme of size
+  $d$~\cite{FloydWarmuth1995,RubinsteinKroese2007}.
+
+\item \textbf{Intersection-closed classes.}  If $\mathcal{H}$ is closed under
+  intersections, compression of size $d$ exists~\cite{Helmbold2018}.
+
+\item \textbf{Classes of VC dimension 1.}  Trivially: a single point suffices.
+
+\item \textbf{Halfspaces in $\R^d$.}  The support vector compression of
+  \Cref{ex:svm-compression} gives size $d + 1$.
+
+\item \textbf{Balls, rectangles, and other geometric classes.}  Known
+  case-by-case.
+\end{enumerate}
+
+The intersection-closed case is worth examining in detail, because its
+compression mechanism is fundamentally different from the SVM case and
+reveals what structure makes compression ``easy.''
+
+\begin{example}[Compression for intersection-closed classes]
+\label{ex:intersection-closed-compression}
+Let $\mathcal{H}$ be a concept class closed under intersection: if
+$h_1, h_2 \in \mathcal{H}$, then $h_1 \cap h_2 \in \mathcal{H}$
+(where $(h_1 \cap h_2)(x) = h_1(x) \wedge h_2(x)$).
+
+Given a sample $S$ consistent with target $h^* \in \mathcal{H}$,
+define
+$\hat{h} = \bigcap\{h \in \mathcal{H} : h \text{ consistent with } S\}$.
+By intersection-closure, $\hat{h} \in \mathcal{H}$, and $\hat{h}$ is
+the \emph{unique minimal} concept consistent with~$S$.  The
+compression scheme exploits this uniqueness.
+
+Let $P^+ = \{x_i \in S : h^*(x_i) = 1\}$ be the positive examples.
+The minimal concept $\hat{h}$ is determined by the constraint that it
+must label all points in $P^+$ as positive while being minimal in
+$\mathcal{H}$.  A \emph{spanning set} for $P^+$ is a subset
+$T \subseteq P^+$ such that
+$\bigcap\{h \in \mathcal{H} : h(x) = 1\;\forall x \in T\}
+ = \bigcap\{h \in \mathcal{H} : h(x) = 1\;\forall x \in P^+\}$%
+---i.e., $T$ imposes the same constraints as the full positive set.
+A minimal spanning set has size $\leq d = \VC(\mathcal{H})$, because
+the VC dimension bounds the number of independent constraints.  The
+compression function selects a minimal spanning set; the
+reconstruction function computes
+$\hat{h} = \bigcap\{h \in \mathcal{H} : h(x) = 1\;\forall (x, 1) \in
+\kappa(S)\}$.
+
+The mechanism is structurally different from SVMs.  Support vector
+machines use \emph{geometric} structure (margin maximization) to
+select anchor points.  Intersection-closed classes use \emph{lattice}
+structure (existence of meets) to guarantee a unique minimum.  Both
+achieve compression of size $d$, but via incomparable mathematical
+facts.  This incomparability is a symptom of the conjecture's
+difficulty: there is no single mechanism that explains compression
+across all class families.
+\end{example}
+
+
+\subsection{Why the Conjecture Resists Resolution}
+\label{sec:why-hard}
+
+The compression conjecture has resisted attack for four decades.  The
+difficulty is not a lack of techniques but a \emph{gap between two
+regimes}: techniques that work for structured classes but cannot
+generalize, and techniques that work for all classes but cannot achieve
+polynomial bounds.
+
+\begin{obstbox}
+\textbf{Three approaches and their failure modes.}
+
+\medskip
+\emph{Approach 1: Direct construction.}  For each verified class
+family (halfspaces, intervals, intersection-closed, maximum classes),
+one can construct a compression scheme tailored to the family's
+structure.  The constructions exploit distinct properties---geometric
+anchoring for SVMs, lattice minimality for intersection-closed classes,
+one-inclusion graph orientation for maximum classes.  But these
+properties are incomparable: no single structural assumption covers all
+families, let alone arbitrary VC classes.  Every direct construction
+exploits something that arbitrary classes lack.
+
+\medskip
+\emph{Approach 2: One-inclusion graph orientation.}  For maximum
+classes, \Cref{thm:one-inclusion-orientation} provides an orientation
+with in-degree $d$, directly yielding compression of size $d$.  For
+non-maximum classes, no such orientation theorem is known.
+Non-maximum one-inclusion graphs can have vertices with degree much
+larger than $d$, and no known orientation strategy achieves in-degree
+$O(d)$ in general.  The maximum class case is tight, but the
+combinatorial extremality that makes it work---achieving the
+Sauer--Shelah bound with equality---is exactly what arbitrary classes
+lack.
+
+\medskip
+\emph{Approach 3: Topological embedding.}  Moran and Yehudayoff's
+proof uses a topological argument related to Radon partitions in
+convex geometry.  The topological machinery is powerful enough to
+handle all VC classes but pays an exponential price: the Radon-type
+argument iterates a doubling construction $d$ times, producing
+compression of size $2^{O(d)}$.  Improving this requires either a
+fundamentally different topological tool or a way to avoid the
+iterative blowup---and the iterative structure appears intrinsic to
+the proof method, not an artifact of a loose analysis.
+
+\medskip
+The conjecture sits at the intersection of three mathematical
+territories---combinatorics (VC dimension, growth functions, maximum
+classes), topology (Radon partitions, convex position), and
+information theory (description length, reconstruction
+complexity)---and each territory contributes techniques that
+illuminate a piece of the puzzle while leaving the central question
+open.  A resolution may require connecting these territories in a way
+that current methods do not.
+\end{obstbox}
+
+
+\subsection{Labeled vs.\ Unlabeled Compression}
+\label{sec:unlabeled-compression}
+
+In \Cref{def:compression-scheme}, the compressed subsample $\kappa(S)$ retains
+both the points and their labels.  One can ask whether labels are necessary.
+
+\begin{defn}[Unlabeled Compression Scheme]
+\label{def:unlabeled-compression}
+An \emph{unlabeled compression scheme} of size $k$ for $\mathcal{H}$ is a pair
+$(\kappa, \rho)$ where $\kappa$ selects a set of $\leq k$ \emph{points}
+(without labels) from the sample, and $\rho$ reconstructs a hypothesis
+consistent with $S$ from these points alone.
+\end{defn}
+
+The natural analogue of the compression conjecture for unlabeled schemes is
+false.
+
+\begin{thm}[Unlabeled compression conjecture fails {\cite{MoranYehudayoff2016,CheriayanMoranShpilka2022}}]
+\label{thm:unlabeled-fails}
+There exist concept classes $\mathcal{H}$ with $\VC(\mathcal{H}) = d$ that do
+\emph{not} admit unlabeled compression schemes of size $f(d)$ for any function
+$f$ independent of $|\mathcal{H}|$.
+\end{thm}
+
+This negative result is sharp: while labeled compression of size $2^{O(d)}$
+always exists (\Cref{thm:moran-yehudayoff}), unlabeled compression cannot be
+bounded by any function of $d$ alone.  The labels carry essential information
+that cannot be recovered from the point locations.
+
+\begin{remark}
+The failure of unlabeled compression makes the labeled compression conjecture
+(\Cref{op:compression}) more subtle than it first appears: labels are not
+merely convenient but \emph{necessary} for compression to work, and the
+conjecture concerns the labeled case specifically.
+\end{remark}
+
+
+% ================================================================
+% SECTION 3: OCCAM'S RAZOR
+% Profile B-light. Occam → PAC and partial converse.
+% ================================================================
+
+\section{Occam's Razor}
+\label{sec:occam}
+
+Compression schemes are a combinatorial form of Occam's razor: prefer the
+hypothesis determined by the fewest data points.  The information-theoretic
+form---prefer the hypothesis with the shortest description---was formalized by
+Blumer, Ehrenfeucht, Haussler, and Warmuth.
+
+\begin{defn}[Occam Algorithm {\cite{BlumerEhrenfeuchtHausslerWarmuth1987}}]
+\label{def:occam}
+Let $\mathcal{H}$ be a hypothesis class and let $\mathcal{R}$ be a
+\emph{representation class} (a set of hypotheses with associated description
+lengths).  An algorithm $A$ is an \emph{Occam algorithm} for $\mathcal{H}$ with
+respect to $\mathcal{R}$ if, given a sample $S$ of size $m$ consistent with some
+$h \in \mathcal{H}$ of description length $n$, the algorithm outputs a
+hypothesis $h' \in \mathcal{R}$ that:
+\begin{enumerate}[leftmargin=*, nosep]
+\item is consistent with $S$, and
+\item has description length $|h'| \leq n^\alpha m^\beta$ for some constants
+  $\alpha \geq 1$ and $0 \leq \beta < 1$.
+\end{enumerate}
+The sub-linear dependence on $m$ (exponent $\beta < 1$) is the key requirement:
+the output hypothesis must be ``simpler'' than the data.
+\end{defn}
+
+\begin{thm}[Occam's Razor Theorem {\cite{BlumerEhrenfeuchtHausslerWarmuth1987}}]
+\label{thm:occam}
+If $A$ is an Occam algorithm for $\mathcal{H}$ with parameters $\alpha, \beta$,
+then $A$ PAC-learns $\mathcal{H}$ with sample complexity
+\[
+  m(\varepsilon, \delta) = O\!\left(\frac{1}{\varepsilon}\left(
+    n^\alpha \log\frac{1}{\varepsilon}
+    + \log\frac{1}{\delta}\right)\right)^{1/(1-\beta)}.
+\]
+\end{thm}
+
+\begin{proof}[Proof sketch]
+The argument is a counting and union bound.  The number of hypotheses in
+$\mathcal{R}$ with description length $\leq L$ is at most $2^L$.  An Occam
+algorithm outputs a hypothesis of length $\leq n^\alpha m^\beta$.  Fixing a
+sample of size $m$, the number of possible outputs is at most
+$2^{n^\alpha m^\beta}$.  For each fixed hypothesis with empirical risk zero, the
+probability that its true risk exceeds $\varepsilon$ is at most
+$(1-\varepsilon)^m \leq e^{-\varepsilon m}$.  A union bound gives
+\[
+  \Pr[\risk_D(A(S)) > \varepsilon] \leq 2^{n^\alpha m^\beta} \cdot e^{-\varepsilon m}.
+\]
+Setting the right-hand side $\leq \delta$ and solving for $m$ (using $\beta < 1$
+to ensure that the exponential decay in $m$ dominates the polynomial growth of
+$2^{m^\beta}$) gives the stated bound.
+\end{proof}
+
+\begin{remark}[Occam and compression]
+\label{rmk:occam-compression}
+Every compression scheme of size $k$ induces an Occam algorithm: the compressed
+subsample has description length $O(k \log m)$, which is sub-linear in $m$.
+Conversely, an Occam algorithm is not necessarily a compression scheme, because
+the output hypothesis need not be determined by a subsample of the input.
+Occam's razor is thus a relaxation of compression.
+\end{remark}
+
+The converse of the Occam theorem---does every PAC-learnable class admit an
+Occam algorithm?---was partially answered by Board and Pitt:
+
+\begin{thm}[Partial converse {\cite{BoardPitt1992}}]
+\label{thm:board-pitt}
+If the class of all polynomial-size circuits is not PAC learnable by
+polynomial-size circuits (a widely believed complexity-theoretic assumption),
+then there exist PAC-learnable classes that do not admit polynomial-time Occam
+algorithms.
+\end{thm}
+
+Thus the Occam property is \emph{strictly stronger} than PAC learnability
+(under standard complexity assumptions): there exist learnable classes where
+no efficient algorithm can find short descriptions of the data.  The gap is
+computational, not information-theoretic.
+
+
+% ================================================================
+% SECTION 4: INFORMATION-THEORETIC FOUNDATIONS
+% Profile A and A-plus. Brief definitions.
+% ================================================================
+
+\section{Information-Theoretic Foundations}
+\label{sec:info-foundations}
+
+The notions of ``description length'' and ``covering'' that underlie Occam's
+razor and compression have precise information-theoretic formulations.
+
+\subsection{Description Length}
+
+\begin{defn}[Description Length]
+\label{def:description-length}
+The \emph{description length} of a hypothesis $h$ in a representation class
+$\mathcal{R}$ is the length $|h|$ of the shortest binary string encoding $h$ in
+$\mathcal{R}$.  A \emph{prefix-free} representation ensures that
+$\sum_{h \in \mathcal{R}} 2^{-|h|} \leq 1$ (the Kraft inequality).
+\end{defn}
+
+Description length connects to PAC learning through the observation that a
+class of hypotheses with bounded description lengths has bounded effective size:
+$|\{h \in \mathcal{R} : |h| \leq L\}| \leq 2^L$.  This makes union bounds
+over the class tractable.
+
+\subsection{Kolmogorov Complexity}
+
+\begin{defn}[Kolmogorov Complexity]
+\label{def:kolmogorov}
+The \emph{Kolmogorov complexity} $K(x)$ of a string $x$ is the length of the
+shortest program (on a fixed universal Turing machine) that outputs $x$ and
+halts.  The \emph{conditional Kolmogorov complexity} $K(x \mid y)$ is the length
+of the shortest program that outputs $x$ given $y$ as input.
+\end{defn}
+
+Kolmogorov complexity is uncomputable but provides the theoretical gold standard
+for description length: $K(x)$ is the ultimate compression of $x$.
+
+\subsection{KL Complexity}
+
+\begin{defn}[KL Complexity]
+\label{def:kl-complexity}
+The \emph{Kullback--Leibler divergence} (KL divergence) between distributions
+$P$ and $Q$ on a measurable space is
+\[
+  \KL(P \| Q) = \E_P\!\left[\log\frac{dP}{dQ}\right],
+\]
+when $P \ll Q$, and $+\infty$ otherwise.  In the PAC-Bayes framework
+(\Cref{ch:generalization}), $\KL(\rho \| \pi)$ measures the ``complexity'' of a
+posterior $\rho$ relative to a prior $\pi$: it is the number of additional
+nats needed to encode a hypothesis drawn from $\rho$ using a code designed for
+$\pi$.
+\end{defn}
+
+\subsection{Covering Numbers}
+
+\begin{defn}[Covering Number]
+\label{def:covering-number}
+Let $(\mathcal{F}, d)$ be a (pseudo)metric space.  The \emph{$\varepsilon$-covering
+number} $\mathcal{N}(\varepsilon, \mathcal{F}, d)$ is the minimum number of
+balls of radius $\varepsilon$ (under $d$) needed to cover $\mathcal{F}$.
+\end{defn}
+
+Covering numbers measure the ``effective size'' of a function class at
+resolution $\varepsilon$.  They connect to sample complexity through the
+classical chaining argument:
+
+\begin{thm}[Dudley's entropy integral {\cite{Dudley1967}}]
+\label{thm:dudley}
+Let $\mathcal{F}$ be a class of functions $f \colon X \to [0,1]$, and let
+$d_n(f,g) = \bigl(\frac{1}{n}\sum_{i=1}^n (f(x_i) - g(x_i))^2\bigr)^{1/2}$
+be the empirical $L^2$ metric on a sample $(x_1, \ldots, x_n)$.  Then
+\[
+  \E\!\left[\sup_{f \in \mathcal{F}} \left|\frac{1}{n}\sum_{i=1}^n f(x_i)
+    - \E[f]\right|\right]
+  \leq \frac{C}{\sqrt{n}} \int_0^1
+    \sqrt{\log \mathcal{N}(\varepsilon, \mathcal{F}, d_n)}\; d\varepsilon,
+\]
+where $C$ is a universal constant.
+\end{thm}
+
+The integral $\int_0^1 \sqrt{\log \mathcal{N}(\varepsilon, \mathcal{F}, d_n)}\;
+d\varepsilon$ is the \emph{Dudley entropy integral}.  It bounds the expected
+supremum of the empirical process indexed by $\mathcal{F}$---the quantity that
+controls uniform convergence and hence generalization.  When
+$\mathcal{N}(\varepsilon, \mathcal{F}, d_n) \leq (C/\varepsilon)^d$ (as for
+VC classes), the integral evaluates to $O(\sqrt{d})$, recovering the standard
+sample complexity bounds.
+
+
+% ================================================================
+% SECTION 5: CHAPTER SUMMARY AND OPEN QUESTIONS
+% ================================================================
+
+\section{The State of the Art}
+\label{sec:compression-summary}
+
+The landscape of this chapter is dominated by the compression conjecture.
+\Cref{fig:compression-landscape} summarizes the logical dependencies.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    node distance=1.5cm and 2.5cm,
+    box/.style={draw, thick, rounded corners, minimum width=3cm,
+      minimum height=0.8cm, font=\small, align=center},
+    open/.style={box, dashed, fill=edgeorange!10, text=edgeorange!80!black},
+    known/.style={box, fill=defblue!10},
+    negative/.style={box, fill=thmred!10},
+    arr/.style={-{Stealth[length=2.5mm]}, thick},
+    lbl/.style={font=\scriptsize, midway, fill=white, inner sep=1pt}
+]
+% Nodes
+\node[known] (vc) {$\VC(\mathcal{H}) = d < \infty$};
+\node[known, below left=1.5cm and 0.5cm of vc] (pac) {PAC learnable};
+\node[known, below right=1.5cm and 0.5cm of vc] (uc) {Uniform convergence};
+\node[known, below=3cm of vc] (compress-exp) {Compression\\size $2^{O(d)}$};
+\node[open, below=1.5cm of compress-exp] (compress-d) {Compression\\size $O(d)$\;?};
+\node[known, right=2.5cm of compress-exp] (occam) {Occam algorithm};
+\node[negative, left=2.5cm of compress-d] (unlabeled) {Unlabeled comp.\\size $f(d)$: \textbf{FALSE}};
+
+% Edges
+\draw[arr] (vc) -- node[lbl, left] {\Cref{ch:pac}} (pac);
+\draw[arr] (vc) -- node[lbl, right] {\Cref{ch:pac}} (uc);
+\draw[arr] (vc) -- node[lbl, right] {\cite{MoranYehudayoff2016}} (compress-exp);
+\draw[arr, dashed, edgeorange] (compress-exp) -- node[lbl] {Open!} (compress-d);
+\draw[arr] (compress-exp) -- node[lbl, above] {implies} (occam);
+\draw[arr] (occam) -- node[lbl, right] {\Cref{thm:occam}} (pac);
+\draw[arr, thmred, dashed] (compress-d) -- node[lbl, above] {fails} (unlabeled);
+\end{tikzpicture}
+\caption{Logical landscape of compression and learnability.  Solid arrows
+  denote known implications; dashed arrows denote open or negative results.
+  The central open question is whether compression of size $O(d)$ is
+  achievable.}
+\label{fig:compression-landscape}
+\end{figure}
+
+The following table summarizes the best known compression bounds:
+
+\begin{table}[ht]
+\centering\small
+\caption{Known compression bounds by class family.}
+\label{tab:compression-bounds}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Class family} & \textbf{VC dim.} & \textbf{Compression size} \\
+\midrule
+Maximum classes & $d$ & $d$ \\
+Intersection-closed & $d$ & $d$ \\
+Halfspaces in $\R^d$ & $d+1$ & $d+1$ \\
+VC dim.\ 1 & 1 & 1 \\
+Arbitrary VC class & $d$ & $2^{O(d)}$ \\
+Unlabeled (arbitrary) & $d$ & No $f(d)$ bound \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{openprob}[Polynomial compression]
+\label{op:poly-compression}
+Does every concept class of VC dimension $d$ admit a compression scheme of
+size $\mathrm{poly}(d)$?  Even this weaker form of the compression conjecture
+remains open.
+\end{openprob}
+
+The chapter's three main themes---tight sample complexity, compression, and
+Occam's razor---are unified by a single idea: \emph{learnability is equivalent
+to the existence of a short summary of the evidence}.  The VC dimension tells
+us \emph{that} a short summary exists; the compression conjecture asks
+\emph{how short}.  The answer, after forty years, remains: we do not know.
+
+
+% ================================================================
+% EXERCISES
+% ================================================================
+
+\subsection*{Exercises}
+
+\begin{enumerate}[leftmargin=*,itemsep=6pt]
+
+\item \textbf{Compression lower bound.}
+  Let $\mathcal{H}$ be a concept class with $\VC(\mathcal{H}) = d$, and
+  let $(\kappa, \rho)$ be a sample compression scheme of size $k$ for
+  $\mathcal{H}$.  Prove that $k \geq d$.
+
+  \emph{Hint:} Let $C = \{x_1, \ldots, x_d\}$ be a shattered set.
+  For each of the $2^d$ labelings $b \in \{0,1\}^d$, the compression
+  function selects a subsequence $\kappa(S_b) \subseteq S_b$ of size
+  $\leq k$.  Show that if $k < d$, a pigeonhole argument forces two
+  distinct labelings $b \neq b'$ to compress to the same subsequence
+  $\kappa(S_b) = \kappa(S_{b'})$ with the same labels, contradicting
+  the requirement that reconstruction produces hypotheses consistent
+  with both $S_b$ and $S_{b'}$.
+
+\item \textbf{Compression for unions of intervals.}
+  Let $\mathcal{H}_k$ be the class of unions of at most $k$ disjoint
+  intervals on $[0,1]$: $h \in \mathcal{H}_k$ iff $h^{-1}(1)$ is a
+  union of at most $k$ intervals.
+  \begin{enumerate}[label=(\alph*)]
+  \item Prove that $\VC(\mathcal{H}_k) = 2k$.
+  \item Construct an explicit compression scheme of size $2k$ for
+    $\mathcal{H}_k$.  (\emph{Hint:} Generalize
+    \Cref{ex:oig-intervals}; the compressed subsample consists of
+    the $2k$ boundary points of the positive regions.)
+  \item Use the result of Exercise~1 to conclude that no compression
+    scheme of size $< 2k$ exists.  This verifies the compression
+    conjecture for $\mathcal{H}_k$ with equality.
+  \end{enumerate}
+
+\item \textbf{Compression and teaching dimension.}
+  The \emph{teaching dimension} $\mathrm{TD}(\mathcal{H})$ is the
+  minimum $k$ such that every concept $h \in \mathcal{H}$ has a
+  \emph{teaching set} of size $k$: a set $T \subseteq X$ with
+  $|T| = k$ such that $h$ is the unique concept in $\mathcal{H}$
+  consistent with $h|_T$.
+  \begin{enumerate}[label=(\alph*)]
+  \item Show that if $\mathcal{H}$ has teaching dimension $k$, then
+    $\mathcal{H}$ admits a compression scheme of size $k$.  (The
+    teaching set is the compressed subsample.)
+  \item Show that a compression scheme of size $k$ does \emph{not}
+    imply teaching dimension $\leq k$: construct a class $\mathcal{H}$
+    with a compression scheme of size $1$ but teaching dimension
+    $> 1$.  (\emph{Hint:} The compression function may depend on the
+    full sample, not just on the target concept; the teaching set must
+    work for a single concept without knowing the other data.)
+  \item Prove that $\mathrm{TD}(\mathcal{H}) \geq \VC(\mathcal{H})$
+    for all classes $\mathcal{H}$.  Combined with the compression
+    conjecture, this would imply
+    $\VC \leq \text{compression size} \leq \mathrm{TD}$: compression
+    sits between VC dimension and teaching dimension.  But whether
+    the compression conjecture implies
+    $\text{compression size} \leq O(\mathrm{TD})$ or
+    $\text{compression size} \leq O(\VC)$ remains open---these are
+    distinct (and incomparable) questions.
+  \end{enumerate}
+
+\end{enumerate}

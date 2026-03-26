@@ -1,0 +1,325 @@
+% Chapter 4: Learners and Teachers
+%   14 × Profile A (vocabulary: learner types and teacher types — TABLE, not definitions)
+%   bayesian_learner = Profile E (Obstruction: posterior ≠ single hypothesis)
+%   gibbs_posterior = Profile C (Revelation: the Bayesian-PAC bridge)
+%   meta_learner = Profile F (Open Frontier: learning to learn)
+%   team_learner = Profile C (Revelation: teams > individuals)
+%   optimal_teacher = Profile G (Framework Bridge → teaching_dimension)
+%   minimally_adequate_teacher = Profile G (Framework Bridge → L*)
+%   learner_with_advice = Profile A-plus (brief)
+%   synthesizer, verifier, llm_critic = Deferred to Ch18
+
+\chapter{Learners and Teachers}
+\label{ch:agents}
+
+Chapters~\ref{ch:objects} and~\ref{ch:data} established what is learned (concept classes) and how data arrives (i.i.d.\ samples, texts, queries, streams). This chapter introduces the agents that do the learning and, in some settings, the agents that provide the data.
+
+Most of the vocabulary here is taxonomic: a learner is a function from data to hypotheses, and the field has named a dozen variants distinguished by which constraints they satisfy. These variants are best presented as a table, not as a sequence of isolated definitions. The chapter's genuine mathematical content lies elsewhere: in the type mismatch between Bayesian posteriors and PAC hypotheses (resolved by the Gibbs posterior), in the surprising power of team learning (Smith, 1982), and in the teacher models that connect to the teaching dimension and to Angluin's $L^*$.
+
+
+% ================================================================
+% SECTION 1: The Learner Abstraction
+% ================================================================
+
+\section{The Learner Abstraction}
+\label{sec:learner}
+
+\begin{defn}[Learner]
+\label{def:learner}
+A \emph{learner} is a function
+\[
+L \colon \bigcup_{m=0}^{\infty} (X \times Y)^m \;\to\; \mathcal{H}
+\]
+that maps a finite data sequence to a hypothesis. At time $t$, having observed $S_t = ((x_1, y_1), \ldots, (x_t, y_t))$, the learner outputs $h_t = L(S_t) \in \mathcal{H}$.
+\end{defn}
+
+This definition is deliberately minimal. It says nothing about how the learner selects $h_t$: whether it stores the full history or only its previous guess, whether it uses randomness, whether it may choose which $x$ to query. Each such constraint yields a named variant, and the field has accumulated many. Figure~\ref{fig:learner-taxonomy} displays them as a tree; Table~\ref{tab:learner-types} provides the precise constraints.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    root/.style={draw, very thick, rounded corners, fill=defblue!15, font=\small\bfseries, minimum width=2.4cm, minimum height=0.7cm},
+    branch/.style={draw, rounded corners, fill=layergray, font=\scriptsize, minimum width=2cm, minimum height=0.55cm, align=center},
+    leaf/.style={draw, rounded corners, fill=edgeorange!8, font=\scriptsize, minimum width=1.8cm, minimum height=0.5cm, align=center},
+    arr/.style={-{Stealth[length=1.5mm]}, thin, notegray},
+    level 1/.style={sibling distance=4.5cm, level distance=1.6cm},
+    level 2/.style={sibling distance=2.2cm, level distance=1.5cm}
+]
+\node[root] {Learner}
+  child { node[branch] {By data\\access}
+    child { node[leaf] {Passive} }
+    child { node[leaf] {Active} }
+  }
+  child { node[branch] {By state\\management}
+    child { node[leaf] {Iterative} }
+    child { node[leaf] {Set-driven} }
+  }
+  child { node[branch] {By hypothesis\\selection}
+    child { node[leaf] {Conservative} }
+    child { node[leaf] {Consistent} }
+    child { node[leaf] {Probabilistic} }
+  };
+\end{tikzpicture}
+\caption{The learner taxonomy. Branches correspond to the axis of variation; leaves are the named specializations. The Bayesian, team, and meta learners are not shown here because they carry genuine mathematical content and are treated in dedicated sections below.}
+\label{fig:learner-taxonomy}
+\end{figure}
+
+
+% ================================================================
+% SECTION 2: Taxonomy Table
+% ================================================================
+
+\section{Taxonomy of Learner Types}
+\label{sec:learner-taxonomy}
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Named learner types. Each row gives the defining constraint and the chapter where the concept plays its primary role. These are not independent definitions; a single learner may satisfy several constraints simultaneously (e.g., a conservative, set-driven, passive learner).}
+\label{tab:learner-types}
+\begin{tabularx}{\textwidth}{>{\bfseries\small}l X l}
+\toprule
+\textbf{Name} & \textbf{Defining Constraint} & \textbf{Primary Role} \\
+\midrule
+Passive &
+  Receives data without choosing which instances to observe. The standard assumption in PAC and Gold settings. &
+  Ch.~\ref{ch:pac}, \ref{ch:gold} \\[4pt]
+
+Active &
+  Chooses which instances to query. Performance measured by \emph{label complexity}: the number of labels requested, not the number of unlabeled instances seen. &
+  Ch.~\ref{ch:exact} \\[4pt]
+
+Conservative &
+  Changes hypothesis only when forced by inconsistency: if $h_t$ is consistent with $S_{t+1}$, then $h_{t+1} = h_t$. &
+  Ch.~\ref{ch:gold} \\[4pt]
+
+Consistent &
+  Always outputs a hypothesis consistent with all data seen so far: $h_t(x_i) = y_i$ for all $i \leq t$. &
+  Ch.~\ref{ch:pac}, \ref{ch:gold} \\[4pt]
+
+Set-driven &
+  Output depends only on the \emph{set} $\{(x_i, y_i)\}$ of data, not on the order of presentation. Formally, $L(S) = L(S')$ whenever $S$ and $S'$ are permutations of each other. &
+  Ch.~\ref{ch:gold} \\[4pt]
+
+Iterative &
+  Hypothesis at step $t$ depends only on $h_{t-1}$ and the new datum $(x_t, y_t)$, not on the full history $S_t$. Memory is bounded: the learner's state is a single hypothesis. &
+  Ch.~\ref{ch:gold}, \ref{ch:online} \\[4pt]
+
+Probabilistic &
+  May use internal randomness in selecting hypotheses. The success criterion (PAC, identification, mistake bound) is then required to hold with high probability over both the data and the learner's coin flips. &
+  Ch.~\ref{ch:pac} \\[4pt]
+
+With advice &
+  Receives $b$ bits of advice in addition to data. The advice may encode information about the target class or the distribution, and $b$ parameterizes the amount of side information. &
+  Ch.~\ref{ch:exact} \\[4pt]
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+These distinctions are not mere nomenclature. Several generate strict separations in learning power within Gold's framework: for example, there exist classes identifiable by a conservative learner from informant but not from text, and classes identifiable by a set-driven learner that require unbounded memory for an iterative learner. These separations are developed in \Cref{ch:gold,ch:separations}.
+
+In the PAC setting, by contrast, many of the distinctions collapse. Any PAC-learnable class is learnable by a consistent, proper learner (the ERM principle), and the order of examples is irrelevant by the i.i.d.\ assumption, so the set-driven/order-sensitive distinction vanishes. The taxonomy has its sharpest teeth in the Gold and online paradigms, where the learner's memory management and update policy genuinely affect what is learnable.
+
+
+% ================================================================
+% SECTION 3: The Bayesian–PAC Bridge
+% ================================================================
+
+\section{The Bayesian--PAC Bridge}
+\label{sec:bayesian-pac}
+
+The learner types in Table~\ref{tab:learner-types} all output a single hypothesis $h \in \mathcal{H}$. The Bayesian learner does not.
+
+\begin{defn}[Bayesian Learner]
+\label{def:bayesian-learner}
+A \emph{Bayesian learner} maintains a prior $\pi$ over $\mathcal{H}$ and, given data $S$, outputs the posterior distribution
+\[
+Q(h \mid S) \;=\; \frac{\pi(h) \cdot P(S \mid h)}{\sum_{h' \in \mathcal{H}} \pi(h') \cdot P(S \mid h')}.
+\]
+The output is a distribution over hypotheses, not a single hypothesis.
+\end{defn}
+
+\subsection{The type mismatch}
+
+This creates a structural problem. PAC learning requires a learner that outputs a single $h \in \mathcal{H}$ satisfying $\risk_D(h) \leq \risk_D(h^*) + \varepsilon$ with probability $1 - \delta$. The Bayesian learner outputs $Q(\cdot \mid S)$---a probability measure on $\mathcal{H}$. These are different types:
+\[
+\text{PAC learner:} \quad (X \times Y)^m \to \mathcal{H},
+\qquad
+\text{Bayesian learner:} \quad (X \times Y)^m \to \Delta(\mathcal{H}).
+\]
+The naive resolution---output the MAP hypothesis $\hat{h} = \arg\max_h Q(h \mid S)$---discards most of the posterior's information and yields suboptimal generalization bounds. The correct resolution is the Gibbs posterior.
+
+\begin{obstbox}
+\textbf{Bayesian $\to$ PAC type mismatch.} The Bayesian learner's output type ($\Delta(\mathcal{H})$) does not match the PAC learner's output type ($\mathcal{H}$). This is not a technicality: the PAC-Bayes theorem (\Cref{ch:generalization}) bounds the risk of a \emph{distribution} over hypotheses, and extracting a single hypothesis from this bound requires an explicit randomized construction---the Gibbs posterior.
+\end{obstbox}
+
+\subsection{The Gibbs posterior}
+
+\begin{defn}[Gibbs Posterior]
+\label{def:gibbs-posterior}
+Given a prior $\pi$ over $\mathcal{H}$, a loss function $\ell$, and a sample $S$ of size $m$, the \emph{Gibbs posterior} at inverse temperature $\lambda > 0$ is the distribution
+\[
+Q_\lambda(h) \;\propto\; \pi(h) \cdot \exp\!\bigl(-\lambda \cdot \emprisk_S(h)\bigr).
+\]
+The \emph{Gibbs classifier} draws $h \sim Q_\lambda$ and predicts according to $h$. Its expected risk is $\E_{h \sim Q_\lambda}[\risk_D(h)]$.
+\end{defn}
+
+The Gibbs posterior bridges the type mismatch as follows. The PAC-Bayes theorem~\cite{McAllester1999} states that for any prior $\pi$ and any posterior $Q$ (not necessarily the Gibbs posterior), with probability $1 - \delta$ over $S \sim D^m$,
+\[
+\E_{h \sim Q}[\risk_D(h)] \;\leq\; \E_{h \sim Q}[\emprisk_S(h)] + \sqrt{\frac{\KL(Q \| \pi) + \ln(m/\delta)}{2m}}.
+\]
+The Gibbs posterior $Q_\lambda$ is the distribution that minimizes the right-hand side: it trades off empirical risk against KL divergence from the prior. This makes the PAC-Bayes bound \emph{actionable}---it tells the learner which posterior to use, not merely that some posterior satisfies a bound.
+
+\begin{remark}[Gibbs $\neq$ MAP]
+\label{rmk:gibbs-vs-map}
+The Gibbs posterior draws a \emph{random} hypothesis from a posterior weighted by empirical performance. The MAP estimate takes the \emph{mode}. In high-dimensional settings, the Gibbs posterior can provide tighter generalization guarantees because the PAC-Bayes bound controls the expected risk under the full posterior, while MAP-based bounds require uniform convergence over a singleton. The relationship is analogous to the distinction between Bayesian model averaging and model selection in statistics: the former controls average-case risk, the latter controls worst-case risk over a point estimate.
+\end{remark}
+
+The full development of PAC-Bayes bounds, including the McAllester and Catoni variants, appears in \Cref{ch:generalization}. The present section establishes only the agent-level fact: the Gibbs posterior is the mechanism by which a Bayesian learner becomes a PAC learner.
+
+
+% ================================================================
+% SECTION 4: Teams and Meta-Learning
+% ================================================================
+
+\section{Teams and Meta-Learning}
+\label{sec:teams-meta}
+
+\subsection{Team learning}
+
+Most learning models assume a single learner. The team model asks what happens when multiple learners collaborate---or, more precisely, when success requires only that \emph{at least one} member of the team converges to the correct hypothesis.
+
+\begin{defn}[Team Learner]
+\label{def:team-learner}
+A \emph{team} of size $k$ is a set of learners $\{L_1, \ldots, L_k\}$. The team \emph{identifies} a concept $c \in \mathcal{C}$ if at least one $L_i$ converges to a correct hypothesis. The class $\mathcal{C}$ is \emph{team-identifiable} (in the limit) if there exists a finite team that identifies every $c \in \mathcal{C}$.
+\end{defn}
+
+\begin{thm}[Teams $>$ Individuals {\cite{Smith1982}}]
+\label{thm:team-power}
+There exist concept classes that are identifiable by a team of size~2 but not by any single learner.
+\end{thm}
+
+This is a strict increase in learning power, and it is surprising on two counts. First, the team members receive the \emph{same} data---they do not partition the instance space or communicate. The power comes purely from the disjunctive success criterion: ``at least one succeeds'' is weaker than ``all succeed,'' and this weakened criterion expands the class of learnable concepts. Second, the separation is not an artifact of infinite hypothesis spaces or exotic concept classes. It holds within Gold's standard framework of identification in the limit.
+
+The proof constructs a concept class $\mathcal{C}$ such that any single learner can be forced into infinitely many mind changes by a diagonalization argument (similar to the text/informant separation in \Cref{ch:data}), but two learners with complementary strategies---one ``optimistic'' (guessing large languages) and one ``pessimistic'' (guessing small languages)---guarantee that at least one converges. The formal argument appears in \Cref{ch:separations}.
+
+\begin{remark}[Teams and probabilistic learners]
+\label{rmk:team-prob}
+A team of deterministic learners is strictly more powerful than a single deterministic learner (Theorem~\ref{thm:team-power}). However, a probabilistic learner that succeeds with probability $> 1/2$ can simulate a team of size $k$ by running $k$ independent copies internally. In the Gold setting, where success means convergence with certainty, this simulation is not available, and the team hierarchy is strict.
+\end{remark}
+
+
+\subsection{Meta-learning}
+
+\begin{defn}[Meta-Learner]
+\label{def:meta-learner}
+A \emph{meta-learner} operates over a family of learning tasks $\{\mathcal{C}_j\}_{j=1}^n$, each drawn from an environment $\mathcal{E}$. Given experience on tasks $\mathcal{C}_1, \ldots, \mathcal{C}_{n-1}$, it produces a learner (or a bias, such as a hypothesis space or prior) that performs well on a new task $\mathcal{C}_n$ drawn from the same environment.
+\end{defn}
+
+Baxter~\cite{Baxter2000} established the first PAC-style bounds for meta-learning: if the environment $\mathcal{E}$ has bounded complexity (measured by covering numbers over a family of hypothesis spaces), and the meta-learner sees $n$ tasks each with $m$ examples, then the meta-learner's expected excess risk on a new task is bounded by
+\[
+O\!\left(\sqrt{\frac{\text{complexity}(\mathcal{E})}{n}} + \sqrt{\frac{\VC(\mathcal{H})}{m}}\right),
+\]
+decomposing the error into a \emph{task-level} term (how well the environment is estimated from $n$ tasks) and a \emph{within-task} term (how well a single task is learned given $m$ examples). This two-level structure is the defining feature of meta-learning bounds.
+
+\begin{openprob}[Meta-learning characterization]
+\label{open:meta-learning}
+No analogue of the fundamental theorem of PAC learning exists for meta-learning. Baxter's bounds use covering numbers, not a combinatorial dimension. Is there a single complexity measure of $\mathcal{E}$ that characterizes meta-learnability in the same way that the VC dimension characterizes PAC learnability? The question is open.
+\end{openprob}
+
+
+% ================================================================
+% SECTION 5: Teachers and the Teaching Game
+% ================================================================
+
+\section{Teachers and the Teaching Game}
+\label{sec:teachers}
+
+In the models above, data arrives passively (from a distribution or enumeration) or through the learner's queries. The \emph{teacher} model reverses the direction: an agent actively chooses examples to help (or hinder) the learner.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Teacher types. Each row gives the teacher's strategy, the induced data model, and the chapter where the concept plays its primary role.}
+\label{tab:teacher-types}
+\begin{tabularx}{\textwidth}{>{\bfseries\small}l X l}
+\toprule
+\textbf{Name} & \textbf{Strategy and Key Property} & \textbf{Primary Role} \\
+\midrule
+Random &
+  The \emph{random teacher}\index{random teacher} draws examples i.i.d.\ from a distribution $D$. The standard PAC assumption; the teacher has no intention, and ``teaching'' is an anthropomorphic misnomer for sampling. &
+  Ch.~\ref{ch:pac} \\[4pt]
+
+Adversarial &
+  Chooses worst-case examples for the learner, adaptively. The online learning model treats the data stream as an adversarial teacher. Performance is measured by worst-case mistake count. &
+  Ch.~\ref{ch:online} \\[4pt]
+
+Optimal &
+  Selects the smallest set of examples from which the target concept can be uniquely identified. The size of this set is the \emph{teaching dimension} of the concept within the class. &
+  Ch.~13 \\[4pt]
+
+Minimally adequate &
+  Angluin's model: answers membership queries and equivalence queries. ``Minimally adequate'' because MQ + EQ is the minimal oracle configuration that makes DFAs efficiently learnable. &
+  Ch.~\ref{ch:exact} \\[4pt]
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{The optimal teacher and teaching dimension}
+
+\begin{defn}[Teaching Dimension]
+\label{def:teaching-dim}
+The \emph{teaching dimension} of a concept $c \in \mathcal{C}$ is the minimum number of labeled examples that uniquely identify $c$ within $\mathcal{C}$:
+\[
+\mathrm{TD}(c, \mathcal{C}) = \min\{|S| : S \subseteq X \times Y,\; c \text{ is the only } c' \in \mathcal{C} \text{ consistent with } S\}.
+\]
+The teaching dimension of the class is $\mathrm{TD}(\mathcal{C}) = \max_{c \in \mathcal{C}} \mathrm{TD}(c, \mathcal{C})$. The \emph{optimal teacher} for $c$ is any teacher that achieves $\mathrm{TD}(c, \mathcal{C})$.
+\end{defn}
+
+The teaching dimension measures the cooperative communication complexity of learning: how many examples must a helpful teacher provide so that a learner who knows $\mathcal{C}$ can identify the target? It is developed in full in \Cref{ch:ordinals}, where it interacts with recursive teaching dimension and the teaching--learning duality.
+
+\subsection{The minimally adequate teacher}
+
+\begin{defn}[Minimally Adequate Teacher {\cite{Angluin1988}}]
+\label{def:mat}
+A \emph{minimally adequate teacher} (MAT) for a concept class $\mathcal{C}$ provides two oracles: a membership oracle $\mathrm{MQ}$ and an equivalence oracle $\mathrm{EQ}$, as defined in \Cref{ch:data}. A class is learnable from a MAT if there exists an algorithm that exactly identifies any $c \in \mathcal{C}$ using polynomially many queries.
+\end{defn}
+
+Angluin's $L^*$ algorithm (\Cref{thm:lstar}) shows that DFAs are learnable from a MAT. The minimally adequate teacher is ``minimal'' in a precise sense: dropping either oracle makes the class unlearnable in polynomial time. The full treatment of $L^*$, including the observation table construction and its connection to the Myhill--Nerode theorem, appears in \Cref{ch:exact}.
+
+\begin{openprob}[Polynomial-time MAT learnability]
+\label{open:mat}
+Which concept classes are learnable from a minimally adequate teacher in polynomial time? Beyond DFAs, the characterization is incomplete. Known positive results include decision trees, certain classes of Boolean formulas, and residual finite-state automata. A general combinatorial characterization analogous to the VC dimension for PAC learning is not known.
+\end{openprob}
+
+
+% ================================================================
+% SECTION 6: Deferred Agents
+% ================================================================
+
+\section{Deferred Agent Types}
+\label{sec:deferred}
+
+Three agent concepts in the knowledge graph---\nde{synthesizer} (a program-synthesis agent), \nde{verifier} (a correctness checker for synthesizer output), and \nde{llm\_critic} (a large language model used as a critic in a learning loop)---belong to the application layer. They are built \emph{from} the learner and teacher primitives defined above, not alongside them. Their treatment is deferred to \Cref{ch:frontiers}, where they appear in the context of program synthesis, neurosymbolic learning, and LLM-in-the-loop verification.
+
+
+% ================================================================
+% SECTION 7: Summary
+% ================================================================
+
+\section{What This Chapter Established}
+\label{sec:ch4-summary}
+
+The chapter's contribution is a taxonomy with three points of genuine content:
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Most learner types are constraints on a single abstraction.} The eight named variants in Table~\ref{tab:learner-types} are not independent concepts---they are orthogonal constraints (data access, state management, hypothesis selection) applied to the base type $L \colon (X \times Y)^* \to \mathcal{H}$. In the PAC setting, many of these distinctions collapse; they are sharpest in Gold's framework.
+
+\item \textbf{The Bayesian--PAC bridge requires a type conversion.} The Bayesian learner outputs a posterior $Q \in \Delta(\mathcal{H})$; PAC learning requires a single $h \in \mathcal{H}$. The Gibbs posterior resolves this by sampling $h \sim Q_\lambda$, and the PAC-Bayes theorem (\Cref{ch:generalization}) bounds the resulting risk.
+
+\item \textbf{Teams are strictly more powerful than individuals.} In the Gold setting, a team of two learners can identify classes that no single learner can. The mechanism is disjunctive success, not data partitioning or communication.
+\end{enumerate}
+
+Teachers, similarly, range from passive (random) to adversarial to cooperative (optimal, minimally adequate). The teaching dimension and MAT learnability connect this chapter to the complexity measures in \Cref{ch:ordinals} and the exact learning algorithms in \Cref{ch:exact}.
+

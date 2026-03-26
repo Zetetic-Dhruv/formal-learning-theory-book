@@ -1,0 +1,274 @@
+% Chapter 8: Exact Learning and Query Models
+% Centerpiece: Angluin's L* algorithm and the passive-active gap.
+% DFAs are NOT PAC-learnable (Kearns-Valiant 1994) but ARE exactly
+% learnable with MQ+EQ (Angluin 1987). This separation is the content.
+
+\chapter{Exact Learning and Query Models}
+\label{ch:exact}
+
+The previous chapters study learners that receive data passively---drawn from a distribution (PAC), or presented by an adversary (online), or enumerated by nature (Gold). This chapter studies what happens when the learner can \emph{ask questions}.
+
+The exact learning model, introduced by Angluin~\cite{Angluin1987}, equips the learner with two oracles: a membership query oracle and an equivalence query oracle. The learner's goal is not approximate generalization but \emph{exact identification}: the game ends when the learner proposes a hypothesis that the equivalence oracle accepts. The central result of this chapter is that DFAs---computationally intractable under passive data~\cite{KearnsValiant1994}---become efficiently learnable with query access. This gap between passive and active learning is one of the sharpest structural results in the field.
+
+% ================================================================
+% SECTION 1: THE EXACT LEARNING FRAMEWORK
+% ================================================================
+
+\section{The Exact Learning Framework}
+\label{sec:exact-framework}
+
+The query model was introduced in \Cref{sec:queries}, where membership and equivalence oracles were defined (\Cref{def:mq,def:eq}). We recall the framework here with the precision needed for algorithmic analysis.
+
+\begin{defn}[Minimally Adequate Teacher]
+\label{def:mat}
+A \emph{minimally adequate teacher} (MAT) for a target concept $c$ over domain $X$ provides two oracles:
+\begin{itemize}[leftmargin=*, itemsep=2pt]
+\item $\mathrm{MQ}(x)$: returns $c(x)$ for any $x \in X$ chosen by the learner.
+\item $\mathrm{EQ}(h)$: if $h = c$, returns \textsc{yes}. Otherwise, returns a counterexample $z \in X$ with $h(z) \neq c(z)$.
+\end{itemize}
+The teacher is ``minimally adequate'' in the sense that it provides exactly these two capabilities and nothing more: no distributional information, no structural hints, no preference among counterexamples.
+\end{defn}
+
+\begin{defn}[Exact Learning]
+\label{def:exact-learning-formal}
+A concept class $\mathcal{C}$ is \emph{exactly learnable in polynomial time} if there exists an algorithm $A$ such that for every target $c \in \mathcal{C}$, algorithm $A$ interacts with a MAT for $c$ and eventually receives \textsc{yes} from $\mathrm{EQ}$, using a number of queries and computation steps polynomial in:
+\begin{enumerate}[leftmargin=*, nosep]
+\item the representation size $n$ of the target $c$, and
+\item the length $m$ of the longest counterexample returned by $\mathrm{EQ}$.
+\end{enumerate}
+\end{defn}
+
+\begin{remark}[The role of counterexample length]
+\label{rmk:counterexample-length}
+The dependence on $m$ is necessary because the equivalence oracle's counterexamples are adversarial: the oracle may return arbitrarily long counterexamples. The algorithm must process them, so the complexity must account for their length.
+\end{remark}
+
+% ================================================================
+% SECTION 2: THE L* ALGORITHM
+% ================================================================
+
+\section{Angluin's $L^*$ Algorithm}
+\label{sec:lstar}
+
+The $L^*$ algorithm learns the minimal DFA for an unknown regular language $L \subseteq \Sigma^*$ using membership and equivalence queries. It is the canonical example of exact learning and the centerpiece of this chapter.
+
+\subsection{Observation Tables}
+
+The algorithm maintains an \emph{observation table} $(S, E, T)$, where:
+\begin{itemize}[leftmargin=*, itemsep=2pt]
+\item $S \subseteq \Sigma^*$ is a finite, prefix-closed set of \emph{access strings} (candidate state representatives).
+\item $E \subseteq \Sigma^*$ is a finite, suffix-closed set of \emph{distinguishing extensions}.
+\item $T : (S \cup S \cdot \Sigma) \times E \to \{0,1\}$ is the table, where $T(s, e) = \mathrm{MQ}(s \cdot e)$.
+\end{itemize}
+For each string $s \in S \cup S \cdot \Sigma$, define the \emph{row} $\mathrm{row}(s) = (T(s, e_1), T(s, e_2), \ldots, T(s, e_{|E|}))$.
+
+\begin{defn}[Closed and Consistent Table]
+\label{def:closed-consistent}
+The observation table $(S, E, T)$ is:
+\begin{itemize}[leftmargin=*, itemsep=2pt]
+\item \emph{Closed} if for every $s \in S$ and $a \in \Sigma$, there exists $s' \in S$ with $\mathrm{row}(s \cdot a) = \mathrm{row}(s')$.
+\item \emph{Consistent} if for all $s_1, s_2 \in S$ with $\mathrm{row}(s_1) = \mathrm{row}(s_2)$, we have $\mathrm{row}(s_1 \cdot a) = \mathrm{row}(s_2 \cdot a)$ for all $a \in \Sigma$.
+\end{itemize}
+\end{defn}
+
+Closedness ensures that every one-step extension of a state representative is equivalent to some existing representative---so the transition function of the conjectured DFA is well-defined. Consistency ensures that equivalent representatives behave identically under extension---so the transition function is well-defined as a function of equivalence classes, not of particular strings.
+
+\subsection{The Algorithm}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    player/.style={draw, very thick, rounded corners, minimum width=2.8cm, minimum height=1cm, font=\small\bfseries, align=center},
+    stepbox/.style={font=\small, align=left, text width=5.5cm},
+    arr/.style={-{Stealth[length=2.5mm]}, thick},
+    note/.style={font=\scriptsize\itshape, text=notegray, align=left},
+    node distance=1.0cm
+]
+% Players
+\node[player, fill=defblue!10] (learner) {Learner\\{\scriptsize (maintains table $(S,E,T)$)}};
+\node[player, fill=thmred!10, right=5.5cm of learner] (teacher) {MAT\\{\scriptsize (knows target DFA $A^*$)}};
+
+% Step 1: MQ phase
+\node[below=1.2cm of learner, anchor=north, stepbox] (s1) {%
+\textbf{1.} Fill table via $\mathrm{MQ}$:\\
+$T(s,e) \leftarrow \mathrm{MQ}(s \cdot e)$\\
+for all $s \in S \cup S\!\cdot\!\Sigma$, $e \in E$.};
+
+% Step 2: Close and make consistent
+\node[below=0.3cm of s1, anchor=north, stepbox] (s2) {%
+\textbf{2.} If table not closed: add\\
+witness $s \cdot a$ to $S$; go to 1.\\
+If not consistent: add\\
+distinguishing $a \cdot e$ to $E$; go to 1.};
+
+% Step 3: Conjecture
+\coordinate (mid) at ($(learner)!0.5!(teacher)$);
+\node[below=4.0cm of mid, font=\small, align=center] (conj) {%
+\textbf{3.} Build DFA $M$ from table.\\
+States $=$ distinct rows of $S$.};
+
+% Step 4: EQ
+\draw[arr, defblue!70!black] ($(conj.east)+(0,0.15)$) -- ++(1.8,0) node[above, midway, font=\small] {$\mathrm{EQ}(M)$} |- ($(teacher.south)+(0,-0.0)$);
+
+% Step 5: Response
+\node[below=5.8cm of teacher, anchor=north, stepbox, text width=4cm] (resp) {%
+If $L(M) = L$: return \textsc{yes}.\\
+Else: return counterexample $z$.};
+
+\draw[arr, thmred!70!black] (resp.west) -- ++(-1.5,0) node[above, midway, font=\small] {$z$} |- ($(s1.east)+(0,-0.1)$);
+
+% Annotations
+\node[note, below=0.3cm of resp] {Add $z$ and all prefixes of $z$\\to $S$; return to step 1.};
+
+% Termination
+\node[note, right=0.3cm of teacher, anchor=west, text width=3.2cm] {Termination: at most $n-1$\\equivalence queries, where\\$n = |$states of $A^*|$.};
+\end{tikzpicture}
+\caption{The $L^*$ protocol. The learner fills an observation table using membership queries, ensures it is closed and consistent, constructs a conjecture DFA, and submits it to the equivalence oracle. Each counterexample refines the table by introducing a new state distinction.}
+\label{fig:lstar-protocol}
+\end{figure}
+
+The $L^*$ algorithm proceeds as follows.
+
+\begin{enumerate}[leftmargin=*, itemsep=4pt]
+\item \textbf{Initialize.} Set $S = E = \{\varepsilon\}$ (the empty string). Fill the table $T$ using membership queries.
+
+\item \textbf{Close and make consistent.} Repeat until the table is both closed and consistent:
+\begin{itemize}[nosep]
+\item If the table is not closed---there exists $s \in S$, $a \in \Sigma$ with $\mathrm{row}(s \cdot a) \neq \mathrm{row}(s')$ for any $s' \in S$---add $s \cdot a$ to $S$ and fill new table entries via $\mathrm{MQ}$.
+\item If the table is not consistent---there exist $s_1, s_2 \in S$ with $\mathrm{row}(s_1) = \mathrm{row}(s_2)$ but $\mathrm{row}(s_1 \cdot a) \neq \mathrm{row}(s_2 \cdot a)$ for some $a \in \Sigma$---then there exists $e \in E$ witnessing the difference. Add $a \cdot e$ to $E$ and fill new entries via $\mathrm{MQ}$.
+\end{itemize}
+
+\item \textbf{Conjecture.} When the table is closed and consistent, construct a DFA $M$:
+\begin{itemize}[nosep]
+\item States: the distinct rows $\mathrm{row}(s)$ for $s \in S$.
+\item Initial state: $\mathrm{row}(\varepsilon)$.
+\item Transition: $\delta(\mathrm{row}(s), a) = \mathrm{row}(s \cdot a)$ (well-defined by closedness and consistency).
+\item Accepting states: those $\mathrm{row}(s)$ with $T(s, \varepsilon) = 1$.
+\end{itemize}
+
+\item \textbf{Query.} Submit $\mathrm{EQ}(M)$.
+\begin{itemize}[nosep]
+\item If the teacher returns \textsc{yes}, halt and output $M$.
+\item If the teacher returns a counterexample $z$, add $z$ and all its prefixes to $S$, fill the table, and return to step~2.
+\end{itemize}
+\end{enumerate}
+
+\begin{thm}[$L^*$ correctness and complexity {\cite{Angluin1987}}]
+\label{thm:lstar-complexity}
+Let $A^*$ be the minimal DFA for the target language $L$, with $n$ states over alphabet $\Sigma$. The $L^*$ algorithm terminates and outputs the minimal DFA for $L$, using:
+\begin{itemize}[nosep]
+\item at most $n - 1$ equivalence queries, and
+\item at most $O(n^2 |\Sigma| \cdot m)$ membership queries,
+\end{itemize}
+where $m$ is the length of the longest counterexample received.
+\end{thm}
+
+\begin{proof}[Proof sketch]
+Each counterexample introduces at least one new distinct row in the observation table, because the counterexample witnesses a string that the current conjecture misclassifies. Since the minimal DFA has $n$ states and the table's distinct rows correspond to Myhill--Nerode equivalence classes, the number of distinct rows is bounded by $n$. The table starts with one row and gains at least one per counterexample, so at most $n - 1$ equivalence queries occur before the table has $n$ distinct rows---at which point the conjecture DFA is isomorphic to $A^*$.
+
+The membership query bound follows from the table dimensions: $|S| \leq n$, $|S \cdot \Sigma| \leq n|\Sigma|$, and $|E| \leq m \cdot n$ (each counterexample adds at most $m$ suffixes). The total number of cells is $O(n|\Sigma|) \times O(nm) = O(n^2 |\Sigma| m)$, each requiring one membership query.
+
+The full correctness proof---that a closed, consistent table yields a DFA consistent with all membership queries, and that the Myhill--Nerode theorem guarantees uniqueness---is given in Angluin~\cite{Angluin1987}.
+\end{proof}
+
+\begin{remark}[Why the table works]
+\label{rmk:table-intuition}
+The observation table is a finite approximation to the Myhill--Nerode equivalence relation of the target language. Two strings $s_1, s_2$ are Myhill--Nerode equivalent if $s_1 \cdot w \in L \iff s_2 \cdot w \in L$ for all $w \in \Sigma^*$. The table approximates this by testing only the extensions in $E$. Closedness ensures the approximation is fine enough to define transitions; consistency ensures it is coherent. Each counterexample reveals that the current approximation conflates two genuinely distinct equivalence classes, forcing a refinement.
+\end{remark}
+
+% ================================================================
+% SECTION 3: THE PASSIVE-ACTIVE GAP
+% ================================================================
+
+\section{The Passive--Active Gap}
+\label{sec:passive-active-gap}
+
+The structural significance of $L^*$ lies not in the algorithm itself but in what it implies when combined with a hardness result.
+
+\begin{thm}[DFAs are not PAC-learnable {\cite{KearnsValiant1994}}]
+\label{thm:dfa-pac-hard}
+Under standard cryptographic assumptions (specifically, the hardness of inverting RSA or factoring Blum integers), the class of DFAs with $n$ states is not efficiently PAC-learnable from random examples alone. No polynomial-time algorithm can PAC-learn DFAs, even improperly.
+\end{thm}
+
+The proof reduces the problem of breaking a cryptographic primitive to the problem of PAC-learning DFAs: if a polynomial-time PAC learner existed, it could be used to invert the cryptographic function, contradicting the hardness assumption. The reduction is non-trivial and we defer to Kearns and Valiant~\cite{KearnsValiant1994} for the full argument.
+
+\begin{separation}
+\textbf{Passive $\not\Leftrightarrow$ Active.} Witness: the class of DFAs.
+\begin{itemize}[leftmargin=*, nosep]
+\item \textbf{Active learning succeeds.} $L^*$ exactly identifies any $n$-state DFA using $O(n^2 |\Sigma| m)$ membership queries and $n - 1$ equivalence queries (\Cref{thm:lstar-complexity}).
+\item \textbf{Passive learning fails.} Under cryptographic assumptions, no polynomial-time algorithm PAC-learns DFAs from random examples (\Cref{thm:dfa-pac-hard}).
+\end{itemize}
+The gap is not quantitative (more data needed) but \emph{qualitative} (no amount of passive data suffices for efficient learning, while a polynomial number of queries does). The mechanism is clear: membership queries let the learner probe the target's transition structure at chosen points, and equivalence queries provide directed feedback at the learner's current frontier of error. Random examples provide neither capability.
+\end{separation}
+
+This separation witnesses a fundamental edge in the concept graph: $\nde{pac\_learning} \not\Rightarrow \nde{exact\_learning}$ and $\nde{exact\_learning} \not\Rightarrow \nde{pac\_learning}$. Neither paradigm subsumes the other. The reverse direction---classes that are PAC-learnable but not efficiently exactly learnable---also holds, because simulating an equivalence oracle in the PAC setting requires enumerating hypotheses and checking consistency, which may be computationally intractable for some classes.
+
+\begin{remark}[The role of the cryptographic assumption]
+\label{rmk:crypto-assumption}
+The Kearns--Valiant result is \emph{conditional}: it assumes that certain cryptographic primitives are hard to break. Without this assumption, the PAC-hardness of DFAs is open. This is typical of computational hardness results in learning theory: unconditional lower bounds for PAC learning remain rare, and most known hardness results reduce from cryptography or from $\mathsf{NP}$-hardness assumptions. The exact learning model sidesteps computational hardness entirely---query access changes the information-theoretic landscape so fundamentally that the cryptographic barrier does not apply.
+\end{remark}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    box/.style={draw, thick, rounded corners, minimum width=2.6cm, minimum height=0.9cm, font=\small\bfseries, align=center},
+    arr/.style={-{Stealth[length=2mm]}, thick},
+    noarr/.style={thick, thmred, dashed},
+    note/.style={font=\scriptsize, align=center, text=notegray}
+]
+\node[box, fill=defblue!10] (exact) {Exact Learning\\{\scriptsize (MQ + EQ)}};
+\node[box, fill=edgeorange!10, right=4cm of exact] (pac) {PAC Learning\\{\scriptsize (random examples)}};
+\node[box, fill=sepgreen!10, below=2.5cm of $(exact)!0.5!(pac)$] (dfa) {DFAs};
+
+% Arrows
+\draw[noarr] (pac) -- node[above, font=\scriptsize, text=thmred] {$\not\Rightarrow$} (exact);
+\draw[noarr] (exact) -- node[above, font=\scriptsize, text=thmred] {$\not\Rightarrow$} (pac);
+
+\draw[arr, sepgreen!60!black] (dfa) -- node[left, note, text width=2.8cm] {Learnable:\\$L^*$ in poly queries\\{\tiny (Angluin 1987)}} (exact);
+\draw[arr, thmred!60!black, dashed] (dfa) -- node[right, note, text width=2.8cm] {Not learnable:\\crypto hardness\\{\tiny (Kearns--Valiant 1994)}} (pac);
+\end{tikzpicture}
+\caption{The passive--active separation. DFAs are exactly learnable with query access but not PAC-learnable under cryptographic assumptions. Neither paradigm implies the other.}
+\label{fig:passive-active-gap}
+\end{figure}
+
+% ================================================================
+% SECTION 4: QUERY COMPLEXITY AND FORWARD REFERENCES
+% ================================================================
+
+\section{Query Complexity}
+\label{sec:query-complexity}
+
+The $L^*$ algorithm's complexity is measured in \emph{query complexity}: the number of membership and equivalence queries as a function of the target's representation size. This measure is the exact learning analogue of sample complexity in PAC learning.
+
+\begin{defn}[Query Complexity]
+\label{def:query-complexity}
+The \emph{membership query complexity} $\mathrm{MQ}(\mathcal{C}, n)$ and \emph{equivalence query complexity} $\mathrm{EQ}(\mathcal{C}, n)$ of a class $\mathcal{C}$ are the minimum numbers of membership and equivalence queries, respectively, that any exact learning algorithm must make in the worst case to identify any target $c \in \mathcal{C}$ of representation size $n$.
+\end{defn}
+
+For DFAs, $L^*$ achieves $\mathrm{EQ} \leq n - 1$ and $\mathrm{MQ} = O(n^2 |\Sigma| m)$. The equivalence query count has a direct connection to the combinatorial structure of the hypothesis class.
+
+\begin{prop}[EQ lower bound via teaching dimension]
+\label{prop:eq-lower}
+For any class $\mathcal{C}$ that is exactly learnable, $\mathrm{EQ}(\mathcal{C}, n) \geq \lceil \log_2 |\mathcal{C}_n| \rceil$, where $\mathcal{C}_n$ is the set of concepts in $\mathcal{C}$ of representation size $n$. Each equivalence query eliminates at most half the version space (by returning a counterexample that is consistent with the target but not the conjecture).
+\end{prop}
+
+\begin{remark}[Certificate complexity]
+\label{rmk:certificate}
+The exact learning framework connects to \emph{certificate complexity} in Boolean function theory: the minimum number of input bits that must be queried to certify a function's value. Teaching dimension (\Cref{ch:dimensions}), which measures the minimum number of examples a teacher must provide to uniquely identify a concept, provides a lower bound on the number of equivalence queries. The connections among query complexity, teaching dimension, and certificate complexity are explored in \Cref{ch:dimensions,ch:computational}.
+\end{remark}
+
+\section{What This Chapter Established}
+\label{sec:ch8-summary}
+
+\begin{enumerate}[leftmargin=*, itemsep=3pt]
+\item \textbf{The exact learning framework.} A minimally adequate teacher provides membership and equivalence queries. Exact learning requires identifying the target concept precisely, not approximately.
+
+\item \textbf{The $L^*$ algorithm.} Angluin's algorithm learns the minimal DFA for any regular language using polynomially many queries. The observation table approximates the Myhill--Nerode equivalence relation; each counterexample refines it by introducing a new state distinction.
+
+\item \textbf{The passive--active gap.} DFAs are exactly learnable with MQ~+~EQ (Angluin, 1987) but not PAC-learnable under cryptographic assumptions (Kearns--Valiant, 1994). This separation is qualitative, not quantitative: query access changes the complexity landscape fundamentally.
+
+\item \textbf{Query complexity.} The number of queries required to exactly learn a class is the natural complexity measure, analogous to sample complexity in PAC learning.
+\end{enumerate}
+
+The gap between passive and active learning demonstrated by DFAs is not an isolated curiosity. It reflects a structural principle: the information geometry of a learning problem can change qualitatively when the learner moves from passive observation to active interrogation. This principle recurs in statistical experimental design, active learning in the PAC setting, and reinforcement learning---all settings where the learner's ability to choose which data to collect transforms the computational landscape.
+

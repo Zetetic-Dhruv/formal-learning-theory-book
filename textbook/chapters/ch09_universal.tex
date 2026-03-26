@@ -1,0 +1,509 @@
+% Chapter 9: Universal Learning and the Trichotomy
+% universal_learning = Profile C: what is the optimal learning RATE over all distributions?
+% universal_trichotomy = Profile C: the modern capstone — three regimes,
+%   classified by Littlestone trees (from online learning!) applied to the statistical setting.
+% Centerpiece: the SURPRISE that the Littlestone dimension controls statistical rates.
+
+\chapter{Universal Learning and the Trichotomy}
+\label{ch:universal}
+
+The Fundamental Theorem of \Cref{ch:pac} answers a binary question: \emph{is}
+$\mathcal{H}$ learnable?  The answer is yes if and only if
+$\VC(\mathcal{H}) < \infty$.  But the binary answer hides a quantitative
+question.  Among all learnable classes, some are learned faster than others.
+How fast?
+
+PAC learning theory phrases this quantitatively through the sample complexity
+$m(\varepsilon, \delta)$: how many samples suffice for accuracy $\varepsilon$
+with confidence $1 - \delta$?  But the answer---$\Theta(d/\varepsilon)$ in
+the realizable case---is a function of the \emph{accuracy parameter}.  It
+describes how accuracy improves as data grows, with $d$ as a constant.  It
+does not describe the \emph{rate} at which the risk itself decreases as a
+function of the sample size $n$.
+
+This chapter asks the rate question directly: given $n$ samples from an
+unknown distribution $D$, how fast can the risk $\risk_D(A(S))$ be driven to
+zero, \emph{uniformly over all distributions $D$ for which learning is
+possible}?  The answer is the trichotomy theorem, which classifies every
+hypothesis class into exactly one of three rate regimes.  The classification
+involves a combinatorial object from an unexpected source.
+
+
+% ================================================================
+% SECTION 1: THE QUESTION
+% ================================================================
+
+\section{Beyond PAC Sample Complexity}
+\label{sec:universal-question}
+
+Fix a hypothesis class $\mathcal{H}$ with $\VC(\mathcal{H}) < \infty$, so
+that $\mathcal{H}$ is PAC learnable.  The PAC framework guarantees a learner
+$A$ and a sample complexity $m(\varepsilon, \delta)$ such that, for any
+distribution $D$ and any $\varepsilon, \delta > 0$, drawing
+$m \geq m(\varepsilon, \delta)$ samples ensures
+$\Pr[\risk_D(A(S)) > \varepsilon] \leq \delta$.
+
+Now invert the perspective.  Instead of asking ``how many samples for
+accuracy $\varepsilon$?'', ask: ``given $n$ samples, what is the best
+accuracy achievable?''  More precisely, define the \emph{learning rate} of a
+class $\mathcal{H}$ as follows.
+
+\begin{defn}[Universal Learning Rate]
+\label{def:universal-rate}
+A function $R \colon \N \to [0,1]$ is a \emph{universal learning rate} for
+$\mathcal{H}$ if there exists a learner $A$ such that, for every realizable
+distribution $D$ (i.e., $\risk_D(h^*) = 0$ for some $h^* \in \mathcal{H}$)
+and every $n \in \N$:
+\[
+  \E_{S \sim D^n}\!\bigl[\risk_D(A(S))\bigr] \leq R(n).
+\]
+The \emph{optimal universal rate} is the fastest-decaying $R$ achievable by
+any learner.
+\end{defn}
+
+Three features distinguish this from the PAC formulation:
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{No fixed $\varepsilon$.}  The rate $R(n)$ describes how the
+  expected risk shrinks with $n$, rather than asking for a threshold sample
+  size at a given $\varepsilon$.
+
+\item \textbf{Uniformity over distributions.}  The same learner $A$ and the
+  same rate $R(n)$ must work for \emph{every} realizable distribution $D$.
+  The learner cannot be tuned to a specific distribution.
+
+\item \textbf{Expected risk, not high-probability.}  We use
+  $\E[\risk_D(A(S))]$ rather than a $(\varepsilon,\delta)$ guarantee.  This
+  is a convenience that simplifies the rate classification without changing
+  the qualitative picture.
+\end{enumerate}
+
+For a class with $\VC(\mathcal{H}) = d < \infty$, the PAC upper bound gives
+$R(n) = O(d/n)$: a $\Theta(1/n)$ rate.  But is $1/n$ always achievable?
+Can some classes be learned faster---exponentially fast?  And are there
+learnable classes where no uniform $1/n$ rate is possible, so that the rate
+degrades depending on the distribution?
+
+All three phenomena occur.  The trichotomy theorem says these are the
+\emph{only} three possibilities.
+
+
+% ================================================================
+% SECTION 2: THE TRICHOTOMY THEOREM
+% ================================================================
+
+\section{The Trichotomy Theorem}
+\label{sec:trichotomy}
+
+The classification involves a combinatorial object that generalizes the
+Littlestone tree of \Cref{ch:online}.  Recall that a mistake tree
+(\Cref{def:mistake-tree}) is a complete binary tree whose internal nodes are
+labeled with instances $x \in X$, such that every root-to-leaf path is
+realized by some $h \in \mathcal{H}$.  We now define a variant with a
+weaker consistency requirement.
+
+\begin{defn}[VCL Tree]
+\label{def:vcl-tree}
+A \emph{VCL tree} (Vapnik--Chervonenkis--Littlestone tree) for
+$\mathcal{H}$ over $X$ is a complete binary tree $T$ in which:
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item Each internal node $v$ is labeled with an instance $x_v \in X$.
+\item The left child corresponds to label $0$, the right to label $1$.
+\item For every root-to-leaf path $\pi = (v_1, y_1), \ldots, (v_d, y_d)$,
+  there exists a \emph{set} $\{x_{v_1}, \ldots, x_{v_d}\}$ that is
+  \emph{shattered} by $\mathcal{H}$---not merely a single hypothesis
+  consistent with $\pi$, but the full shattering condition: for every
+  labeling $b \in \{0,1\}^d$ of these $d$ points, some $h \in \mathcal{H}$
+  realizes $b$.
+\end{itemize}
+The tree is \emph{infinite} if it has unbounded depth.
+\end{defn}
+
+\begin{remark}[VCL trees vs.\ Littlestone trees]
+\label{rmk:vcl-vs-littlestone}
+Every Littlestone tree is a VCL tree (shattering is a stronger condition
+than path-consistency, but the shattering requirement in the VCL definition
+applies to each path individually, and a Littlestone tree already provides a
+consistent hypothesis for every path---since the tree is complete, all
+$2^d$ paths are realized, which implies shattering of the instances along
+any single path).  The converse fails: a VCL tree requires shattering along
+each path, which is a weaker global condition than the Littlestone tree's
+requirement that \emph{every} root-to-leaf path has a \emph{single}
+consistent hypothesis.  The distinction matters: infinite VCL trees can
+exist even when $\Ldim(\mathcal{H}) < \infty$.
+\end{remark}
+
+\begin{thm}[The Trichotomy Theorem {\cite{BousquetHannekeMoranVanHandelYehudayoff2021}}]
+\label{thm:trichotomy}
+Let $\mathcal{H}$ be a hypothesis class with $|\mathcal{H}| \geq 3$.
+Exactly one of the following three cases holds:
+\begin{enumerate}[label=\textnormal{(T\arabic*)}]
+\item \label{T:exp} \textbf{Exponential rate.}  $\mathcal{H}$ has no
+  infinite Littlestone tree (equivalently, $\Ldim(\mathcal{H}) < \infty$).
+  Then the optimal universal learning rate is \emph{exponential}:
+  \[
+    R(n) = \Theta\!\left(e^{-n}\right).
+  \]
+
+\item \label{T:linear} \textbf{Linear rate.}  $\mathcal{H}$ has an infinite
+  Littlestone tree but no infinite VCL tree.  Then the optimal universal
+  learning rate is \emph{linear}:
+  \[
+    R(n) = \Theta\!\left(\frac{1}{n}\right).
+  \]
+
+\item \label{T:arb} \textbf{Arbitrarily slow rates.}  $\mathcal{H}$ has an
+  infinite VCL tree.  Then no uniform rate exists: for every function
+  $R(n) \to 0$ (no matter how slowly), every learner $A$ fails to achieve
+  rate $R(n)$ on some realizable distribution $D$.
+\end{enumerate}
+\end{thm}
+
+The three cases are exhaustive and mutually exclusive.  Every learnable class
+(i.e., every class with $\VC(\mathcal{H}) < \infty$ and
+$|\mathcal{H}| \geq 3$) falls into exactly one regime.  The boundaries are
+sharp: there is no class whose optimal rate is, say, $1/\sqrt{n}$ or
+$1/n^2$.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    decision/.style={draw, thick, diamond, aspect=2.2, inner sep=2pt,
+      font=\small, fill=defblue!8, align=center, minimum width=3cm},
+    outcome/.style={draw, thick, rounded corners, minimum width=2.8cm,
+      minimum height=1.2cm, font=\small, align=center},
+    arr/.style={-{Stealth[length=2.5mm]}, thick},
+    yeslabel/.style={font=\scriptsize\bfseries, text=sepgreen},
+    nolabel/.style={font=\scriptsize\bfseries, text=thmred},
+]
+% Decision 1
+\node[decision] (d1) {Infinite\\Littlestone tree?};
+
+% No → Exponential
+\node[outcome, fill=sepgreen!12, left=2.8cm of d1, yshift=-2.5cm] (exp) {%
+  \textbf{Exponential rate}\\[3pt]
+  $R(n) = \Theta(e^{-n})$\\[2pt]
+  {\scriptsize $\Ldim(\mathcal{H}) < \infty$}};
+
+% Yes → Decision 2
+\node[decision, right=2.8cm of d1, yshift=-2.5cm] (d2) {Infinite\\VCL tree?};
+
+% No → Linear
+\node[outcome, fill=defblue!12, left=2.5cm of d2, yshift=-2.5cm] (lin) {%
+  \textbf{Linear rate}\\[3pt]
+  $R(n) = \Theta(1/n)$\\[2pt]
+  {\scriptsize $\Ldim = \infty$, no $\infty$-VCL}};
+
+% Yes → Arbitrarily slow
+\node[outcome, fill=thmred!12, right=2.5cm of d2, yshift=-2.5cm] (slow) {%
+  \textbf{Arbitrarily slow}\\[3pt]
+  $\forall\, R(n) \to 0$: fails\\[2pt]
+  {\scriptsize $\infty$-VCL tree exists}};
+
+% Arrows
+\draw[arr] (d1) -- node[nolabel, left, pos=0.3] {No} (exp);
+\draw[arr] (d1) -- node[yeslabel, right, pos=0.3] {Yes} (d2);
+\draw[arr] (d2) -- node[nolabel, left, pos=0.3] {No} (lin);
+\draw[arr] (d2) -- node[yeslabel, right, pos=0.3] {Yes} (slow);
+\end{tikzpicture}
+\caption{The trichotomy decision tree.  Two binary questions---does
+$\mathcal{H}$ have an infinite Littlestone tree?\ does it have an infinite
+VCL tree?---partition all hypothesis classes (with $|\mathcal{H}| \geq 3$)
+into exactly three rate regimes.  There is no fourth regime and no
+intermediate rate.}
+\label{fig:trichotomy-tree}
+\end{figure}
+
+\subsection{An Online Concept in a Statistical Theorem}
+\label{sec:surprise}
+
+The trichotomy theorem is the structural capstone of this book.  To
+appreciate what it says, consider the expectations each tradition brought
+to the table.
+
+The PAC tradition (\Cref{ch:pac}) characterized learnability through the VC
+dimension and established the sample complexity
+$\Theta(d/\varepsilon)$.  The natural expectation: the VC dimension should
+also determine the learning rate.  It does not.
+Two classes with the same VC dimension can have different optimal
+rates---one exponential, one $1/n$.  So what draws the boundary?
+
+The online learning tradition (\Cref{ch:online}) introduced the Littlestone
+dimension to characterize mistake-bounded learning against an adversary.
+A worst-case combinatorial quantity, built for a worst-case adversarial
+game.  No connection to statistical convergence rates.  None expected.
+
+And yet.  The Littlestone dimension---this adversarial, combinatorial
+object---is exactly what governs the boundary between exponential and
+polynomial convergence in the i.i.d.\ setting.
+
+Neither tradition predicted this.  The trichotomy does not merely classify
+rates; it reveals that the deepest structural boundary in statistical
+learning theory is drawn by a quantity from a different paradigm entirely.
+
+\subsection{Examples}
+\label{sec:trichotomy-examples}
+
+\begin{example}[The three regimes, witnessed]
+\label{ex:three-regimes}
+\begin{enumerate}[label=(\alph*),leftmargin=*,itemsep=4pt]
+\item \textbf{Exponential: finite classes.}  Any finite class
+  $\mathcal{H}$ with $|\mathcal{H}| = k$ has
+  $\Ldim(\mathcal{H}) \leq \lfloor\log_2 k\rfloor < \infty$.  No infinite
+  Littlestone tree exists, so $\mathcal{H}$ falls into regime~\ref{T:exp}.
+  Concretely, the Halving algorithm achieves risk $\leq k \cdot 2^{-n}$
+  after $n$ rounds.
+
+\item \textbf{Exponential: halfspaces.}  The class of halfspaces in
+  $\R^d$ has $\Ldim = d < \infty$ (\Cref{ex:ldim-examples}).  This class
+  is learned at an exponential rate, despite having infinite cardinality.
+
+\item \textbf{Linear: thresholds on $\R$.}  The class
+  $\mathcal{H}_{\mathrm{thr}} = \{x \mapsto \ind[x \geq \theta] :
+  \theta \in \R\}$ has $\VC = 1$ but $\Ldim = \infty$
+  (\Cref{prop:pac-online-sep}).  It has no infinite VCL tree (the
+  one-dimensional ordering prevents shattering along arbitrarily long
+  adaptive paths).  The optimal rate is $\Theta(1/n)$.
+
+\item \textbf{Arbitrarily slow: unions of intervals.}  For each $k$, let
+  $\mathcal{H}_k$ be the class of unions of at most $k$ intervals on $\R$.
+  The class $\mathcal{H}_\infty = \bigcup_k \mathcal{H}_k$ (unions of
+  finitely many intervals, with no bound on the number) has
+  $\VC < \infty$ but admits infinite VCL trees.  No uniform rate $R(n) \to 0$
+  is achievable.
+\end{enumerate}
+\end{example}
+
+
+% ================================================================
+% SECTION 3: PROOF SKETCH
+% ================================================================
+
+\section{Proof Architecture}
+\label{sec:proof-sketch}
+
+The full proof of \Cref{thm:trichotomy} occupies much of
+\cite{BousquetHannekeMoranVanHandelYehudayoff2021}.  We sketch the key ideas
+for each regime, emphasizing why the boundaries fall where they do.
+
+
+\subsection{The Exponential Case: Finite Littlestone Dimension}
+\label{sec:exp-case}
+
+Suppose $\Ldim(\mathcal{H}) = d < \infty$.  The Standard Optimal Algorithm
+($\SOA$) from \Cref{ch:online} was designed for adversarial online learning,
+but its structure can be adapted to the statistical setting.
+
+The key insight is that a learner with access to i.i.d.\ samples can
+simulate a version-space strategy.  Consider the following approach: given a
+sample $S$ of size $n$, maintain the version space
+$V = \{h \in \mathcal{H} : h \text{ consistent with } S\}$.  Return a
+hypothesis from $V$ using an $\SOA$-derived selection rule.
+
+When $\Ldim(\mathcal{H}) = d$, the version space after seeing $n$ i.i.d.\
+samples has the following property: the probability (over $D$) that there
+exists a hypothesis $h \in V$ with $\risk_D(h) > \varepsilon$ decreases
+exponentially in $n$.  This is because each sample point, with probability
+at least $\varepsilon$ under $D$, eliminates all hypotheses in $V$ that
+disagree with the true label at that point.  After $n$ samples, the survival
+probability of any ``bad'' hypothesis (one with risk $> \varepsilon$) is at
+most $(1 - \varepsilon)^n \leq e^{-\varepsilon n}$.  The finite Littlestone
+dimension controls the effective complexity of $V$ through the mistake tree
+structure, ensuring that a union bound over the relevant version space
+subsets remains finite.
+
+The result:
+\[
+  \E[\risk_D(A(S))] \leq C \cdot 2^d \cdot e^{-n/C'}
+\]
+for constants $C, C'$ depending on $d$.  The rate is exponential in $n$.
+
+The matching lower bound shows that exponential convergence is impossible
+when $\Ldim(\mathcal{H}) = \infty$: an infinite Littlestone tree provides an
+adversary-like construction (within the distributional framework) that
+forces the learner's expected risk to decay no faster than $\Omega(1/n)$.
+
+
+\subsection{The Linear Case: Infinite Littlestone, Finite VCL}
+\label{sec:linear-case}
+
+Suppose $\Ldim(\mathcal{H}) = \infty$ but $\mathcal{H}$ has no infinite VCL
+tree.  The exponential strategy fails because the $\SOA$-based approach
+requires finite Littlestone dimension.  But a different algorithm---the
+\emph{one-inclusion predictor}---achieves the $1/n$ rate.
+
+\begin{defn}[One-Inclusion Predictor (Informal)]
+\label{def:oip}
+Given a sample $S = \{(x_1, y_1), \ldots, (x_n, y_n)\}$ and a new point
+$x$, form the multiset $\{x_1, \ldots, x_n, x\}$.  Consider the one-inclusion
+graph $G$: the graph whose vertices are all labelings of this multiset
+consistent with some $h \in \mathcal{H}$, with edges connecting labelings
+that differ on exactly one point.  Predict the label $\hat{y}$ that
+minimizes the maximum degree of the vertex in $G$ corresponding to the
+completed labeling.
+\end{defn}
+
+Haussler, Littlestone, and Warmuth~\cite{Haussler1988} introduced the
+one-inclusion graph technique.  Bousquet et
+al.~\cite{BousquetHannekeMoranVanHandelYehudayoff2021} showed that when
+$\mathcal{H}$ has no infinite VCL tree, the one-inclusion predictor achieves
+\[
+  \E[\risk_D(A(S))] \leq \frac{C}{n}
+\]
+for a constant $C$ depending on $\mathcal{H}$.  The absence of infinite VCL
+trees is precisely the combinatorial condition needed for the one-inclusion
+graph to have bounded degree growth, which in turn controls the expected
+risk.
+
+The matching lower bound is the PAC lower bound: any class with
+$\VC(\mathcal{H}) \geq 1$ requires $\Omega(1/n)$ expected risk, since
+distinguishing hypotheses that differ on a $1/n$-fraction of the domain
+requires $\Omega(n)$ samples.
+
+
+\subsection{The Slow Case: Infinite VCL Trees}
+\label{sec:slow-case}
+
+Suppose $\mathcal{H}$ has an infinite VCL tree.  The theorem claims that no
+uniform rate $R(n) \to 0$ is achievable: for every learner $A$ and every
+function $R(n) \to 0$, there exists a realizable distribution $D$ such that
+$\E[\risk_D(A(S_n))] \geq R(n)$ for infinitely many $n$.
+
+The proof constructs, for any candidate learner $A$ and any target rate
+$R(n)$, a distribution that defeats $A$ at the desired rate.  The
+construction uses the infinite VCL tree as a source of combinatorial
+richness.
+
+Descend the VCL tree adaptively, choosing at each node the branch that is
+harder for $A$.  Because the tree is infinite and each path corresponds to a
+shattered set, the adversary can build a distribution at any depth $d$ whose
+effective VC dimension on the relevant support is $d$.  By choosing $d$
+large enough (as a function of $n$), the adversary ensures that the PAC
+lower bound $\Omega(d/n)$ exceeds $R(n)$.  The infinite VCL tree provides
+arbitrarily large effective VC dimension along adaptive paths, preventing
+any uniform rate from holding.
+
+This is the sense in which infinite VCL trees are an obstruction: they
+provide an inexhaustible reservoir of complexity that any learner eventually
+confronts.
+
+
+% ================================================================
+% SECTION 4: THE CROSS-PARADIGM MAP
+% ================================================================
+
+\section{The Cross-Paradigm Map}
+\label{sec:cross-paradigm}
+
+The trichotomy theorem connects three chapters of this book through a single
+combinatorial object.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    regime/.style={draw, thick, ellipse, minimum width=3.6cm,
+      minimum height=2.2cm, font=\small, align=center},
+    example/.style={font=\scriptsize, align=center, text=notegray},
+    label/.style={font=\small\bfseries, align=center},
+    connection/.style={thick, dashed, notegray},
+]
+% Three regimes as overlapping regions
+\node[regime, fill=sepgreen!10] (exp) at (-3.5, 0) {};
+\node[label] at (-3.5, 0.4) {$e^{-n}$};
+\node[example] at (-3.5, -0.3) {finite classes\\halfspaces\\conjunctions};
+
+\node[regime, fill=defblue!10] (lin) at (0, 0) {};
+\node[label] at (0, 0.4) {$1/n$};
+\node[example] at (0, -0.3) {thresholds on $\R$\\intervals on $\R$};
+
+\node[regime, fill=thmred!10] (slow) at (3.5, 0) {};
+\node[label] at (3.5, 0.4) {arb.\ slow};
+\node[example] at (3.5, -0.3) {$\bigcup_k \mathcal{H}_k$\\unbounded\\unions};
+
+% Boundaries
+\draw[very thick, sepgreen!70!black, {Stealth[length=2mm]}-{Stealth[length=2mm]}]
+  (-1.6, -1.8) -- (-1.6, 1.8)
+  node[above, font=\scriptsize, align=center, text=sepgreen!70!black]
+  {$\Ldim < \infty$\\vs.\ $\Ldim = \infty$};
+
+\draw[very thick, thmred!70!black, {Stealth[length=2mm]}-{Stealth[length=2mm]}]
+  (1.7, -1.8) -- (1.7, 1.8)
+  node[above, font=\scriptsize, align=center, text=thmred!70!black]
+  {no $\infty$-VCL\\vs.\ $\infty$-VCL};
+
+% Chapter connections
+\node[font=\scriptsize\itshape, text=defblue, align=center] at (-3.5, -2.6)
+  {Ch.~6: Online\\(Littlestone dim)};
+\node[font=\scriptsize\itshape, text=defblue, align=center] at (0, -2.6)
+  {Ch.~5: PAC\\(VC dim)};
+\node[font=\scriptsize\itshape, text=defblue, align=center] at (3.5, -2.6)
+  {Ch.~9: Universal\\(VCL trees)};
+
+\draw[connection, -{Stealth[length=1.5mm]}] (-3.5, -2.2) -- (-1.8, -1.6);
+\draw[connection, -{Stealth[length=1.5mm]}] (0, -2.2) -- (0, -1.2);
+\draw[connection, -{Stealth[length=1.5mm]}] (3.5, -2.2) -- (1.9, -1.6);
+\end{tikzpicture}
+\caption{The three rate regimes and their governing combinatorial conditions.
+The left boundary is drawn by the Littlestone dimension (from online
+learning, \Cref{ch:online}); the right boundary by VCL trees (a hybrid of
+VC shattering and Littlestone trees).  The VC dimension (\Cref{ch:pac})
+determines \emph{whether} learning is possible; the Littlestone dimension
+and VCL trees determine \emph{how fast}.}
+\label{fig:rate-regimes}
+\end{figure}
+
+The structural lesson is a hierarchy of three combinatorial conditions,
+each finer than the last:
+
+\begin{center}\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llll}
+\toprule
+\textbf{Condition} & \textbf{Governs} & \textbf{Chapter} & \textbf{Paradigm} \\
+\midrule
+$\VC(\mathcal{H}) < \infty$ & Learnability (yes/no) & \Cref{ch:pac} & PAC \\
+$\Ldim(\mathcal{H}) < \infty$ & Rate: $e^{-n}$ vs.\ $1/n$ & \Cref{ch:online} & Online \\
+No infinite VCL tree & Rate: $1/n$ vs.\ arb.\ slow & This chapter & Universal \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Each row refines the previous one.  The VC dimension draws the coarsest
+line (learnable vs.\ not).  The Littlestone dimension draws a finer line
+within the learnable classes (fast vs.\ slow).  The VCL tree draws the
+finest line (uniformly slow vs.\ hopelessly slow).
+
+This hierarchy was not predicted by any single tradition.  It emerged from
+the trichotomy theorem's proof, which required techniques from both the PAC
+and online learning literatures.  The result is a unified picture in which
+the three paradigms---PAC, online, and universal---are not separate theories
+with accidental parallels, but different projections of a single
+combinatorial landscape.
+
+
+\section{What This Chapter Established}
+\label{sec:ch9-summary}
+
+Two results, one structural lesson.
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Universal learning rates.}  The optimal learning rate asks a
+  harder question than PAC sample complexity: not how many samples for a
+  fixed accuracy, but how fast the risk decreases as a function of $n$,
+  uniformly over all realizable distributions.
+
+\item \textbf{The trichotomy.}  Every hypothesis class with
+  $|\mathcal{H}| \geq 3$ falls into exactly one of three regimes:
+  exponential ($e^{-n}$), linear ($1/n$), or arbitrarily slow.  The
+  boundaries are determined by the Littlestone dimension and VCL trees.
+  There are no intermediate rates.
+
+\item \textbf{The cross-paradigm bridge.}  The Littlestone dimension---born
+  in the adversarial online setting of \Cref{ch:online}---controls the
+  boundary between exponential and polynomial convergence in the i.i.d.\
+  statistical setting.  This was the central open question resolved by
+  Bousquet et al.~\cite{BousquetHannekeMoranVanHandelYehudayoff2021}: not
+  just what the rate regimes are, but what combinatorial objects govern
+  them---and the answer came from an unexpected paradigm.
+\end{enumerate}
+

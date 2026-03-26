@@ -1,0 +1,1011 @@
+% Chapter 17: Extensions Beyond Binary Classification
+%   ds_dimension — Profile C (Revelation): The 30-year gap from Natarajan to DS
+%   multiclass_learning — Profile G (Framework Bridge): Multiple paradigms tried
+%   agnostic_learning — Profile B-light: The agnostic fundamental theorem
+%   proper_improper_separation — Profile D (Witness Construction)
+% Theme: GRAMMAR GROWTH — each extension requires new primitives.
+% The extends_grammar edge type is the structural backbone.
+
+\chapter{Extensions Beyond Binary Classification}
+\label{ch:extensions}
+
+The PAC theory of \Cref{ch:pac} and its characterization through VC dimension
+apply to binary classification: the label set is $\{0,1\}$, the hypothesis
+class is $\mathcal{H} \subseteq \{0,1\}^X$, and the loss is $0$-$1$.  This is
+the setting where the theory is cleanest and most complete.  But most learning
+problems are not binary classification.  Labels may come from a finite set of
+$k > 2$ classes; the target may be a real-valued function; the data may be
+noisy; the realizability assumption may fail.
+
+This chapter asks: how does the binary theory extend to these richer settings?
+The answer is not ``straightforwardly.''  Each extension requires
+\emph{new mathematical primitives}---new notions of shattering, new complexity
+measures, new assumptions.  The binary theory does not generalize by
+substitution; it generalizes by \emph{grammar growth}.  In the concept graph,
+this is captured by edges of type \rel{extends\_grammar}: the source dimension
+extends the grammar of the VC dimension by introducing primitives that have no
+analogue in the binary case.
+
+\medskip
+
+The chapter has six sections.
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{Multiclass learning} (\Cref{sec:multiclass}): the Natarajan
+  dimension, the DS dimension, and the resolution of a thirty-year open problem.
+\item \textbf{Real-valued functions} (\Cref{sec:real-valued}):
+  pseudodimension and fat-shattering dimension.
+\item \textbf{Agnostic learning} (\Cref{sec:agnostic}): dropping realizability
+  and the agnostic fundamental theorem.
+\item \textbf{Noise-tolerant and partial concept learning}
+  (\Cref{sec:noise-partial}): classification noise, malicious noise,
+  and promise problems.
+\item \textbf{Proper versus improper learning}
+  (\Cref{sec:proper-improper}): the computational gap.
+\item \textbf{The \rel{extends\_grammar} pattern}
+  (\Cref{sec:extends-grammar}): what the extensions have in common.
+\end{enumerate}
+
+
+% ================================================================
+%     CONCEPT MAP FIGURE
+% ================================================================
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  node distance=1.6cm and 2.8cm,
+  concept/.style={
+    rectangle, rounded corners=3pt, draw, thick,
+    fill=layergray, font=\small\sffamily,
+    minimum width=2.4cm, minimum height=0.7cm,
+    align=center
+  },
+  ext/.style={-{Stealth[length=5pt]}, edgeorange, thick},
+  chr/.style={-{Stealth[length=5pt]}, defblue, thick},
+  ss/.style={-{Stealth[length=5pt]}, thmred, thick, dashed},
+  lbl/.style={font=\tiny\itshape, text=notegray, align=center}
+]
+
+% --- Binary core ---
+\node[concept] (vc) {VC\\Dimension};
+\node[concept, right=3.2cm of vc] (pac) {PAC\\Learning};
+
+% --- Multiclass branch ---
+\node[concept, above right=1.8cm and 0.8cm of vc] (nat) {Natarajan\\Dimension};
+\node[concept, above=1.4cm of nat] (ds) {DS\\Dimension};
+
+% --- Real-valued branch ---
+\node[concept, below right=1.8cm and 0.8cm of vc] (pdim) {Pseudo-\\dimension};
+\node[concept, below=1.4cm of pdim] (fat) {Fat-Shattering\\Dimension};
+
+% --- Agnostic ---
+\node[concept, right=3.2cm of pac] (agn) {Agnostic\\PAC};
+
+% --- Proper/Improper ---
+\node[concept, below=2.0cm of pac] (pi) {Proper vs\\Improper};
+
+% --- Noise ---
+\node[concept, above=2.0cm of pac] (noise) {Noise-Tolerant\\Learning};
+
+% --- Edges ---
+\draw[ext] (nat) -- node[lbl, left] {\rel{extends\_grammar}} (vc);
+\draw[ext] (pdim) -- node[lbl, left] {\rel{extends\_grammar}} (vc);
+\draw[ss] (ds) -- node[lbl, left] {\rel{strictly\_stronger}} (nat);
+\draw[chr] (vc) -- node[lbl, above] {\rel{characterizes}} (pac);
+\draw[chr] (ds) to[bend left=20] node[lbl, above right] {\rel{characterizes}} (pac);
+\draw[chr] (fat) to[bend right=20] node[lbl, below right] {\rel{characterizes}} (pac);
+\draw[chr] (vc) to[bend right=15] node[lbl, below] {\rel{characterizes}} (agn);
+
+\draw[-{Stealth[length=5pt]}, sepgreen, thick]
+  (agn) -- node[lbl, above] {\rel{restricts}} (pac);
+\draw[-{Stealth[length=5pt]}, boundbrown, thick]
+  (pi) -- node[lbl, right] {\rel{lower\_bounds}} (pac);
+
+\end{tikzpicture}
+
+\caption{Concept map for this chapter.  Orange:~\rel{extends\_grammar}.
+Dashed red:~\rel{strictly\_stronger}.  Blue:~\rel{characterizes}.
+Green:~\rel{restricts}.  Brown:~\rel{lower\_bounds}.  Each arrow
+represents an edge in the concept graph.}
+\label{fig:ch17-concept-map}
+\end{figure}
+
+
+% ================================================================
+% SECTION 1: MULTICLASS LEARNING
+% ================================================================
+
+\section{Multiclass Learning: From Natarajan to DS}
+\label{sec:multiclass}
+
+Let $Y = [k] = \{1, 2, \ldots, k\}$ for some $k \geq 2$, and let
+$\mathcal{H} \subseteq Y^X$ be a multiclass hypothesis class.  The question
+is: what characterizes PAC learnability of $\mathcal{H}$?
+
+For $k = 2$, the answer is the VC dimension.  For $k > 2$, the answer was only
+fully resolved in 2022, after a thirty-year journey through two competing
+dimensions, each introducing a new shattering primitive.  That journey---and its
+resolution---is the narrative backbone of this section.
+
+
+\subsection{The Natarajan Dimension}
+
+Natarajan~\cite{Natarajan1989} introduced the first multiclass complexity
+measure by generalizing shattering to require two functions instead of one.
+
+\begin{defn}[Natarajan Dimension {\cite{Natarajan1989}}]
+\label{def:natarajan-dim}
+The \emph{Natarajan dimension} $\Ndim(\mathcal{H})$ of a multiclass hypothesis
+class $\mathcal{H} \subseteq Y^X$ is the largest size $d$ of a set
+$\{x_1, \ldots, x_d\} \subseteq X$ for which there exist two functions
+$f_0, f_1 \colon \{x_1, \ldots, x_d\} \to Y$ satisfying:
+\begin{enumerate}[leftmargin=*,nosep]
+\item $f_0(x_i) \neq f_1(x_i)$ for all $i \in [d]$, and
+\item for every binary string $b \in \{0,1\}^d$, there exists $h \in
+  \mathcal{H}$ with $h(x_i) = f_{b_i}(x_i)$ for all $i$.
+\end{enumerate}
+\end{defn}
+
+The new primitive is the \emph{pair of functions} $(f_0, f_1)$.  In binary
+classification, $f_0$ and $f_1$ are forced to be the constant functions $0$
+and $1$, and the definition reduces to VC shattering.  In the multiclass case,
+the choice of which two labels to use at each point is part of the
+combinatorial structure.
+
+\begin{example}[Natarajan shattering with $k=3$]
+\label{ex:natarajan-k3}
+Let $X = \{a, b\}$, $Y = \{1,2,3\}$.  Define $f_0(a)=1$, $f_0(b)=2$
+and $f_1(a)=3$, $f_1(b)=1$.  To N-shatter $\{a,b\}$, we need four
+hypotheses realizing every binary string:
+\[
+  h_{00}(a)=1,\, h_{00}(b)=2;\quad
+  h_{01}(a)=1,\, h_{01}(b)=1;\quad
+  h_{10}(a)=3,\, h_{10}(b)=2;\quad
+  h_{11}(a)=3,\, h_{11}(b)=1.
+\]
+Any $\mathcal{H} \supseteq \{h_{00}, h_{01}, h_{10}, h_{11}\}$ has $\Ndim \geq 2$.
+\end{example}
+
+\begin{historical}
+\textbf{The Natarajan gap (1989--2022).}
+Natarajan showed that $\Ndim(\mathcal{H}) < \infty$ is \emph{sufficient}
+for PAC learnability and provided sample complexity bounds.  The best
+known bounds, due to Ben-David et al.~\cite{BenDavidCesaBianchiHausslerLong1995},
+were:
+\[
+  C_1 \cdot \frac{\Ndim}{\varepsilon}
+  \;\leq\; m_{\mathrm{PAC}}(\varepsilon,\delta)
+  \;\leq\; C_2 \cdot \frac{\Ndim \cdot \ln k \cdot \ln(1/\varepsilon)}{\varepsilon}.
+\]
+Two gaps persisted.  First, the $\Theta(\log k)$ factor between upper
+and lower bounds.  Second, and more fundamentally: is finiteness of $\Ndim$
+also \emph{necessary}?  For finite label sets $|Y| = k < \infty$, the answer
+is yes (the $\log k$ factor is at most a polynomial overhead).  But when
+$|Y| = \infty$, a class can have $\Ndim = 1$ and yet fail to be PAC learnable.
+This was the open problem that persisted for over thirty years.
+\end{historical}
+
+
+\begin{graphnode}[title={Graph Node: \nde{natarajan\_dimension}}]
+Layer~5: \texttt{complexity\_measure}.  Key edge:
+$\edge{natarajan\_dimension}{extends\_grammar}{vc\_dimension}$.
+The grammar extension is the two-function shattering primitive $(f_0, f_1)$.
+Open frontier: tight multiclass sample complexity without the $\log k$ factor.
+\end{graphnode}
+
+
+\subsection{The DS Dimension: A Thirty-Year Resolution}
+\label{subsec:ds-dim}
+
+The correct characterization of multiclass PAC learnability was established
+by Brukhim et al.~\cite{BrukhimCarmonDinurMoranYehudayoff2022} using the
+\emph{DS dimension}, named after Daniely and
+Shalev-Shwartz~\cite{DanielyShalevShwartz2014} who introduced the
+underlying concept of pseudo-cubes in one-inclusion hypergraphs.
+
+\begin{defn}[One-Inclusion Hypergraph]
+\label{def:oig}
+Let $\mathcal{H} \subseteq Y^X$ and let $S = \{x_1, \ldots, x_n\} \subseteq X$
+be a finite set.  The \emph{one-inclusion hypergraph} $\mathrm{OIG}(\mathcal{H}, S)$
+has vertex set $\mathcal{H}|_S = \{(h(x_1), \ldots, h(x_n)) : h \in \mathcal{H}\}$
+and, for each coordinate $i \in [n]$, a hyperedge connecting all vertices that
+agree on all coordinates except possibly coordinate $i$.
+\end{defn}
+
+\begin{defn}[DS Dimension {\cite{DanielyShalevShwartz2014,BrukhimCarmonDinurMoranYehudayoff2022}}]
+\label{def:ds-dim}
+A set $\{x_1, \ldots, x_d\} \subseteq X$ is \emph{DS-shattered} by
+$\mathcal{H} \subseteq Y^X$ if there exists a function
+$f \colon \{x_1, \ldots, x_d\} \to Y$ such that for every $i \in [d]$,
+there exists $h_i \in \mathcal{H}$ with:
+\begin{enumerate}[leftmargin=*,nosep]
+\item $h_i(x_i) \neq f(x_i)$, and
+\item $h_i(x_j) = f(x_j)$ for all $j \neq i$.
+\end{enumerate}
+The \emph{DS dimension} $\DSdim(\mathcal{H})$ is the size of the largest
+DS-shattered set.
+\end{defn}
+
+The structural content of DS-shattering is different from Natarajan shattering
+in a revealing way.  Natarajan shattering asks for a \emph{global} pair of
+labeling functions with \emph{all} $2^d$ interpolations realized.
+DS-shattering asks for a single ``default'' labeling $f$ and, for each
+point, a \emph{local} witness that deviates at exactly that point.  The
+requirement is weaker per point (only one deviation, not arbitrary binary
+combinations) but more structural: it encodes a property of the
+one-inclusion hypergraph of $\mathcal{H}$.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  scale=0.85,
+  point/.style={circle, fill=defblue, inner sep=1.8pt},
+  hyp/.style={font=\small},
+  brace/.style={decorate, decoration={brace, amplitude=5pt}}
+]
+% Default labeling
+\node[hyp] at (-1.5, 2.0) {Default $f$:};
+\foreach \i/\lbl in {1/a, 2/b, 3/c} {
+  \node[point] (x\i) at (1.5*\i, 2.0) {};
+  \node[above=3pt] at (x\i) {$x_{\i}$};
+  \node[below=5pt, font=\small, text=defblue] at (x\i) {$\lbl$};
+}
+
+% Witness hypotheses
+\node[hyp] at (-1.5, 0.6) {$h_1$:};
+\foreach \i/\lbl/\col in {1/{\neq a}/thmred, 2/b/defblue, 3/c/defblue} {
+  \node[circle, fill=\col!20, draw=\col, inner sep=1.8pt] (h1\i) at (1.5*\i, 0.6) {};
+  \node[below=5pt, font=\small, text=\col] at (h1\i) {$\lbl$};
+}
+
+\node[hyp] at (-1.5, -0.4) {$h_2$:};
+\foreach \i/\lbl/\col in {1/a/defblue, 2/{\neq b}/thmred, 3/c/defblue} {
+  \node[circle, fill=\col!20, draw=\col, inner sep=1.8pt] (h2\i) at (1.5*\i, -0.4) {};
+  \node[below=5pt, font=\small, text=\col] at (h2\i) {$\lbl$};
+}
+
+\node[hyp] at (-1.5, -1.4) {$h_3$:};
+\foreach \i/\lbl/\col in {1/a/defblue, 2/b/defblue, 3/{\neq c}/thmred} {
+  \node[circle, fill=\col!20, draw=\col, inner sep=1.8pt] (h3\i) at (1.5*\i, -1.4) {};
+  \node[below=5pt, font=\small, text=\col] at (h3\i) {$\lbl$};
+}
+
+% Annotations
+\draw[brace] (5.3, 0.9) -- (5.3, -1.7)
+  node[midway, right=6pt, font=\small, align=left]
+  {Each $h_i$ deviates\\from $f$ at $x_i$ only};
+
+\end{tikzpicture}
+\caption{DS-shattering of $\{x_1, x_2, x_3\}$.  The default labeling $f$
+assigns labels $a, b, c$.  Each witness $h_i$ disagrees with $f$ at
+exactly one coordinate (shown in red).}
+\label{fig:ds-shattering}
+\end{figure}
+
+
+\begin{thm}[Multiclass Characterization {\cite{BrukhimCarmonDinurMoranYehudayoff2022}}]
+\label{thm:multiclass-char}
+A multiclass hypothesis class $\mathcal{H} \subseteq Y^X$ is PAC learnable if
+and only if $\DSdim(\mathcal{H}) < \infty$.
+\end{thm}
+
+\begin{proof}[Proof sketch]
+We outline both directions.
+
+\medskip\noindent
+\textbf{Sufficiency} ($\DSdim(\mathcal{H}) < \infty \Rightarrow$ learnable).
+The proof proceeds through the one-inclusion hypergraph.  For a finite
+restriction $\mathcal{H}|_S$ to a sample $S$ of size $m$, the one-inclusion
+hypergraph $\mathrm{OIG}(\mathcal{H}, S)$ has vertices $\mathcal{H}|_S$ and
+hyperedges indexed by coordinates.  The key insight of Daniely and
+Shalev-Shwartz is that a \emph{proper orientation} of this hypergraph---an
+assignment of each hyperedge to one of its vertices---yields a learning
+algorithm.  Specifically:
+
+\begin{enumerate}[leftmargin=*,nosep]
+\item Given a sample $S = \{(x_1, y_1), \ldots, (x_m, y_m)\}$, restrict
+  $\mathcal{H}$ to $\{x_1, \ldots, x_m\}$ and build $\mathrm{OIG}(\mathcal{H}, S)$.
+\item Find a proper orientation with \emph{minimum outdegree}.
+\item Return the hypothesis whose vertex has minimum outdegree in the
+  orientation.
+\end{enumerate}
+
+If $\DSdim(\mathcal{H}) = d < \infty$, then the one-inclusion hypergraph
+of any restriction has no $d$-dimensional pseudo-cube, and a combinatorial
+argument (via the Helly property of CAT(0) cube complexes) shows that
+a proper orientation with outdegree at most $O(d)$ exists.  The learner's
+error is bounded by $O(d/m)$, yielding PAC learnability with sample
+complexity $O(d/\varepsilon)$.
+
+\medskip\noindent
+\textbf{Necessity} ($\DSdim(\mathcal{H}) = \infty \Rightarrow$ not learnable).
+If $\DSdim(\mathcal{H}) = \infty$, then for every $d$, there exists a
+finite set that is DS-shattered.  The proof constructs, for each $d$, a
+distribution $D_d$ over $X \times Y$ such that:
+\begin{itemize}[leftmargin=*,nosep]
+\item The Bayes-optimal classifier has zero error.
+\item Any learner given $m < d$ samples has expected error
+  $\Omega(d/m)$ on $D_d$.
+\end{itemize}
+The distribution is supported on the DS-shattered set and uses the default
+labeling $f$ as the target.  The witness hypotheses $h_1, \ldots, h_d$ act
+as ``confusers'': a learner that has not seen point $x_i$ cannot distinguish
+$f$ from $h_i$, because they agree everywhere except at $x_i$.  Since this
+works for arbitrarily large $d$, no finite sample suffices for
+$\varepsilon$-accurate learning uniformly over $D_d$.
+\end{proof}
+
+
+\begin{obstbox}
+\textbf{Natarajan $\not\Rightarrow$ PAC learnability when $|Y| = \infty$.}
+
+\medskip\noindent
+\emph{Witness (Brukhim et al.~2022).}
+There exists a hypothesis class $\mathcal{H} \subseteq Y^X$ with
+$\Ndim(\mathcal{H}) = 1$ but $\DSdim(\mathcal{H}) = \infty$.  The
+construction uses a hyperbolic pseudo-manifold: the domain $X$ is the
+vertex set of a high-dimensional simplicial complex with hyperbolic
+geometry, and $\mathcal{H}$ encodes colorings of simplices.  The
+hyperbolic geometry ensures that any two points can be N-shattered
+(only two labels are needed locally), but the global structure admits
+arbitrarily large DS-shattered sets because the one-inclusion hypergraph
+contains arbitrarily large pseudo-cubes.
+
+\medskip\noindent
+\emph{Structural lesson.}
+The Natarajan dimension is a \emph{local} measure: it examines pairs of
+labels at each point.  The DS dimension is a \emph{global} measure: it
+examines the connectivity structure of the entire one-inclusion hypergraph.
+When $|Y| = \infty$, local two-label constraints do not capture global
+learnability.
+
+\medskip\noindent
+\emph{Graph edge:}
+$\edge{natarajan\_dimension}{does\_not\_imply}{pac\_learning}$ with witness
+``Brukhim et al.\ 2022: non-learnable class with $\Ndim = 1$.''
+\end{obstbox}
+
+
+The relationship between the two dimensions is:
+
+\begin{prop}[DS vs.\ Natarajan]
+\label{prop:ds-vs-nat}
+For any $\mathcal{H} \subseteq Y^X$:
+\[
+  \Ndim(\mathcal{H}) \;\leq\; \DSdim(\mathcal{H}).
+\]
+Moreover, when $|Y| = k < \infty$:
+\[
+  \DSdim(\mathcal{H}) \;\leq\; O\!\bigl(\Ndim(\mathcal{H}) \cdot \log k\bigr).
+\]
+\end{prop}
+
+\begin{proof}
+For the first inequality, suppose $S = \{x_1,\ldots, x_d\}$ is
+DS-shattered via default $f$ and witnesses $h_1, \ldots, h_d$.
+Define $f_0 = f|_S$ and, for each $i$, define $f_1(x_i) = h_i(x_i) \neq f(x_i)$.
+Then $S$ is N-shattered by $(f_0, f_1)$, but only for binary strings that
+flip at most one coordinate.  The full $2^d$ interpolation requirement of
+Natarajan shattering may not hold, so DS-shattering is a weaker condition
+per set, hence $\Ndim \leq \DSdim$.
+
+For the second inequality (finite $k$), suppose $\DSdim = D$.  Any
+DS-shattered set provides $D$ witness hypotheses deviating from a default.
+Since each deviation chooses one of $k-1$ alternative labels, a pigeonhole
+argument over the $k^D$ possible deviation patterns shows
+$D \leq O(\Ndim \cdot \log k)$.
+\end{proof}
+
+
+\begin{graphnode}[title={Graph Node: \nde{ds\_dimension}}]
+Layer~5: \texttt{complexity\_measure}.  Key edges:
+$\edge{ds\_dimension}{characterizes}{pac\_learning}$ (for multiclass).
+$\edge{ds\_dimension}{strictly\_stronger}{natarajan\_dimension}$ with
+witness: hyperbolic pseudo-manifold construction.
+This node resolved a 30-year open problem in the theory.
+\end{graphnode}
+
+
+% ================================================================
+% SECTION 2: REAL-VALUED FUNCTIONS
+% ================================================================
+
+\section{Real-Valued Functions}
+\label{sec:real-valued}
+
+Now let $\mathcal{F} \subseteq \R^X$ be a class of real-valued functions.
+The learner observes samples $(x_i, y_i)$ with $y_i = f(x_i)$ (or
+$y_i \approx f(x_i)$ in the noisy case) and aims to approximate $f$.
+The $0$-$1$ loss is replaced by the squared loss or absolute loss, and the
+question becomes: what is the analogue of VC dimension?
+
+Two dimensions extend the binary theory.  Both introduce \emph{thresholds} as
+a new primitive.
+
+
+\subsection{Pseudodimension}
+
+\begin{defn}[Pseudodimension {\cite{Pollard1984,Haussler1992}}]
+\label{def:pseudodim}
+The \emph{pseudodimension} $\Pdim(\mathcal{F})$ of a function class
+$\mathcal{F} \subseteq \R^X$ is the VC dimension of the class of subgraphs:
+\[
+  \Pdim(\mathcal{F}) \;=\; \VC\!\bigl(\bigl\{
+    x \mapsto \ind[f(x) \geq t] : f \in \mathcal{F},\; t \in \R
+  \bigr\}\bigr).
+\]
+Equivalently, $\Pdim(\mathcal{F}) = d$ if there exist $x_1, \ldots, x_d \in X$
+and thresholds $t_1, \ldots, t_d \in \R$ such that for every
+$b \in \{0,1\}^d$, there exists $f \in \mathcal{F}$ with
+$f(x_i) \geq t_i \iff b_i = 1$.
+\end{defn}
+
+The new primitive is the \emph{threshold vector} $(t_1, \ldots, t_d)$.
+In binary classification, thresholds are unnecessary: the outputs are
+already $0$ or $1$.  For real-valued functions, thresholds convert the
+continuous outputs into a binary shattering condition.
+
+\begin{example}[Linear functions]
+For the class of linear functions $\mathcal{F} = \{x \mapsto w^\top x : w \in \R^d\}$
+on $\R^d$, we have $\Pdim(\mathcal{F}) = d$.  Any $d$ affinely independent
+points $x_1, \ldots, x_d$ can be P-shattered with thresholds $t_i = 0$:
+for each $b \in \{0,1\}^d$, one can find $w$ such that $\mathrm{sign}(w^\top x_i) = (-1)^{1-b_i}$.
+\end{example}
+
+\begin{prop}[Pseudodimension and covering numbers]
+\label{prop:pdim-covering}
+If $\Pdim(\mathcal{F}) = d < \infty$, then for every probability measure
+$P$ on $X$ and every $\varepsilon > 0$:
+\[
+  \mathcal{N}(\varepsilon, \mathcal{F}, L_1(P))
+  \;\leq\; \left(\frac{2e}{\varepsilon}\right)^d.
+\]
+\end{prop}
+
+\begin{graphnode}[title={Graph Node: \nde{pseudodimension}}]
+Layer~5: \texttt{complexity\_measure}.  Key edge:
+$\edge{pseudodimension}{extends\_grammar}{vc\_dimension}$.
+The grammar extension is the threshold primitive.
+\end{graphnode}
+
+
+\subsection{Fat-Shattering Dimension}
+
+Pseudodimension controls learnability in the realizable case.  For the
+agnostic setting with real-valued targets, a scale-sensitive
+notion is needed.
+
+\begin{defn}[Fat-Shattering Dimension {\cite{AlonBenDavidCesaBianchiHaussler1997}}]
+\label{def:fat-shattering}
+For $\gamma > 0$, the \emph{$\gamma$-fat-shattering dimension}
+$\fatshat_\gamma(\mathcal{F})$ is the largest $d$ such that there exist
+$x_1, \ldots, x_d \in X$ and thresholds $t_1, \ldots, t_d \in \R$ satisfying:
+for every $b \in \{0,1\}^d$, there exists $f \in \mathcal{F}$ with
+\[
+  f(x_i) \geq t_i + \gamma \;\text{if } b_i = 1,
+  \qquad
+  f(x_i) \leq t_i - \gamma \;\text{if } b_i = 0.
+\]
+\end{defn}
+
+The new primitive beyond pseudodimension is the \emph{margin} $\gamma$.
+As $\gamma \to 0$, the fat-shattering dimension approaches the
+pseudodimension.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[scale=0.9]
+  % Axes
+  \draw[->] (0,0) -- (7,0) node[right] {$x$};
+  \draw[->] (0,-0.5) -- (0,4) node[above] {$f(x)$};
+
+  % Thresholds
+  \foreach \i/\xpos/\tval in {1/1.5/1.5, 2/3.5/2.5, 3/5.5/1.8} {
+    \draw[dashed, notegray] (\xpos-0.5, \tval) -- (\xpos+0.5, \tval)
+      node[right, font=\tiny] {$t_{\i}$};
+    \fill[edgeorange!30] (\xpos-0.3, \tval+0.5) rectangle (\xpos+0.3, \tval+1.2);
+    \fill[defblue!20] (\xpos-0.3, \tval-1.0) rectangle (\xpos+0.3, \tval-0.3);
+    \node[font=\tiny] at (\xpos, \tval+0.85) {$\geq t_i{+}\gamma$};
+    \node[font=\tiny] at (\xpos, \tval-0.65) {$\leq t_i{-}\gamma$};
+    \draw[<->, thick, sepgreen] (\xpos+0.4, \tval-0.3) -- (\xpos+0.4, \tval+0.5)
+      node[midway, right, font=\tiny, text=sepgreen] {$2\gamma$};
+  }
+\end{tikzpicture}
+\caption{$\gamma$-fat-shattering.  At each point $x_i$, the threshold
+$t_i$ creates a gap of width $2\gamma$.  Functions must place values
+strictly within the shaded regions, not merely across the threshold.}
+\label{fig:fat-shattering}
+\end{figure}
+
+\begin{thm}[Real-Valued Characterization {\cite{AlonBenDavidCesaBianchiHaussler1997}}]
+\label{thm:real-valued-char}
+A class $\mathcal{F} \subseteq [0,1]^X$ of bounded real-valued functions is
+agnostically PAC learnable with respect to the absolute loss if and only if
+$\fatshat_\gamma(\mathcal{F}) < \infty$ for all $\gamma > 0$.
+\end{thm}
+
+\begin{proof}[Proof sketch]
+\textbf{Sufficiency.}  If $\fatshat_\gamma(\mathcal{F}) = d_\gamma < \infty$
+for all $\gamma > 0$, then the $L_2$ covering numbers satisfy
+$\log \mathcal{N}_2(\varepsilon, \mathcal{F}, x_1^n) \leq
+O(d_{\varepsilon/4} \cdot \log^2(n/d_{\varepsilon/4}))$.
+Finite covering numbers imply uniform convergence of empirical risk to
+true risk, which yields agnostic PAC learnability.
+
+\textbf{Necessity.}  If $\fatshat_\gamma(\mathcal{F}) = \infty$ for some
+$\gamma > 0$, then for every $n$, one can $\gamma$-fat-shatter $n$ points.
+By a probabilistic argument, any empirical risk minimizer on a sample of
+size $m$ has expected error $\Omega(\gamma)$ on a suitably chosen
+distribution, regardless of $m$.  Hence $\mathcal{F}$ is not learnable
+at accuracy $\gamma$.
+\end{proof}
+
+\begin{remark}[Scale families versus single numbers]
+\label{rmk:scale-family}
+The fat-shattering characterization is a \emph{family} of finiteness
+requirements (one for each $\gamma > 0$), not a single number.  This is
+another instance of grammar growth: the real-valued setting requires a
+scale parameter that has no analogue in the binary theory.  In practice,
+$\fatshat_\gamma$ is often a decreasing function of $\gamma$---larger
+margins are harder to maintain, so fewer points can be fat-shattered.
+\end{remark}
+
+
+% ================================================================
+% SECTION 3: AGNOSTIC LEARNING
+% ================================================================
+
+\section{Agnostic Learning: Dropping Realizability}
+\label{sec:agnostic}
+
+All results so far have assumed \emph{realizability}: there exists some
+$h^* \in \mathcal{H}$ with $\risk_D(h^*) = 0$.  In practice, models are
+always wrong; the question is how wrong.  The agnostic setting, introduced
+by Haussler~\cite{Haussler1992}, removes the realizability assumption entirely.
+
+\begin{defn}[Agnostic PAC Learning {\cite{Haussler1992}}]
+\label{def:agnostic-pac}
+A hypothesis class $\mathcal{H}$ is \emph{agnostically PAC learnable}
+if there exists a learner $A$ and a function $m \colon (0,1)^2 \to \N$ such
+that for every distribution $D$ over $X \times \{0,1\}$ (with \emph{no}
+assumption that the Bayes-optimal classifier lies in $\mathcal{H}$), for
+every $\varepsilon, \delta > 0$: given $m(\varepsilon, \delta)$ i.i.d.\
+samples from $D$,
+\[
+  \Pr_{S \sim D^m}\!\Bigl[
+    \risk_D\!\bigl(A(S)\bigr)
+    \;\leq\;
+    \inf_{h \in \mathcal{H}} \risk_D(h) + \varepsilon
+  \Bigr] \;\geq\; 1 - \delta.
+\]
+\end{defn}
+
+The learner must compete with the \emph{best hypothesis in the class},
+not with the Bayes-optimal classifier.  The gap
+$\inf_{h \in \mathcal{H}} \risk_D(h)$ may be positive; the learner need
+only close to within $\varepsilon$ of it.
+
+\begin{thm}[Agnostic Fundamental Theorem]
+\label{thm:agnostic-ft}
+For binary classification with $0$-$1$ loss, a hypothesis class
+$\mathcal{H} \subseteq \{0,1\}^X$ is agnostically PAC learnable if and only
+if $\VC(\mathcal{H}) < \infty$.
+\end{thm}
+
+\begin{proof}[Proof sketch]
+The characterizing condition is the same as in the realizable case---finite
+VC dimension---but the proof mechanism and sample complexity differ.
+
+\medskip\noindent
+\textbf{Sufficiency.}  Suppose $\VC(\mathcal{H}) = d < \infty$.  The learner
+runs empirical risk minimization: $A(S) = \arg\min_{h \in \mathcal{H}}
+\emprisk_S(h)$.  By the uniform convergence theorem for VC classes, with
+probability at least $1 - \delta$ over a sample of size
+$m = O\!\bigl(\frac{d + \log(1/\delta)}{\varepsilon^2}\bigr)$,
+\[
+  \sup_{h \in \mathcal{H}} \bigl|\risk_D(h) - \emprisk_S(h)\bigr|
+  \;\leq\; \varepsilon/2.
+\]
+Let $h^* = \arg\min_{h \in \mathcal{H}} \risk_D(h)$ and $\hat{h} = A(S)$.
+Then:
+\begin{align*}
+  \risk_D(\hat{h})
+  &\leq \emprisk_S(\hat{h}) + \varepsilon/2
+    &\text{(uniform convergence)}\\
+  &\leq \emprisk_S(h^*) + \varepsilon/2
+    &\text{(ERM chose $\hat{h}$)}\\
+  &\leq \risk_D(h^*) + \varepsilon/2 + \varepsilon/2
+    &\text{(uniform convergence)}\\
+  &= \risk_D(h^*) + \varepsilon.
+\end{align*}
+
+\medskip\noindent
+\textbf{Necessity.}  If $\VC(\mathcal{H}) = \infty$, the No-Free-Lunch
+argument of the realizable case applies \textit{a fortiori}: for any learner
+and any sample size $m$, there exists a realizable distribution (which is
+a special case of an arbitrary distribution) on which the learner fails.
+\end{proof}
+
+\begin{separation}
+\textbf{Agnostic versus realizable sample complexity.}
+
+\medskip\noindent
+The agnostic and realizable settings are characterized by the \emph{same}
+condition ($\VC < \infty$), but the sample complexities differ:
+\[
+  m_{\mathrm{realizable}}(\varepsilon, \delta)
+  = \Theta\!\left(\frac{d}{\varepsilon} + \frac{\log(1/\delta)}{\varepsilon}\right),
+  \qquad
+  m_{\mathrm{agnostic}}(\varepsilon, \delta)
+  = \Theta\!\left(\frac{d}{\varepsilon^2} + \frac{\log(1/\delta)}{\varepsilon^2}\right).
+\]
+The quadratic dependence on $1/\varepsilon$ in the agnostic case is
+inherent, not an artifact of the analysis: the lower bound is achieved by
+distributions where the optimal hypothesis has error $1/2 - \varepsilon$,
+and distinguishing it from a hypothesis with error $1/2$ requires
+$\Omega(1/\varepsilon^2)$ samples by a Chernoff-bound argument.
+
+\medskip\noindent
+\emph{Graph edge:}
+$\edge{agnostic\_pac\_learning}{restricts}{pac\_learning}$---agnostic PAC
+learning \emph{generalizes} standard PAC learning by removing the
+realizability constraint.
+\end{separation}
+
+
+% ================================================================
+% SECTION 4: NOISE AND PARTIAL CONCEPTS
+% ================================================================
+
+\section{Noise-Tolerant and Partial Concept Learning}
+\label{sec:noise-partial}
+
+\subsection{Classification Noise}
+
+The \emph{classification noise} model (Angluin and
+Laird~\cite{AngluinLaird1988}) modifies PAC learning by flipping each
+label independently with probability $\eta < 1/2$: the learner observes
+$(x, y \oplus z)$ where $z \sim \mathrm{Bernoulli}(\eta)$ and $y$ is the true
+label.  The question is whether finite VC dimension still suffices for
+learning.
+
+\begin{thm}[Noise-tolerant PAC learning]
+\label{thm:noise-tolerant}
+If $\VC(\mathcal{H}) = d < \infty$ and the noise rate $\eta < 1/2$ is known,
+then $\mathcal{H}$ is PAC learnable under classification noise with sample
+complexity
+\[
+  m = O\!\left(\frac{d}{(1-2\eta)^2 \varepsilon^2}
+  + \frac{\log(1/\delta)}{(1-2\eta)^2 \varepsilon^2}\right).
+\]
+\end{thm}
+
+The sample complexity degrades as $\eta \to 1/2$---the noise rate approaches
+the information-theoretic limit where labels carry no signal.
+
+\begin{remark}[SQ connection]
+\label{rmk:sq-noise}
+Statistical query (SQ) learnable classes are automatically noise-tolerant:
+an SQ algorithm estimates expectations $\E_D[\phi(x, y)]$ to tolerance
+$\tau$, and these can be simulated from noisy samples with a $1/(1-2\eta)$
+overhead in sample size.  However, not all noise-tolerant classes are
+SQ learnable: parities are PAC learnable (via Gaussian elimination) and
+hence noise-tolerant for known $\eta$, but not SQ learnable
+($\SQdim = 2^n$).
+\end{remark}
+
+
+\subsection{Partial Concept Learning}
+
+In \emph{partial concept learning} (also called \emph{promise problems}),
+the hypothesis class $\mathcal{H}$ is defined only on a subset
+$P \subseteq X$---the \emph{promise set}.  Points outside $P$ have no
+defined label, and the distribution $D$ is supported on $P$.
+
+\begin{defn}[Partial Concept Class]
+\label{def:partial-concept}
+A \emph{partial concept class} is a set $\mathcal{H} \subseteq \{0, 1, *\}^X$
+where $*$ denotes ``undefined.''  A distribution $D$ is \emph{compatible}
+with $h \in \mathcal{H}$ if $D$ is supported on $\{x : h(x) \neq *\}$.
+\end{defn}
+
+Partial concepts arise naturally in many settings: medical diagnosis where
+only symptomatic patients have definite diagnoses, or feature spaces where
+certain regions are ``don't care'' zones.
+
+The VC dimension of a partial concept class is defined by restricting
+shattering to the promise region.  The fundamental theorem extends:
+finite VC dimension of the promise-restricted class characterizes PAC
+learnability of partial concepts.  However, the \emph{computational}
+landscape changes: problems that are efficiently learnable as total concepts
+may become hard when restricted to a promise set, because the promise
+constraint interacts with the hypothesis representation.
+
+
+% ================================================================
+% SECTION 5: PROPER VS IMPROPER
+% ================================================================
+
+\section{Proper Versus Improper Learning}
+\label{sec:proper-improper}
+
+All PAC definitions permit the learner to output \emph{any} efficiently
+evaluatable hypothesis---not just one from the target class $\mathcal{H}$.
+When the learner is restricted to output a hypothesis from $\mathcal{H}$
+itself, we call it a \emph{proper} learner.
+
+\begin{defn}[Proper and Improper PAC Learning]
+\label{def:proper-improper}
+A PAC learner $A$ for class $\mathcal{H}$ is \emph{proper} if
+$A(S) \in \mathcal{H}$ for all samples $S$.  It is \emph{improper} if
+$A(S)$ may lie in a larger class $\mathcal{H}' \supseteq \mathcal{H}$.
+\end{defn}
+
+\begin{remark}
+In the information-theoretic (sample complexity) sense, there is no
+separation between proper and improper learning for standard PAC: both are
+characterized by finite VC dimension, and the sample complexities are
+$\Theta(d/\varepsilon)$ in both cases.  The separation is \emph{computational}.
+\end{remark}
+
+\begin{thm}[Pitt--Valiant {\cite{PittValiant1988}}]
+\label{thm:pitt-valiant}
+For $k \geq 2$, $k$-term DNF is not properly PAC learnable unless $\mathrm{RP} = \mathrm{NP}$.
+\end{thm}
+
+\begin{proof}[Proof]
+The proof reduces graph $k$-colorability to the problem of finding a
+consistent $k$-term DNF formula.
+
+Let $G = (V, E)$ be a graph with $V = \{v_1, \ldots, v_n\}$.  We construct
+a learning instance over $X = \{0,1\}^n$ as follows.
+
+\medskip\noindent
+\textbf{Positive examples.}  For each vertex $v_i$, create the example
+$e_i^+ \in \{0,1\}^n$ defined by $e_i^+(j) = 1$ if $j \neq i$ and
+$e_i^+(i) = 0$.  Label: positive.
+
+\medskip\noindent
+\textbf{Negative examples.}  For each edge $(v_i, v_j) \in E$, create the
+example $e_{ij}^- \in \{0,1\}^n$ defined by $e_{ij}^-(l) = 1$ if
+$l \notin \{i, j\}$, and $e_{ij}^-(i) = e_{ij}^-(j) = 0$.  Label: negative.
+
+\medskip\noindent
+\textbf{Claim.}  A consistent $k$-term DNF exists for this labeled sample
+if and only if $G$ is $k$-colorable.
+
+\medskip\noindent
+\emph{Forward direction.}  Given a proper $k$-coloring $c \colon V \to [k]$,
+define the $k$-term DNF $\phi = T_1 \vee \cdots \vee T_k$ where
+$T_j = \bigwedge_{i : c(v_i) = j} \overline{x_i}$.  Each positive example
+$e_i^+$ satisfies $T_{c(v_i)}$ (since $e_i^+(i) = 0$ makes the literal
+$\overline{x_i}$ true, and all other literals in $T_{c(v_i)}$ are true
+because $e_i^+(l) = 1$ for $l \neq i$).  Each negative example $e_{ij}^-$
+falsifies every term: for any term $T_j$, since $(v_i, v_j)$ is an edge
+and $c$ is proper, $c(v_i) \neq c(v_j)$, so at most one of $v_i, v_j$
+is in color class $j$, and the other has $e_{ij}^-(l) = 0$ which falsifies
+a literal not in $T_j$.  (A careful case analysis confirms the argument.)
+
+\medskip\noindent
+\emph{Reverse direction.}  Given a consistent $k$-term DNF
+$\phi = T_1 \vee \cdots \vee T_k$, assign color $c(v_i) = \min\{j : e_i^+
+\text{ satisfies } T_j\}$.  Since $e_i^+$ is positive, at least one term is
+satisfied.  For any edge $(v_i, v_j)$, the negative example $e_{ij}^-$
+falsifies $\phi$, which forces $c(v_i) \neq c(v_j)$ (otherwise the term
+satisfied by both would also satisfy $e_{ij}^-$).  Hence $c$ is a proper
+$k$-coloring.
+
+\medskip\noindent
+\textbf{Conclusion.}  A proper PAC learner for $k$-term DNF, given the
+above examples (which can be generated efficiently from $G$), would find
+a consistent $k$-term DNF in polynomial time, thereby solving $k$-colorability
+in polynomial time.  Since $k$-colorability is NP-complete for $k \geq 3$
+(and NP-hard to decide in randomized polynomial time unless
+$\mathrm{RP} = \mathrm{NP}$), proper PAC learning of $k$-term DNF is
+computationally hard.
+\end{proof}
+
+
+\begin{separation}
+\textbf{Proper $\not\Rightarrow$ efficient learning: the DNF witness.}
+
+\medskip\noindent
+The same class that is hard to learn properly is easy to learn improperly.
+Observe that every $k$-term DNF over $n$ variables is a $k$-CNF formula
+(by distributing), and $k$-CNF is learnable in polynomial time: simply
+enumerate all $O(n^k)$ candidate clauses and filter by consistency with the
+data.
+
+\medskip\noindent
+\emph{Summary.} For $k = 3$: 3-term DNF is NP-hard proper, polynomial-time
+improper (via 3-CNF).  This is the cleanest known computational separation
+in PAC learning.
+
+\medskip\noindent
+\emph{Graph edge:}
+$\edge{proper\_improper\_separation}{does\_not\_imply}{pac\_learning}$ with
+witness ``3-term DNF: NP-hard proper, poly-time improper.''
+\end{separation}
+
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  node distance=2cm and 3cm,
+  box/.style={
+    rectangle, rounded corners=4pt, draw, thick,
+    minimum width=3cm, minimum height=1cm,
+    font=\small, align=center
+  },
+  arr/.style={-{Stealth[length=6pt]}, thick}
+]
+
+\node[box, fill=sepgreen!10] (imp) {Improper learner\\outputs $h \in \mathcal{H}'$};
+\node[box, fill=thmred!10, right=3cm of imp] (prop) {Proper learner\\outputs $h \in \mathcal{H}$};
+
+\node[box, fill=layergray, below=1.5cm of imp] (samp) {Same sample\\complexity\\$\Theta(d/\varepsilon)$};
+\node[box, fill=layergray, below=1.5cm of prop] (comp) {Computational\\gap\\(NP-hard vs poly)};
+
+\draw[arr, sepgreen] (imp) -- (samp);
+\draw[arr, thmred] (prop) -- (comp);
+\draw[arr, dashed, notegray] (prop) -- node[above, font=\small\itshape] {restricted to $\mathcal{H}$} (imp);
+
+\node[below=0.3cm of samp, font=\small\itshape, text=notegray]
+  {Information-theoretic: no gap};
+\node[below=0.3cm of comp, font=\small\itshape, text=notegray]
+  {Computational: gap via $k$-colorability};
+\end{tikzpicture}
+\caption{The proper/improper separation.  The information-theoretic sample
+complexity is the same; the computational complexity can differ dramatically.}
+\label{fig:proper-improper}
+\end{figure}
+
+
+\begin{graphnode}[title={Graph Node: \nde{proper\_improper\_separation}}]
+Layer~6: \texttt{impossibility}.  Key edges:
+$\edge{proper\_improper\_separation}{lower\_bounds}{pac\_learning}$ and
+$\edge{proper\_improper\_separation}{does\_not\_imply}{pac\_learning}$.
+Provenance: Pitt--Valiant 1988.  The proof is a direct reduction from
+graph coloring to consistent hypothesis finding.
+\end{graphnode}
+
+
+% ================================================================
+% SECTION 6: THE EXTENDS_GRAMMAR PATTERN
+% ================================================================
+
+\section{The \rel{extends\_grammar} Pattern}
+\label{sec:extends-grammar}
+
+The extensions of the previous sections share a common structure.  Each
+begins with the VC-dimension framework and introduces new primitives that
+have no analogue in binary classification:
+
+\begin{center}\small
+\begin{tabular}{llp{5.5cm}}
+\toprule
+\textbf{Extension} & \textbf{New Primitive} & \textbf{Why Needed} \\
+\midrule
+Natarajan dim. & Two-function shattering $(f_0, f_1)$
+  & With $k > 2$ labels, a single bit string does not
+    describe a labeling. \\[4pt]
+DS dimension & One-inclusion witness
+  & Global hypergraph structure governs learnability
+    when $|Y| = \infty$. \\[4pt]
+Pseudodimension & Threshold vector $(t_1, \ldots, t_d)$
+  & Real-valued outputs must be discretized before
+    shattering can be defined. \\[4pt]
+Fat-shattering dim. & Scale parameter $\gamma$
+  & Agnostic real-valued learning requires margin;
+    finiteness at all scales replaces a single
+    finiteness condition. \\[4pt]
+Agnostic PAC & Benchmark $\inf_{h \in \mathcal{H}} \risk(h)$
+  & Without realizability, success is measured relative
+    to the best in class. \\[4pt]
+Noise model & Noise rate $\eta$
+  & Labels are corrupted; sample complexity depends on
+    the signal-to-noise ratio $(1-2\eta)^{-2}$. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+In each case, the extension is an \rel{extends\_grammar} edge in the concept
+graph, not a \rel{restricts} edge.  The distinction matters:
+
+\begin{itemize}[leftmargin=*,itemsep=3pt]
+\item A \rel{restricts} edge means the target is a special case of the source
+  (no new vocabulary needed).
+\item An \rel{extends\_grammar} edge means the source introduces
+  \emph{new vocabulary}---concepts that cannot be expressed in the target's
+  language.  The extension is irreducible.
+\end{itemize}
+
+\begin{remark}[The non-reduction principle]
+\label{rmk:non-reduction}
+A tempting strategy for multiclass or real-valued learning is to reduce to
+binary classification (e.g., one-vs-all for multiclass, or
+thresholding for real-valued).  Such reductions are computationally useful but
+do not eliminate the need for new dimensions.  The VC dimension of the
+reduced class does not generally equal the Natarajan, DS, pseudo-, or
+fat-shattering dimension of the original class.  The reductions introduce
+approximation gaps that the native dimensions avoid.  This is why the
+\rel{extends\_grammar} edges exist: they mark the points where reduction to the
+binary theory loses information.
+\end{remark}
+
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  scale=0.85,
+  level/.style={font=\small\sffamily, align=center},
+  box/.style={
+    rectangle, rounded corners=3pt, draw=defblue, thick,
+    fill=defblue!5, minimum width=2.8cm, minimum height=0.8cm,
+    font=\small, align=center
+  },
+  extarr/.style={-{Stealth[length=5pt]}, edgeorange, thick,
+    decorate, decoration={snake, amplitude=1pt, segment length=6pt}}
+]
+
+% Binary core
+\node[box] (bin) at (0,0) {Binary PAC\\$\VC(\mathcal{H}) < \infty$};
+
+% Extensions
+\node[box] (mc) at (-4, 2.5) {Multiclass\\$\DSdim(\mathcal{H}) < \infty$};
+\node[box] (rv) at (4, 2.5) {Real-valued\\$\fatshat_\gamma < \infty\;\forall\gamma$};
+\node[box] (ag) at (-4, -2.5) {Agnostic\\$\VC(\mathcal{H}) < \infty$\\(same condition)};
+\node[box] (no) at (4, -2.5) {Noise-tolerant\\$\VC(\mathcal{H}) < \infty$\\$+ \eta < 1/2$};
+
+% Grammar growth arrows
+\draw[extarr] (bin) -- node[left, font=\tiny\itshape, text=edgeorange, align=center]
+  {$+$ two-function\\shattering} (mc);
+\draw[extarr] (bin) -- node[right, font=\tiny\itshape, text=edgeorange, align=center]
+  {$+$ thresholds\\$+$ margins} (rv);
+\draw[extarr] (bin) -- node[left, font=\tiny\itshape, text=edgeorange, align=center]
+  {$+$ relative\\benchmark} (ag);
+\draw[extarr] (bin) -- node[right, font=\tiny\itshape, text=edgeorange, align=center]
+  {$+$ noise rate\\$\eta$} (no);
+
+\end{tikzpicture}
+\caption{Grammar growth from binary PAC learning.  Each wavy arrow represents
+an \rel{extends\_grammar} edge: the extension requires new primitives
+(labeled) that have no analogue in the binary theory.}
+\label{fig:grammar-growth}
+\end{figure}
+
+
+The grammar growth \emph{is} the extension.  A multiclass learning theory that
+avoids two-function shattering will not characterize learnability.  A
+real-valued theory that avoids scale sensitivity will not capture the agnostic
+setting.  In each case, the new primitive is not an optional enrichment but a
+structural necessity: without it, the characterization theorem fails.
+
+\bigskip
+
+\begin{openprob}[Tight multiclass sample complexity]
+\label{open:multiclass-tight}
+For finite $|Y| = k$, the best known bounds leave a $\Theta(\log k)$ gap
+between the Natarajan-dimension-based upper and lower bounds on sample
+complexity.  Does the DS dimension close this gap, yielding a sample
+complexity of $\Theta(\DSdim / \varepsilon)$ without logarithmic factors?
+\end{openprob}
+
+\begin{openprob}[Multiclass online learning]
+\label{open:multiclass-online}
+The DS dimension characterizes PAC learnability in the multiclass setting.
+What is the correct characterization of \emph{online} multiclass learnability?
+Is there a multiclass analogue of the Littlestone dimension, and does it
+relate to the DS dimension as the Littlestone dimension relates to VC?
+\end{openprob}
+
+\bigskip
+
+This chapter has traced the grammar growth required to extend binary PAC
+learning theory to multiclass, real-valued, agnostic, noise-tolerant, and
+computationally constrained settings.  Each extension introduces irreducible
+new primitives and yields its own characterization theorem or separation
+result.  The next chapter examines what lies beyond these
+characterizations: the application-layer concepts, the open problems, and the
+scope boundaries of the theory.

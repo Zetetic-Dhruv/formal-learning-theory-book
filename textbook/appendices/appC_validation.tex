@@ -1,0 +1,250 @@
+% ============================================================
+% APPENDIX C: Graph Validation
+% ============================================================
+\chapter{Graph Validation}
+\label{app:validation}
+
+This appendix documents the validation infrastructure that enforces structural integrity of \texttt{flt\_concept\_graph.json}.  Two scripts, both located in \texttt{scripts/}, perform complementary checks: \texttt{validate\_graph.py} enforces the embedded JSON schema and all relational constraints, while \texttt{validate\_bibliography\_links.py} cross-references every citation field against the BibTeX file.  Together they ensure that the graph remains self-consistent, fully cited, and release-ready.
+
+% ----------------------------------------------------------
+\section{Validation Scripts}
+\label{sec:validation-scripts}
+
+The concept graph embeds its own JSON schema in the \texttt{meta.json\_schema} object.  Both validators read this schema at runtime, so adding a new relation type, required field, or status value automatically propagates to the checks without modifying validator code.
+
+\begin{table}[ht]
+\centering\small
+\caption{Companion files relevant to validation.}\label{tab:validation-files}
+\begin{tabular}{lp{7.5cm}}
+\toprule
+\textbf{File} & \textbf{Purpose} \\
+\midrule
+\texttt{flt\_concept\_graph.json} & The knowledge graph (142 nodes, 260 edges, 13 relation types). \\
+\texttt{flt\_bibliography.bib} & Complete BibTeX bibliography (${\sim}120$ entries). \\
+\texttt{scripts/validate\_graph.py} & Schema and constraint validator (13 checks). \\
+\texttt{scripts/validate\_bibliography\_links.py} & Bibliography cross-reference validator (3 checks). \\
+\texttt{scripts/run\_reference\_tasks.py} & Executes the 15 benchmark tasks against the graph. \\
+\texttt{scripts/evaluate\_reference\_tasks.py} & Scores task outputs against gold answers. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\medskip
+\noindent\textbf{Invocation.}  Both validators accept \texttt{-{}-graph} and \texttt{-{}-bib} flags with sensible defaults (the repository root).
+
+\begin{verbatim}
+  python3 scripts/validate_graph.py \
+      --graph flt_concept_graph.json \
+      --bib   flt_bibliography.bib
+
+  python3 scripts/validate_bibliography_links.py \
+      --graph flt_concept_graph.json \
+      --bib   flt_bibliography.bib
+\end{verbatim}
+
+\noindent Both scripts exit with code~0 on success and code~1 on failure, making them suitable for continuous-integration pipelines.  A trailing-comma tolerance layer (regex-based) strips syntactic noise before JSON parsing, so hand-edited graph files with accidental trailing commas do not cause spurious parse failures.
+
+% ----------------------------------------------------------
+\section{The Thirteen Validation Checks}
+\label{sec:thirteen-checks}
+
+\texttt{validate\_graph.py} executes the following checks in order.  A single failure in any check causes the overall result to be \texttt{FAIL}.
+
+\begin{longtable}{r p{3.8cm} p{7.2cm}}
+\caption{Validation checks performed by \texttt{validate\_graph.py}.}\label{tab:validation-checks}\\
+\toprule
+\textbf{\#} & \textbf{Check name} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Check name} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+1 & JSON parses correctly & The graph file is valid JSON after trailing-comma stripping. Executed before the \texttt{Validator} object is constructed; a parse failure terminates immediately. \\
+2 & Unique node IDs & Every \texttt{id} field across the 142-element node array is unique.  Collected IDs are cached for use by subsequent checks. \\
+3 & Edge endpoints exist & Every edge \texttt{source} and \texttt{target} value appears in the set of declared node IDs from Check~2. \\
+4 & Relation values in enum & Every edge \texttt{relation} value is one of the 13 strings declared in \texttt{meta.json\_schema.relation\_enum}. \\
+5 & Required node fields & Every node contains all 8 required fields: \texttt{id}, \texttt{name}, \texttt{category}, \texttt{layer}, \texttt{status}, \texttt{claim\_type}, \texttt{description}, \texttt{formal\_definition}. \\
+6 & Required edge fields & Every edge contains all 3 universal required fields: \texttt{source}, \texttt{target}, \texttt{relation}. \\
+7 & Edge constraints & Relation-specific required fields are present and non-empty.  See \S\ref{sec:edge-constraints} for the full constraint table. \\
+8 & No duplicate edges & No two edges share the same (\texttt{source}, \texttt{relation}, \texttt{target}) triple. \\
+9 & Bib keys resolve & All values in node \texttt{bib\_keys} arrays, \texttt{provenance.introduced\_by}, \texttt{provenance.proved\_by}, and edge \texttt{citation} fields that match the BibTeX key pattern \texttt{[A-Za-z]+[0-9]\{4\}[a-z]?} resolve against entries in the bibliography file. \\
+10 & Node count matches meta & The actual length of the \texttt{nodes} array equals \texttt{meta.node\_count} (currently 142). \\
+11 & Edge count matches meta & The actual length of the \texttt{edges} array equals \texttt{meta.edge\_count} (currently 260). \\
+12 & Status values in enum & Every node \texttt{status} value is one of: \texttt{defined}, \texttt{proved}, \texttt{deferred}, \texttt{scope\_note}. \\
+13 & No \texttt{generalizes\_unclassified} & No edges carry the legacy relation \texttt{generalizes\_unclassified}.  All such edges must be reclassified as either \rel{restricts} (constraint removal) or \rel{extends\_grammar} (new primitives) before release. \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section{Edge Constraints}
+\label{sec:edge-constraints}
+
+Not all relation types carry the same metadata.  The schema declares relation-specific \emph{required fields} beyond the universal triple (\texttt{source}, \texttt{target}, \texttt{relation}).  Check~7 enforces these constraints.
+
+\begin{longtable}{p{3.4cm} p{3.2cm} p{5.8cm}}
+\caption{Relation-specific required fields enforced by Check~7.}\label{tab:edge-constraints}\\
+\toprule
+\textbf{Relation type} & \textbf{Required fields} & \textbf{Rationale} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Relation type} & \textbf{Required fields} & \textbf{Rationale} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\rel{strictly\_stronger}     & \texttt{witness}, \texttt{citation} & Strict hierarchy requires a separating construction and a proof reference. \\
+\rel{does\_not\_imply}        & \texttt{witness}, \texttt{citation} & Negative result requires an explicit counterexample and a proof reference. \\
+\rel{characterizes}           & \texttt{citation} & Equivalence theorem requires a traceable reference. \\
+\rel{upper\_bounds}           & \texttt{citation} & Bound statement requires a proof reference. \\
+\rel{lower\_bounds}           & \texttt{citation} & Bound statement requires a proof reference. \\
+\rel{requires\_assumption}    & \texttt{citation} & Conditional result requires a reference. \\
+\rel{used\_in\_proof}         & \texttt{citation} & Proof dependency requires a reference to the theorem that uses the concept. \\
+\midrule
+\rel{defined\_using}          & \emph{none beyond triple} & Definitional edges are self-documenting from node definitions. \\
+\rel{instance\_of}            & \emph{none beyond triple} & Taxonomic specializations are self-documenting. \\
+\rel{measures}                & \emph{none beyond triple} & Measurement relationships are self-documenting. \\
+\rel{analogy}                 & \emph{none beyond triple} & Carries optional \texttt{obstruction\_type} and \texttt{obstruction} fields. \\
+\rel{restricts}               & \emph{none beyond triple} & May carry optional \texttt{note}. \\
+\rel{extends\_grammar}        & \emph{none beyond triple} & May carry optional \texttt{generalization\_type}. \\
+\end{longtable}
+
+\noindent\textbf{Design principle.}  The seven relations in the upper block encode mathematical claims---equivalences, bounds, separations, conditional validity, proof dependencies---and therefore require traceable citations.  The two separation types (\rel{strictly\_stronger} and \rel{does\_not\_imply}) additionally require a \texttt{witness} field: a concrete concept class, construction, or example that demonstrates the separation.  The six relations in the lower block encode structural or definitional relationships that do not assert a mathematical result and therefore need no external citation.
+
+% ----------------------------------------------------------
+\section{The Thirteen Relation Types}
+\label{sec:relation-semantics}
+
+Each relation type has a forward reading, an inverse reading, and specific semantics.  Table~\ref{tab:relation-semantics} documents all 13, ordered by frequency in the graph.
+
+\begin{longtable}{p{3.2cm} r p{6.8cm}}
+\caption{Relation types with semantics and edge counts.}\label{tab:relation-semantics}\\
+\toprule
+\textbf{Relation} & \textbf{Edges} & \textbf{Semantics (forward $\to$ inverse)} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Relation} & \textbf{Edges} & \textbf{Semantics (forward $\to$ inverse)} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\rel{defined\_using} & 99 & $X$'s formal definition directly invokes $Y$.  Forms the definitional dependency DAG. \newline Inverse: \rel{definition\_of}. \\[3pt]
+\rel{analogy} & 32 & Structural parallel that is formally independent.  Symmetric: $A \mathbin{\rel{analogy}} B$ iff $B \mathbin{\rel{analogy}} A$.  Each edge carries an optional \texttt{obstruction\_type} field (one of: \texttt{data\_model\_mismatch}, \texttt{missing\_equiv\_witness}, \texttt{one\_way\_theorem\_only}, \texttt{proof\_method\_mismatch}) classifying why the analogy does not upgrade to a theorem. \\[3pt]
+\rel{instance\_of} & 25 & $X$ is a specific instance or specialization of $Y$. \newline Inverse: \rel{has\_instance}. \\[3pt]
+\rel{characterizes} & 24 & $X \leftrightarrow Y$: equivalence under the stated conditions (the fundamental ``iff'' edges). \newline Inverse: \rel{characterized\_by}.  Requires \texttt{citation}. \\[3pt]
+\rel{measures} & 22 & Complexity measure $X$ quantifies a property of object $Y$. \newline Inverse: \rel{measured\_by}. \\[3pt]
+\rel{used\_in\_proof} & 14 & Theorem $X$ invokes concept $Y$ in its statement or proof.  Distinct from \rel{defined\_using}: the latter is a definitional prerequisite, while \rel{used\_in\_proof} records proof-level dependencies. \newline Inverse: \rel{proves\_about}.  Requires \texttt{citation}. \\[3pt]
+\rel{does\_not\_imply} & 9 & $X$ does \emph{not} imply $Y$, with a concrete separating witness.  These are the negative-layer edges that encode the field's ``what does not hold'' structure. \newline Inverse: \rel{not\_implied\_by}.  Requires \texttt{witness} and \texttt{citation}. \\[3pt]
+\rel{restricts} & 8 & $X$ generalizes $Y$ by removing a constraint: $Y = X +$ additional restriction.  Conservative generalization---no new formal primitives are needed. \newline Inverse: \rel{restricted\_from}. \\[3pt]
+\rel{extends\_grammar} & 8 & $X$ generalizes $Y$ but required inventing new concepts or primitives not present in $Y$.  Generative grammar expansion.  Each edge carries an optional \texttt{generalization\_type} field (typically \texttt{new\_primitives\_required}). \newline Inverse: \rel{grammar\_extended\_by}. \\[3pt]
+\rel{upper\_bounds} & 8 & $X$ provides an upper bound on $Y$. \newline Inverse: \rel{bounded\_above\_by}.  Requires \texttt{citation}. \\[3pt]
+\rel{lower\_bounds} & 5 & $X$ provides a lower bound on $Y$. \newline Inverse: \rel{bounded\_below\_by}.  Requires \texttt{citation}. \\[3pt]
+\rel{strictly\_stronger} & 4 & $X \supsetneq Y$: $X$ implies $Y$ but not conversely, with a known separating witness.  These edges encode the strict hierarchies among learning criteria. \newline Inverse: \rel{strictly\_weaker}.  Requires \texttt{witness} and \texttt{citation}. \\[3pt]
+\rel{requires\_assumption} & 2 & $X$ holds only if $Y$ is assumed (e.g., cryptographic assumptions for hardness results). \newline Inverse: \rel{assumed\_by}.  Requires \texttt{citation}. \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section{Bibliography Link Validation}
+\label{sec:bib-validation}
+
+\texttt{validate\_bibliography\_links.py} performs three additional checks beyond those in the graph validator:
+
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{Missing keys} (FAIL).  BibTeX keys referenced in node \texttt{bib\_keys}, \texttt{provenance.introduced\_by}, \texttt{provenance.proved\_by}, or edge \texttt{citation} fields that do not appear in \texttt{flt\_bibliography.bib}.  Each missing key is listed with all locations where it is referenced.
+
+\item \textbf{Malformed bib keys} (FAIL).  Entries in the \texttt{.bib} file whose keys do not match the canonical pattern \texttt{[A-Za-z]+[0-9]\{4\}[a-z]?} (e.g., \texttt{BlumerEhrenfeuchtHausslerWarmuth1989}).
+
+\item \textbf{Orphan keys} (WARN).  Entries in the \texttt{.bib} file that are never referenced by any node or edge.  These do not cause a failure but indicate potential dead references.
+\end{enumerate}
+
+\noindent The script reports the total number of BibTeX entries and unique keys referenced in the graph, then lists any missing, malformed, or orphaned keys with their locations.
+
+% ----------------------------------------------------------
+\section{Sample Validator Output}
+\label{sec:sample-output}
+
+When all checks pass, \texttt{validate\_graph.py} produces:
+
+\begin{verbatim}
+=================================================================
+  FLT Concept Graph Validation
+=================================================================
+
+  [PASS]  JSON parses correctly
+
+  [PASS]  Unique node IDs
+
+  [PASS]  Edge endpoints exist
+
+  [PASS]  Relation values in enum
+
+  [PASS]  Required node fields
+
+  [PASS]  Required edge fields
+
+  [PASS]  Edge constraints
+
+  [PASS]  No duplicate edges
+
+  [PASS]  Bib keys resolve
+
+  [PASS]  Node count matches meta
+
+  [PASS]  Edge count matches meta
+
+  [PASS]  Status values in enum
+
+  [PASS]  No generalizes_unclassified edges
+
+=================================================================
+  13/13 checks passed, 0 failed.
+  RESULT: PASS
+=================================================================
+\end{verbatim}
+
+\noindent When a check fails, the validator prints up to 20 detail lines identifying specific violations.  For example, a dangling edge endpoint produces:
+
+\begin{verbatim}
+  [FAIL]  Edge endpoints exist
+           Edge 47: source 'nonexistent_node' is not a node ID
+\end{verbatim}
+
+\noindent A missing witness on a separation edge produces:
+
+\begin{verbatim}
+  [FAIL]  Edge constraints
+           Edge pac_learning-[does_not_imply]->mistake_bounded:
+           constraint requires 'witness' but it is missing or empty
+\end{verbatim}
+
+% ----------------------------------------------------------
+\section{Running the Benchmark Suite}
+\label{sec:run-benchmark}
+
+The benchmark consists of 15 tasks (see Appendix~\ref{app:traversals}).  Execution and evaluation are separate steps.
+
+\paragraph{Step 1: Execute tasks.}
+\begin{verbatim}
+  python3 scripts/run_reference_tasks.py \
+      flt_concept_graph.json flt_tasks.json \
+      --output results.json
+\end{verbatim}
+
+\noindent This traverses the graph for each task and writes structured outputs to \texttt{results.json}.
+
+\paragraph{Step 2: Evaluate against gold answers.}
+\begin{verbatim}
+  python3 scripts/evaluate_reference_tasks.py \
+      results.json flt_task_answers.json
+\end{verbatim}
+
+\noindent Scoring modes include \texttt{set\_match} (exact set equality), \texttt{chain\_match} (ordered sequence), and \texttt{structured\_explanation} (required elements present in structured output).  The expected output on a correct implementation is 15/15 tasks passed.

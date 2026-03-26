@@ -1,0 +1,711 @@
+% Chapter 18: Frontiers and Open Problems
+% Theme: WHAT WE DO NOT KNOW — question-driven structure.
+% Each section leads with an open problem, shows what is known,
+% identifies the gap, and asks what would close it.
+% Concepts: compression_scheme, margin_theory, kolmogorov_complexity,
+% algorithmic_probability, universal_learning, computational_hardness,
+% differential_privacy_learning, active_learning, transfer/meta/continual.
+
+\chapter{Frontiers and Open Problems}
+\label{ch:frontiers}
+
+Every preceding chapter has presented established results: definitions,
+characterization theorems, separation witnesses, and tight bounds.  This
+chapter presents none of these.  Its subject is the boundary of what we know,
+and its organizing principle is the open question rather than the proven
+theorem.
+
+The shift in profile is deliberate.  Chapters~1--17 follow six pedagogical
+profiles: foundational definition, canonical proof, separation witness,
+analogy analysis, computational illustration, and framework bridge.  This
+chapter follows a seventh: the \emph{open frontier}.  Each section leads with
+a question to which no complete answer is known, presents the best partial
+results, identifies the precise gap between what is known and what is
+conjectured, and speculates---cautiously---on what kind of argument might
+close the gap.
+
+No pretense of completeness is made.  The problems chosen are those that
+connect most tightly to the concept graph of this book: the compression
+conjecture (Chapter~\ref{ch:compression}), deep network generalization
+(Chapter~\ref{ch:generalization}), universal learning beyond countable classes
+(Chapter~\ref{ch:universal}), computational--statistical tradeoffs
+(Chapter~\ref{ch:computational}), and the role of Kolmogorov complexity in
+learning.  Other important open problems---online multiclass learnability,
+private agnostic learning, quantum sample complexity gaps---are noted but not
+developed.
+
+\medskip
+
+The chapter has five sections.
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{The Compression Conjecture} (\Cref{sec:compression-conjecture}):
+  does $\VC(\mathcal{H}) = d$ imply a compression scheme of size $O(d)$?
+\item \textbf{Deep Learning and Generalization}
+  (\Cref{sec:deep-generalization}): why do overparameterized networks
+  generalize?
+\item \textbf{Universal Learning Beyond Countable Classes}
+  (\Cref{sec:universal-frontiers}): does the trichotomy extend?
+\item \textbf{Computational--Statistical Tradeoffs}
+  (\Cref{sec:comp-stat-tradeoffs}): when does computational hardness prevent
+  statistically optimal learning?
+\item \textbf{Kolmogorov Complexity and the Ideal Learner}
+  (\Cref{sec:kolmogorov-learning}): can the uncomputable yield computable
+  insight?
+\end{enumerate}
+
+
+% ================================================================
+% SECTION 1: THE COMPRESSION CONJECTURE
+% ================================================================
+
+\section{The Compression Conjecture}
+\label{sec:compression-conjecture}
+
+\begin{openprob}[Littlestone--Warmuth Compression Conjecture]
+\label{op:compression}
+Let $\mathcal{H} \subseteq \{0,1\}^X$ with $\VC(\mathcal{H}) = d < \infty$.
+Does there exist a sample compression scheme for $\mathcal{H}$ of size
+$O(d)$?
+\end{openprob}
+
+This conjecture, stated by Littlestone and Warmuth in 1986, is arguably the
+oldest major open problem in computational learning theory.  It asks whether
+the sample complexity of PAC learning---which is $\Theta(d/\varepsilon)$---is
+explained by compression: whether every learnable class can be learned by
+storing only $O(d)$ examples from the training set and reconstructing a
+consistent hypothesis from those examples alone.
+
+\subsection{What is Known}
+
+The positive direction is settled in a weak sense.
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Exponential compression exists.}
+  Moran and Yehudayoff~\cite{MoranYehudayoff2016} proved that every class
+  with $\VC(\mathcal{H}) = d$ admits a compression scheme of size
+  $2^{O(d)}$.  The proof uses a beautiful argument involving the
+  Radon partition structure of finite VC classes, but the bound is
+  exponentially larger than the conjecture predicts.
+
+\item \textbf{Special cases are resolved.}  Maximum classes (those achieving
+  the Sauer--Shelah bound $\growth_\mathcal{H}(n) = \binom{n}{\leq d}$)
+  admit compression of size exactly $d$, as shown by Floyd and
+  Warmuth~\cite{FloydWarmuth1995}.  Intersection-closed classes, classes of
+  bounded recursive teaching dimension, and several other families satisfy the
+  conjecture.
+
+\item \textbf{Compression implies learning.}  The converse direction is
+  established: a compression scheme of size $k$ yields PAC learning with
+  sample complexity $O\bigl(\frac{k}{\varepsilon}\log\frac{k}{\varepsilon}
+  + \frac{1}{\varepsilon}\log\frac{1}{\delta}\bigr)$.  Thus compression
+  of size $O(d)$ would give an alternative proof of the fundamental theorem
+  of PAC learning, with the added structural insight that the hypothesis
+  depends on only $O(d)$ training points.
+\end{itemize}
+
+\begin{historical}
+The compression conjecture predates the fundamental theorem of statistical
+learning.  Littlestone and Warmuth formulated it in 1986, three years before
+Blumer, Ehrenfeucht, Haussler, and Warmuth~\cite{BlumerEhrenfeuchtHausslerWarmuth1989}
+completed the characterization of PAC learnability through VC dimension.
+The conjecture was motivated by the observation that specific learnable
+classes---halfspaces, rectangles, decision lists---all admit small compression
+schemes, and the belief that this was not coincidental but structural.  Four
+decades later, the general case remains open.
+\end{historical}
+
+\subsection{Where the Gap Is}
+
+The gap is between $O(d)$ and $2^{O(d)}$.  No class is known to require
+compression size $\omega(d)$, but no proof technique is known to achieve
+$o(2^d)$ in general.
+
+The difficulty is structural.  The Moran--Yehudayoff proof proceeds through
+a topological argument (the staircase lemma) that inherently produces
+exponential-size compressions.  Improving the bound requires a fundamentally
+different approach---one that exploits the combinatorial structure of VC
+classes more directly.
+
+Several partial strategies have been explored:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Unlabeled compression.}  Allowing the compression to store
+  unlabeled points (without their labels) does not help: the reconstruction
+  map must still determine labels, and known reductions show that unlabeled
+  compression of size $k$ implies labeled compression of size $O(k)$.
+
+\item \textbf{Algebraic approaches.}  For classes definable by polynomial
+  threshold functions, algebraic arguments yield compression of size $O(d)$.
+  But this exploits algebraic structure absent from general VC classes.
+
+\item \textbf{Recursive approaches.}  Decomposing a class into subclasses
+  of smaller VC dimension and compressing each recursively is a natural
+  strategy, but known decompositions (e.g., via Helly-type theorems) produce
+  too many subclasses, losing the linear bound.
+\end{itemize}
+
+\subsection{What Would Close the Gap}
+
+A resolution likely requires one of the following:
+
+\begin{enumerate}[leftmargin=*]
+\item A new structural theorem about VC classes that controls the geometry
+  of their restrictions to finite sets more tightly than Sauer--Shelah.
+\item A connection to a different branch of combinatorics (e.g., matroid
+  theory or extremal set theory) that provides the right decomposition lemma.
+\item A counterexample: a family of classes with VC dimension $d$ and
+  no compression scheme of size $o(d^{1+c})$ for some $c > 0$.  Even a
+  superlinear lower bound would be a breakthrough.
+\end{enumerate}
+
+\begin{remark}
+The compression conjecture illustrates a recurring theme in this chapter:
+the gap between \emph{existential} and \emph{constructive} knowledge.  We
+know that every finite-VC-dimension class is PAC learnable (Chapter~\ref{ch:pac}).
+We know that compression of size $2^{O(d)}$ exists
+(Chapter~\ref{ch:compression}).  What we do not know is whether these two
+facts are reflections of the same underlying structure at the right
+quantitative scale.
+\end{remark}
+
+
+% ================================================================
+% SECTION 2: DEEP LEARNING AND GENERALIZATION
+% ================================================================
+
+\section{Deep Learning and Generalization}
+\label{sec:deep-generalization}
+
+\begin{openprob}[Generalization in Overparameterized Networks]
+\label{op:deep-gen}
+Let $\mathcal{H}$ be the class of functions computed by a neural network
+with $p \gg n$ parameters, trained by gradient descent on $n$ samples.
+Why does the trained network generalize---i.e., why is $\risk(\hat{h})
+\approx \emprisk(\hat{h})$---despite $\VC(\mathcal{H}) \geq p$?
+\end{openprob}
+
+This is perhaps the most practically urgent open problem in learning theory.
+Classical generalization bounds predict that a model with more parameters than
+training examples should overfit catastrophically.  Deep networks routinely
+violate this prediction.
+
+\subsection{What is Known}
+
+Several partial explanations exist, none fully satisfactory.
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Margin-based bounds.}  Bartlett, Foster, and
+  Telgarsky~\cite{BartlettFosterTelgarsky2017} proved that for a
+  depth-$L$ network with weight matrices $W_1, \ldots, W_L$, the
+  generalization error is controlled by
+  \[
+    \frac{1}{n}\biggl(\frac{\prod_{i=1}^L \|W_i\|_\sigma}{\gamma}\biggr)^2
+    \cdot \sum_{i=1}^L \frac{\|W_i\|_F^2}{\|W_i\|_\sigma^2}
+  \]
+  where $\gamma$ is the margin, $\|\cdot\|_\sigma$ is the spectral norm,
+  and $\|\cdot\|_F$ is the Frobenius norm.  This bound is independent of the
+  number of parameters $p$ and depends instead on the \emph{spectral
+  complexity} of the learned weights.
+
+\item \textbf{PAC-Bayes bounds.}  Treating the trained weights as a
+  posterior distribution (e.g., by adding Gaussian noise), PAC-Bayes
+  bounds (\Cref{ch:extensions}) can yield non-vacuous generalization
+  certificates for specific trained networks.  Dziugaite and
+  Roy~\cite{DziugaiteRoy2017} demonstrated this empirically.
+
+\item \textbf{Algorithmic stability.}  SGD with bounded iterations satisfies
+  uniform stability with $\beta = O(1/n)$ under convexity assumptions.
+  For non-convex losses, Hardt, Recht, and Singer~\cite{HardtRechtSinger2016}
+  showed that early stopping provides stability guarantees, but the bounds
+  depend on the number of SGD steps and become vacuous for the training
+  durations used in practice.
+
+\item \textbf{Compression-based arguments.}  If the effective hypothesis
+  after training can be compressed to $k \ll p$ bits, then compression
+  bounds (Chapter~\ref{ch:compression}) apply.  Lottery ticket
+  observations---that trained networks contain sparse subnetworks matching
+  full performance---provide indirect evidence for compression, but no
+  rigorous connection to sample complexity has been established.
+\end{itemize}
+
+\begin{computational}
+\textbf{The double descent curve.}  Consider interpolation threshold: the
+point where the number of parameters $p$ equals the number of training
+examples $n$.  Classical theory predicts that test error is U-shaped
+as a function of model complexity, with minimum at $p \approx n$.
+Empirically, the test error \emph{decreases again} for $p \gg n$,
+forming a double descent curve.  This was systematically documented
+by Belkin et al.~\cite{BelkinHsuMaMandal2019}.
+
+The double descent phenomenon is observed across architectures (linear
+models, random features, deep networks) and datasets.  No existing
+generalization bound fully explains it: all known bounds are monotone in
+model complexity and cannot predict the second descent.  The phenomenon
+suggests that the relevant notion of complexity for overparameterized models
+is not a simple function of parameter count.
+\end{computational}
+
+\subsection{Where the Gap Is}
+
+The gap has three aspects.
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Quantitative vacuity.}  Most existing bounds, when evaluated
+  on practical networks, predict generalization error close to 1 (i.e.,
+  they are vacuous).  The margin bounds of Bartlett--Foster--Telgarsky are
+  the tightest known, but still far from observed test error on benchmarks
+  such as ImageNet.
+
+\item \textbf{Architecture dependence.}  Existing bounds treat networks as
+  generic function classes parameterized by weight norms.  They do not
+  explain why certain architectures (e.g., ResNets, Transformers)
+  generalize better than others with the same parameter count and weight
+  norms.
+
+\item \textbf{Optimization dependence.}  The generalization behavior of deep
+  networks depends heavily on the optimization algorithm (SGD vs.\ Adam),
+  learning rate schedule, batch size, and initialization.  No existing
+  framework captures how the optimization trajectory selects hypotheses
+  with low population risk from the vast set of interpolating solutions.
+\end{enumerate}
+
+\subsection{What Would Close the Gap}
+
+The field appears to need a complexity measure that simultaneously accounts
+for:
+\begin{itemize}[leftmargin=*]
+\item the architecture (not just the function class),
+\item the optimization trajectory (not just the endpoint),
+\item the data distribution (not just worst-case analysis).
+\end{itemize}
+
+Possible directions include:
+\begin{itemize}[leftmargin=*]
+\item \textbf{Implicit regularization theory:} proving that gradient descent
+  on specific architectures converges to solutions with low complexity
+  in a suitable measure (e.g., low rank, low spectral norm product, or
+  low description length).
+\item \textbf{Distribution-dependent bounds:} replacing uniform convergence
+  (which bounds $\sup_D |\risk - \emprisk|$) with bounds that depend on the
+  specific data distribution, potentially through conditional mutual
+  information (Steinke--Zakynthinou, \Cref{ch:generalization}).
+\item \textbf{Feature learning theory:} understanding how networks transform
+  input representations during training, and why the learned features
+  support generalization.
+\end{itemize}
+
+
+% ================================================================
+% SECTION 3: UNIVERSAL LEARNING BEYOND COUNTABLE CLASSES
+% ================================================================
+
+\section{Universal Learning Beyond Countable Classes}
+\label{sec:universal-frontiers}
+
+\begin{openprob}[Universal Learning for Uncountable Classes]
+\label{op:universal-uncountable}
+The trichotomy theorem of Bousquet et
+al.~\cite{BousquetHannekeMoranVanHandelYehudayoff2021} characterizes
+universal learning rates for classes $\mathcal{H}$ with $|\mathcal{H}| \geq 3$.
+Does an analogous characterization hold for uncountable classes of functions
+$f \colon X \to [0,1]$ under general loss functions?
+\end{openprob}
+
+\subsection{What is Known}
+
+The trichotomy theorem (\Cref{ch:universal}) establishes that for hypothesis
+classes of size at least 3, the optimal universal learning rate is exactly one
+of three types:
+\begin{enumerate}[leftmargin=*,nosep]
+\item Exponential ($e^{-n}$): if and only if the Littlestone dimension is
+  finite.
+\item Linear ($1/n$): if and only if the Littlestone dimension is infinite
+  but no infinite VCL tree exists.
+\item Arbitrarily slow: if and only if an infinite VCL tree exists.
+\end{enumerate}
+This characterization applies to binary classification with the $0$-$1$ loss.
+
+For regression and general losses, partial results exist:
+\begin{itemize}[leftmargin=*]
+\item Hanneke, Moran, and others have extended the trichotomy to multiclass
+  settings with finite label spaces, showing that the DS dimension
+  (\Cref{ch:extensions}) plays a role analogous to the Littlestone dimension.
+\item For real-valued regression under squared loss, the fat-shattering
+  dimension at all scales characterizes PAC learnability, but the universal
+  learning rate structure is not yet characterized.
+\end{itemize}
+
+\subsection{Where the Gap Is}
+
+The gap has two components:
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{The loss function.}  The trichotomy proof relies on the
+  discreteness of $0$-$1$ loss.  For continuous losses (squared loss,
+  absolute loss, logistic loss), the proof technique does not directly
+  apply.  The VCL tree, which is the combinatorial object governing the
+  third regime, has no established analogue for continuous losses.
+
+\item \textbf{The function class.}  For uncountable classes (e.g., all
+  Lipschitz functions, all bounded-variation functions), measurability
+  issues arise: the supremum of uncountably many random variables may not
+  be measurable without additional regularity assumptions.  The universal
+  learning framework requires that the learning rate hold for
+  \emph{all} realizable distributions, and handling uncountable classes
+  demands careful measure-theoretic foundations.
+\end{enumerate}
+
+\subsection{What Would Close the Gap}
+
+Two ingredients appear necessary:
+\begin{itemize}[leftmargin=*]
+\item A combinatorial object for continuous losses that plays the role of
+  the Littlestone tree and VCL tree in the binary case---a ``scale-sensitive
+  game tree'' that captures the sequential complexity of the class at all
+  accuracy levels.
+\item A measurability framework (e.g., based on metric entropy or covering
+  numbers) that allows the universal learning definition to extend cleanly
+  to uncountable classes without requiring separability or other ad hoc
+  assumptions.
+\end{itemize}
+
+
+% ================================================================
+% SECTION 4: COMPUTATIONAL--STATISTICAL TRADEOFFS
+% ================================================================
+
+\section{Computational--Statistical Tradeoffs}
+\label{sec:comp-stat-tradeoffs}
+
+\begin{openprob}[Computational--Statistical Gap]
+\label{op:comp-stat}
+For which concept classes $\mathcal{C}$ does a gap exist between the
+information-theoretic sample complexity of PAC learning $\mathcal{C}$ and
+the sample complexity achievable by any polynomial-time algorithm?
+Can such gaps be characterized combinatorially?
+\end{openprob}
+
+The results of Chapter~\ref{ch:computational} show that computational
+hardness can prevent efficient PAC learning even when the VC dimension is
+finite.  But those results are conditional: they assume the hardness of
+specific cryptographic problems (factoring, LWE, discrete cube root).  The
+deeper question is whether the computational--statistical gap is a structural
+feature of learning or an artifact of our inability to prove $P \neq NP$.
+
+\subsection{What is Known}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Cryptographic hardness.}  Kearns and
+  Valiant~\cite{KearnsValiant1994} showed that under the Discrete Cube Root
+  Assumption, polynomial-size circuits are not PAC learnable in polynomial
+  time, despite having polynomial VC dimension.  The gap is between
+  $O(d/\varepsilon)$ samples (information-theoretically sufficient) and
+  ``no polynomial-time algorithm suffices'' (computationally).
+
+\item \textbf{Statistical query lower bounds.}  The SQ dimension provides
+  \emph{unconditional} computational lower bounds within the SQ model
+  (\Cref{ch:computational}).  Parities over $\{0,1\}^n$ have
+  $\VC = n$ but $\SQdim = 2^n$: any SQ algorithm needs exponentially
+  many queries.  Yet Gaussian elimination learns parities in polynomial
+  time---it is simply not an SQ algorithm.  This shows that the SQ model
+  captures one type of computational constraint but not all.
+
+\item \textbf{Planted clique and related problems.}  A growing body of work
+  studies problems where the information-theoretic threshold differs from
+  the apparent computational threshold: planted clique, sparse PCA,
+  community detection.  In each case, $\Theta(\sqrt{n})$ appears to be a
+  computational barrier, while information-theoretically $O(\log n)$ samples
+  suffice.  But none of these gaps are proven unconditionally.
+
+\item \textbf{The barrier of Applebaum--Barak--Xiao.}  One cannot prove
+  ``$P \neq NP$ implies hard PAC learning'' via standard Karp reductions.
+  Cryptographic or average-case assumptions are inherently necessary for
+  hardness results in PAC learning.  This is a meta-theoretic constraint on
+  the kind of hardness proofs that are possible.
+\end{itemize}
+
+\begin{historical}
+The computational--statistical tradeoff emerged as a distinct research
+direction in the 2010s, though its roots go back to Kearns and Valiant's
+1994 cryptographic hardness results.  The key conceptual shift was the
+recognition that sample complexity and computational complexity are not
+independent axes of difficulty, but interact in subtle ways.  A problem
+may have low sample complexity (few examples suffice) but high
+computational complexity (no efficient algorithm can use those examples),
+or vice versa.  The SQ model, introduced by Kearns~\cite{Kearns1998},
+provided the first framework where computational lower bounds could be
+proved unconditionally, but only within a restricted model of computation.
+\end{historical}
+
+\subsection{Where the Gap Is}
+
+The fundamental gap is proof-theoretic: we lack techniques to prove
+unconditional computational lower bounds for PAC learning.
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{No unconditional separations.}  Every known example of a
+  computational--statistical gap relies on a complexity-theoretic assumption.
+  Proving an unconditional gap would require proving $P \neq NP$ or something
+  similarly difficult.
+
+\item \textbf{No combinatorial characterization.}  For information-theoretic
+  learnability, we have a complete combinatorial characterization: finite VC
+  dimension.  For computationally efficient learnability, no analogous
+  characterization exists.  We do not know what combinatorial property of a
+  concept class determines whether it is efficiently learnable.
+
+\item \textbf{Model dependence.}  Lower bounds proved in the SQ model, the
+  low-degree polynomial model, or the sum-of-squares hierarchy apply only to
+  those specific computational models.  An algorithm outside the model
+  (like Gaussian elimination for parities) may circumvent the lower bound.
+  No model of computation is known to be simultaneously natural, powerful
+  enough to capture practical algorithms, and amenable to unconditional lower
+  bounds.
+\end{enumerate}
+
+\subsection{What Would Close the Gap}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{A natural proof barrier for learning.}  Razborov and
+  Rudich's natural proofs barrier explains why circuit lower bounds are hard.
+  An analogous barrier for learning---explaining why computational lower
+  bounds for PAC learning are hard---would clarify the structural limits of
+  current proof techniques.
+\item \textbf{A unifying computational model.}  A model of bounded
+  computation that captures SQ algorithms, low-degree methods,
+  sum-of-squares, and gradient descent, while admitting provable lower
+  bounds, would provide a natural home for computational--statistical
+  tradeoff results.
+\item \textbf{Conditional characterizations.}  Even under assumptions
+  like $P \neq NP$ or the hardness of LWE, a characterization of
+  efficiently learnable classes (analogous to the fundamental theorem for
+  information-theoretic learnability) would be a major advance.
+\end{itemize}
+
+
+% ================================================================
+% SECTION 5: KOLMOGOROV COMPLEXITY AND THE IDEAL LEARNER
+% ================================================================
+
+\section{Kolmogorov Complexity and the Ideal Learner}
+\label{sec:kolmogorov-learning}
+
+\begin{openprob}[Computable Approximations to Solomonoff Induction]
+\label{op:solomonoff}
+Solomonoff's universal prior $M(x) = \sum_{p:\, U(p)=x} 2^{-|p|}$ defines
+an ideal but uncomputable learner.  To what extent can computable
+approximations to $M$ achieve the learning-theoretic properties of the ideal
+learner?
+\end{openprob}
+
+This section concerns the deepest stratum of the theory: the connection
+between algorithmic information theory and learning.
+
+\subsection{What is Known}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Solomonoff's completeness theorem.}  For any computable
+  measure $\mu$ on infinite binary sequences, the universal semimeasure $M$
+  satisfies
+  \[
+    \sum_{n=1}^\infty \E_{x_{1:n} \sim \mu}
+    \bigl[D_{\mathrm{KL}}(\mu(\cdot \mid x_{1:n}) \,\|\,
+    M(\cdot \mid x_{1:n}))\bigr] < \infty.
+  \]
+  That is, the cumulative prediction error of $M$ relative to any
+  computable environment is bounded.  This makes $M$ the ``ideal learner'':
+  it converges to the true distribution at a rate dominated by the
+  Kolmogorov complexity of the environment.
+
+\item \textbf{MDL and MML as approximations.}  The minimum description
+  length principle (Rissanen~\cite{Rissanen1984}) and minimum message length
+  (Wallace and Boulton~\cite{WallaceBoulton1968}) are computable
+  approximations to the Kolmogorov-optimal encoding.  Both embody a version
+  of Occam's razor: prefer the hypothesis with the shortest total description
+  (model + data given model).
+
+\item \textbf{Occam bounds via Kolmogorov complexity.}  Li, Tromp, and
+  Vit\'anyi~\cite{LiVitanyi2008} showed that replacing description length
+  with Kolmogorov complexity in Occam-style PAC bounds yields tighter
+  (but uncomputable) generalization guarantees.  The bound states that
+  the generalization error of a hypothesis $h$ is controlled by
+  $K(h)/n$, where $K(h)$ is the Kolmogorov complexity of $h$ and $n$
+  is the sample size.
+
+\item \textbf{Algorithmic probability and universal learning.}  The
+  connection between Solomonoff's prior and the universal learning
+  framework of Chapter~\ref{ch:universal} is suggestive but not formal.
+  Universal learning allows distribution-dependent rates; Solomonoff's
+  prior achieves distribution-dependent convergence.  But the universal
+  learning framework is information-theoretic (it asks only about sample
+  complexity), while Solomonoff's prior is algorithmic (it asks about
+  description complexity).  The precise relationship between these two
+  notions of universality is open.
+\end{itemize}
+
+\begin{historical}
+Solomonoff's 1964 paper~\cite{Solomonoff1964} predates Gold's 1967
+formalization of identification in the limit and Valiant's 1984
+introduction of PAC learning.  It is arguably the first formal proposal
+for a universal learning algorithm, though it was formulated in the language
+of algorithmic information theory rather than learning theory.  The
+intellectual genealogy runs:
+Solomonoff~(1964) $\to$ Kolmogorov complexity~(1965) $\to$ MDL~(1978)
+$\to$ Occam bounds in PAC~(1987) $\to$ compression schemes~(1986).
+The compression conjecture of \Cref{sec:compression-conjecture} can be
+viewed as asking whether the Occam principle---short description implies
+good generalization---holds at the tightest possible quantitative level.
+\end{historical}
+
+\subsection{Where the Gap Is}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Uncomputability.}  Kolmogorov complexity and Solomonoff's
+  prior are uncomputable.  Every computable approximation introduces a
+  gap: MDL uses a fixed model class rather than all programs; bounded
+  Solomonoff approximations (running programs for at most $t$ steps)
+  introduce a time--complexity tradeoff that is poorly understood.
+
+\item \textbf{No convergence rate for approximations.}  For the ideal
+  learner $M$, the convergence rate is known: the expected KL divergence
+  is $O(K(\mu)/n)$ where $K(\mu)$ is the complexity of the true
+  environment.  For computable approximations, no analogous rate is
+  established that holds uniformly over all computable environments.
+
+\item \textbf{The gap between prediction and classification.}  Solomonoff's
+  framework concerns \emph{sequence prediction}: predicting the next bit.
+  PAC learning concerns \emph{concept identification}: finding a hypothesis
+  close to the target.  The formal relationship between these two tasks
+  is well understood in specific settings (e.g., the realizable case with
+  i.i.d.\ data), but the general connection---especially in the agnostic
+  or adversarial setting---remains underdeveloped.
+\end{enumerate}
+
+\subsection{What Would Close the Gap}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Time-bounded Solomonoff induction.}  A theory of
+  $M^t(x) = \sum_{p:\, U(p)=x,\; \mathrm{time}(p) \leq t} 2^{-|p|}$
+  with provable convergence rates as a function of both $n$ (sample size)
+  and $t$ (computation time) would bridge the gap between the ideal and
+  the computable.  Such a theory would need to handle the fact that
+  $M^t$ is not a semimeasure for finite $t$, and that the dominant programs
+  may have very long running times.
+
+\item \textbf{Kolmogorov complexity as a complexity measure for PAC
+  learning.}  Formalizing $K(\mathcal{H})$ (the description complexity of
+  a hypothesis class) as a complexity measure in the sense of
+  Chapter~\ref{ch:dimensions}---with upper and lower bound relationships
+  to VC dimension, Rademacher complexity, and compression size---would
+  integrate algorithmic information theory into the concept graph of this
+  book.
+
+\item \textbf{A computable universal learner.}  An algorithm that, for
+  every computable concept class $\mathcal{C}$ and every realizable
+  distribution $D$, achieves PAC learning with sample complexity depending
+  on $K(\mathcal{C})$, would be a computable analogue of the Solomonoff
+  ideal.  Whether such an algorithm exists is itself an open question,
+  closely related to the universal learning framework of
+  Chapter~\ref{ch:universal}.
+\end{itemize}
+
+
+% ================================================================
+% SECTION 6: FURTHER FRONTIERS
+% ================================================================
+
+\section{Further Frontiers}
+\label{sec:further-frontiers}
+
+The five problems above are those most tightly connected to the conceptual
+framework of this book.  We briefly note several other directions where the
+theory is actively expanding.  Each lies at the boundary of the framework
+developed in Chapters~1--17 and involves mathematical structures that do
+not reduce to the types established there.
+
+\begin{description}[leftmargin=*,itemsep=6pt]
+
+\item[Private learning.]
+  Differential privacy constrains the learner: the output hypothesis must
+  not reveal too much about any individual training example.  Kasiviswanathan
+  et al.\ showed that the sample complexity of private PAC learning is
+  $\Theta(d/\varepsilon + \log|\mathcal{X}|/(\varepsilon\alpha))$ for pure
+  differential privacy, where $\alpha$ is the privacy parameter.  For
+  approximate differential privacy, the Littlestone dimension characterizes
+  private learnability (Alon et al., Bun et al.), connecting online learning
+  theory to privacy in an unexpected way.  The tight sample complexity of
+  private agnostic learning remains open.
+
+\item[Active learning.]
+  An active learner chooses which examples to query, rather than receiving
+  them passively.  The label complexity---the number of label queries needed
+  for PAC learning---can be exponentially smaller than the sample complexity
+  of passive learning.  Hanneke showed that the disagreement coefficient
+  controls the label complexity for general hypothesis classes.  Open
+  problems include tight characterizations of active learning under agnostic
+  noise and the computational complexity of active learning algorithms.
+
+\item[Transfer, meta-learning, and continual learning.]
+  These paradigms concern learning from multiple related tasks.  Transfer
+  learning asks: when does experience on a source task improve learning on
+  a target task?  Meta-learning asks: can the learner learn to learn faster
+  across a distribution of tasks?  Continual learning asks: can the learner
+  acquire new tasks without forgetting old ones?  Formal frameworks exist
+  (e.g., Baxter's model of learning to learn, the PAC-Bayes approach to
+  meta-learning), but no characterization theorems analogous to the VC
+  characterization have been established.  The fundamental question is whether
+  the combinatorial objects governing multi-task learning can be expressed
+  in terms of the single-task dimensions of this book, or whether genuinely
+  new complexity measures are needed.
+
+\item[Online multiclass learnability.]
+  The Littlestone dimension characterizes online binary learnability.
+  For multiclass online learning, the situation is more complex: the
+  Littlestone dimension of the binary reductions does not always capture
+  the optimal mistake bound.  A combinatorial characterization of online
+  multiclass learnability, and its relationship to the DS dimension, is
+  an active area of research.
+
+\item[Quantum sample complexity.]
+  Quantum PAC learning, where the learner receives quantum superpositions
+  of labeled examples, can have polynomially different sample complexity
+  from the classical setting.  The no-signaling constraint on learnability
+  is a recent development.  A full characterization of when quantum
+  examples help---in terms of classical complexity measures---is open.
+
+\end{description}
+
+\bigskip
+
+\begin{computational}
+\textbf{The shape of the frontier.}
+The open problems of this chapter are not isolated.  They form a connected
+subgraph in the concept graph, linked by shared dependencies.  The
+compression conjecture involves the same VC dimension that governs PAC
+learning, which connects to the computational hardness that creates
+computational--statistical gaps, which connects to the SQ dimension, which
+connects to the Kolmogorov complexity that underlies the ideal learner.
+The deep learning generalization problem is linked to compression (through
+lottery tickets), to margin theory (through spectral bounds), and to
+algorithmic stability (through SGD analysis).  Universal learning connects
+to the Littlestone dimension and therefore to private learning.
+
+This interconnection is not coincidental.  The open problems persist
+\emph{because} they are entangled: a resolution of the compression
+conjecture would likely yield insight into generalization bounds; a
+combinatorial characterization of efficient learnability would likely
+require new structural theorems about VC classes; a computable approximation
+to Solomonoff induction would likely connect to both compression and
+universal learning.  The frontier of formal learning theory is not a
+collection of independent problems but a single, tightly coupled surface.
+\end{computational}
+
+\bigskip
+
+This chapter has surveyed what we do not know.  The theory developed in
+Chapters~1--17 provides a rigorous, interconnected framework for what we do
+know: characterization theorems, tight bounds, separation results, and
+structural analogies.  The open problems of this chapter mark the places
+where that framework reaches its current limits.  They are not embarrassments
+but invitations.

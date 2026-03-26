@@ -1,0 +1,325 @@
+% Chapter 1: The Objects of Learning
+% concept_class = Profile G (hub node, parallax),
+% inductive_bias = Profile D (negative result centerpiece),
+% MDL/MML/Bayesian = Profile E (analogy triangle obstruction analysis)
+
+\chapter{The Objects of Learning}
+\label{ch:objects}
+
+Every learning problem begins with the same question: given data drawn from an unknown source, find a rule that predicts well on future data. This chapter introduces the mathematical vocabulary for making that question precise.
+
+The vocabulary divides into three groups of unequal importance. The first group---domain, label, concept, hypothesis---is atomic: these are the sets and functions from which everything else is built. They require only brief definitions. The second group---concept class, hypothesis space, inductive bias---carries genuine mathematical content, because the relationships between these objects determine what is learnable. The third group---Bayesian inference, minimum description length, minimum message length---appears to be vocabulary but is actually a network of near-miss analogies, each encoding a different answer to the same question about model selection.
+
+\section{Atomic Vocabulary}
+\label{sec:atoms}
+
+The following objects are the type-level substrate of learning theory. They are presented together because none of them, individually, contains any mathematical surprise.
+
+\begin{defn}[Domain, Label, Concept]
+\label{def:domain-label-concept}
+A \emph{domain} $X$ is a set whose elements are called \emph{instances}. A \emph{label set} $Y$ is a set of possible outputs; in binary classification, $Y = \{0, 1\}$. A \emph{concept} is a function $c : X \to Y$.
+
+Equivalently, when $Y = \{0,1\}$, a concept $c$ can be identified with the subset $\{x \in X : c(x) = 1\} \subseteq X$. Both perspectives---function and set---are used throughout the literature. We adopt the function view as primary and the set view when it simplifies combinatorial arguments (as in shattering, \Cref{ch:dimensions}).
+\end{defn}
+
+\begin{defn}[Hypothesis, Target Concept, Proper/Improper Flag]
+\label{def:hypothesis-target}
+A \emph{hypothesis} $h : X \to Y$ is a candidate prediction rule that a learning algorithm might output. The \emph{target concept} $c^* \in \mathcal{C}$ is the specific concept that generated the training data. Learning is \emph{proper} if the algorithm's output is constrained to lie in $\mathcal{C}$, and \emph{improper} if it may use a larger hypothesis space $\mathcal{H} \supseteq \mathcal{C}$.
+\end{defn}
+
+An \emph{alphabet} $\Sigma$ is a finite symbol set; it appears only in the formal language chapters (\Cref{ch:automata,ch:gold}) and plays no role in statistical learning theory.
+
+\medskip
+
+These definitions are unremarkable individually. The mathematical content begins when we ask how they compose.
+
+% ================================================================
+% CONCEPT CLASS: Hub Node — Profile G (Framework Bridge)
+% Centerpiece: the node everything measures
+% ================================================================
+
+\section{The Concept Class: Where All Paradigms Converge}
+\label{sec:concept-class}
+
+\begin{defn}[Concept Class]
+\label{def:concept-class}
+A \emph{concept class} $\mathcal{C} \subseteq Y^X$ is a collection of concepts over a common domain. The class is the primary object of study: every major question in learning theory is a question about concept classes.
+\end{defn}
+
+This definition is simple. Its importance is not. In the companion knowledge graph, \nde{concept\_class} is the single most connected node: 21 edges point into it, including \emph{every} complexity measure in the graph (Figure~\ref{fig:concept-class-hub}).
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    hub/.style={draw, very thick, rounded corners, fill=defblue!15, font=\small\bfseries, minimum width=2.8cm, minimum height=0.9cm},
+    measure/.style={draw, rounded corners, fill=layergray, font=\scriptsize, minimum width=1.6cm, minimum height=0.55cm, align=center},
+    paradigm/.style={draw, rounded corners, fill=edgeorange!10, font=\scriptsize, minimum width=1.8cm, minimum height=0.55cm, align=center},
+    arr/.style={-{Stealth[length=1.5mm]}, thin, notegray},
+    node distance=0.5cm
+]
+\node[hub] (cc) {Concept Class $\mathcal{C}$};
+
+% Complexity measures - left arc
+\node[measure, above left=1.2cm and 2.5cm of cc] (vc) {VCdim};
+\node[measure, left=2.8cm of cc] (ldim) {Ldim};
+\node[measure, below left=1.2cm and 2.5cm of cc] (ds) {DSdim};
+\node[measure, above left=0.4cm and 2.8cm of cc] (star) {$\star$-number};
+\node[measure, below left=0.4cm and 2.8cm of cc] (nat) {$d_N$};
+
+% More measures - right arc
+\node[measure, above right=1.2cm and 2.5cm of cc] (rad) {Rademacher};
+\node[measure, right=2.8cm of cc] (comp) {Compression};
+\node[measure, below right=1.2cm and 2.5cm of cc] (sq) {SQ-dim};
+\node[measure, above right=0.4cm and 2.8cm of cc] (cover) {Covering \#};
+\node[measure, below right=0.4cm and 2.8cm of cc] (fat) {Fat-shattering};
+
+% Top measures
+\node[measure, above=1.5cm of cc] (growth) {Growth fn};
+\node[measure, above left=1.5cm and 0.8cm of cc] (samp) {Sample cplx};
+\node[measure, above right=1.5cm and 0.8cm of cc] (teach) {Teaching dim};
+
+% Paradigms below
+\node[paradigm, below left=1.8cm and 1cm of cc] (pac) {PAC};
+\node[paradigm, below=1.8cm of cc] (gold) {Gold};
+\node[paradigm, below right=1.8cm and 1cm of cc] (online) {Online};
+
+\foreach \n in {vc,ldim,ds,star,nat,rad,comp,sq,cover,fat,growth,samp,teach}
+  \draw[arr] (\n) -- (cc);
+
+\foreach \n in {pac,gold,online}
+  \draw[arr, dashed, defblue] (\n) -- (cc);
+
+% Legend
+\node[font=\tiny, below=2.5cm of cc, anchor=north] (leg) {%
+  \textcolor{notegray}{\rule{0.8cm}{0.4pt}}\;\rel{measures} \qquad
+  \textcolor{defblue}{\rule[0.2ex]{0.3cm}{0.4pt}\,\rule[0.2ex]{0.3cm}{0.4pt}}\;\textcolor{defblue}{\rel{defined\_using}}};
+\end{tikzpicture}
+\caption{The concept class as hub node. All 13 complexity measures in the graph target $\mathcal{C}$; each paradigm defines its success criterion in terms of $\mathcal{C}$. The same mathematical object is measured by 13 different instruments, each revealing a different aspect of learnability.}
+\label{fig:concept-class-hub}
+\end{figure}
+
+Each measure asks a different question about the same object:
+
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item \textbf{VC dimension} asks: how many points can $\mathcal{C}$ shatter? (Determines PAC learnability.)
+\item \textbf{Littlestone dimension} asks: how deep a mistake tree can $\mathcal{C}$ support? (Determines online learnability.)
+\item \textbf{DS dimension} asks: what pseudo-cubes exist in $\mathcal{C}$'s one-inclusion hypergraph? (Determines multiclass learnability.)
+\item \textbf{Teaching dimension} asks: how many examples suffice for a teacher to identify each $c \in \mathcal{C}$? (Measures cooperative communication.)
+\item \textbf{Rademacher complexity} asks: how well can $\mathcal{C}$ correlate with random noise? (Controls generalization bounds.)
+\end{itemize}
+
+These 13 measures are not independent. Many of them are related by \rel{upper\_bounds}, \rel{lower\_bounds}, and \rel{characterizes} edges in the graph. But none of them is reducible to another. Each captures a genuine aspect of $\mathcal{C}$'s complexity that the others miss. The fact that a single mathematical object---a set of functions---supports 13 inequivalent complexity measures is one of the structural surprises of the field.
+
+\begin{example}[Four concept classes of increasing complexity]
+\label{ex:concept-classes}
+Fix $X = \R$.
+\begin{enumerate}[label=(\alph*),leftmargin=*,itemsep=3pt]
+\item \textbf{Thresholds:} $\mathcal{C}_1 = \{x \mapsto \ind[x \geq \theta] : \theta \in \R\}$.
+\begin{itemize}[nosep]
+\item $\VC = 1$, $\Ldim = \infty$, teaching dimension $= 2$.
+\item PAC learnable (1 sample suffices up to $\varepsilon$). Not online learnable (adversary forces arbitrarily many mistakes by approaching the threshold).
+\end{itemize}
+\item \textbf{Intervals:} $\mathcal{C}_2 = \{x \mapsto \ind[a \leq x \leq b] : a \leq b \in \R\}$.
+\begin{itemize}[nosep]
+\item $\VC = 2$, $\Ldim = \infty$.
+\end{itemize}
+\item \textbf{Unions of $k$ intervals:} $\mathcal{C}_3^{(k)}$. $\VC = 2k$.
+\item \textbf{All measurable functions:} $\mathcal{C}_4 = \{0,1\}^X$.
+\begin{itemize}[nosep]
+\item $\VC = \infty$. Not PAC learnable, not online learnable, not identifiable in the limit. The NFL theorem (\Cref{sec:inductive-bias}) applies in full force.
+\end{itemize}
+\end{enumerate}
+The thresholds example deserves attention: $\VC = 1$ but $\Ldim = \infty$. This single class witnesses the separation between PAC and online learning (\Cref{ch:separations}).
+\end{example}
+
+% ================================================================
+% HYPOTHESIS SPACE: Profile B-light
+% Centerpiece: proper vs improper tension
+% ================================================================
+
+\section{Hypothesis Spaces and the Proper--Improper Divide}
+\label{sec:hypothesis-space}
+
+\begin{defn}[Hypothesis Space]
+\label{def:hypothesis-space}
+A \emph{hypothesis space} $\mathcal{H} \subseteq Y^X$ is the set of functions available to the learner as candidate outputs. When $\mathcal{H} = \mathcal{C}$, learning is \emph{proper}; when $\mathcal{H} \supsetneq \mathcal{C}$, learning is \emph{improper}.
+\end{defn}
+
+The proper--improper distinction is not merely notational. It has computational consequences that are among the sharpest in the theory:
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Improper learning can be exponentially cheaper.} There exist concept classes where proper learning requires exponentially more samples or computation than improper learning~\cite{PittValiant1988}. The graph records this as a \rel{does\_not\_imply} edge from \nde{pac\_learning} to \nde{exact\_learning} (\Cref{ch:separations}).
+
+\item \textbf{Computational hardness often depends on properness.} Cryptographic hardness results (Kearns--Valiant, 1994) typically establish hardness of \emph{proper} learning; improper learners may circumvent the barrier by using richer representations~\cite{KearnsValiant1994}.
+
+\item \textbf{The fundamental theorem is representation-independent.} The VC characterization of PAC learnability holds regardless of whether learning is proper or improper---what matters is the VC dimension of the \emph{target} class $\mathcal{C}$, not of the learner's hypothesis space $\mathcal{H}$.
+\end{enumerate}
+
+\begin{defn}[Version Space]
+\label{def:version-space}
+Given a training sample $S = \{(x_i, y_i)\}_{i=1}^m$, the \emph{version space} is
+$\mathrm{VS}_{\mathcal{H},S} = \{h \in \mathcal{H} : h(x_i) = y_i \text{ for all } i\},$
+the set of hypotheses consistent with all observed data.
+\end{defn}
+
+The version space is the simplest object one can define from $\mathcal{H}$ and $S$ together: just the set of survivors. Version space elimination---outputting any element of $\mathrm{VS}_{\mathcal{H},S}$---is perhaps the most natural learning algorithm imaginable.
+
+The trouble is computational. For most hypothesis classes of interest, the version space cannot be efficiently represented, enumerated, or even sampled from. The \emph{star number} of $\mathcal{H}$ (\Cref{ch:dimensions}) measures one aspect of this difficulty: it is the size of the largest star-shaped substructure in $\mathcal{H}$'s dual, and its finiteness turns out to be equivalent to finite VC dimension. The \emph{eluder dimension}~\cite{RussoVanRoy2013} measures another aspect relevant to exploration--exploitation tradeoffs.
+
+% ================================================================
+% INDUCTIVE BIAS: Profile D (Negative Result)
+% Centerpiece: NFL theorem makes this NECESSARY
+% ================================================================
+
+\section{Inductive Bias and the No-Free-Lunch Barrier}
+\label{sec:inductive-bias}
+
+\begin{defn}[Inductive Bias]
+\label{def:inductive-bias}
+The \emph{inductive bias} of a learner is the set of assumptions---explicit or implicit---that it uses to generalize from training data to unseen instances.
+\end{defn}
+
+This definition is deliberately informal, because inductive bias is not a single mathematical object. It is a meta-concept whose formalization changes across paradigms:
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l l X@{}}
+\toprule
+\textbf{Paradigm} & \textbf{Inductive bias formalized as} & \textbf{Graph edge} \\
+\midrule
+PAC & Restriction of $\mathcal{H}$ to finite VC dimension & \rel{used\_in\_proof} by \nde{nfl\_theorem} \\
+Bayesian & Prior $P(h)$ over hypotheses & \rel{analogy} from \nde{bayesian\_inference} \\
+SRM & Nested class hierarchy $\mathcal{H}_1 \subset \mathcal{H}_2 \subset \cdots$ & \rel{analogy} from \nde{srm} \\
+Computational & Cryptographic assumption restricting efficient search & \rel{requires\_assumption} by \nde{computational\_hardness} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The reason inductive bias is not merely a design choice but a \emph{mathematical necessity} is the No-Free-Lunch theorem.
+
+\begin{thm}[No Free Lunch {\cite{Wolpert1996}}]
+\label{thm:nfl}
+Let $A$ be any learning algorithm. For any sample size $m \leq |X|/2$:
+\[
+\max_{c \in \{0,1\}^X} \E_{S \sim D^m}[\risk_D(A(S))] \geq \frac{1}{4}.
+\]
+That is, for every learner, there exists a target function on which the learner's expected error is at least $1/4$---no better than random guessing on two labels.
+\end{thm}
+
+\begin{proof}
+Fix any algorithm $A$. Consider the uniform distribution on $X$. For any training sample $S$ of size $m$, let $T = X \setminus \{x_1, \ldots, x_m\}$ be the unseen instances ($|T| \geq |X|/2$).
+
+The labels on $T$ are unconstrained by $S$ (since we average over all target functions). For each $x \in T$, the target label is equally likely to be $0$ or $1$ under the uniform distribution over target functions. Therefore the expected error of $A(S)$ on each unseen point is exactly $1/2$. Since $|T|/|X| \geq 1/2$, the overall error is at least $1/4$.
+\end{proof}
+
+The NFL theorem has a precise structural consequence. It says that the class $\{0,1\}^X$ of \emph{all} binary functions is not learnable. Therefore any learnable class must be a \emph{proper subset} of $\{0,1\}^X$. The choice of which proper subset---the choice of $\mathcal{C}$---is exactly the inductive bias. This is why inductive bias is mandatory, not optional.
+
+\begin{remark}[NFL as a Pl-boundary]
+\label{rmk:nfl-pl}
+In the language of the graph, the NFL theorem establishes that \nde{inductive\_bias} is a \rel{requires\_assumption} dependency for \nde{computational\_hardness}: without inductive bias, the question ``which classes are efficiently learnable?'' is not even askable, because no class is learnable at all. The NFL theorem is a plausibility boundary---it tells you what is not even admissible to ask about learning without first restricting $\mathcal{C}$.
+\end{remark}
+
+% ================================================================
+% MODEL SELECTION: Profile E (Analogy Triangle)
+% Centerpiece: MDL/MML/Bayesian near-miss network
+% ================================================================
+
+\section{Three Faces of Model Selection}
+\label{sec:model-selection}
+
+Bayesian inference, minimum description length, and minimum message length are often described informally as ``the same idea.'' They are not. Each formalizes a different answer to the question ``which hypothesis should I prefer?''---and the differences between them are more instructive than any individual definition.
+
+\subsection{The Definitions}
+
+\begin{defn}[Bayesian Inference]
+\label{def:bayesian}
+Given a prior $P(h)$ over $\mathcal{H}$ and a likelihood $P(S \mid h)$, the posterior is $P(h \mid S) \propto P(S \mid h) \cdot P(h)$. The Bayesian learner outputs $\hat{h} = \arg\max_{h} P(h \mid S)$ (MAP) or the full posterior $P(\cdot \mid S)$.
+\end{defn}
+
+\begin{defn}[Minimum Description Length {\cite{Rissanen1978}}]
+\label{def:mdl}
+Select $h$ minimizing $L(h) + L(S \mid h)$, where $L(\cdot)$ denotes description length under a fixed prefix-free code. The first term penalizes complexity; the second penalizes misfit.
+\end{defn}
+
+\begin{defn}[Minimum Message Length {\cite{WallaceBoulton1968}}]
+\label{def:mml}
+Select $h$ minimizing the total message length $\ell(h) + \ell(S \mid h)$ required to transmit the hypothesis and then the data, under a two-part coding scheme. Wallace--Freeman (1987): $\ell(h) = -\log P(h) + \frac{1}{2}\log |F(h)| + \text{const}$, where $F(h)$ is the Fisher information.
+\end{defn}
+
+\subsection{The Analogy Network}
+
+These three methods sit in a triangular analogy network in the graph, connected by \rel{analogy} edges with explicit obstructions (Figure~\ref{fig:model-selection-triangle}).
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    method/.style={draw, thick, rounded corners, fill=analogypurple!8, font=\small\bfseries, minimum width=2.2cm, minimum height=0.8cm, align=center},
+    obs/.style={font=\scriptsize, text=edgeorange, align=center, fill=white, inner sep=2pt},
+    edge/.style={thick, dashed, analogypurple!60},
+    node distance=2.5cm
+]
+\node[method] (bayes) {Bayesian\\Inference};
+\node[method, below right=3cm and 2.5cm of bayes] (mdl) {MDL};
+\node[method, below left=3cm and 2.5cm of bayes] (mml) {MML};
+
+% Also connect to inductive_bias and occam
+\node[draw, rounded corners, fill=layergray, font=\small, minimum width=2cm, minimum height=0.7cm] (ib) at ($(bayes)+(0,2.2)$) {Inductive Bias};
+\node[draw, rounded corners, fill=layergray, font=\small, minimum width=2cm, minimum height=0.7cm] (occam) at ($(mdl)+(3.2,0)$) {Occam};
+
+\draw[edge] (bayes) -- node[obs, right, xshift=3pt] {missing equiv.\\witness} (mml);
+\draw[edge] (mml) -- node[obs, below] {missing equiv.\ witness} (mdl);
+\draw[edge] (mdl) -- node[obs, left, xshift=10pt, yshift=-5pt] {type\_mismatch\\(codes vs priors)} (bayes);
+
+\draw[edge, notegray] (bayes) -- node[obs, left] {type\_mismatch\\(prior $\neq$ bias)} (ib);
+\draw[edge, notegray] (mdl) -- node[obs, below right, xshift=-5pt] {proof\_method\\mismatch} (occam);
+\end{tikzpicture}
+\caption{The model selection analogy triangle. Each pair is connected by an \rel{analogy} edge with an explicit obstruction explaining why the analogy is not a theorem. The triangle encodes a genuine mathematical fact: these three methods look similar but are not equivalent, and the reasons for non-equivalence are different for each pair.}
+\label{fig:model-selection-triangle}
+\end{figure}
+
+\subsection{Why They Are Not the Same}
+
+\begin{obstbox}
+\textbf{Bayesian $\leftrightarrow$ MML:} obstruction type \emph{missing\_equivalence\_witness}. MML's two-part code corresponds to Bayesian MAP estimation when the Fisher information correction term is constant. But for models with varying curvature in parameter space, MML departs from Bayesian posteriors. No theorem establishes their equivalence beyond the constant-Fisher case.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{MML $\leftrightarrow$ MDL:} obstruction type \emph{missing\_equivalence\_witness}. Both minimize a two-part code length. But MML uses Shannon-optimal coding relative to a prior (subjective), while MDL uses a universal code based on Kolmogorov complexity (objective). In the limit of infinite data, both converge to the true model under standard regularity conditions, but their finite-sample behavior differs.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{MDL $\leftrightarrow$ Bayesian:} obstruction type \emph{type\_mismatch}. MDL uses description lengths (integers under a code); Bayesian inference uses probability densities (reals under a measure). The connection $L(h) = -\log P(h)$ identifies description lengths with log-probabilities, but this identification breaks down when the code is not prefix-free or the prior is improper.
+\end{obstbox}
+
+The fact that three different formalization of ``prefer the simpler hypothesis'' are \emph{not} equivalent---and that the reasons for non-equivalence are themselves different (missing witness, missing witness, and type mismatch)---is a structural feature of learning theory that no single definition can convey. It is visible only in the graph.
+
+\subsection{Structural Risk Minimization}
+
+\begin{defn}[Structural Risk Minimization {\cite{Vapnik1998}}]
+\label{def:srm}
+Given a nested sequence of hypothesis classes $\mathcal{H}_1 \subset \mathcal{H}_2 \subset \cdots$ with $\VC(\mathcal{H}_k) = d_k$, select $k^*$ minimizing $\emprisk_{\mathcal{H}_k}(h) + \mathrm{penalty}(d_k, m, \delta)$.
+\end{defn}
+
+SRM is the operational realization of inductive bias within VC theory: instead of choosing a single $\mathcal{H}$, choose a hierarchy indexed by complexity, and let the data select the level. The graph records this as an \rel{analogy} edge from \nde{srm} to \nde{inductive\_bias} with a \emph{type\_mismatch} obstruction: SRM constructs inductive bias via structural nesting, but the concept of ``inductive bias'' itself is broader than any single construction.
+
+\begin{defn}[Algorithmic Probability {\cite{Solomonoff1964}}]
+\label{def:alg-prob}
+The \emph{Solomonoff prior} assigns to each string $x$ the probability $M(x) = \sum_{p : U(p)=x} 2^{-|p|}$, summing over all programs $p$ that produce $x$ on a universal Turing machine $U$. This is the ``prior that assigns higher probability to simpler explanations'' in the most literal possible sense.
+\end{defn}
+
+Algorithmic probability connects directly to Kolmogorov complexity ($K(x) \approx -\log M(x)$) and provides the information-theoretic foundation for MDL. Its detailed treatment belongs to \Cref{ch:compression}, where it interacts with compression schemes and Occam's razor.
+
+\section{What This Chapter Established}
+\label{sec:ch1-summary}
+
+The base vocabulary of learning theory is small: domain, label, concept, concept class, hypothesis space. But even at this level, three structural features are already visible:
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item The concept class is a hub node: the same object is measured by 13 inequivalent complexity measures. This multiplicity is not redundancy---it reflects the fact that learnability has 13 genuinely different aspects.
+
+\item Inductive bias is not optional. The NFL theorem converts it from a design choice to a mathematical necessity.
+
+\item The three standard model selection principles (Bayesian, MDL, MML) form a triangle of near-miss analogies. They look equivalent; they are not; and the reasons for non-equivalence are themselves informative.
+\end{enumerate}
+
+These patterns---hub nodes, negative results as content, analogy obstructions---recur throughout the book.
+

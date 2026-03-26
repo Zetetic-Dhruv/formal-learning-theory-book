@@ -1,0 +1,693 @@
+% Chapter 15: Analogies and Their Obstructions
+% Organized by OBSTRUCTION TYPE, not by analogy source.
+% Content: ALL 32 analogy edges from the graph.
+
+\chapter{Analogies and Their Obstructions}
+\label{ch:analogies}
+
+The concept graph contains 32 edges of type \rel{analogy}. In most
+treatments of learning theory, such analogies appear as informal remarks:
+``compression is like VC dimension,'' or ``stability is related to
+PAC-Bayes.'' This chapter treats each analogy as a formal object with
+three components:
+
+\begin{enumerate}[leftmargin=*, nosep]
+\item A \emph{source} and \emph{target}: two concepts that share a
+structural parallel.
+\item A \emph{shared structure}: the precise mathematical property that
+makes the analogy plausible.
+\item An \emph{obstruction}: the precise reason the analogy fails to be
+a theorem, classified by \emph{type}.
+\end{enumerate}
+
+The key insight of this chapter is that the obstruction type is more
+informative than the analogy itself. Two analogies may look superficially
+similar (``X is like Y because both measure complexity'') but fail for
+entirely different reasons: one because the objects live in different
+type systems, another because a conjectured equivalence remains unproved.
+The obstruction type tells you \emph{why} the analogy fails, and this
+``why'' determines whether the analogy might become a theorem in the
+future, or is structurally blocked.
+
+The 32 analogy edges distribute across six obstruction types:
+
+\begin{center}\small
+\begin{tabular}{llr}
+\toprule
+\textbf{Obstruction type} & \textbf{Meaning} & \textbf{Count} \\
+\midrule
+Type mismatch & Objects live in different formal categories & 12 \\
+Missing equivalence witness & Plausible but unproved & 9 \\
+One-way theorem only & One direction proved, reverse open/false & 4 \\
+Data model mismatch & Incompatible data-generating assumptions & 3 \\
+Proof method mismatch & Same structure, non-transferable proofs & 3 \\
+Success criterion mismatch & Different optimization objectives & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The distribution is itself revealing. The plurality of obstructions
+are type mismatches---analogies that fail because the mathematical
+objects being compared belong to different formal categories. The second
+largest group, missing equivalence witnesses, represents the frontier:
+analogies that \emph{might} become theorems if someone proves the right
+conjecture.
+
+
+% ================================================================
+% SECTION 1: TYPE MISMATCH (12 edges)
+% ================================================================
+
+\section{Type Mismatch}
+\label{sec:type-mismatch}
+
+A type mismatch obstruction arises when the source and target of an
+analogy belong to different formal categories in the concept graph.
+The analogy is structurally plausible---both concepts ``do something
+similar''---but they operate on different mathematical objects, and no
+bridging theorem connects the two type systems.
+
+Type mismatches are the most common obstruction (12 of 32 edges) and
+generally the least likely to be resolved. They are not open problems
+waiting for a clever proof; they are structural incompatibilities in the
+formalism.
+
+\begin{table}[ht]
+\centering\small
+\caption{Type mismatch analogies. The ``type gap'' column identifies
+the category mismatch that blocks a formal theorem.}
+\label{tab:type-mismatch}
+\begin{tabularx}{\textwidth}{@{}p{4.2cm}p{3.2cm}X@{}}
+\toprule
+\textbf{Analogy} & \textbf{Shared structure} & \textbf{Type gap} \\
+\midrule
+
+\nde{algorithmic\_stability} $\leftrightarrow$ \nde{pac\_bayes\_bound}
+& Both bound generalization gap
+& Stability is algorithm-dependent (perturbation of $A$). PAC-Bayes is
+posterior-dependent (divergence $\KL(Q \| P)$). An algorithm defines a
+posterior, but the primary objects differ. \\[6pt]
+
+\nde{information\_theoretic\_bound} $\leftrightarrow$
+\nde{pac\_bayes\_bound}
+& Both use information-divergence measures
+& Info-theoretic bounds use $I(W; S)$ (mutual information between
+algorithm output and training set). PAC-Bayes uses $\KL(Q \| P)$
+(posterior vs.\ prior). Different information measures on different
+objects. Hellstr\"om et al.\ (2023) partially unify via change-of-measure,
+but the objects remain distinct. \\[6pt]
+
+\nde{fundamental\_theorem} $\leftrightarrow$
+\nde{algorithmic\_stability}
+& Both characterize learnability
+& The fundamental theorem is a characterization (equivalence result).
+Stability is a complexity measure. The structural parallel exists but the
+formal types are incompatible without a bridging theorem. \\[6pt]
+
+\nde{sq\_dimension} $\leftrightarrow$ \nde{vc\_dimension}
+& Both measure concept class complexity
+& SQ dimension measures pairwise correlation structure under a
+distribution. VC dimension measures distribution-free shattering.
+Exponential gap possible (parities: $\VC = n$, $\SQdim = 2^n$). \\[6pt]
+
+\nde{grammar\_induction} $\leftrightarrow$ \nde{gold\_theorem}
+& Both concern language learning
+& Grammar induction is a process; Gold's theorem is an impossibility
+result. Different concept categories. \\[6pt]
+
+\nde{concept\_drift} $\leftrightarrow$ \nde{ex\_under\_drift}
+& Both concern non-stationary learning
+& Concept drift is a process; Ex-under-drift is a success criterion.
+Different concept categories. \\[6pt]
+
+\nde{lifelong\_learning} $\leftrightarrow$ \nde{meta\_learner}
+& Both concern learning across tasks
+& Lifelong learning is a process; meta-learner is a learner type.
+Different concept categories. \\[6pt]
+
+\nde{background\_knowledge} $\leftrightarrow$ \nde{advice}
+& Both provide side information to a learner
+& Background knowledge is a process; advice is a data presentation.
+Different concept categories. \\[6pt]
+
+\nde{mdl} $\leftrightarrow$ \nde{kolmogorov\_complexity}
+& Both measure description length
+& MDL uses finite computable codes. Kolmogorov complexity uses the
+shortest program on a universal Turing machine (generally
+incomputable). The parallel is ``short description = good model,''
+but MDL's codes are constructive while Kolmogorov's are not. \\[6pt]
+
+\nde{srm} $\leftrightarrow$ \nde{inductive\_bias}
+& Both constrain hypothesis selection
+& SRM is a model selection principle; inductive bias is a base type.
+The structural parallel exists but the categories are incompatible. \\[6pt]
+
+\nde{bayesian\_inference} $\leftrightarrow$ \nde{inductive\_bias}
+& Both encode prior assumptions
+& Bayesian inference is a model selection method (probability over
+hypotheses). Inductive bias is a base type (constraint on learner
+behavior). The prior \emph{is} a specific form of bias, but the type
+systems differ. \\[6pt]
+
+\nde{occam\_algorithm} $\leftrightarrow$ \nde{compression\_scheme}
+& Both embody ``short representation $\Rightarrow$ generalization''
+& Occam uses description length of hypotheses (syntactic: bits to
+encode $h$). Compression uses a subset of training data (extensional:
+examples to reconstruct $h$). The notion of shortness differs. \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The pattern across these 12 edges is consistent: the analogy identifies
+a genuine structural parallel, but the source and target live in
+different parts of the type system. Making the analogy formal would
+require a bridging theorem that relates the two types, and in most cases
+no such theorem is expected. These are permanent features of the
+landscape, not temporary gaps in knowledge.
+
+
+% ================================================================
+% SECTION 2: MISSING EQUIVALENCE WITNESS (9 edges)
+% ================================================================
+
+\section{Missing Equivalence Witness}
+\label{sec:missing-equiv}
+
+A missing equivalence witness obstruction marks the most interesting
+class of analogies: those where a formal equivalence is plausible but
+unproved. Some of these may become theorems; others may eventually be
+disproved. They represent the active frontier of the field.
+
+\begin{obstbox}
+\textbf{Compression $\leftrightarrow$ VC dimension.}
+
+\medskip\noindent
+The sample compression conjecture asserts that every concept class with
+VC dimension $d$ admits a sample compression scheme of size $O(d)$.
+Moran and Yehudayoff~\cite{MoranYehudayoff2016} proved that finite VC
+dimension implies \emph{some} finite compression scheme (of size
+exponential in $d$), establishing one direction. The conjecture that
+compression size is $O(d)$ remains open. If proved, this would upgrade
+the analogy to an equivalence; if disproved, it would become a
+separation.
+
+This is arguably the most important open problem connected to the
+analogy edges in the graph.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Rademacher complexity $\leftrightarrow$ VC dimension.}
+
+\medskip\noindent
+The two are asymptotically related: $\Rad_n(\mathcal{H}) \leq
+O\!\left(\sqrt{\VC(\mathcal{H})/n}\right)$. Both measure the complexity
+of a hypothesis class, and for binary classification both control
+generalization. But Rademacher complexity is data-dependent
+(computed from a specific sample and distribution), while VC dimension is
+distribution-free. No equivalence holds: Rademacher complexity can be
+much smaller than the VC bound for benign distributions, and the two
+quantities can disagree on the ranking of hypothesis classes.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{VC characterization $\leftrightarrow$ Littlestone
+characterization.}
+
+\medskip\noindent
+Both theorems have the same logical form: ``a class is learnable in
+paradigm $P$ if and only if combinatorial dimension $d$ is finite.''
+The parallel is exact at the level of logical structure. But the
+dimensions measure different adversarial strengths---batch (VC) vs.\
+adaptive (Littlestone)---and $\VC \leq \Ldim$ with no reverse bound.
+The gap can be infinite (thresholds on $\R$). Alon et
+al.~\cite{AlonLivniMalliarisMoran2019} connected the two via
+differential privacy, but no equivalence between the dimensions exists.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{MML $\leftrightarrow$ MDL.}
+
+\medskip\noindent
+Minimum Message Length (Wallace--Freeman) and Minimum Description Length
+(Rissanen) both select hypotheses by minimizing a two-part code: the
+model plus the data given the model. They are often treated as variants
+of the same idea. However, MML uses a Bayesian prior explicitly and
+integrates over the parameter space, while MDL uses a minimax-optimal
+universal code. No formal theorem establishes their equivalence or
+separation; the two traditions developed independently and use different
+mathematical frameworks.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{MML $\leftrightarrow$ Bayesian inference.}
+
+\medskip\noindent
+MML selects the hypothesis that minimizes total message length; Bayesian
+inference selects (or averages over) hypotheses according to posterior
+probability. For certain prior--likelihood pairs, MML and MAP
+(maximum a posteriori) estimates coincide asymptotically. But MML is a
+coding-theoretic criterion and Bayesian inference is a probabilistic
+criterion; the equivalence is approximate and model-dependent, not a
+general theorem.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{PAC learning $\leftrightarrow$ posterior consistency.}
+
+\medskip\noindent
+Both are success criteria requiring convergence to the truth. PAC
+demands uniform convergence in probability over all distributions;
+Bayesian consistency demands that the posterior concentrates on the true
+parameter. The structural parallel is ``learning = convergence,'' but
+PAC convergence is frequentist and distribution-free, while posterior
+consistency is Bayesian and prior-dependent. No general theorem
+connects the two: a class can be PAC learnable but Bayesian-inconsistent
+under a misspecified prior, and vice versa.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Mistake bound $\leftrightarrow$ Littlestone dimension.}
+
+\medskip\noindent
+The optimal mistake bound for a concept class equals its Littlestone
+dimension (this is Littlestone's theorem). However, the \emph{analogy}
+edge in the graph refers to the structural parallel between the two as
+complexity measures in their own right. The mistake bound is defined
+operationally (worst-case mistakes of the best algorithm); the
+Littlestone dimension is defined combinatorially (depth of the largest
+shattered tree). Their equivalence is a theorem, but as stand-alone
+objects they measure different things, and extending either to new
+settings (e.g., partial monitoring, bandit feedback) produces divergent
+generalizations.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Label complexity $\leftrightarrow$ sample complexity.}
+
+\medskip\noindent
+Both count the amount of data needed for learning, but label complexity
+(from active learning) counts the number of \emph{labels queried},
+while sample complexity counts the number of \emph{labeled examples
+drawn}. In active learning, the learner sees many unlabeled points but
+requests labels selectively, so label complexity can be exponentially
+smaller than sample complexity. No equivalence exists; the gap is the
+content of active learning theory.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Lifelong learning $\leftrightarrow$ concept drift.}
+
+\medskip\noindent
+Both concern learning in non-stationary environments. Lifelong learning
+emphasizes knowledge transfer across a sequence of tasks; concept drift
+emphasizes adaptation to a changing target within a single task. The
+structural parallel is ``the learning problem changes over time,'' but
+the formalization differs: lifelong learning uses a task distribution,
+concept drift uses a time-varying concept. No formal theorem connects
+the two frameworks.
+\end{obstbox}
+
+
+% ================================================================
+% SECTION 3: ONE-WAY THEOREM ONLY (4 edges)
+% ================================================================
+
+\section{One-Way Theorem Only}
+\label{sec:one-way}
+
+In these analogies, one direction of the relationship has been proved as
+a theorem, but the reverse direction is either open or known to be
+false. The analogy is ``half-true'': the structural parallel exists, but
+it is asymmetric.
+
+\begin{obstbox}
+\textbf{Sample complexity $\rightarrow$ VC dimension} (but not
+$\leftarrow$).
+
+\medskip\noindent
+The fundamental theorem establishes: $\VC(\mathcal{H}) < \infty
+\Leftrightarrow$ finite sample complexity. The two are functionally
+related, but sample complexity is defined independently as the minimum
+number of examples needed, while VC dimension is a combinatorial
+property. The relationship is a theorem, not a definition; treating
+them as interchangeable obscures the logical structure.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Compression scheme $\rightarrow$ sample complexity} (but not
+$\leftarrow$).
+
+\medskip\noindent
+A compression scheme of size $k$ implies PAC sample complexity
+$O(k \cdot \log m / \varepsilon)$ (Littlestone--Warmuth, Moran--Yehudayoff).
+But no theorem says that optimal sample complexity determines optimal
+compression size. A class might be learnable with few samples yet require
+a large compression scheme. The compression direction is proved;
+the reverse is open.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Covering number $\rightarrow$ VC dimension} (but not
+$\leftarrow$).
+
+\medskip\noindent
+The Sauer--Shelah lemma gives: $\log N(\varepsilon, \mathcal{H},
+L_1(P)) \leq d \cdot \log(2e/\varepsilon)$, bounding covering numbers
+from VC dimension. But covering numbers are defined for arbitrary
+metric spaces, while VC dimension applies only to binary hypothesis
+classes. VC dimension is a sufficient condition for covering number
+bounds, not a necessary one; the covering number framework is strictly
+more general.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Covering number $\rightarrow$ Rademacher complexity} (but not
+$\leftarrow$).
+
+\medskip\noindent
+Dudley's entropy integral bounds Rademacher complexity from above using
+covering numbers: $\Rad_n(\mathcal{H}) \leq \inf_{\alpha > 0}
+\left[ 4\alpha + \frac{12}{\sqrt{n}} \int_\alpha^1
+\sqrt{\log N(\varepsilon, \mathcal{H}, L_2)} \, d\varepsilon \right]$.
+This bound can be loose; tighter chaining methods (Talagrand's generic
+chaining) and direct Rademacher estimates sometimes give better results.
+The Dudley bound is one-directional: covering numbers control
+Rademacher, but Rademacher complexity does not determine covering
+numbers.
+\end{obstbox}
+
+
+% ================================================================
+% SECTION 4: DATA MODEL MISMATCH (3 edges)
+% ================================================================
+
+\section{Data Model Mismatch}
+\label{sec:data-model}
+
+These analogies fail because the source and target assume incompatible
+data-generating processes. The structural parallel is real, but the
+mathematical assumptions about how data arrives are fundamentally
+different.
+
+\begin{obstbox}
+\textbf{Concept drift $\leftrightarrow$ online learning.}
+
+\medskip\noindent
+Both are sequential learning settings, but concept drift uses i.i.d.\
+draws per time step from a slowly changing distribution, while online
+learning uses adversarially chosen instances from a fixed concept class.
+The shared structure is ``sequential prediction under non-stationarity,''
+but the non-stationarity is stochastic in one case and adversarial in
+the other. Results from one setting do not transfer: online regret
+bounds assume a fixed comparator class, while drift bounds assume a
+rate of distributional change.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Advice reduction $\leftrightarrow$ sample complexity.}
+
+\medskip\noindent
+Both quantify ``how much side information shrinks the learner's search
+space.'' But advice operates in the Gold model (infinite stream,
+computable learner), while sample complexity operates in the PAC model
+(finite i.i.d.\ sample, distribution-free guarantees). No formal theorem
+bridges the two frameworks. The structural parallel---``side information
+helps''---is too vague to formalize without choosing a specific data
+model, and the two models are incompatible.
+
+\hfill\cite{KaufmannStephan2001}
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Granger causality $\leftrightarrow$ concept drift.}
+
+\medskip\noindent
+Both operate on time-series data, but Granger causality assumes
+stationarity within estimation windows (testing whether past values
+of $X$ improve prediction of $Y$), while concept drift explicitly
+models non-stationarity. The structural parallel is ``temporal
+dependence in sequential data,'' but the assumptions about the data
+process are contradictory: Granger requires stationarity; drift requires
+its absence.
+\end{obstbox}
+
+
+% ================================================================
+% SECTION 5: PROOF METHOD MISMATCH (3 edges)
+% ================================================================
+
+\section{Proof Method Mismatch}
+\label{sec:proof-method}
+
+In these analogies, the source and target have the same theorem
+structure---the ``shape'' of the result is parallel---but the proof
+techniques from one do not transfer to the other.
+
+\begin{obstbox}
+\textbf{Information-theoretic bound $\leftrightarrow$ algorithmic
+stability.}
+
+\medskip\noindent
+Both bound the generalization gap via properties of the learning
+algorithm. Stability uses sup-norm perturbation sensitivity (how much
+does the output change when one training point is replaced?).
+Information-theoretic bounds use mutual information $I(W; S)$ (how much
+does the algorithm's output depend on the training set?). These are
+connected via the chain: low stability $\Rightarrow$ low $I(W; S)$
+$\Rightarrow$ low generalization gap. But the proof methods are
+fundamentally different: stability arguments use coupling and
+McDiarmid-type concentration; information-theoretic arguments use
+change-of-measure and data processing inequalities. Neither proof
+technique subsumes the other.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Ordinal VC dimension $\leftrightarrow$ mind-change ordinal.}
+
+\medskip\noindent
+Both use ordinal-valued measures to characterize learnability in
+transfinite settings. Ordinal VC dimension (Martin--Sharma--Stephan)
+characterizes predictive complexity; mind-change ordinals characterize
+identification complexity in the Gold model. Both use ordinals, but they
+measure different things. The connection is mediated through predictive
+complexity, not direct: ordinal VC dimension governs prediction error
+bounds, while mind-change ordinals govern convergence to a correct
+hypothesis. The proof techniques (Ramsey-theoretic for ordinal VC,
+topological for mind-change) do not transfer.
+\end{obstbox}
+
+\begin{obstbox}
+\textbf{Occam's razor $\leftrightarrow$ MDL.}
+
+\medskip\noindent
+Both assert that simpler models generalize better. Occam's razor (in the
+PAC sense of Blumer et al.) is a worst-case generalization theorem:
+if the hypothesis is short, its error is low with high probability.
+MDL is an information-theoretic model selection principle: minimize the
+total description length of model plus data-given-model. The theorem
+\emph{structure} is parallel (``short $\Rightarrow$ good''), but Occam
+gives frequentist, distribution-free guarantees while MDL gives
+Bayesian-flavored, coding-theoretic guarantees. The proof methods
+inhabit different mathematical worlds.
+
+\hfill\cite{BlumerEhrenfeuchtHausslerWarmuth1987}
+\end{obstbox}
+
+
+% ================================================================
+% SECTION 6: SUCCESS CRITERION MISMATCH (1 edge)
+% ================================================================
+
+\section{Success Criterion Mismatch}
+\label{sec:criterion-mismatch}
+
+A single analogy edge has this obstruction type.
+
+\begin{obstbox}
+\textbf{Granger causality $\leftrightarrow$ online learning.}
+
+\medskip\noindent
+Granger causality tests causal structure: does the past of time series
+$X$ improve prediction of time series $Y$ beyond what $Y$'s own past
+provides? Online learning minimizes cumulative prediction error against
+an adversary. Both involve sequential prediction, but they optimize
+different objectives. Granger seeks a \emph{structural} conclusion
+(causal influence exists or does not); online learning seeks a
+\emph{performance} guarantee (low regret). The success criteria are
+fundamentally different: statistical significance of a causal test vs.\
+sub-linear regret growth. No formal theorem connects them because they
+answer different questions about the same sequential data.
+\end{obstbox}
+
+
+% ================================================================
+% SECTION 7: THE OBSTRUCTION MAP
+% ================================================================
+
+\section{The Obstruction Map}
+\label{sec:obstruction-map}
+
+\Cref{fig:obstruction-map} displays all 32 analogy edges, colored by
+obstruction type. The visual pattern reveals the structure of the field's
+unresolved connections.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  node distance=1.2cm and 1.6cm,
+  concept/.style={
+    rectangle, rounded corners=2pt, draw, thick,
+    fill=layergray, font=\scriptsize\sffamily,
+    minimum width=1.6cm, minimum height=0.5cm,
+    align=center, inner sep=2pt
+  },
+  tm/.style={-, edgeorange, thick},        % type mismatch
+  mew/.style={-, defblue, thick, dashed},   % missing equiv witness
+  owt/.style={-, sepgreen, thick, dotted},  % one-way theorem
+  dm/.style={-, thmred, thick, dashdotted}, % data model mismatch
+  pm/.style={-, analogypurple, thick, densely dashed}, % proof method
+  sc/.style={-, boundbrown, thick, densely dotted},    % success criterion
+]
+
+% --- Complexity measures cluster ---
+\node[concept] (vc) {VC dim};
+\node[concept, right=1.4cm of vc] (rad) {Rademacher};
+\node[concept, right=1.4cm of rad] (cov) {Covering\\number};
+\node[concept, below=1.0cm of vc] (sq) {SQ dim};
+\node[concept, below=1.0cm of rad] (comp) {Compression};
+\node[concept, above=1.0cm of vc] (ldim) {Littlestone\\dim};
+\node[concept, above=1.0cm of rad] (mb) {Mistake\\bound};
+\node[concept, right=1.4cm of cov] (sc_node) {Sample\\complexity};
+\node[concept, below=1.0cm of sc_node] (lc) {Label\\complexity};
+
+% --- Paradigm cluster ---
+\node[concept, below=2.8cm of vc] (pac) {PAC};
+\node[concept, right=1.4cm of pac] (stab) {Stability};
+\node[concept, right=1.4cm of stab] (pb) {PAC-Bayes};
+\node[concept, right=1.4cm of pb] (itb) {Info-theoretic};
+\node[concept, below=1.0cm of pac] (post) {Posterior\\consistency};
+\node[concept, left=1.4cm of pac] (ft) {Fund.\\Theorem};
+
+% --- Characterization cluster ---
+\node[concept, above left=1.0cm and 0.0cm of ldim] (vcc) {VC charac.};
+\node[concept, above right=1.0cm and 0.0cm of ldim] (lc_char) {Ldim charac.};
+
+% --- Model selection cluster ---
+\node[concept, below=2.8cm of stab] (mdl) {MDL};
+\node[concept, left=1.4cm of mdl] (mml) {MML};
+\node[concept, right=1.4cm of mdl] (bayes) {Bayesian};
+\node[concept, left=1.4cm of mml] (kolm) {Kolmogorov};
+\node[concept, below=1.0cm of mdl] (occam) {Occam};
+\node[concept, right=1.4cm of bayes] (srm) {SRM};
+\node[concept, below=1.0cm of bayes] (ib) {Inductive\\bias};
+
+% --- Sequential cluster ---
+\node[concept, below=2.8cm of pb] (ol) {Online};
+\node[concept, right=1.4cm of ol] (drift) {Concept\\drift};
+\node[concept, right=1.4cm of drift] (gc) {Granger};
+\node[concept, below=1.0cm of drift] (exd) {Ex under\\drift};
+\node[concept, below=1.0cm of ol] (ll) {Lifelong};
+\node[concept, below left=1.0cm and 0.0cm of ll] (ml) {Meta-\\learner};
+
+% --- Data cluster ---
+\node[concept, left=1.4cm of kolm] (bk) {Background\\knowledge};
+\node[concept, below=1.0cm of kolm] (adv) {Advice};
+\node[concept, below=1.0cm of bk] (gi) {Grammar\\induction};
+\node[concept, below=1.0cm of gi] (gt) {Gold's\\theorem};
+\node[concept, below=1.0cm of adv] (ar) {Advice\\reduction};
+
+% --- Type mismatch edges (orange, 12) ---
+\draw[tm] (stab) -- (pb);
+\draw[tm] (itb) -- (pb);
+\draw[tm] (ft) -- (stab);
+\draw[tm] (sq) -- (vc);
+\draw[tm] (gi) -- (gt);
+\draw[tm] (drift) -- (exd);
+\draw[tm] (ll) -- (ml);
+\draw[tm] (bk) -- (adv);
+\draw[tm] (mdl) -- (kolm);
+\draw[tm] (srm) -- (ib);
+\draw[tm] (bayes) -- (ib);
+\draw[tm] (occam) -- (comp);
+
+% --- Missing equivalence witness edges (blue dashed, 9) ---
+\draw[mew] (comp) -- (vc);
+\draw[mew] (rad) -- (vc);
+\draw[mew] (vcc) -- (lc_char);
+\draw[mew] (mml) -- (mdl);
+\draw[mew] (mml) -- (bayes);
+\draw[mew] (pac) -- (post);
+\draw[mew] (mb) -- (ldim);
+\draw[mew] (lc) -- (sc_node);
+\draw[mew] (ll) -- (drift);
+
+% --- One-way theorem edges (green dotted, 4) ---
+\draw[owt] (sc_node) -- (vc);
+\draw[owt] (comp) -- (sc_node);
+\draw[owt] (cov) -- (vc);
+\draw[owt] (cov) -- (rad);
+
+% --- Data model mismatch edges (red dashdotted, 3) ---
+\draw[dm] (drift) -- (ol);
+\draw[dm] (ar) -- (sc_node);
+\draw[dm] (gc) -- (drift);
+
+% --- Proof method mismatch edges (purple, 3) ---
+\draw[pm] (itb) -- (stab);
+\draw[pm] (occam) -- (mdl);
+% ordinal_vc_dim -> mind_change_ordinal not shown (nodes would clutter)
+
+% --- Success criterion mismatch (brown, 1) ---
+\draw[sc] (gc) -- (ol);
+
+\end{tikzpicture}
+
+\caption{The obstruction map: all 32 analogy edges colored by
+obstruction type.
+\textcolor{edgeorange}{\textbf{---}} type mismatch (12);
+\textcolor{defblue}{\textbf{-\,-\,-}} missing equivalence witness (9);
+\textcolor{sepgreen}{\textbf{$\cdots$}} one-way theorem (4);
+\textcolor{thmred}{\textbf{-$\cdot$-}} data model mismatch (3);
+\textcolor{analogypurple}{\textbf{-\,-}} proof method mismatch (3);
+\textcolor{boundbrown}{\textbf{$\cdots$}} success criterion mismatch (1).
+One edge (ordinal VC dim $\leftrightarrow$ mind-change ordinal,
+proof method mismatch) is omitted from the diagram for clarity.}
+\label{fig:obstruction-map}
+\end{figure}
+
+\subsection*{What the distribution tells us}
+
+The obstruction type distribution reveals three structural facts about
+formal learning theory.
+
+\emph{First}, the dominance of type mismatches (12 of 32) means that
+the field's most common cross-paradigm analogies fail for the most
+basic possible reason: the objects being compared are not the same kind
+of thing. This is not a failure of proof technique; it is a failure of
+type compatibility. It suggests that future unification results will
+require new bridging concepts that mediate between the existing type
+systems.
+
+\emph{Second}, the 9 missing equivalence witnesses represent the field's
+open frontier. The sample compression conjecture (compression
+$\leftrightarrow$ VC dimension) is the most prominent, but the
+Rademacher--VC relationship and the characterization-theorem parallel
+(VC $\leftrightarrow$ Littlestone) are equally fundamental. Progress on
+any of these would restructure the analogy map, converting a dashed blue
+edge into a solid theorem edge.
+
+\emph{Third}, the 4 one-way theorems show where asymmetry is
+structural, not accidental. Covering numbers bound Rademacher complexity
+(Dudley) and are bounded by VC dimension (Sauer--Shelah), but these
+bounds flow in one direction only. The asymmetry reflects the
+generality hierarchy: covering numbers apply to metric spaces,
+Rademacher to function classes, VC dimension to binary classes. Each
+step downward in generality tightens the bound but loses applicability.
+
+Together, the 32 analogy edges and their obstructions form a map of what
+formal learning theory does \emph{not yet} know how to unify. The
+obstructions are not obstacles to be removed; most of them are permanent
+features of the mathematical landscape. Understanding why an analogy
+fails is, in this field, as valuable as understanding why a theorem
+holds.

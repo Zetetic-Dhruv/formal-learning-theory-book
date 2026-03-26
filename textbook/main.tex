@@ -1,0 +1,359 @@
+\documentclass[11pt,a4paper,twoside,openright]{book}
+
+% ============================================================
+% ENCODING & FONTS
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% ============================================================
+% MATHEMATICS
+% ============================================================
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{thmtools}
+\usepackage{stmaryrd}        % \llbracket, \rrbracket
+\usepackage{bm}              % bold math
+
+% ============================================================
+% GRAPHICS & DIAGRAMS
+% ============================================================
+\usepackage{tikz}
+\usetikzlibrary{
+  arrows.meta, positioning, shapes.geometric, fit, calc,
+  backgrounds, decorations.pathmorphing, decorations.markings,
+  trees, matrix, chains, patterns, shadows
+}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% ============================================================
+% TABLES
+% ============================================================
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+
+% ============================================================
+% LAYOUT
+% ============================================================
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{emptypage}       % blank pages truly blank
+
+% ============================================================
+% HYPERLINKS & CROSS-REFERENCES
+% ============================================================
+\usepackage[
+  colorlinks=true,
+  linkcolor=defblue,
+  citecolor=thmred,
+  urlcolor=edgeorange,
+  bookmarksdepth=3
+]{hyperref}
+\usepackage{cleveref}
+
+% ============================================================
+% COLORS
+% ============================================================
+\usepackage{xcolor}
+\definecolor{defblue}{RGB}{31,78,121}
+\definecolor{thmred}{RGB}{153,0,0}
+\definecolor{sepgreen}{RGB}{0,100,0}
+\definecolor{layergray}{RGB}{245,245,245}
+\definecolor{edgeorange}{RGB}{204,102,0}
+\definecolor{notegray}{RGB}{100,100,100}
+\definecolor{boundbrown}{RGB}{139,90,43}
+\definecolor{analogypurple}{RGB}{102,0,153}
+\definecolor{goldcolor}{RGB}{184,134,11}
+\definecolor{onlineblue}{RGB}{0,51,153}
+
+% ============================================================
+% COLORED BOXES
+% ============================================================
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems,skins,breakable}
+
+\newtcolorbox{separation}{
+  colback=sepgreen!5, colframe=sepgreen!50!black,
+  title=Separation Result, fonttitle=\bfseries\small,
+  breakable
+}
+\newtcolorbox{traversal}{
+  colback=defblue!5, colframe=defblue!50!black,
+  title=Graph Traversal, fonttitle=\bfseries\small,
+  breakable
+}
+\newtcolorbox{obstbox}{
+  colback=edgeorange!5, colframe=edgeorange!50!black,
+  title=Obstruction, fonttitle=\bfseries\small,
+  breakable
+}
+\newtcolorbox{historical}{
+  colback=goldcolor!5, colframe=goldcolor!50!black,
+  title=Historical Note, fonttitle=\bfseries\small,
+  breakable
+}
+\newtcolorbox{computational}{
+  colback=layergray, colframe=notegray!50!black,
+  title=Computational Illustration, fonttitle=\bfseries\small,
+  breakable
+}
+\newtcolorbox{graphnode}[1][]{
+  colback=defblue!3, colframe=defblue!30!black,
+  fonttitle=\bfseries\small\sffamily,
+  title={Graph Node}, #1,
+  breakable
+}
+
+% ============================================================
+% THEOREM ENVIRONMENTS
+% ============================================================
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[chapter]
+\newtheorem{example}[defn]{Example}
+\newtheorem{notation}[defn]{Notation}
+\newtheorem{convention}[defn]{Convention}
+
+\theoremstyle{plain}
+\newtheorem{thm}[defn]{Theorem}
+\newtheorem{prop}[defn]{Proposition}
+\newtheorem{cor}[defn]{Corollary}
+\newtheorem{lemma}[defn]{Lemma}
+\newtheorem{claim}[defn]{Claim}
+
+\theoremstyle{remark}
+\newtheorem{remark}[defn]{Remark}
+\newtheorem{openprob}[defn]{Open Problem}
+\newtheorem{warning}[defn]{Warning}
+
+% ============================================================
+% PAGE STYLE
+% ============================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\textit{A Textbook of Formal Learning Theory}}
+\fancyhead[RO]{\small\textit{\leftmark}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ============================================================
+% CHAPTER TITLE FORMAT
+% ============================================================
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{defblue}}
+  {\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{50pt}{40pt}
+
+% ============================================================
+% MACROS
+% ============================================================
+% Dimensions
+\newcommand{\VC}{\ensuremath{\mathrm{VCdim}}}
+\newcommand{\Ldim}{\ensuremath{\mathrm{Ldim}}}
+\newcommand{\DSdim}{\ensuremath{\mathrm{DSdim}}}
+\newcommand{\Ndim}{\ensuremath{d_{\mathrm{N}}}}
+\newcommand{\Pdim}{\ensuremath{\mathrm{Pdim}}}
+\newcommand{\fatshat}{\ensuremath{\mathrm{fat}}}
+\newcommand{\SQdim}{\ensuremath{\mathrm{SQdim}}}
+
+% Complexities
+\newcommand{\Rad}{\ensuremath{\widehat{\mathcal{R}}}}
+\newcommand{\KL}{\ensuremath{\mathrm{KL}}}
+\newcommand{\ERM}{\ensuremath{\mathrm{ERM}}}
+\newcommand{\SOA}{\ensuremath{\mathrm{SOA}}}
+
+% Learning criteria
+\newcommand{\Ex}{\ensuremath{\mathbf{Ex}}}
+\newcommand{\BC}{\ensuremath{\mathbf{BC}}}
+\newcommand{\FIN}{\ensuremath{\mathbf{FIN}}}
+
+% Probability and expectation
+\newcommand{\E}{\ensuremath{\mathbb{E}}}
+\renewcommand{\Pr}{\ensuremath{\mathbb{P}}}
+\newcommand{\ind}{\ensuremath{\mathbf{1}}}
+\newcommand{\R}{\ensuremath{\mathbb{R}}}
+\newcommand{\N}{\ensuremath{\mathbb{N}}}
+\newcommand{\Z}{\ensuremath{\mathbb{Z}}}
+
+% Risk
+\newcommand{\risk}{\ensuremath{R}}
+\newcommand{\emprisk}{\ensuremath{\hat{R}}}
+
+% Graph relations
+\newcommand{\rel}[1]{\texttt{\small #1}}
+\newcommand{\nde}[1]{\textsf{\small #1}}
+\newcommand{\edge}[3]{\nde{#1}\ensuremath{\;\xrightarrow{\text{\rel{#2}}}\;}\nde{#3}}
+
+% Growth function
+\newcommand{\growth}{\ensuremath{\Pi}}
+
+% ============================================================
+% TITLE
+% ============================================================
+\title{%
+  \textbf{\Huge A Textbook of Formal Learning Theory}\\[1em]
+  \Large Six Paradigms, Their Characterization Theorems,\\
+  and the Separations Between Them\\[1em]
+  \large Across Six Decades of Computational and Statistical Learning Theory
+}
+\author{%
+  Dhruv Gupta\\
+  Zetesis Labs, ARTPARK @ IISc Bangalore\\
+  \texttt{dhruv@zetesis.org}
+}
+\date{March 2026}
+
+% ============================================================
+\begin{document}
+% ============================================================
+
+\frontmatter
+\maketitle
+
+% ============================================================
+% EPIGRAPH
+% ============================================================
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+\begin{minipage}{0.7\textwidth}
+\centering\itshape\large
+``The question is not which functions can be learned,\\
+but which functions can be learned \emph{given what you already know}.''
+\end{minipage}
+\end{center}
+\vspace*{\fill}
+\newpage
+
+% ============================================================
+% PREFACE
+% ============================================================
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+
+This book presents formal learning theory as a single, navigable mathematical structure.  It treats six paradigms---PAC, online, Gold-style, exact, universal, and multiclass learning---within a unified framework of typed relations, and devotes equal attention to the separations between them.
+
+The need for such a book arises from a structural gap. The field's foundational results are distributed across several research traditions that developed largely in parallel:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{PAC learning} (Valiant, 1984) and its combinatorial characterization through VC dimension (Vapnik--Chervonenkis, 1971; Blumer et al., 1989).
+\item \textbf{Online learning} (Littlestone, 1988) and its characterization through the Littlestone dimension.
+\item \textbf{Gold-style identification in the limit} (Gold, 1967) and its mind-change hierarchy (Freivalds--Smith, Case--Smith).
+\item \textbf{Universal learning} (Bousquet et al., 2021) and the trichotomy theorem.
+\item \textbf{Multiclass learning} and its resolution through the DS dimension (Brukhim et al., 2022).
+\item \textbf{Generalization bounds} from five distinct traditions: VC/Rademacher, PAC-Bayes, algorithmic stability, information-theoretic, and margin-based.
+\end{itemize}
+
+No single textbook covers all these traditions with their precise interconnections and, critically, their precise \emph{non}-connections. Shalev-Shwartz and Ben-David~\cite{ShalevShwartzBenDavid2014} treat PAC and online learning comprehensively but omit Gold-style identification, universal learning, and information-theoretic bounds. Jain et al.~\cite{JainOshersonRoyerSharma1999} cover inductive inference thoroughly but not PAC theory. The generalization-bound literature is scattered.
+
+This book fills the gap by treating all traditions within a single framework organized around typed relations between concepts.  The key structural innovation is not any new theorem, but a \emph{negative layer}: the book devotes equal attention to what \emph{does not} hold---separation results with explicit witnesses, cross-paradigm analogies with their precise obstructions, and the boundaries where one framework's characterization theorem fails to generalize to another.
+
+\subsection*{How to Read This Book}
+
+The book is organized in five parts:
+
+\begin{description}[leftmargin=*]
+\item[Part I: Foundations] (Chapters 1--3) introduces the base types---domains, concepts, hypothesis spaces, data presentations, and the automata-theoretic vocabulary underlying identification in the limit.
+\item[Part II: Paradigms] (Chapters 4--9) presents the six major learning paradigms, each with its characterization theorem proved in full: PAC learning (VC dimension), online learning (Littlestone dimension), Gold-style identification (mind-change ordinals), exact learning (query models), and universal learning (the trichotomy).
+\item[Part III: Complexity Measures] (Chapters 10--13) develops the 33 complexity measures in the graph, organized by what they measure: combinatorial dimensions, sample complexity and compression, generalization bounds, and mind-change ordinals.
+\item[Part IV: The Negative Layer] (Chapters 14--15) presents all separation results with full proofs and all analogy-obstruction pairs with analysis.
+\item[Part V: Extensions] (Chapters 16--18) covers computational hardness, extensions beyond binary classification, and application-layer concepts.
+\end{description}
+
+Each chapter includes TikZ diagrams showing the subgraph relevant to that chapter's concepts and computational illustrations where appropriate.  Cross-references to the companion knowledge graph are given in the appendices.
+
+\subsection*{Prerequisites}
+
+The reader should be comfortable with:
+\begin{itemize}[leftmargin=*]
+\item Basic probability (expectation, concentration inequalities, Markov/Chebyshev/Hoeffding bounds).
+\item Basic combinatorics (growth functions, pigeonhole principle).
+\item Computability theory at the level of decidability, Turing machines, and the halting problem (for Gold-style chapters).
+\item Mathematical maturity sufficient for $\varepsilon$-$\delta$ arguments.
+\end{itemize}
+
+Background in machine learning is helpful but not required; the book is self-contained from the definitions upward.
+
+\subsection*{Companion Materials}
+
+The book is accompanied by a machine-readable knowledge graph and a benchmark suite, available at \url{https://github.com/Zetetic-Dhruv/Formal-Learning-Theory}.  The graph encodes 142 concepts connected by 260 typed edges across 13 relation types; it is described in detail in Appendix~A (edge inventory) and Appendix~C (validation).  The repository also contains a complete bibliography and scripts for validating the graph against the textbook's content.
+
+\subsection*{Notation}
+
+A notation index appears in Appendix~D. We highlight the most frequently used symbols here:
+
+\begin{center}\small
+\begin{tabular}{ll@{\qquad}ll}
+\toprule
+$\mathcal{C}$ & concept class & $\VC(\mathcal{H})$ & VC dimension \\
+$\mathcal{H}$ & hypothesis space & $\Ldim(\mathcal{H})$ & Littlestone dimension \\
+$D$ & distribution on $X \times Y$ & $\DSdim(\mathcal{H})$ & DS dimension \\
+$S = \{(x_i, y_i)\}_{i=1}^m$ & training sample & $\Ndim(\mathcal{H})$ & Natarajan dimension \\
+$\risk(h) = \E_{(x,y) \sim D}[\ell(h(x),y)]$ & true risk & $\Pdim(\mathcal{F})$ & pseudodimension \\
+$\emprisk(h) = \frac{1}{m}\sum \ell(h(x_i),y_i)$ & empirical risk & $\fatshat_\gamma(\mathcal{F})$ & fat-shattering dim \\
+$\varepsilon$ & accuracy parameter & $\Rad_n(\mathcal{H})$ & Rademacher complexity \\
+$\delta$ & confidence parameter & $\growth_\mathcal{H}(n)$ & growth function \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+\hfill \textit{Dhruv Gupta, Bangalore, March 2026}
+
+\tableofcontents
+
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+% ============================================================
+\mainmatter
+% ============================================================
+
+\input{chapters/ch01_objects}
+\input{chapters/ch02_data}
+\input{chapters/ch03_automata}
+\input{chapters/ch04_agents}
+\input{chapters/ch05_pac}
+\input{chapters/ch06_online}
+\input{chapters/ch07_gold}
+\input{chapters/ch08_exact}
+\input{chapters/ch09_universal}
+\input{chapters/ch10_dimensions}
+\input{chapters/ch11_compression}
+\input{chapters/ch12_generalization}
+\input{chapters/ch13_ordinals}
+\input{chapters/ch14_separations}
+\input{chapters/ch15_analogies}
+\input{chapters/ch16_computational}
+\input{chapters/ch17_extensions}
+\input{chapters/ch18_frontiers}
+
+% ============================================================
+\appendix
+% ============================================================
+
+\input{appendices/appA_edge_inventory}
+\input{appendices/appB_traversals}
+\input{appendices/appC_validation}
+\input{appendices/appD_notation}
+
+% ============================================================
+\backmatter
+% ============================================================
+
+\bibliographystyle{alpha}
+\bibliography{../flt_bibliography}
+
+\end{document}

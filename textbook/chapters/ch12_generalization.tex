@@ -1,0 +1,1226 @@
+% Chapter 12: Generalization Bounds
+%   uniform_convergence: Profile B (load-bearing theorem --- symmetrization
+%     + concentration proof IS the content)
+%   Five bound traditions: Profile G (framework bridge --- parallax)
+%   rademacher_complexity: Profile A-to-B bridge (definition matters, but
+%     comparison to VC is the content)
+%   pac_bayes_bound: Profile E (obstruction --- looks Bayesian but prior
+%     has a fundamentally different role)
+%
+% Centerpiece: the symmetrization argument (Sec 2) and the five-framework
+% parallax (Sec 8).
+
+\chapter{Generalization Bounds}
+\label{ch:generalization}
+
+\Cref{ch:pac} established \emph{that} finite VC dimension characterizes PAC
+learnability.  \Cref{ch:compression} refined the quantitative dependence
+through compression.  This chapter asks a different question: given a
+specific learning algorithm~$A$ and a specific training sample~$S$, what
+can we say about the generalization error of the hypothesis~$A(S)$?
+
+The answer is not unique.  Five distinct research traditions have developed
+bounds on the same quantity---the gap between true and empirical
+risk---each using different information about the learner:
+
+\begin{enumerate}[leftmargin=*, itemsep=3pt]
+\item \textbf{VC/uniform convergence} measures the combinatorial richness
+  of the hypothesis class through the growth function.
+\item \textbf{Rademacher complexity} refines this to a data-dependent
+  measure of how well the class correlates with random noise.
+\item \textbf{PAC-Bayes bounds} measure the ``distance'' of a learned
+  posterior from a data-independent prior.
+\item \textbf{Algorithmic stability} measures how much the output changes
+  when a single training example is perturbed.
+\item \textbf{Margin theory} measures the ``confidence'' of predictions
+  and connects to scale-sensitive dimensions.
+\end{enumerate}
+
+\noindent
+We also discuss information-theoretic bounds, which measure the mutual
+information between the training sample and the learned hypothesis.
+
+Each framework produces a bound on the same quantity but requires
+different structural assumptions and succeeds in different regimes.  The
+centerpiece of this chapter is twofold: (i)~the \emph{symmetrization
+argument} that powers uniform convergence (\Cref{sec:uniform-convergence}),
+proved in full as the engine behind classical generalization theory; and
+(ii)~the \emph{comparison} among the five frameworks
+(\Cref{sec:comparison}), which reveals what each sees that the others miss.
+
+\medskip
+
+Throughout this chapter, $\mathcal{H}$ denotes a hypothesis class,
+$D$~a distribution on $X \times Y$,
+$S = \{(x_i, y_i)\}_{i=1}^m$ an i.i.d.\ sample from~$D$,
+$A$~a learning algorithm, and
+$\ell \colon \mathcal{H} \times (X \times Y) \to [0,1]$ a bounded loss
+function.
+
+
+% ================================================================
+% SECTION 1: GENERALIZATION ERROR
+% Profile A.  Definition.
+% ================================================================
+
+\section{Generalization Error}
+\label{sec:gen-error}
+
+\begin{defn}[Generalization Error]
+\label{def:gen-error}
+The \emph{generalization error} (or \emph{generalization gap}) of a
+hypothesis $h$ with respect to distribution~$D$ and sample~$S$ is
+\[
+  \mathrm{gen}(h, S) \;=\; \risk_D(h) - \emprisk_S(h)
+    \;=\; \E_{(x,y) \sim D}[\ell(h, (x,y))]
+    - \frac{1}{m}\sum_{i=1}^m \ell(h, (x_i, y_i)).
+\]
+A \emph{generalization bound} is any high-probability or in-expectation
+upper bound on $|\mathrm{gen}(h, S)|$ or on $\mathrm{gen}(A(S), S)$.
+\end{defn}
+
+The generalization error is a random variable (through~$S$), and when
+$h = A(S)$ depends on~$S$, controlling it requires accounting for the
+dependence between the hypothesis and the data that produced it.  This is
+the core technical challenge that each framework addresses differently.
+
+
+% ================================================================
+% SECTION 2: UNIFORM CONVERGENCE
+% Profile B (load-bearing theorem).  FULL proof.
+% ================================================================
+
+\section{Uniform Convergence: The Engine}
+\label{sec:uniform-convergence}
+
+The classical approach to generalization does not look at the algorithm at
+all.  Instead, it asks: does the empirical risk converge to the true risk
+\emph{uniformly over all hypotheses}?  If so, any hypothesis with small
+empirical risk automatically has small true risk---including the one the
+algorithm selects.
+
+\begin{defn}[Uniform Convergence]
+\label{def:uniform-convergence}
+A hypothesis class~$\mathcal{H}$ has the \emph{uniform convergence
+property} with respect to loss~$\ell$ if, for every $\varepsilon > 0$,
+\[
+  \sup_{h \in \mathcal{H}} |\risk_D(h) - \emprisk_S(h)|
+  \xrightarrow{\;m \to \infty\;} 0
+  \quad \text{in probability, uniformly over all distributions } D.
+\]
+\end{defn}
+
+The content of uniform convergence is the proof technique: the
+\emph{symmetrization argument} introduced by Vapnik and Chervonenkis in
+1971.  The argument proceeds in three stages, each with a distinct role.
+
+\begin{thm}[VC Uniform Convergence Bound]
+\label{thm:vc-uniform}
+Let $\mathcal{H} \subseteq \{0,1\}^X$ with $\VC(\mathcal{H}) = d < \infty$.
+Then for any distribution~$D$ on $X \times \{0,1\}$, any $\varepsilon > 0$,
+and any $\delta > 0$, with probability at least $1 - \delta$ over
+$S \sim D^m$:
+\[
+  \sup_{h \in \mathcal{H}} |\risk_D(h) - \emprisk_S(h)|
+  \;\leq\; \sqrt{\frac{8\,d \log(2em/d) + 8\log(4/\delta)}{m}}.
+\]
+\end{thm}
+
+\begin{proof}
+The proof has three stages: symmetrization, reduction to a finite
+problem, and concentration.
+
+\textbf{Stage 1: Symmetrization (the ghost sample).}
+Let $S = (z_1, \ldots, z_m)$ be the training sample and let
+$S' = (z_1', \ldots, z_m')$ be an independent ``ghost'' sample drawn
+from the same distribution.  Define
+$\Phi(S) = \sup_{h \in \mathcal{H}} (\risk_D(h) - \emprisk_S(h))$.
+
+For any fixed~$h$, the true risk equals
+$\risk_D(h) = \E_{S'}[\emprisk_{S'}(h)]$, so
+\[
+  \Phi(S) = \sup_{h \in \mathcal{H}} \E_{S'}\!\left[
+    \emprisk_{S'}(h) - \emprisk_S(h)\right].
+\]
+Moving the supremum inside the expectation (Jensen's inequality applied
+to the convex functional $\sup$) gives:
+\begin{equation}
+\label{eq:symm-step}
+  \E_S[\Phi(S)]
+  \;\leq\; \E_{S,S'}\!\left[\sup_{h \in \mathcal{H}}
+    \bigl(\emprisk_{S'}(h) - \emprisk_S(h)\bigr)\right].
+\end{equation}
+
+\emph{Why this helps.}  The left side involves the population
+quantity~$\risk_D(h)$, which we cannot compute.  The right side involves
+only \emph{two finite samples}---no population quantities remain.  This is
+the symmetrization trick: the ghost sample replaces the unknown
+distribution.
+
+\textbf{Stage 1b: Rademacher sign-flip.}
+The difference $\emprisk_{S'}(h) - \emprisk_S(h) =
+\frac{1}{m}\sum_{i=1}^m (\ell(h,z_i') - \ell(h,z_i))$ is a sum of
+symmetric random variables (since $z_i$ and $z_i'$ are identically
+distributed, swapping them does not change the joint distribution).
+Introducing i.i.d.\ Rademacher variables $\sigma_1,\ldots,\sigma_m$
+(uniform on $\{-1,+1\}$):
+\begin{align}
+  \E_{S,S'}\!\left[\sup_{h} \frac{1}{m}\sum_{i=1}^m
+    \bigl(\ell(h,z_i') - \ell(h,z_i)\bigr)\right]
+  &= \E_{S,S',\sigma}\!\left[\sup_{h} \frac{1}{m}\sum_{i=1}^m
+    \sigma_i\bigl(\ell(h,z_i') - \ell(h,z_i)\bigr)\right]
+    \nonumber \\
+  &\leq 2\,\E_{S,\sigma}\!\left[\sup_{h} \frac{1}{m}\sum_{i=1}^m
+    \sigma_i \ell(h,z_i)\right],
+    \label{eq:rademacher-step}
+\end{align}
+where the last step uses the triangle inequality for suprema and the
+identical distribution of $S$ and~$S'$.
+
+\textbf{Stage 2: Reduction to a finite class.}
+The supremum in \eqref{eq:rademacher-step} ranges over all
+$h \in \mathcal{H}$, but on the fixed sample~$S$, only finitely many
+distinct behavior patterns occur.  Specifically, the loss vectors
+$(\ell(h,z_1), \ldots, \ell(h,z_m))$ take at most $\growth_\mathcal{H}(m)$
+distinct values, where $\growth_\mathcal{H}$ is the growth function.
+
+For binary classification with 0--1 loss, each behavior pattern is a
+binary vector in $\{0,1\}^m$, and the Sauer--Shelah lemma
+(\Cref{ch:dimensions}) gives
+\begin{equation}
+\label{eq:sauer-shelah-app}
+  \growth_\mathcal{H}(m) \;\leq\; \left(\frac{em}{d}\right)^d.
+\end{equation}
+
+Applying Massart's finite lemma to the at most $\growth_\mathcal{H}(m)$
+distinct vectors, each with Euclidean norm at most $\sqrt{m}$:
+\begin{equation}
+\label{eq:massart}
+  \E_\sigma\!\left[\sup_{h} \frac{1}{m}\sum_{i=1}^m \sigma_i \ell(h,z_i)
+  \right]
+  \;\leq\; \sqrt{\frac{2\log \growth_\mathcal{H}(m)}{m}}
+  \;\leq\; \sqrt{\frac{2d\log(em/d)}{m}}.
+\end{equation}
+
+\textbf{Stage 3: Concentration.}
+The bound so far controls $\E[\Phi(S)]$.  To obtain a high-probability
+bound, observe that $\Phi(S) = \sup_h (\risk_D(h) - \emprisk_S(h))$
+satisfies the bounded-differences condition: replacing any single~$z_i$
+changes $\Phi(S)$ by at most $1/m$ (since each loss value lies in
+$[0,1]$).  By McDiarmid's inequality,
+\[
+  \Pr\!\left[\Phi(S) > \E[\Phi(S)] + t\right]
+  \leq \exp(-2mt^2).
+\]
+Setting $t = \sqrt{\log(2/\delta)/(2m)}$ and combining with
+\eqref{eq:rademacher-step}--\eqref{eq:massart}, the one-sided bound
+follows.  Applying the same argument to
+$\sup_h (\emprisk_S(h) - \risk_D(h))$ and taking a union bound yields
+the two-sided result.
+\end{proof}
+
+\begin{historical}
+The symmetrization argument was introduced by Vapnik and Chervonenkis
+(1971) in the original paper that defined what is now called the VC
+dimension.  The three-stage structure---ghost sample, sign-flip,
+finite reduction---was not initially presented in this clean form.  The
+modern presentation, which passes through Rademacher complexity as an
+intermediate quantity, crystallized in the work of Koltchinskii (2001)
+and Bartlett--Mendelson (2002).  The Rademacher step (Stage~1b) was
+implicit in the original argument but was not isolated as a self-standing
+concept until much later.
+\end{historical}
+
+\begin{traversal}
+The uniform convergence theorem connects three graph nodes:
+$\edge{growth\_function}{characterizes}{uniform\_convergence}$,
+$\edge{sauer\_shelah\_lemma}{used\_in\_proof}{vc\_generalization\_bound}$,
+and $\edge{vc\_dimension}{upper\_bounds}{rademacher\_complexity}$.
+The proof above traces this path: the growth function enters at Stage~2,
+Sauer--Shelah provides the polynomial bound, and the Rademacher
+intermediate appears at Stage~1b.
+\end{traversal}
+
+
+\begin{example}[Halfspaces in $\R^d$]
+\label{ex:halfspace-uc}
+Let $\mathcal{H} = \{x \mapsto \ind[\langle w, x \rangle \geq b]
+: w \in \R^d, b \in \R\}$ be the class of halfspaces.
+Then $\VC(\mathcal{H}) = d+1$ (\Cref{ch:dimensions}), and the uniform
+convergence bound gives: with probability $\geq 1 - \delta$,
+\[
+  \sup_{h \in \mathcal{H}} |\risk_D(h) - \emprisk_S(h)|
+  \leq \sqrt{\frac{8(d+1)\log(2em/(d+1)) + 8\log(4/\delta)}{m}}.
+\]
+For $d = 10$ and $m = 10{,}000$, this gives a bound of approximately
+$0.12$ --- nontrivial and meaningful.  For a two-layer neural network
+with $p = 10^6$ parameters (where naive VC bounds give
+$\VC \approx O(p \log p)$), the same formula gives a bound exceeding~$1$:
+the uniform convergence bound is \emph{vacuous}.
+\end{example}
+
+
+% ================================================================
+% SECTION 3: RADEMACHER COMPLEXITY
+% Profile A-to-B bridge.  Definition + comparison to VC.
+% ================================================================
+
+\section{Rademacher Complexity}
+\label{sec:rademacher}
+
+The Rademacher intermediate that appeared in Stage~1b of the
+symmetrization proof is itself a fundamental complexity measure.  It
+refines VC dimension in two ways: it is \emph{data-dependent} (computed on
+the actual sample, not worst-case) and it applies to \emph{real-valued}
+function classes (not just binary hypotheses).
+
+\begin{defn}[Empirical Rademacher Complexity]
+\label{def:rademacher}
+Let $\mathcal{F}$ be a class of functions $f \colon Z \to \R$ and let
+$S = (z_1, \ldots, z_m)$ be a fixed sample.  The \emph{empirical
+Rademacher complexity} of $\mathcal{F}$ on~$S$ is
+\[
+  \Rad_S(\mathcal{F}) = \E_{\sigma}\!\left[\sup_{f \in \mathcal{F}}
+    \frac{1}{m}\sum_{i=1}^m \sigma_i f(z_i)\right],
+\]
+where $\sigma_1, \ldots, \sigma_m$ are independent Rademacher random
+variables (uniform on $\{-1, +1\}$).  The \emph{Rademacher complexity} of
+$\mathcal{F}$ at sample size~$m$ is
+$\mathcal{R}_m(\mathcal{F}) = \E_S[\Rad_S(\mathcal{F})]$.
+\end{defn}
+
+The Rademacher complexity measures how well $\mathcal{F}$ can
+\emph{correlate with pure noise}.  A class that achieves high correlation
+with random $\pm 1$ labels is rich enough to fit arbitrary patterns,
+including the noise in the training data.
+
+\begin{thm}[Rademacher Generalization Bound
+{\cite{BartlettMendelson2002}}]
+\label{thm:rademacher-bound}
+Let $\mathcal{F}$ be a class of functions $f \colon Z \to [0,1]$, let
+$D$ be a distribution on~$Z$, and let $S = (z_1,\ldots,z_m) \sim D^m$.
+Then for any $\delta > 0$, with probability at least $1-\delta$ over~$S$,
+for all $f \in \mathcal{F}$ simultaneously:
+\[
+  \E_D[f] \leq \frac{1}{m}\sum_{i=1}^m f(z_i)
+    + 2\,\Rad_S(\mathcal{F})
+    + 3\sqrt{\frac{\log(2/\delta)}{2m}}.
+\]
+\end{thm}
+
+\begin{proof}
+The proof follows the same three-stage architecture as the uniform
+convergence theorem: symmetrization, Rademacher sign-flip, and
+concentration.
+
+Define $\Phi(S) = \sup_{f \in \mathcal{F}} (\E_D[f] -
+\frac{1}{m}\sum_i f(z_i))$.
+
+\textbf{Step 1: Concentration of $\Phi$.}
+Replacing any single $z_i$ in~$S$ changes $\Phi(S)$ by at most $1/m$
+(since $f$ is bounded in $[0,1]$).  By McDiarmid's inequality:
+\begin{equation}
+\label{eq:rad-conc}
+  \Pr[\Phi(S) > \E[\Phi(S)] + t] \leq \exp(-2mt^2).
+\end{equation}
+Setting $t = \sqrt{\log(2/\delta)/(2m)}$ gives
+$\Phi(S) \leq \E[\Phi(S)] + \sqrt{\log(2/\delta)/(2m)}$
+with probability $\geq 1 - \delta/2$.
+
+\textbf{Step 2: Symmetrization.}
+Let $S' = (z_1', \ldots, z_m')$ be an independent ghost sample.  Then
+\begin{align*}
+  \E_S[\Phi(S)]
+  &= \E_S\!\left[\sup_{f \in \mathcal{F}} \left(\E_{S'}
+    \!\left[\frac{1}{m}\sum_{i=1}^m f(z_i')\right]
+    - \frac{1}{m}\sum_{i=1}^m f(z_i)\right)\right] \\
+  &\leq \E_{S, S'}\!\left[\sup_{f \in \mathcal{F}}
+    \frac{1}{m}\sum_{i=1}^m \bigl(f(z_i') - f(z_i)\bigr)\right].
+\end{align*}
+Since $z_i$ and $z_i'$ are i.i.d., the differences are symmetric
+random variables, so introducing Rademacher signs does not change the
+distribution:
+\begin{align*}
+  \E_{S, S'}\!\left[\sup_{f}
+    \frac{1}{m}\sum_i \bigl(f(z_i') - f(z_i)\bigr)\right]
+  &= \E_{S, S', \sigma}\!\left[\sup_{f}
+    \frac{1}{m}\sum_i \sigma_i\bigl(f(z_i') - f(z_i)\bigr)\right] \\
+  &\leq 2\,\E_{S, \sigma}\!\left[\sup_{f}
+    \frac{1}{m}\sum_i \sigma_i f(z_i)\right]
+  = 2\,\mathcal{R}_m(\mathcal{F}).
+\end{align*}
+
+\textbf{Step 3: Data-dependent form.}
+Apply McDiarmid again: $\Rad_S(\mathcal{F})$ has bounded differences
+$1/m$ (changing one sample point changes the Rademacher average by at
+most $1/m$), so
+$\mathcal{R}_m(\mathcal{F}) \leq \Rad_S(\mathcal{F})
+  + \sqrt{\log(2/\delta)/(2m)}$
+with probability $\geq 1 - \delta/2$.
+
+A union bound over the two $\delta/2$ events yields the stated bound.
+\end{proof}
+
+
+\subsection{Rademacher Complexity versus VC Dimension}
+\label{sec:rad-vs-vc}
+
+The following proposition makes the relationship precise.
+
+\begin{prop}[VC dimension bounds Rademacher complexity]
+\label{prop:rad-vc}
+For any binary hypothesis class $\mathcal{H} \subseteq \{0,1\}^X$ with
+$\VC(\mathcal{H}) = d$:
+\[
+  \mathcal{R}_m(\mathcal{H})
+  \;\leq\; \sqrt{\frac{2d \log(em/d)}{m}}.
+\]
+\end{prop}
+
+\begin{proof}
+On any fixed sample of size~$m$, the restriction $\mathcal{H}|_S$ has at
+most $\growth_\mathcal{H}(m) \leq (em/d)^d$ elements (Sauer--Shelah).
+Each element is a binary vector of Euclidean norm at most $\sqrt{m}$.
+By Massart's finite lemma, the Rademacher complexity of a finite set~$V$
+of vectors in $\R^m$ satisfies
+$\E_\sigma[\sup_{v \in V} \frac{1}{m}\langle \sigma, v\rangle]
+\leq \frac{\max_v \|v\|_2}{m}\sqrt{2\log|V|}$.
+Substituting $|V| \leq (em/d)^d$ and $\|v\|_2 \leq \sqrt{m}$ gives
+the result.
+\end{proof}
+
+\begin{remark}[When Rademacher is tighter than VC]
+\label{rmk:rad-tighter}
+The VC bound is worst-case: it uses the maximum of
+$|\mathcal{H}|_S|$ over all samples of size~$m$.  The empirical
+Rademacher complexity $\Rad_S(\mathcal{H})$ uses the \emph{actual}
+restriction $\mathcal{H}|_S$, which may be much smaller.  Consider the
+class of all threshold functions on $\R$:
+$\mathcal{H} = \{x \mapsto \ind[x \geq \theta] : \theta \in \R\}$.
+This class has $\VC(\mathcal{H}) = 1$ and
+$\growth_\mathcal{H}(m) = m + 1$, so the VC bound gives
+$\mathcal{R}_m \leq \sqrt{2\log(em)/m}$.  But on a sample where all
+points lie in $\{0,1\}$, the restriction has at most $3$ elements, and the
+empirical Rademacher complexity is $O(1/\sqrt{m})$ without the
+logarithmic factor.  The gain is modest here but becomes significant for
+classes with distribution-dependent structure.
+\end{remark}
+
+\begin{computational}
+\textbf{Rademacher complexity of linear classifiers.}
+Let $\mathcal{F} = \{x \mapsto \langle w, x \rangle : \|w\|_2 \leq W\}$
+and suppose $\|x_i\|_2 \leq B$ for all $i$.  Then
+\[
+  \Rad_S(\mathcal{F})
+  = \E_\sigma\!\left[\sup_{\|w\| \leq W}
+    \frac{1}{m}\left\langle w, \sum_i \sigma_i x_i\right\rangle\right]
+  = \frac{W}{m}\,\E_\sigma\!\left[\left\|\sum_i \sigma_i x_i\right\|_2
+    \right]
+  \leq \frac{WB}{\sqrt{m}},
+\]
+where the last step uses
+$\E[\|\sum_i \sigma_i x_i\|_2^2] = \sum_i \|x_i\|_2^2 \leq mB^2$ and
+Jensen's inequality.  Note: no dependence on ambient dimension.  A
+linear classifier in $\R^{10^6}$ with bounded norm has the same
+Rademacher complexity as one in $\R^{10}$---only the norm and the data
+radius matter.
+\end{computational}
+
+
+% ================================================================
+% SECTION 4: THE GROWTH FUNCTION AND SAUER--SHELAH
+% Brief recall (proved in Ch 10).
+% ================================================================
+
+\section{The Growth Function}
+\label{sec:growth-function}
+
+The growth function $\growth_\mathcal{H}(m) = \max_{|S|=m}
+|\mathcal{H}|_S|$ mediates between VC dimension and generalization bounds.
+It is the growth function---not the VC dimension directly---that enters
+the uniform convergence argument (Stage~2 of the proof of
+\Cref{thm:vc-uniform}).  The VC dimension is a single number; the growth
+function is a whole sequence.
+
+The Sauer--Shelah lemma (\Cref{ch:dimensions}) provides the critical
+link: if $\VC(\mathcal{H}) = d$, then
+$\growth_\mathcal{H}(m) \leq \sum_{i=0}^d \binom{m}{i}
+\leq (em/d)^d$ for $m \geq d$.
+The dichotomy is sharp: either $\growth_\mathcal{H}(m) = 2^m$ for all~$m$
+(when $\VC = \infty$) or $\growth_\mathcal{H}(m) = O(m^d)$
+(when $\VC = d < \infty$).  There is no intermediate growth rate.
+
+
+% ================================================================
+% SECTION 5: PAC-BAYES BOUNDS
+% Profile E (obstruction).  The prior is NOT a Bayesian prior.
+% ================================================================
+
+\section{PAC-Bayes Bounds}
+\label{sec:pac-bayes}
+
+The PAC-Bayes framework replaces the worst-case uniform convergence of
+Rademacher bounds with a \emph{distribution over hypotheses}.  Instead of
+bounding the risk of every $h \in \mathcal{H}$ simultaneously, it bounds
+the expected risk of a hypothesis drawn from a learned posterior~$\rho$,
+measured relative to a data-independent prior~$\pi$.
+
+\begin{defn}[PAC-Bayes Setting]
+\label{def:pac-bayes-setting}
+Fix a hypothesis space~$\mathcal{H}$, a loss
+$\ell \colon \mathcal{H} \times (X \times Y) \to [0,1]$,
+a \emph{prior} distribution~$\pi$ over~$\mathcal{H}$ chosen
+\emph{before} seeing data, and a training sample $S \sim D^m$.
+A \emph{posterior}~$\rho$ is any distribution over~$\mathcal{H}$ that
+may depend on~$S$.  Define
+\[
+  \risk_D(\rho) = \E_{h \sim \rho}[\risk_D(h)], \qquad
+  \emprisk_S(\rho) = \E_{h \sim \rho}[\emprisk_S(h)].
+\]
+\end{defn}
+
+\begin{thm}[McAllester's PAC-Bayes Bound
+{\cite{McAllester1999}}]
+\label{thm:pac-bayes}
+For any prior~$\pi$ over~$\mathcal{H}$ (chosen independently of~$S$),
+any $\delta > 0$, with probability at least $1 - \delta$ over
+$S \sim D^m$: for all posteriors~$\rho$ over~$\mathcal{H}$
+simultaneously,
+\[
+  \risk_D(\rho) \leq \emprisk_S(\rho)
+    + \sqrt{\frac{\KL(\rho \| \pi) + \log(2\sqrt{m}/\delta)}{2m}}.
+\]
+\end{thm}
+
+\begin{proof}
+The proof has four steps: change-of-measure, moment generating function
+bound, prior expectation, and optimization.
+
+\textbf{Step 1: Change-of-measure inequality.}
+For any measurable function $\phi \colon \mathcal{H} \to \R$ and
+distributions $\rho$,~$\pi$, the Donsker--Varadhan variational formula
+gives
+\[
+  \E_{h \sim \rho}[\phi(h)] \leq \KL(\rho \| \pi)
+    + \log \E_{h \sim \pi}[e^{\phi(h)}].
+\]
+This holds for every~$\rho$; it converts a bound on the moment generating
+function under~$\pi$ into a bound under any~$\rho$, at the cost of
+$\KL(\rho \| \pi)$.
+
+\textbf{Step 2: Moment generating function bound.}
+Set $\phi(h) = \lambda(\risk_D(h) - \emprisk_S(h))$ for a parameter
+$\lambda > 0$ to be optimized.  For a fixed~$h$ (independent of~$S$),
+$\emprisk_S(h) = \frac{1}{m}\sum_{i=1}^m \ell(h, z_i)$ is an average of
+i.i.d.\ $[0,1]$-valued random variables with mean~$\risk_D(h)$.  By
+Hoeffding's lemma,
+\[
+  \E_S\!\left[e^{\lambda(\risk_D(h) - \emprisk_S(h))}\right]
+  \leq e^{\lambda^2/(8m)}.
+\]
+
+\textbf{Step 3: Prior expectation.}
+Since $\pi$ is independent of~$S$, we can exchange the expectations:
+\[
+  \E_S\!\left[\E_{h \sim \pi}\!\left[
+    e^{\lambda(\risk_D(h) - \emprisk_S(h))}\right]\right]
+  = \E_{h \sim \pi}\!\left[\E_S\!\left[
+    e^{\lambda(\risk_D(h) - \emprisk_S(h))}\right]\right]
+  \leq e^{\lambda^2/(8m)}.
+\]
+By Markov's inequality applied to the non-negative random variable
+$\E_{h \sim \pi}[e^{\lambda(\risk_D(h) - \emprisk_S(h))}]$: with
+probability $\geq 1 - \delta$,
+\[
+  \log \E_{h \sim \pi}\!\left[
+    e^{\lambda(\risk_D(h) - \emprisk_S(h))}\right]
+  \leq \frac{\lambda^2}{8m} + \log\frac{1}{\delta}.
+\]
+
+\textbf{Step 4: Combine and optimize.}
+Applying Step~1 to the event from Step~3: with probability
+$\geq 1 - \delta$, for all~$\rho$,
+\[
+  \lambda\bigl(\risk_D(\rho) - \emprisk_S(\rho)\bigr)
+  \leq \KL(\rho \| \pi) + \frac{\lambda^2}{8m} + \log\frac{1}{\delta}.
+\]
+Dividing by~$\lambda$ and optimizing
+$\lambda = \sqrt{8m(\KL(\rho\|\pi) + \log(1/\delta))}$ yields
+\[
+  \risk_D(\rho) - \emprisk_S(\rho)
+  \leq \sqrt{\frac{2(\KL(\rho \| \pi) + \log(1/\delta))}{m}}.
+\]
+The slightly refined constant in \Cref{thm:pac-bayes} follows from
+a tighter application using Catoni's approach~\cite{Catoni2007}.
+\end{proof}
+
+
+\begin{obstbox}
+\textbf{The ``Bayesian'' in PAC-Bayes is an obstruction, not a
+feature.}
+
+The PAC-Bayes bound looks Bayesian: it involves a ``prior''~$\pi$
+and a ``posterior''~$\rho$, and the complexity term $\KL(\rho\|\pi)$
+penalizes departure from the prior.  But the prior plays a
+fundamentally different role from a Bayesian prior.
+
+In Bayesian inference, the prior $\pi$ represents \emph{beliefs}
+about which hypothesis is true.  The posterior is obtained by Bayes'
+rule: $\rho(h) \propto \pi(h) \cdot \prod_i p(z_i \mid h)$.  The
+prior must be honest---it should reflect actual uncertainty.
+
+In PAC-Bayes, the prior is a \emph{reference measure} chosen for
+technical convenience.  It need not represent beliefs.  The ``posterior''
+is \emph{any} distribution over~$\mathcal{H}$, not necessarily the
+Bayesian posterior.  The bound holds for all~$\rho$ simultaneously,
+so one can optimize~$\rho$ to minimize the bound.  The optimal
+$\rho$ is the \emph{Gibbs posterior}
+$\rho_\lambda \propto e^{-\lambda \emprisk_S(h)} \pi(h)$, which
+resembles a Bayesian posterior but with a free temperature
+parameter~$\lambda$ that a true Bayesian would set to~$m$.
+
+\emph{Type mismatch:} Bayesian prior lives in the space of beliefs;
+PAC-Bayes prior lives in the space of reference measures.  They have
+the same mathematical type (distributions over~$\mathcal{H}$) but
+different \emph{epistemic types}.  This is why PAC-Bayes bounds hold
+for \emph{any} prior, including bad ones---the bound simply becomes
+large.  A Bayesian analysis with a bad prior can give arbitrarily
+wrong posteriors; a PAC-Bayes analysis with a bad prior gives a
+correct but loose bound.
+\end{obstbox}
+
+
+% ================================================================
+% SECTION 6: ALGORITHMIC STABILITY
+% ================================================================
+
+\section{Algorithmic Stability}
+\label{sec:stability}
+
+Stability bounds abandon the hypothesis class entirely and focus on the
+\emph{algorithm}: if replacing a single training example changes the
+output hypothesis only slightly, the algorithm generalizes.
+
+\begin{defn}[Uniform Stability {\cite{BousquetElisseeff2002}}]
+\label{def:uniform-stability}
+A (possibly randomized) algorithm~$A$ is \emph{$\beta$-uniformly stable}
+with respect to loss~$\ell$ if, for all samples
+$S = (z_1, \ldots, z_m)$ and all samples~$S^{(i)}$ obtained by
+replacing~$z_i$ with an independent copy~$z_i'$:
+\[
+  \sup_{z \in X \times Y}
+    \bigl|\ell(A(S), z) - \ell(A(S^{(i)}), z)\bigr|
+  \leq \beta.
+\]
+\end{defn}
+
+\begin{thm}[Stability Generalization Bound
+{\cite{BousquetElisseeff2002}}]
+\label{thm:stability-bound}
+If $A$ is $\beta$-uniformly stable and $\ell$ takes values in $[0,1]$,
+then for any $\delta > 0$, with probability at least $1 - \delta$:
+\[
+  |\risk_D(A(S)) - \emprisk_S(A(S))|
+  \leq 2\beta + (4m\beta + 1)\sqrt{\frac{\log(1/\delta)}{2m}}.
+\]
+In particular, if $\beta = O(1/m)$, then the generalization gap is
+$O(1/\sqrt{m})$.
+\end{thm}
+
+\begin{proof}
+Define $\Delta(S) = \risk_D(A(S)) - \emprisk_S(A(S))$.  The proof
+proceeds in two stages.
+
+\emph{Stage 1: Bound $\E[\Delta(S)]$.}
+Write $\risk_D(A(S)) = \E_{z'}[\ell(A(S), z')]$ and
+$\emprisk_S(A(S)) = \frac{1}{m}\sum_i \ell(A(S), z_i)$.  By symmetry of
+the i.i.d.\ draw,
+$\E[\ell(A(S), z_i)] = \E[\ell(A(S^{(i)}), z_i')]$
+up to an error of~$\beta$ (by uniform stability applied to~$S$
+vs.~$S^{(i)}$).  Summing over~$i$ and using
+$\E[\ell(A(S^{(i)}), z_i')] = \E[\risk_D(A(S^{(i)}))] =
+\E[\risk_D(A(S))]$ (by identical distribution), one obtains
+$|\E[\Delta(S)]| \leq \beta$.
+
+\emph{Stage 2: Concentration.}
+Replacing~$z_i$ changes $\emprisk_S(A(S))$ by at most $1/m$ (direct
+computation) and changes $\risk_D(A(S))$ by at most~$\beta$ (via
+stability).  So $\Delta(S)$ has bounded differences
+$c_i \leq 2\beta + 1/m$.  McDiarmid's inequality gives
+\[
+  \Pr[|\Delta(S) - \E[\Delta(S)]| > t]
+  \leq 2\exp\!\left(\frac{-2t^2}{\sum_i c_i^2}\right)
+  \leq 2\exp\!\left(\frac{-2t^2}{m(2\beta+1/m)^2}\right).
+\]
+Combining with $|\E[\Delta(S)]| \leq \beta$ gives the stated bound.
+\end{proof}
+
+\begin{example}[Regularized ERM is stable]
+\label{ex:regularized-erm-stable}
+Consider regularized empirical risk minimization:
+$A(S) = \arg\min_{h \in \mathcal{H}} \emprisk_S(h) +
+\lambda \|h\|^2$.  For $\lambda$-strongly convex regularizers and
+$L$-Lipschitz losses, $\beta \leq L^2/(2\lambda m)$, giving
+$\beta = O(1/m)$ and hence $O(1/\sqrt{m})$
+generalization~\cite{BousquetElisseeff2002}.
+\end{example}
+
+\begin{remark}[Stability beyond binary classification]
+\label{rmk:stability-beyond}
+The deepest result in stability theory is due to Shalev-Shwartz et
+al.\ (2010): beyond binary classification with 0--1 loss,
+\emph{learnability is equivalent to the existence of a stable empirical
+risk minimizer}.  Uniform convergence fails to characterize learnability
+in this more general setting, but stability succeeds.  This is a
+fundamental structural result: stability replaces uniform convergence as
+the correct notion when one leaves the binary classification world.
+\end{remark}
+
+
+% ================================================================
+% SECTION 7: INFORMATION-THEORETIC BOUNDS
+% ================================================================
+
+\section{Information-Theoretic Bounds}
+\label{sec:info-bound}
+
+The most recent entry in the generalization-bound landscape connects
+generalization to the mutual information between the training sample and
+the learned hypothesis.
+
+\begin{thm}[Information-Theoretic Generalization Bound
+{\cite{XuRaginsky2017}}]
+\label{thm:xu-raginsky}
+Let $A$ be a (possibly randomized) learning algorithm, $\ell$ a loss
+taking values in $[0,1]$, and $W = A(S)$ the output hypothesis.  Let
+$I(S; W)$ denote the mutual information between~$S$ and~$W$.  Then
+\[
+  \bigl|\E[\risk_D(W) - \emprisk_S(W)]\bigr|
+  \leq \sqrt{\frac{I(S; W)}{2m}}.
+\]
+\end{thm}
+
+\begin{proof}[Proof sketch]
+The argument uses the transportation lemma, a consequence of Pinsker's
+inequality and the Donsker--Varadhan representation of KL divergence.
+
+For each index~$i$, define
+$g_i(w) = \E_Z[\ell(w, Z)] - \ell(w, Z_i)$, where the first expectation
+is over a fresh test point $Z \sim D$.  Then
+$\E[\mathrm{gen}(W,S)] = \frac{1}{m}\sum_{i=1}^m \E[g_i(W)]$.
+
+For each~$i$, the function $g_i$ satisfies $|g_i| \leq 1$, so $g_i(W)$
+is $1$-sub-Gaussian under the marginal distribution of~$W$ given all
+other samples.  The transportation lemma gives
+$|\E[g_i(W)]| \leq \sqrt{2 I(W; Z_i)}$.
+Averaging over~$i$ and using the chain rule
+$\sum_i I(W; Z_i) \leq I(W; S)$ (by the data-processing inequality
+applied to the Markov chain
+$Z_i \to S \to W$) yields the result.
+\end{proof}
+
+\begin{remark}[Conditional mutual information]
+\label{rmk:cmi}
+The Xu--Raginsky bound can be vacuous for deterministic algorithms,
+since $I(S; W) = H(W)$ when $W = A(S)$ is a deterministic function
+of~$S$.  Steinke and Zakynthinou (2020) introduced the \emph{conditional
+mutual information} (CMI) framework, which replaces $I(S; W)$ with
+$I(A(\tilde{S}_U); U \mid \tilde{S})$, where $\tilde{S}$ is a
+``supersample'' of $2m$ points and $U \in \{0,1\}^m$ selects which half
+to train on.  The CMI is always bounded by $m \log 2$ and gives
+nontrivial bounds even for deterministic algorithms.  This framework
+unifies PAC-Bayes, VC, and stability bounds within a single
+information-theoretic language.
+\end{remark}
+
+
+% ================================================================
+% SECTION 8: MARGIN THEORY
+% Profile F (Open Frontier).
+% ================================================================
+
+\section{Margin Theory}
+\label{sec:margin}
+
+Margin-based bounds were the original motivation for support vector
+machines and remain the primary tool for analyzing neural network
+generalization.
+
+\begin{defn}[Margin]
+\label{def:margin}
+For a classifier $f \colon X \to \R$ and a labeled example $(x, y)$
+with $y \in \{-1, +1\}$, the \emph{margin} is
+$\gamma(f, x, y) = y \cdot f(x)$.  The margin is positive when the
+prediction is correct, and its magnitude measures the ``confidence'' of
+the prediction.
+\end{defn}
+
+\begin{thm}[Margin-Based Generalization Bound]
+\label{thm:margin-bound}
+Let $\mathcal{F}$ be a class of functions $f \colon X \to \R$ with
+$\|f\|_\infty \leq B$, and let $\gamma > 0$.  Then for any $\delta > 0$,
+with probability at least $1 - \delta$, for all $f \in \mathcal{F}$:
+\[
+  \Pr_{(x,y) \sim D}[y \cdot f(x) \leq 0]
+  \leq \frac{1}{m}\sum_{i=1}^m \ind[y_i f(x_i) \leq \gamma]
+  + \frac{4}{\gamma}\,\Rad_S(\mathcal{F})
+  + \sqrt{\frac{\log(2/\delta)}{2m}}.
+\]
+\end{thm}
+
+\begin{proof}[Proof sketch]
+Define the ramp loss $\ell_\gamma(t) = \min(1, \max(0, 1 - t/\gamma))$,
+which is $1/\gamma$-Lipschitz and satisfies
+$\ind[t \leq 0] \leq \ell_\gamma(t) \leq \ind[t \leq \gamma]$.  Then
+\begin{align*}
+  \Pr_D[y f(x) \leq 0]
+  &\leq \E_D[\ell_\gamma(y f(x))] \\
+  &\leq \frac{1}{m}\sum_i \ell_\gamma(y_i f(x_i))
+    + 2\Rad_S(\ell_\gamma \circ \mathcal{F})
+    + \sqrt{\frac{\log(2/\delta)}{2m}} \\
+  &\leq \frac{1}{m}\sum_i \ind[y_i f(x_i) \leq \gamma]
+    + \frac{2}{\gamma}\cdot 2\Rad_S(\mathcal{F})
+    + \sqrt{\frac{\log(2/\delta)}{2m}},
+\end{align*}
+using the Rademacher contraction lemma
+($\Rad_S(\phi \circ \mathcal{F}) \leq L \cdot \Rad_S(\mathcal{F})$
+for $L$-Lipschitz~$\phi$) in the last step.
+\end{proof}
+
+\begin{example}[Halfspaces with margin]
+\label{ex:halfspace-margin}
+Let $\mathcal{F} = \{x \mapsto \langle w, x \rangle : \|w\|_2 \leq W\}$
+with data satisfying $\|x_i\| \leq B$.  From the computational
+illustration in \Cref{sec:rademacher},
+$\Rad_S(\mathcal{F}) \leq WB/\sqrt{m}$.  The margin bound gives
+\[
+  \Pr_D[y \langle w, x \rangle \leq 0]
+  \leq \hat{L}_\gamma(w) + \frac{4WB}{\gamma\sqrt{m}}
+    + \sqrt{\frac{\log(2/\delta)}{2m}},
+\]
+where $\hat{L}_\gamma(w)$ is the fraction of training points with margin
+$\leq \gamma$.  Observe: the bound depends on $WB/\gamma$ (the ratio of
+norm to margin), not on the ambient dimension.  This is why SVMs with
+large-margin solutions generalize well even in very high dimensions.
+\end{example}
+
+\begin{example}[Neural networks: the open frontier]
+\label{ex:neural-margin}
+For a depth-$L$ network $f_W(x) = W_L \sigma(W_{L-1} \sigma(\cdots
+W_1 x \cdots))$ with ReLU activation~$\sigma$, Bartlett, Foster, and
+Telgarsky (2017) showed that the Rademacher complexity satisfies
+\[
+  \Rad_S(\mathcal{F})
+  \leq \frac{B_x \cdot (\sqrt{2\log(2d_{\max})})^L
+    \cdot \prod_{i=1}^L \|W_i\|_\sigma}{\sqrt{m}},
+\]
+where $\|W_i\|_\sigma$ is the spectral norm of the $i$-th layer and
+$d_{\max}$ is the maximum width.  Combined with the margin bound, this
+gives a generalization bound scaling as the product of spectral norms
+divided by the margin.
+
+The problem: for practical networks, this product is large.  A ResNet-18
+on CIFAR-10 has $\prod_i \|W_i\|_\sigma \approx 10^3$, making the bound
+vacuous (larger than~1).  Yet the network generalizes perfectly well.  The
+resolution of this tension---finding bounds that are both non-vacuous and
+predictive---remains one of the central open problems in learning theory.
+\end{example}
+
+\begin{openprob}[Tight deep network bounds]
+\label{op:deep-margins}
+For deep neural networks, all known generalization bounds---margin-based,
+PAC-Bayes, stability, and information-theoretic---are \emph{loose} in
+the following sense: the bounds scale with quantities that grow with
+network size, yet empirically, larger networks generalize \emph{better}.
+
+The specific open problem: find a generalization bound for deep networks
+trained by stochastic gradient descent that (a)~is non-vacuous (smaller
+than~1) on standard benchmarks, (b)~correctly predicts that increasing
+width improves generalization, and (c)~does not require post-hoc
+compression or quantization.  As of 2025, no known framework achieves all
+three simultaneously.
+\end{openprob}
+
+
+% ================================================================
+% SECTION 9: META-LEARNING BOUNDS
+% Profile A-plus.  Brief.
+% ================================================================
+
+\section{Meta-Learning Bounds}
+\label{sec:meta-pac}
+
+\begin{defn}[Meta-PAC Bound {\cite{Baxter2000}}]
+\label{def:meta-pac}
+In the meta-learning setting, the learner observes $T$ tasks, each
+providing $m$ samples from a task-specific distribution~$D_t$.  The tasks
+are drawn from a task distribution~$\mathcal{T}$.  Baxter's meta-PAC
+bound states that if the bias class~$\mathcal{B}$ has finite complexity,
+then with $T$ tasks and $m$ samples per task:
+\[
+  \risk_\mathcal{T}(\hat{b}) \leq \emprisk_{T,m}(\hat{b})
+  + O\!\left(\sqrt{\frac{\log \mathcal{N}(\varepsilon,\mathcal{B},d)}{T}}
+    + \sqrt{\frac{d_{\mathrm{task}}}{m}}\right),
+\]
+where $d_{\mathrm{task}}$ is the VC dimension of the task-level
+hypothesis class induced by the bias.  The first term controls
+meta-generalization; the second controls within-task generalization.
+\end{defn}
+
+
+% ================================================================
+% SECTION 10: THE COMPARISON
+% CENTERPIECE: Profile G.  Five frameworks in parallax.
+% ================================================================
+
+\section{Five Frameworks Compared}
+\label{sec:comparison}
+
+The five frameworks bound the same quantity but use different information
+and succeed in different regimes.  \Cref{tab:five-frameworks} compares
+them along five axes.
+
+\begin{table}[ht]
+\centering\small
+\caption{Five generalization-bound frameworks compared.  Each row
+describes what the framework measures, what it bounds, where it is
+tightest, and where it fails.}
+\label{tab:five-frameworks}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{>{\bfseries\small}l X X X X}
+\toprule
+\textbf{Framework} & \textbf{Key quantity} & \textbf{What it bounds}
+  & \textbf{Tight for} & \textbf{Fails on} \\
+\midrule
+Rademacher
+  & $\Rad_S(\mathcal{F})$: noise correlation
+  & Uniform over all $f \in \mathcal{F}$
+  & Finite VC classes; linear models
+  & Overparameterized models (vacuous) \\
+\addlinespace
+PAC-Bayes
+  & $\KL(\rho \| \pi)$: posterior--prior divergence
+  & Expected risk under posterior~$\rho$
+  & Bayesian and ensemble methods
+  & Requires meaningful prior \\
+\addlinespace
+Stability
+  & $\beta$: one-sample sensitivity
+  & $|\risk - \emprisk|$ for algorithm~$A$
+  & Regularized ERM; SGD
+  & Non-regularized ERM (unstable) \\
+\addlinespace
+Information
+  & $I(S; W)$: mutual information
+  & $|\E[\risk - \emprisk]|$
+  & Noisy algorithms (DP-SGD)
+  & Deterministic algorithms (vacuous) \\
+\addlinespace
+Margin
+  & $\gamma$: prediction confidence
+  & $\Pr[\text{error}]$ via margin loss
+  & SVMs; kernel methods
+  & Deep networks (norms too large) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\subsection{The Parallax Diagram}
+
+\Cref{fig:five-frameworks} displays the implication and obstruction
+relationships among the five frameworks.  The diagram should be read as a
+\emph{parallax}: five views of the same phenomenon (generalization),
+each projecting the three-way interaction between data, class, and
+algorithm onto a different axis.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    fbox/.style={draw, thick, rounded corners=4pt, minimum width=2.8cm,
+      minimum height=0.9cm, font=\small\bfseries, align=center},
+    arr/.style={-{Stealth[length=2.5mm]}, thick},
+    darr/.style={arr, defblue},
+    oarr/.style={{Stealth[length=2.5mm]}-{Stealth[length=2.5mm]}, thick,
+      analogypurple, dashed},
+    xarr/.style={arr, thmred, dashed},
+    lbl/.style={font=\scriptsize, midway, fill=white, inner sep=1pt}
+]
+% Nodes
+\node[fbox, fill=defblue!10] (vc) at (-3.5,0) {VC / Uniform\\Convergence};
+\node[fbox, fill=defblue!15] (rad) at (0,0) {Rademacher};
+\node[fbox, fill=sepgreen!10] (pb) at (4.5,0) {PAC-Bayes};
+\node[fbox, fill=goldcolor!10] (stab) at (-1.5,-2.8) {Stability};
+\node[fbox, fill=edgeorange!10] (info) at (3,-2.8) {Information-\\Theoretic};
+\node[fbox, fill=boundbrown!10] (margin) at (0,2.5) {Margin};
+
+% Implications (solid blue arrows)
+\draw[darr] (margin) -- node[lbl, left] {specializes} (rad);
+\draw[darr] (rad) -- node[lbl, above] {refines} (vc);
+\draw[darr] (stab) -- node[lbl, below] {implies} (info);
+
+% Dual relationship (dashed purple double arrow)
+\draw[oarr] (pb) -- node[lbl, right, xshift=2pt]
+  {\textcolor{analogypurple}{dual views}} (info);
+
+% Obstructions (dashed red)
+\draw[xarr] (info) -- node[lbl, left, xshift=-2pt, rotate=30]
+  {\textcolor{thmred}{orthogonal}} (rad);
+\draw[xarr] (stab) -- node[lbl, below, yshift=-2pt]
+  {\textcolor{thmred}{type mismatch}} (pb);
+
+% Dotted connection: VC to Rademacher via Sauer-Shelah
+\draw[darr, densely dotted] (vc) to[bend right=20]
+  node[lbl, below] {\scriptsize Sauer--Shelah} (rad);
+\end{tikzpicture}
+\caption{Implication and obstruction relationships among the five
+generalization frameworks.  Solid arrows: one framework implies or
+refines the other.  Dashed purple: dual or analogous frameworks.  Dashed
+red: obstruction (the frameworks measure orthogonal aspects or have a
+type mismatch).  Dotted: the Sauer--Shelah lemma mediates the
+VC-to-Rademacher connection.}
+\label{fig:five-frameworks}
+\end{figure}
+
+
+\subsection{Cross-Framework Relationships}
+
+The five frameworks are not independent.  Several implication, analogy,
+and obstruction relationships connect them:
+
+\begin{enumerate}[leftmargin=*, itemsep=3pt]
+\item \textbf{Rademacher $\Rightarrow$ VC.}  The Rademacher complexity of
+  a binary class satisfies $\mathcal{R}_m(\mathcal{H}) \leq
+  \sqrt{2\VC(\mathcal{H}) \log(em/\VC(\mathcal{H}))/m}$
+  (\Cref{prop:rad-vc}), so Rademacher bounds subsume and refine VC
+  bounds.  The refinement is strict: Rademacher complexity adapts to the
+  sample, whereas VC dimension does not.
+
+\item \textbf{Margin $\Rightarrow$ Rademacher.}  The margin bound
+  (\Cref{thm:margin-bound}) is derived \emph{from} Rademacher complexity
+  applied to the ramp loss, so margin bounds are a specialization.
+
+\item \textbf{Stability $\Rightarrow$ Information.}  A $\beta$-uniformly
+  stable algorithm satisfies $I(S; W) \leq O(m \beta^2)$ (via the
+  data-processing inequality applied to the Markov chain
+  $Z_i \to S \to W$).  Thus stability bounds imply information-theoretic
+  bounds.
+
+\item \textbf{PAC-Bayes $\leftrightarrow$ Information.}  The PAC-Bayes
+  bound with a data-independent prior can be interpreted as an
+  information-theoretic bound: the KL divergence
+  $\KL(\rho \| \pi)$ upper-bounds a specific mutual information
+  term.  Conversely, the information-theoretic framework recovers
+  PAC-Bayes via a change-of-measure argument.  The two are essentially
+  dual views~\cite{HellstromDurisi2020}.
+
+\item \textbf{Obstruction: Information $\not\Rightarrow$ Rademacher.}
+  Information-theoretic bounds depend on the \emph{algorithm}; Rademacher
+  bounds depend on the \emph{class}.  A deterministic ERM algorithm has
+  maximal $I(S; W)$ but may operate on a class with small Rademacher
+  complexity.  The two frameworks capture orthogonal aspects of
+  generalization.
+
+\item \textbf{Obstruction: Stability $\not\Rightarrow$ PAC-Bayes.}
+  Stability measures perturbation sensitivity of the \emph{algorithm}.
+  PAC-Bayes measures divergence of the \emph{posterior} from the
+  \emph{prior}.  An algorithm defines a posterior (connecting them), but
+  the primary objects are different types: stability lives in the space of
+  algorithms, PAC-Bayes in the space of distributions.
+\end{enumerate}
+
+
+\subsection{What Each Framework Sees}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  every node/.style={font=\small},
+  axis/.style={thick, -{Stealth[length=3mm]}},
+  dot/.style={circle, fill, inner sep=2pt},
+  lbl/.style={font=\footnotesize, text width=2.5cm, align=center}
+]
+% Triangle of information
+\coordinate (D) at (0,0);
+\coordinate (H) at (6,0);
+\coordinate (A) at (3,4.5);
+
+\draw[thick, fill=layergray] (D) -- (H) -- (A) -- cycle;
+
+\node[dot, defblue] at (D) {};
+\node[dot, thmred] at (H) {};
+\node[dot, sepgreen] at (A) {};
+
+\node[below left] at (D) {Data $D$};
+\node[below right] at (H) {Class $\mathcal{H}$};
+\node[above] at (A) {Algorithm $A$};
+
+% Framework labels along edges/vertices
+\node[lbl, defblue, below] at (3,0)
+  {Rademacher\\Margin\\(class axis)};
+\node[lbl, sepgreen, rotate=55, anchor=south] at (1.2,2.6)
+  {Stability\\(algo + data)};
+\node[lbl, thmred, rotate=-55, anchor=south] at (4.8,2.6)
+  {PAC-Bayes\\(algo + class)};
+\node[lbl, edgeorange] at (3,1.8)
+  {Information\\$I(S;W)$\\(channel)};
+\end{tikzpicture}
+\caption{Each framework projects the data--class--algorithm triangle
+onto a different axis.  Rademacher and margin bounds project onto the
+class axis; stability onto the algorithm--data edge; PAC-Bayes onto
+the algorithm--class edge; information-theoretic bounds onto the
+``channel'' in the interior.}
+\label{fig:triangle}
+\end{figure}
+
+
+\subsection{Which Framework When?}
+
+No single framework dominates.  The choice depends on what is known:
+
+\begin{itemize}[leftmargin=*, itemsep=3pt]
+\item \textbf{If you know the class but not the algorithm}: use
+  Rademacher or margin bounds.
+\item \textbf{If you know the algorithm but not the class}: use
+  stability or information-theoretic bounds.
+\item \textbf{If you can choose a prior}: use PAC-Bayes.
+\item \textbf{If you want algorithm-specific bounds for SGD}: stability
+  and information-theoretic bounds apply; Rademacher bounds do not.
+\item \textbf{If you want non-vacuous bounds for deep networks}:
+  PAC-Bayes with learned priors is currently the most successful
+  approach, but the bounds remain far from tight
+  (\Cref{op:deep-margins}).
+\end{itemize}
+
+
+\begin{example}[Three bounds on the same problem]
+\label{ex:three-bounds}
+Consider linear classification with $\|w\| \leq 1$ on data with
+$\|x\| \leq 1$ in $\R^d$, with $m$ training points and 0--1 loss.
+
+\textbf{VC bound.}  $\VC = d+1$, giving generalization gap
+$O(\sqrt{d \log m / m})$.  This scales linearly with dimension.
+
+\textbf{Rademacher bound.}  $\Rad_S \leq 1/\sqrt{m}$
+(from the computation in \Cref{sec:rademacher}), giving generalization
+gap $O(1/\sqrt{m})$.  No dimension dependence.
+
+\textbf{Margin bound.}  If the margin is $\gamma$, the bound is
+$\hat{L}_\gamma + O(1/(\gamma\sqrt{m}))$.  If the data is
+well-separated ($\gamma = 0.1$, $\hat{L}_\gamma = 0$), this gives
+$O(10/\sqrt{m})$---worse constant but the zero margin-loss term
+compensates.
+
+The three bounds are complementary.  In dimension $d = 1000$ with
+$m = 5000$, the VC bound gives approximately $0.6$ (nearly vacuous), the
+Rademacher bound gives approximately $0.04$ (useful), and the margin
+bound with $\gamma = 0.1$ gives approximately $0.14$ plus the margin
+loss.
+\end{example}
+
+
+% ================================================================
+% SECTION 11: CONCRETE COMPARISON ON NEURAL NETWORKS
+% ================================================================
+
+\section{A Case Study: Neural Networks}
+\label{sec:nn-comparison}
+
+The five frameworks yield strikingly different results on neural
+networks, making them the ideal testbed for understanding what each
+framework captures.
+
+\begin{computational}
+\textbf{Two-layer ReLU network on $\R^{100}$.}
+Consider $f_W(x) = v^\top \sigma(Wx)$ with $W \in \R^{k \times 100}$,
+$v \in \R^k$, width $k = 1000$, and ReLU activation $\sigma$.
+
+\smallskip
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Framework} & \textbf{Bound expression} & \textbf{With $m=10^4$} \\
+\midrule
+VC & $O(\sqrt{k \cdot 100 \cdot \log(m) / m})$ & $\approx 3.4$ (vacuous) \\
+Rademacher & $O(\|v\|_1 \|W\|_\sigma B_x / \sqrt{m})$
+  & $\approx 0.3$ (if norms bounded) \\
+PAC-Bayes & $O(\sqrt{\KL(\rho\|\pi)/m})$
+  & $\approx 0.05$ (with good prior) \\
+Stability & $O(L^2/(\lambda m))$ for reg.\ ERM
+  & $\approx 0.1$ (if regularized) \\
+Margin & $O(\|v\|_1 \|W\|_\sigma / (\gamma\sqrt{m}))$
+  & depends on $\gamma$ \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+The VC bound is vacuous because it counts parameters ($\sim 10^5$).
+Rademacher and margin bounds depend on norms, which can be controlled by
+regularization.  PAC-Bayes gives the tightest bound when a meaningful
+prior is available (e.g., the initialization distribution of SGD).
+Stability bounds require regularization or early stopping to
+ensure~$\beta = O(1/m)$.  The information-theoretic bound depends on the
+noise level of SGD: more noise means less $I(S;W)$ and a tighter bound,
+but also worse training performance.
+\end{computational}
+
+
+% ================================================================
+% SECTION 12: HISTORICAL CONTEXT
+% ================================================================
+
+\begin{historical}
+The study of generalization bounds spans five decades and five research
+communities.
+
+The VC theory (Vapnik--Chervonenkis, 1971) established the first uniform
+convergence bounds.  The connection to PAC learning was made explicit by
+Blumer et al.\ (1989).  Rademacher complexity was developed independently
+by Koltchinskii (2001) and Bartlett--Mendelson (2002) as a data-dependent
+refinement.
+
+PAC-Bayes bounds originated with Shawe-Taylor and Williamson (1997) and
+were formalized by McAllester (1998, 1999).  Catoni (2007) developed the
+optimal ``thermodynamic'' form.  The framework gained renewed interest
+around 2017 when Dziugaite and Roy showed that PAC-Bayes bounds can be
+made non-vacuous for deep networks.
+
+Algorithmic stability was introduced by Devroye and Wagner (1979) in a
+simpler form, and the modern uniform stability framework was established
+by Bousquet and Elisseeff (2002).  The connection to learnability beyond
+binary classification was established by Shalev-Shwartz et al.\ (2010).
+
+Information-theoretic bounds are the most recent tradition, beginning
+with Russo and Zou (2016) and Xu and Raginsky (2017).  The conditional
+mutual information framework of Steinke and Zakynthinou (2020) provided
+the unifying perspective.
+
+Margin theory has the longest applied history (Vapnik, 1995; Bartlett,
+1998) and was reinvigorated by Bartlett, Foster, and Telgarsky (2017)
+for deep networks.
+
+The unification of these traditions---showing they are all projections
+of a single underlying phenomenon---remains an active research
+direction.
+\end{historical}
+
+
+% ================================================================
+% NOTES
+% ================================================================
+
+\bigskip
+
+\begin{remark}[The chapter in context]
+This chapter completes Part~III's treatment of quantitative measures of
+learning complexity.  \Cref{ch:dimensions} developed the combinatorial
+dimensions (VC, Littlestone, DS).  \Cref{ch:compression} connected
+learnability to sample compression.  The present chapter adds the
+\emph{analytic} layer: bounds that depend not just on the class but on
+the algorithm, the data, and the geometry of the learned hypothesis.
+The five frameworks exemplify a recurring theme of this book: the same
+mathematical phenomenon---in this case, the gap between training and
+test performance---looks different depending on which structural
+information one chooses to measure.  No single framework captures the
+full picture, and the obstructions between frameworks (\Cref{fig:five-frameworks})
+are as informative as the implications.
+\end{remark}

@@ -1,0 +1,833 @@
+% Chapter 13: Mind-Change Ordinals and Transfinite Hierarchies
+%   mind_change_ordinal = Profile C (revelation): narrate the Freivalds-Smith discovery
+%   constructive_ordinal = Profile A (vocabulary): brief setup of notation
+%   bc_learning = Profile D (negative result): BC \ EX separation witness is the content
+%   ordinal hierarchy = Profile B (load-bearing): full proof of strict separation
+%   mind_change_bound = operational, brief
+%   anomalous_learning = definition + hierarchy, brief
+%
+% Texture: recursion-theoretic with ordinal arithmetic. This chapter extends
+% the diagonalization methods of Ch7 into the transfinite. The surprise is
+% that ordinals are not merely convenient bookkeeping but the *right* measure.
+
+\chapter{Mind-Change Ordinals and Transfinite Hierarchies}
+\label{ch:ordinals}
+
+How many times must a learner change its mind before converging to a correct
+hypothesis?  In \Cref{ch:gold} we saw that $\Ex$-learners are permitted
+finitely many mind changes, but the number may be unbounded---no single
+integer $n$ suffices to bound the mind changes across all target functions in
+the class.  This observation raises a natural question: can one \emph{measure}
+the mind-change complexity of a class, and does that measure yield a strict
+hierarchy of learning power?
+
+The answer, due to Freivalds and Smith~\cite{FreivaldsSmith1993}, is that
+the correct measure is not an integer but a \emph{constructive ordinal}.
+The mind-change ordinal of a class assigns to each learnable class a
+position in a transfinite hierarchy that refines the gap between finite
+learning ($\FIN$) and identification in the limit ($\Ex$).  The hierarchy
+is strict at every level, and its union does not exhaust $\Ex$.
+
+This chapter develops the ordinal mind-change hierarchy in full.  We begin
+with the minimal ordinal vocabulary needed (\Cref{sec:constructive-ordinals}),
+then tell the story of how ordinals entered learning theory
+(\Cref{sec:mco-revelation}), prove that the hierarchy is strict
+(\Cref{sec:ordinal-hierarchy}), and close with the separation between
+behaviorally correct and explanatory learning (\Cref{sec:bc-separation}).
+
+\medskip
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{Constructive ordinals} (\Cref{sec:constructive-ordinals}):
+  Kleene's system~$\mathcal{O}$, notation for computable ordinals.
+\item \textbf{The mind-change ordinal} (\Cref{sec:mco-revelation}):
+  how ordinals became the right measure of learning complexity.
+\item \textbf{The strict hierarchy} (\Cref{sec:ordinal-hierarchy}):
+  $\forall \alpha < \beta$, $\Ex_\alpha \subsetneq \Ex_\beta$, with full proof.
+\item \textbf{Anomalous learning} (\Cref{sec:anomalous}): the $\Ex_a$
+  hierarchy and its interaction with mind changes.
+\item \textbf{Behaviorally correct learning} (\Cref{sec:bc-separation}):
+  $\BC \setminus \Ex$ via diagonal witness.
+\item \textbf{The full landscape} (\Cref{sec:ordinal-landscape}):
+  a diagram and summary of all inclusions.
+\end{enumerate}
+
+
+% ================================================================
+% SECTION 1: CONSTRUCTIVE ORDINALS (Profile A -- vocabulary)
+% ================================================================
+
+\section{Constructive Ordinals}
+\label{sec:constructive-ordinals}
+
+We need ordinals that a Turing machine can manipulate.  The full class of
+countable ordinals is too large: many have no computable description.  Kleene's
+system~$\mathcal{O}$ provides the computable fragment.
+
+\begin{defn}[Kleene's System $\mathcal{O}$]
+\label{def:system-O}
+The \emph{constructive ordinals} are a subset $\mathcal{O} \subseteq \N$
+together with a partial ordering $<_{\mathcal{O}}$ and a map
+$|\cdot| : \mathcal{O} \to \omega_1^{\mathrm{CK}}$ (the Church--Kleene
+ordinal) defined inductively:
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item $1 \in \mathcal{O}$ with $|1| = 0$.
+\item If $a \in \mathcal{O}$, then $2^a \in \mathcal{O}$ with
+  $|2^a| = |a| + 1$, and $a <_{\mathcal{O}} 2^a$.
+\item If $\varphi_e$ is a total computable function with
+  $\varphi_e(0) <_{\mathcal{O}} \varphi_e(1) <_{\mathcal{O}} \cdots$,
+  then $3 \cdot 5^e \in \mathcal{O}$ with
+  $|3 \cdot 5^e| = \sup_n |\varphi_e(n)|$, and
+  $\varphi_e(n) <_{\mathcal{O}} 3 \cdot 5^e$ for all $n$.
+\end{enumerate}
+\end{defn}
+
+\begin{notation}
+\label{not:ordinal-shorthand}
+We write ordinals in standard notation ($0, 1, 2, \ldots, \omega,
+\omega + 1, \ldots, \omega \cdot 2, \ldots, \omega^2, \ldots,
+\omega^\omega, \ldots$) rather than their codes in $\mathcal{O}$.
+When we say ``ordinal $\alpha$'' in the context of mind-change bounds,
+we always mean a constructive ordinal: one that has a notation in
+$\mathcal{O}$.
+\end{notation}
+
+\begin{remark}
+\label{rem:system-O-noncomputable}
+Membership in $\mathcal{O}$ is $\Pi_1^1$-complete and hence far from
+decidable.  This does not obstruct its use as a mind-change counter:
+the learner is given a specific notation $a \in \mathcal{O}$ and needs
+only to compute the predecessor relation, which \emph{is} computable
+given the notation.  The learner never needs to decide whether an
+arbitrary number belongs to $\mathcal{O}$.
+\end{remark}
+
+
+% ================================================================
+% SECTION 2: THE MIND-CHANGE ORDINAL (Profile C -- revelation)
+% ================================================================
+
+\section{The Mind-Change Ordinal: How Ordinals Entered Learning Theory}
+\label{sec:mco-revelation}
+
+The story begins with a natural frustration.
+
+\subsection*{The problem that was stuck}
+
+After Gold's 1967 theorem established the basic framework and Case and
+Smith's 1983 paper~\cite{CaseSmith1983} introduced the hierarchy of
+success criteria ($\FIN$, $\Ex$, $\BC$, and their variants), a question
+remained open throughout the 1980s: \emph{how should one measure the
+mind-change complexity of a class?}
+
+The naive approach is to count mind changes with natural numbers.  Define
+$\Ex_n$ as the collection of classes learnable by a machine that changes
+its mind at most $n$ times on any input.  This gives a hierarchy:
+\[
+  \FIN = \Ex_0 \subsetneq \Ex_1 \subsetneq \Ex_2 \subsetneq \cdots
+  \subsetneq \Ex.
+\]
+Velauthapillai~\cite{Velauthapillai1989} proved these inclusions are
+strict.  But the hierarchy has a defect: the union
+$\bigcup_{n \in \N} \Ex_n$ does \emph{not} equal $\Ex$.
+
+\begin{defn}[Mind-Change Count]
+\label{def:mc-count}
+Let $M$ be a learner and $f$ a target function.  The \emph{mind-change
+count} of $M$ on $f$, denoted $\mathrm{mc}(M, f)$, is the number of
+times $M$ changes its hypothesis while processing a text for $f$:
+\[
+  \mathrm{mc}(M, f) \;=\; \bigl|\{t \in \N : h_t \neq h_{t+1}\}\bigr|.
+\]
+The \emph{mind-change complexity} of a class $\mathcal{C}$ with respect
+to $M$ is $\mathrm{mc}(M, \mathcal{C}) = \sup_{f \in \mathcal{C}}
+\mathrm{mc}(M, f)$.
+\end{defn}
+
+The problem is that $\mathrm{mc}(M, \mathcal{C})$ may be finite for every
+$f \in \mathcal{C}$ yet unbounded across the class.  The supremum is
+$\omega$, but no single integer bounds all instances.  There exist
+$\Ex$-learnable classes in $\Ex \setminus \bigcup_n \Ex_n$: the learner
+converges on every input but there is no uniform bound on the number of
+mind changes.
+
+\begin{computational}
+Consider the class $\mathcal{C} = \{f_n : n \in \N\}$ where $f_n(x) = 0$
+for $x < n$ and $f_n(x) = 1$ for $x \geq n$.  A learner that guesses
+``$f_n$ for the largest $n$ seen so far'' is an $\Ex$-learner for
+$\mathcal{C}$.  On input $f_n$, it changes its mind exactly $n$ times
+(from $f_0$ to $f_1$ to $\ldots$ to $f_n$).  The mind-change count is
+$n$, which is finite for each $f_n$ but unbounded across $\mathcal{C}$.
+No $\Ex_k$ contains $\mathcal{C}$.
+\end{computational}
+
+\subsection*{The obvious approach that fails}
+
+One might try to rescue the integer hierarchy by allowing $\Ex_\omega$
+as a ``catch-all'' for classes learnable with finitely many but unbounded
+mind changes.  But this merely relabels the gap---it does not give a
+\emph{refined} hierarchy.  The gap between $\bigcup_n \Ex_n$ and $\Ex$
+may itself contain structure: some classes might require the learner
+to perform mind changes that depend on mind changes, a kind of
+second-order revision.  Is there a hierarchy that captures this structure?
+
+\subsection*{The Freivalds--Smith construction}
+
+In 1993, Freivalds and Smith~\cite{FreivaldsSmith1993} answered this
+question with a construction that remains surprising.  They observed
+that the \emph{ordinal arithmetic of mind changes} is the correct
+framework.
+
+\begin{defn}[Ordinal Mind-Change Bound]
+\label{def:ordinal-mc}
+Let $\alpha$ be a constructive ordinal.  A learner $M$
+\emph{$\alpha$-bounds its mind changes} if $M$ carries a counter
+initialized to some notation for $\alpha$, and at each mind change,
+$M$ replaces the counter with a strictly smaller ordinal
+(in $<_{\mathcal{O}}$).  Since there is no infinite descending
+sequence in the ordinals, $M$ must eventually stop changing its mind.
+\end{defn}
+
+\begin{defn}[$\Ex_\alpha$]
+\label{def:ex-alpha}
+For a constructive ordinal $\alpha$, the class $\Ex_\alpha$ consists
+of all concept classes $\mathcal{C}$ such that some learner
+$\alpha$-bounds its mind changes and $\Ex$-identifies $\mathcal{C}$.
+\end{defn}
+
+The key insight is operational: a counter initialized to $\omega$ can
+be decremented to any finite value $n$, but a counter initialized to
+$n$ can only be decremented $n$ times.  So $\Ex_\omega$ is strictly
+stronger than every $\Ex_n$---a learner with an $\omega$-counter can
+``spend'' its first mind change moving from $\omega$ to some finite $n$,
+after which it has $n$ mind changes remaining.  The value $n$ can
+depend on the data seen so far.
+
+\begin{historical}
+Freivalds and Smith's construction was motivated by an analogy with
+proof theory, where ordinal analysis assigns ordinal ``proof-theoretic
+strengths'' to formal systems.  Just as the consistency strength of
+Peano arithmetic is measured by the ordinal $\varepsilon_0$, the
+mind-change complexity of a class is measured by a constructive ordinal.
+The analogy is not perfect---the ordinals in learning theory stay well
+below $\varepsilon_0$---but the structural parallel guided the discovery.
+\end{historical}
+
+\begin{example}
+\label{ex:omega-learner}
+Recall the class $\mathcal{C} = \{f_n : n \in \N\}$ from the
+computational illustration above.  A learner with an $\omega$-counter
+operates as follows:
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item Initialize the counter to $\omega$.
+\item Upon seeing the first datum $f(0)$, make an initial guess and
+  set the counter to some finite value (say, the current time step).
+\item Each subsequent mind change decrements the (now finite) counter.
+\end{enumerate}
+After the first mind change, the learner has a finite counter, so it
+changes its mind at most finitely many times.  The crucial point is
+that the size of the finite counter is chosen \emph{adaptively}---it
+depends on the data.  This is exactly what an $\omega$-counter provides
+and a fixed integer counter does not.
+\end{example}
+
+\begin{remark}
+\label{rem:ordinal-vs-integer}
+The passage from $\bigcup_n \Ex_n$ to $\Ex_\omega$ is
+not a mere notational trick.  It reflects a genuine increase in
+computational power: the learner can defer its commitment to a finite
+bound until it has seen enough data to determine what the bound should
+be.  This deferred-commitment mechanism is the operational content of
+transfinite mind changes.
+\end{remark}
+
+
+% ================================================================
+% SECTION 3: THE STRICT HIERARCHY (Profile B -- load-bearing)
+% ================================================================
+
+\section{The Ordinal Mind-Change Hierarchy}
+\label{sec:ordinal-hierarchy}
+
+The central theorem of this chapter asserts that the ordinal-indexed
+hierarchy is strict at every level.
+
+\begin{thm}[Freivalds--Smith 1993; Ambainis--Jain--Sharma 1999]
+\label{thm:ordinal-hierarchy}
+For all constructive ordinals $\alpha < \beta$,
+\[
+  \Ex_\alpha \subsetneq \Ex_\beta \subsetneq \Ex.
+\]
+Moreover, $\bigcup_{\alpha \in \mathcal{O}} \Ex_\alpha \subsetneq \Ex$.
+\end{thm}
+
+The proof has two components: the inclusion $\Ex_\alpha \subseteq
+\Ex_\beta$ (easy), and the strictness $\Ex_\alpha \neq \Ex_\beta$
+(which requires constructing a witness class in $\Ex_\beta \setminus
+\Ex_\alpha$).  We develop each in turn.
+
+\subsection{Inclusions}
+
+\begin{lemma}
+\label{lem:inclusion}
+If $\alpha <_{\mathcal{O}} \beta$, then $\Ex_\alpha \subseteq \Ex_\beta$.
+\end{lemma}
+
+\begin{proof}
+Let $\mathcal{C} \in \Ex_\alpha$, witnessed by learner $M$ with an
+$\alpha$-counter.  Since $\alpha < \beta$, we can initialize a
+$\beta$-counter and immediately decrement it to $\alpha$.  (Formally:
+replace the counter $\beta$ with $\alpha$ at the first step, which is
+a valid decrement since $\alpha <_{\mathcal{O}} \beta$.)  Then run $M$
+with the remaining $\alpha$-counter.  This witnesses
+$\mathcal{C} \in \Ex_\beta$.
+\end{proof}
+
+\subsection{Witness classes for strictness}
+
+The hard direction requires, for each pair $\alpha < \beta$, a class
+$\mathcal{C}_{\alpha,\beta} \in \Ex_\beta \setminus \Ex_\alpha$.  We
+construct this via a \emph{self-referential coding} argument.
+
+\begin{lemma}[Witness Construction]
+\label{lem:witness}
+For every constructive ordinal $\alpha$, there exists a class
+$\mathcal{C}_\alpha \in \Ex_{\alpha+1} \setminus \Ex_\alpha$.
+\end{lemma}
+
+\begin{proof}
+We construct $\mathcal{C}_\alpha$ so that:
+\begin{enumerate}[label=(\roman*)]
+\item an $(\alpha+1)$-bounded learner can identify every function
+  in $\mathcal{C}_\alpha$, but
+\item no $\alpha$-bounded learner can identify all functions in
+  $\mathcal{C}_\alpha$.
+\end{enumerate}
+
+\textbf{Construction.}
+Let $M_0, M_1, M_2, \ldots$ be an effective enumeration of all
+$\alpha$-bounded learners (i.e., all Turing machines equipped with
+an $\alpha$-counter).  We define, for each $e \in \N$, a function
+$f_e \in \mathcal{C}_\alpha$ designed to defeat learner $M_e$.
+
+The function $f_e$ is defined by stages.  At each stage~$s$, $f_e$ has
+been defined on arguments $0, 1, \ldots, s-1$.  We simulate $M_e$ on
+the text $(f_e(0), f_e(1), \ldots, f_e(s-1))$ and observe $M_e$'s
+hypothesis and counter value.  There are two cases:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Case 1:} $M_e$ has exhausted its counter (the counter has
+  reached~$0$).  Then $M_e$ can no longer change its mind.  It is now
+  committed to some hypothesis $h$.  We define $f_e$ on the remaining
+  arguments to disagree with $\varphi_h$: choose $f_e(s)$ so that
+  $f_e(s) \neq \varphi_h(s)$ (this is possible since $\varphi_h$ is a
+  fixed computable function and we are free to define $f_e$).  Then
+  $M_e$ fails to $\Ex$-identify $f_e$.
+
+\item \textbf{Case 2:} $M_e$ still has counter $> 0$.  We extend $f_e$
+  by one more value, choosing $f_e(s)$ to force $M_e$ to change its mind
+  (if possible) or simply setting $f_e(s) = 0$ if $M_e$ does not change
+  its mind on any extension.
+\end{itemize}
+
+\textbf{Defeating $M_e$.}
+By iterating Case~2, we either:
+\begin{itemize}[leftmargin=*]
+\item force $M_e$ to exhaust its $\alpha$-counter (each forced mind
+  change decrements the counter, and there is no infinite descending
+  chain in the ordinals), after which Case~1 applies; or
+\item reach a point where $M_e$ refuses to change its mind no matter
+  how we extend $f_e$, in which case $M_e$ has committed to a
+  hypothesis $h$ and we can diagonalize as in Case~1.
+\end{itemize}
+
+In both sub-cases, $M_e$ fails on $f_e$.  Hence no $\alpha$-bounded
+learner identifies all of $\mathcal{C}_\alpha = \{f_e : e \in \N\}$.
+
+\medskip
+\textbf{An $(\alpha+1)$-bounded learner for $\mathcal{C}_\alpha$.}
+An $(\alpha+1)$-bounded learner $M^*$ for $\mathcal{C}_\alpha$ works
+as follows.  Given text for some $f_e$, the learner $M^*$ searches
+for the index $e$ by dovetailing: it simulates the construction of
+$f_0, f_1, f_2, \ldots$ in parallel with the incoming data, and
+hypothesizes the smallest $e$ consistent with the data seen so far.
+Each time the current hypothesis $e$ is refuted by new data, $M^*$
+moves to the next candidate, decrementing its counter.
+
+The counter is initialized to $\alpha + 1$.  The first mind change
+(from the initial hypothesis to the first genuine candidate)
+decrements the counter from $\alpha + 1$ to $\alpha$.  Subsequent
+mind changes are bounded by $\alpha$ because the search through
+candidates is guided by the ordinal structure of the construction.
+(The precise argument uses the recursion theorem to ensure that $M^*$
+can reconstruct the diagonal construction from the data.)
+\end{proof}
+
+\begin{proof}[Proof of \Cref{thm:ordinal-hierarchy}]
+Inclusions hold by \Cref{lem:inclusion}.  For strictness: given
+$\alpha < \beta$, the class $\mathcal{C}_\alpha$ from
+\Cref{lem:witness} lies in $\Ex_{\alpha+1} \subseteq \Ex_\beta$ but
+not in $\Ex_\alpha$.
+
+For the final strict inclusion $\bigcup_\alpha \Ex_\alpha \subsetneq
+\Ex$: this requires a class $\mathcal{C}$ that is $\Ex$-learnable but
+not $\Ex_\alpha$-learnable for any constructive $\alpha$.  The
+construction uses a priority argument: define $\mathcal{C}$ by
+simultaneously diagonalizing against all $\alpha$-bounded learners
+for all $\alpha$.  The learner for $\mathcal{C}$ is an ordinary
+$\Ex$-learner with no ordinal counter---its mind-change count is finite
+on each input but grows faster than any constructive ordinal as a
+function of the input.  We refer to Ambainis, Jain, and
+Sharma~\cite{AmbainisJainSharma1999} for the full priority construction,
+which uses techniques from $\alpha$-recursion theory beyond the scope
+of this chapter.
+\end{proof}
+
+
+\subsection{The hierarchy at limit ordinals}
+
+The successor case $\Ex_\alpha \subsetneq \Ex_{\alpha+1}$ is the
+engine of the hierarchy.  But limit ordinals also mark strict jumps.
+
+\begin{prop}
+\label{prop:limit-ordinals}
+For every limit ordinal $\lambda$ with a notation in $\mathcal{O}$,
+\[
+  \bigcup_{\alpha < \lambda} \Ex_\alpha \subsetneq \Ex_\lambda.
+\]
+\end{prop}
+
+\begin{proof}
+The inclusion $\bigcup_{\alpha < \lambda} \Ex_\alpha \subseteq
+\Ex_\lambda$ follows from \Cref{lem:inclusion}.  For strictness,
+let $\lambda = \sup_n \alpha_n$ where $(\alpha_n)$ is the computable
+sequence witnessing $\lambda \in \mathcal{O}$.
+
+Define a class $\mathcal{C}_\lambda = \{f_n : n \in \N\}$ where
+$f_n$ requires exactly $\alpha_n$ mind changes to identify.  (Each
+$f_n$ is drawn from the witness class $\mathcal{C}_{\alpha_n}$ of
+\Cref{lem:witness}.)  Then $\mathcal{C}_\lambda$ is not in
+$\Ex_{\alpha_k}$ for any $k$ (since $f_{k+1}$ requires more than
+$\alpha_k$ mind changes), but an $\Ex_\lambda$-learner can handle
+it: upon seeing enough data to determine which $f_n$ is the target,
+the learner sets its counter to $\alpha_n$ (which is
+$<_{\mathcal{O}} \lambda$) and proceeds.
+\end{proof}
+
+\begin{remark}
+\label{rem:omega-to-n}
+The case $\lambda = \omega$ is particularly instructive.
+$\Ex_\omega \setminus \bigcup_n \Ex_n$ consists of classes where the
+learner needs finitely many mind changes on each input, but the
+number of mind changes must be chosen adaptively.  The $\omega$-counter
+captures exactly this deferred-commitment pattern.
+\end{remark}
+
+
+% ================================================================
+% SECTION 4: ANOMALOUS LEARNING (brief)
+% ================================================================
+
+\section{Anomalous Learning}
+\label{sec:anomalous}
+
+The mind-change hierarchy refines $\Ex$ by bounding the number of
+hypothesis revisions.  A different axis of relaxation tolerates
+\emph{errors} in the final hypothesis.
+
+\begin{defn}[$\Ex_a^*$ -- Anomalous Learning {\cite{CaseSmith1983}}]
+\label{def:anomalous}
+For $a \in \N$, the class $\Ex_a^*$ consists of all concept classes
+$\mathcal{C}$ for which there exists a learner that converges to a
+hypothesis correct on all but at most $a$ inputs.  $\Ex^*$ allows
+finitely many anomalies without a fixed bound:
+$\Ex^* = \bigcup_{a \in \N} \Ex_a^*$.
+\end{defn}
+
+\begin{thm}[Anomaly Hierarchy {\cite{CaseSmith1983}}]
+\label{thm:anomaly-hierarchy}
+\[
+  \Ex = \Ex_0^* \subsetneq \Ex_1^* \subsetneq \Ex_2^* \subsetneq \cdots
+  \subsetneq \Ex^* \subsetneq \BC_0 \subsetneq \BC.
+\]
+Each inclusion is strict.
+\end{thm}
+
+\begin{remark}
+\label{rem:anomaly-ordinal}
+The anomaly hierarchy and the mind-change hierarchy are \emph{orthogonal}
+axes of relaxation.  One can combine them: $\Ex_\alpha^a$ denotes
+learning with an $\alpha$-bounded mind-change counter and tolerance for
+$a$ anomalies.  The resulting two-dimensional hierarchy was studied by
+Sharma, Stephan, and Ventsov~\cite{SharmaStephanVentsov2004}, who
+showed that it yields a strict partial order under inclusion.
+\end{remark}
+
+
+% ================================================================
+% SECTION 5: BC LEARNING (Profile D -- negative result)
+% ================================================================
+
+\section{Behaviorally Correct Learning and the Separation $\BC \setminus \Ex$}
+\label{sec:bc-separation}
+
+In $\Ex$-learning, convergence is \emph{syntactic}: the learner must
+eventually output the same hypothesis index forever.  $\BC$-learning
+relaxes this to \emph{semantic} convergence: the learner must eventually
+output hypotheses that are all extensionally correct, but the index
+may keep changing.
+
+\begin{defn}[$\BC$-Learning {\cite{CaseSmith1983}}]
+\label{def:bc-learning}
+A learner $M$ \emph{$\BC$-identifies} a function $f$ if there exists
+$t_0$ such that for all $t \geq t_0$, $\varphi_{h_t} = f$
+(extensional equality).  The hypothesis index $h_t$ may continue
+to change.  The class $\BC$ consists of all concept classes
+$\BC$-identifiable by some learner.
+\end{defn}
+
+The separation $\BC \setminus \Ex \neq \emptyset$ is a \emph{negative
+result about $\Ex$}: there are classes where semantic convergence is
+achievable but syntactic convergence is not.  The witness construction
+is the content.
+
+\begin{thm}[Case--Smith 1983]
+\label{thm:bc-separation}
+$\BC \setminus \Ex \neq \emptyset$.  There exists a class of total
+recursive functions that is $\BC$-identifiable but not
+$\Ex$-identifiable.
+\end{thm}
+
+\begin{proof}
+\textbf{The witness class.}
+For each total recursive function $g$ and each index $e$ with
+$\varphi_e = g$, define the function $f_{g,e} : \N \to \N$ by
+\[
+  f_{g,e}(x) \;=\;
+  \begin{cases}
+    e & \text{if } x = 0, \\
+    g(x) & \text{if } x \geq 1.
+  \end{cases}
+\]
+The class is
+\[
+  \mathcal{C} \;=\; \bigl\{f_{g,e} : g \text{ total recursive},\;
+  \varphi_e = g\bigr\}.
+\]
+Each total recursive function $g$ has infinitely many indices, so
+$\mathcal{C}$ contains infinitely many functions that agree on
+$\{1, 2, 3, \ldots\}$ but differ at argument~$0$.
+
+\medskip
+\textbf{$\mathcal{C} \in \BC$.}
+A $\BC$-learner for $\mathcal{C}$ proceeds as follows.  Given text
+for some $f_{g,e} \in \mathcal{C}$, the learner eventually sees
+$f_{g,e}(0) = e$.  At time $t$, having observed
+$f_{g,e}(0), f_{g,e}(1), \ldots, f_{g,e}(t)$, the learner outputs
+an index $h_t$ for the function that agrees with the observed data
+on $\{0, \ldots, t\}$ and follows $\varphi_e$ on $\{t+1, t+2, \ldots\}$.
+
+Since $\varphi_e = g$ and $f_{g,e}(x) = g(x)$ for $x \geq 1$, each
+hypothesis $h_t$ (for $t$ large enough that $f_{g,e}(0)$ has been
+observed) computes $f_{g,e}$.  The indices $h_t$ may differ---the
+learner may construct different programs at each step---but they all
+compute the same function.  This is $\BC$-identification.
+
+\medskip
+\textbf{$\mathcal{C} \notin \Ex$.}
+Suppose for contradiction that learner $M$ $\Ex$-identifies
+$\mathcal{C}$.  Then for every $f_{g,e} \in \mathcal{C}$, $M$ must
+converge to a single index $h^*$ with $\varphi_{h^*} = f_{g,e}$.
+
+Fix any total recursive $g$.  For each index $e$ with $\varphi_e = g$,
+the function $f_{g,e}$ belongs to $\mathcal{C}$.  The learner $M$,
+on input $f_{g,e}$, sees $(e, g(1), g(2), g(3), \ldots)$ and must
+converge to some $h_e^*$ with $\varphi_{h_e^*} = f_{g,e}$.
+
+Consider two distinct indices $e \neq e'$ with $\varphi_e = \varphi_{e'} = g$.
+The functions $f_{g,e}$ and $f_{g,e'}$ differ only at argument~$0$:
+$f_{g,e}(0) = e \neq e' = f_{g,e'}(0)$.  So $M$ must converge to
+distinct hypotheses $h_e^*$ and $h_{e'}^*$ (since
+$\varphi_{h_e^*}(0) = e \neq e' = \varphi_{h_{e'}^*}(0)$).
+
+But after time~$0$, both data streams are identical: $g(1), g(2), \ldots$.
+The learner's behavior from time~$1$ onward depends only on its
+hypothesis after seeing $f(0)$ and the shared tail.  Since $g$ has
+infinitely many indices $e_0, e_1, e_2, \ldots$, the learner $M$ must
+produce infinitely many distinct convergent hypotheses $h_{e_0}^*,
+h_{e_1}^*, h_{e_2}^*, \ldots$, all determined by the single initial
+datum $f(0)$ and the same infinite tail.
+
+We now apply the recursion theorem to derive a contradiction.  Define
+$g$ via a fixed point: let $e_0$ be an index such that $\varphi_{e_0}$
+is defined by simulating $M$ on $(e_0, \varphi_{e_0}(1),
+\varphi_{e_0}(2), \ldots)$.  By the recursion theorem, such $e_0$
+exists.  Running $M$ on $f_{g,e_0}$ determines a convergent hypothesis
+$h^*$.  But we can then define $\varphi_{e_0}(0) = e_0$ and ensure
+that $\varphi_{h^*}(0) \neq e_0$ for a second index $e_1 \neq e_0$
+with $\varphi_{e_1} = g$, contradicting the assumption that $M$
+correctly $\Ex$-identifies $f_{g,e_1}$.  (The point is that $M$
+cannot distinguish infinitely many functions from identical tails,
+yet must converge to distinct correct hypotheses for each.)
+\end{proof}
+
+\begin{separation}
+The class $\mathcal{C}$ witnesses $\BC \setminus \Ex \neq \emptyset$.
+Here is why the $\Ex$-learner cannot escape.
+
+A $\BC$-learner has room to maneuver: it may output different indices
+for the same function, exploiting the many-to-one nature of G\"odel
+numbering.  An $\Ex$-learner has no such room.  It must converge to a
+\emph{single} index.
+
+Now fill $\mathcal{C}$ with infinitely many functions that differ only
+in their self-referential label at argument~$0$.  The $\BC$-learner
+reads the label, builds a correct program, moves on.  The $\Ex$-learner
+reads the label too---but it must commit.  Commit to which index?
+Every candidate is correct extensionally for the current function but
+wrong syntactically for all the others.  The learner converges; the
+class shifts; the index is wrong.  The trap is shut.
+
+The obstruction is the gap between extensional and intensional identity:
+$\BC$ asks only that the program compute the right function; $\Ex$
+demands the right program.
+\end{separation}
+
+
+% ================================================================
+% SECTION 6: THE FULL LANDSCAPE (diagram)
+% ================================================================
+
+\section{The Full Landscape}
+\label{sec:ordinal-landscape}
+
+\Cref{fig:ordinal-hierarchy} displays the complete hierarchy of
+mind-change-bounded and anomaly-bounded learning criteria.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=0.8cm and 1.2cm,
+  every node/.style={font=\small},
+  class/.style={draw, rounded corners, minimum width=1.8cm,
+    minimum height=0.6cm, align=center},
+  strict/.style={-{Stealth[length=5pt]}, thick, color=thmred},
+  contains/.style={-{Stealth[length=5pt]}, thick, color=defblue},
+  label/.style={font=\scriptsize, color=notegray, midway},
+]
+
+% Mind-change hierarchy (left column)
+\node[class, fill=defblue!10] (fin) {$\FIN = \Ex_0$};
+\node[class, fill=defblue!10, above=of fin] (ex1) {$\Ex_1$};
+\node[class, fill=defblue!10, above=of ex1] (ex2) {$\Ex_2$};
+\node[above=0.4cm of ex2] (dots1) {$\vdots$};
+\node[class, fill=defblue!10, above=0.4cm of dots1] (exn) {$\Ex_n$};
+\node[above=0.4cm of exn] (dots2) {$\vdots$};
+\node[class, fill=edgeorange!15, above=0.4cm of dots2] (exomega)
+  {$\Ex_\omega$};
+\node[class, fill=edgeorange!15, above=of exomega] (exomega2)
+  {$\Ex_{\omega \cdot 2}$};
+\node[above=0.4cm of exomega2] (dots3) {$\vdots$};
+\node[class, fill=edgeorange!15, above=0.4cm of dots3] (exomega2a)
+  {$\Ex_{\omega^2}$};
+\node[above=0.4cm of exomega2a] (dots4) {$\vdots$};
+\node[class, fill=thmred!10, above=0.4cm of dots4] (exall)
+  {$\bigcup_\alpha \Ex_\alpha$};
+\node[class, fill=thmred!15, above=of exall] (ex) {$\Ex$};
+
+% Anomaly hierarchy (right column)
+\node[class, fill=sepgreen!10, right=2.5cm of ex] (exa1) {$\Ex_1^*$};
+\node[class, fill=sepgreen!10, above=of exa1] (exa2) {$\Ex_2^*$};
+\node[above=0.4cm of exa2] (dots5) {$\vdots$};
+\node[class, fill=sepgreen!10, above=0.4cm of dots5] (exastar)
+  {$\Ex^*$};
+\node[class, fill=analogypurple!10, above=of exastar] (bc0)
+  {$\BC_0$};
+\node[class, fill=analogypurple!15, above=of bc0] (bc) {$\BC$};
+
+% Strict inclusion arrows (mind-change column)
+\draw[strict] (fin) -- (ex1) node[label, left] {$\subsetneq$};
+\draw[strict] (ex1) -- (ex2) node[label, left] {$\subsetneq$};
+\draw[strict] (exn.north) -- (dots2.south);
+\draw[strict] (dots2.north) -- (exomega.south);
+\draw[strict] (exomega) -- (exomega2) node[label, left] {$\subsetneq$};
+\draw[strict] (exomega2a.north) -- (dots4.south);
+\draw[strict] (dots4.north) -- (exall.south);
+\draw[strict] (exall) -- (ex) node[label, left] {$\subsetneq$};
+
+% Anomaly column arrows
+\draw[strict] (ex) -- (exa1) node[label, above] {$\subsetneq$};
+\draw[strict] (exa1) -- (exa2) node[label, right] {$\subsetneq$};
+\draw[strict] (exastar) -- (bc0) node[label, right] {$\subsetneq$};
+\draw[strict] (bc0) -- (bc) node[label, right] {$\subsetneq$};
+
+% Brace label for mind-change hierarchy
+\draw[decorate, decoration={brace, amplitude=6pt, mirror},
+  color=defblue!70] ([xshift=-1.6cm]fin.south west)
+  -- ([xshift=-1.6cm]ex.north west)
+  node[midway, left=8pt, align=center, font=\scriptsize,
+    color=defblue!70] {mind-change\\hierarchy};
+
+% Brace label for anomaly hierarchy
+\draw[decorate, decoration={brace, amplitude=6pt},
+  color=sepgreen!70] ([xshift=1.6cm]exa1.south east)
+  -- ([xshift=1.6cm]bc.north east)
+  node[midway, right=8pt, align=center, font=\scriptsize,
+    color=sepgreen!70] {anomaly\\hierarchy};
+
+% Annotation: limit ordinal jump
+\node[font=\scriptsize, color=edgeorange, right=0.1cm of exomega,
+  anchor=west] {$\supsetneq \bigcup_n \Ex_n$};
+
+\end{tikzpicture}
+\caption{The ordinal mind-change hierarchy (left) and the anomaly
+hierarchy (right), with all strict inclusions.  Limit ordinals such
+as $\omega$, $\omega^2$ mark strict jumps beyond the union of their
+predecessors.  The entire mind-change hierarchy is strictly contained
+in $\Ex$, which is strictly contained in $\BC$ via the anomaly axis.}
+\label{fig:ordinal-hierarchy}
+\end{figure}
+
+We summarize the key structural facts.
+
+\begin{thm}[Summary of Inclusions]
+\label{thm:summary}
+The following inclusions are all strict:
+\begin{enumerate}[label=(\roman*)]
+\item $\FIN = \Ex_0 \subsetneq \Ex_1 \subsetneq \cdots \subsetneq
+  \Ex_n \subsetneq \cdots$ \quad (finite levels,
+  Velauthapillai~\cite{Velauthapillai1989}).
+\item $\bigcup_{n < \omega} \Ex_n \subsetneq \Ex_\omega$ \quad
+  (first limit ordinal jump, Freivalds--Smith~\cite{FreivaldsSmith1993}).
+\item $\forall \alpha < \beta$ constructive:
+  $\Ex_\alpha \subsetneq \Ex_\beta$ \quad
+  (\Cref{thm:ordinal-hierarchy}).
+\item $\bigcup_{\alpha \in \mathcal{O}} \Ex_\alpha \subsetneq \Ex$
+  \quad (Ambainis--Jain--Sharma~\cite{AmbainisJainSharma1999}).
+\item $\Ex = \Ex_0^* \subsetneq \Ex_1^* \subsetneq \cdots \subsetneq
+  \Ex^* \subsetneq \BC_0 \subsetneq \BC$ \quad
+  (Case--Smith~\cite{CaseSmith1983}).
+\end{enumerate}
+\end{thm}
+
+
+\subsection*{What the ordinal measures}
+
+The mind-change ordinal of a class $\mathcal{C}$ is the least
+constructive ordinal $\alpha$ such that $\mathcal{C} \in \Ex_\alpha$,
+if such an ordinal exists.  If $\mathcal{C} \in \Ex \setminus
+\bigcup_\alpha \Ex_\alpha$, then $\mathcal{C}$ has no ordinal
+mind-change bound---its mind-change complexity exceeds all constructive
+ordinals.
+
+\begin{defn}[Mind-Change Ordinal of a Class]
+\label{def:mco-class}
+The \emph{mind-change ordinal} of a class $\mathcal{C}$ is
+\[
+  \mathrm{mco}(\mathcal{C}) \;=\;
+  \min\bigl\{\alpha \in \mathcal{O} : \mathcal{C} \in \Ex_\alpha\bigr\}
+\]
+if the minimum exists, and $\infty$ otherwise.
+\end{defn}
+
+\begin{example}
+\label{ex:pattern-languages}
+Unions of $n$ pattern languages have mind-change complexity exactly
+$\omega^n$ (Ambainis--Jain--Sharma~\cite{AmbainisJainSharma1999}).
+This provides a natural example of classes at each level $\omega^n$
+in the hierarchy.
+\end{example}
+
+\begin{graphnode}[title={\nde{mind\_change\_ordinal}}]
+\textbf{Graph node.} Category: \texttt{complexity\_measure}, Layer~5.\\
+\textbf{Edges:}
+$\nde{mind\_change\_ordinal}
+  \xrightarrow{\rel{extends\_grammar}} \nde{mind\_change\_count}$
+(new primitives required: constructive ordinals).\\
+$\nde{mind\_change\_characterization}
+  \xrightarrow{\rel{characterizes}} \nde{mind\_change\_ordinal}$
+(Ambainis--Jain--Sharma 1999).\\
+\textbf{Provenance:} Freivalds--Smith 1993.
+\end{graphnode}
+
+\begin{graphnode}[title={\nde{bc\_learning}}]
+\textbf{Graph node.} Category: \texttt{success\_criterion}, Layer~4.\\
+\textbf{Edges:}
+$\nde{bc\_learning} \xrightarrow{\rel{restricts}} \nde{ex\_learning}$
+(constraint removal: drops syntactic convergence requirement).\\
+\textbf{Provenance:} Case--Smith 1983.
+\end{graphnode}
+
+
+% ================================================================
+% EXERCISES
+% ================================================================
+
+\subsection*{Exercises}
+
+\begin{enumerate}[leftmargin=*,itemsep=4pt]
+
+\item \textbf{Finite mind-change hierarchy.}
+  Prove directly (without ordinals) that $\Ex_n \subsetneq \Ex_{n+1}$
+  for every $n \in \N$.  \emph{Hint:} Diagonalize against all learners
+  with at most $n$ mind changes.
+
+\item \textbf{$\omega$-counter mechanics.}
+  Let $\mathcal{C} = \{f_n : n \in \N\}$ where $f_n$ is the
+  characteristic function of $\{0, 1, \ldots, n\}$.  Show that
+  $\mathcal{C} \in \Ex_\omega \setminus \bigcup_n \Ex_n$.
+
+\item \textbf{Ordinal arithmetic of mind changes.}
+  Show that if $\mathcal{C}_1 \in \Ex_\alpha$ and
+  $\mathcal{C}_2 \in \Ex_\beta$, then
+  $\mathcal{C}_1 \cup \mathcal{C}_2 \in \Ex_{\alpha \oplus \beta}$
+  where $\oplus$ denotes natural (Hessenberg) sum.
+
+\item \textbf{BC does not collapse.}
+  Show that $\BC_0 \subsetneq \BC_1$: construct a class that is
+  $\BC$-identifiable with at most one anomaly but not with zero
+  anomalies.
+
+\item \textbf{Anomaly vs.\ mind change.}
+  Prove that $\Ex_1^* \not\subseteq \Ex_\omega$: tolerance for one
+  anomaly cannot be simulated by any ordinal mind-change bound (without
+  anomaly tolerance).  \emph{Hint:} Use a class where the anomalous
+  input cannot be detected in finite time.
+
+\item \textbf{Counter initialization matters.}
+  Show that the learning power of $\Ex_\alpha$ depends on the
+  \emph{notation} for $\alpha$, not just the ordinal.  That is,
+  two different notations $a, a' \in \mathcal{O}$ with $|a| = |a'|$
+  may yield different classes $\Ex_a \neq \Ex_{a'}$.
+  \emph{Hint:} Different notations for $\omega$ give different
+  computable sequences for decrementing.
+
+\end{enumerate}
+
+\subsection*{Notes and Further Reading}
+
+The mind-change hierarchy was introduced by Freivalds and
+Smith~\cite{FreivaldsSmith1993}, building on the finite mind-change
+bounds of Velauthapillai~\cite{Velauthapillai1989} and the systematic
+study of mind changes by Fulk, Jain, and
+Osherson~\cite{FulkJainOsherson1995}.  The full characterization using
+constructive ordinals, including the strictness of the hierarchy and
+its non-exhaustion of $\Ex$, was completed by Ambainis, Jain, and
+Sharma~\cite{AmbainisJainSharma1999}.
+
+The four types of mind-change counters (constant, ordinal, linearly
+ordered, partially ordered) were introduced by Sharma, Stephan, and
+Ventsov~\cite{SharmaStephanVentsov2004}, who showed that these form a
+strict hierarchy of learning power.  The connection between
+mind-change ordinals and ordinal VC dimension was explored by Martin,
+Sharma, and Stephan~\cite{MartinSharmaStephan2006}.
+
+$\BC$-learning was introduced by Case and Smith~\cite{CaseSmith1983}.
+The comprehensive treatment of learning criteria hierarchies is in
+Jain, Osherson, Royer, and Sharma~\cite{JainOshersonRoyerSharma1999},
+which remains the definitive reference for Gold-style learning theory.
+
+The interaction between mind changes and anomalies produces a
+two-dimensional lattice that is still not fully mapped.  Whether every
+point in this lattice has a natural characterization (analogous to
+pattern language unions for $\omega^n$) remains an open question.

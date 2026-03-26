@@ -1,0 +1,339 @@
+% ============================================================
+% APPENDIX A: Complete Edge Inventory
+% ============================================================
+\chapter{Complete Edge Inventory}
+\label{app:edge-inventory}
+
+This appendix lists all 260 edges in the companion knowledge graph, organized by the 13 relation types.  Each table shows representative edges; the full inventory is machine-readable in \texttt{flt\_concept\_graph.json}.
+
+\medskip
+\noindent\textit{Column conventions.}
+\nde{Source} and \nde{Target} give graph node identifiers.
+\emph{Citation} gives the abbreviated bibliography key.
+Relation-specific columns (\emph{Witness}, \emph{Obstruction type}, \emph{Generalization type}) appear where the schema requires them.
+
+% ----------------------------------------------------------
+\section*{A.1\quad \rel{defined\_using} (99 edges)}
+\label{sec:edges-defined-using}
+
+\begin{longtable}{lll}
+\caption{\rel{defined\_using} edges (representative sample; 99 total).}\label{tab:defined-using}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Note} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Note} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\nde{concept} & \nde{domain} & \\
+\nde{concept} & \nde{label} & \\
+\nde{concept\_class} & \nde{concept} & \\
+\nde{hypothesis\_space} & \nde{concept} & \\
+\nde{proper\_flag} & \nde{hypothesis\_space} & \\
+\multicolumn{3}{c}{\footnotesize\itshape $\cdots$ 94 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.2\quad \rel{instance\_of} (25 edges)}
+\label{sec:edges-instance-of}
+
+\begin{longtable}{lll}
+\caption{\rel{instance\_of} edges (representative sample; 25 total).}\label{tab:instance-of}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Note} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Note} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\nde{text\_presentation} & \nde{data\_stream} & \\
+\nde{informant\_presentation} & \nde{data\_stream} & \\
+\nde{noisy\_input} & \nde{data\_stream} & \\
+\nde{time\_index} & \nde{domain} & \\
+\nde{iterative\_learner} & \nde{learner} & \\
+\multicolumn{3}{c}{\footnotesize\itshape $\cdots$ 20 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.3\quad \rel{characterizes} (24 edges)}
+\label{sec:edges-characterizes}
+
+\begin{longtable}{lll}
+\caption{\rel{characterizes} edges (representative sample; 24 total).}\label{tab:characterizes}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\nde{vc\_characterization} & \nde{pac\_learning} & \cite{BlumerEhrenfeuchtHausslerWarmuth1989} \\
+\nde{vc\_characterization} & \nde{vc\_dimension} & \cite{BlumerEhrenfeuchtHausslerWarmuth1989} \\
+\nde{star\_number} & \nde{vc\_dimension} & \cite{Hanneke2024b} \\
+\nde{trial\_and\_error} & \nde{ex\_learning} & \cite{Gold1965} \\
+\nde{ds\_dimension} & \nde{pac\_learning} & \cite{BrukhimCarmonDinurMoranYehudayoff2022} \\
+\multicolumn{3}{c}{\footnotesize\itshape $\cdots$ 19 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.4\quad \rel{analogy} (32 edges)}
+\label{sec:edges-analogy}
+
+\begin{longtable}{llll}
+\caption{\rel{analogy} edges (representative sample; 32 total).}\label{tab:analogy}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Obstruction type} & \textbf{Citation} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Obstruction type} & \textbf{Citation} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\nde{sample\_complexity} & \nde{vc\_dimension} & one\_way\_theorem\_only & \\
+\nde{ordinal\_vc\_dim} & \nde{mind\_change\_ordinal} & proof\_method\_mismatch & \\
+\nde{mistake\_bound} & \nde{littlestone\_dimension} & missing\_equiv\_witness & \\
+\nde{label\_complexity} & \nde{sample\_complexity} & missing\_equiv\_witness & \\
+\nde{concept\_drift} & \nde{online\_learning} & data\_model\_mismatch & \\
+\multicolumn{4}{c}{\footnotesize\itshape $\cdots$ 27 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.5\quad \rel{measures} (22 edges)}
+\label{sec:edges-measures}
+
+\begin{longtable}{lll}
+\caption{\rel{measures} edges (representative sample; 22 total).}\label{tab:measures}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Note} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Note} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\nde{vc\_dimension} & \nde{concept\_class} & \\
+\nde{shatters} & \nde{concept\_class} & \\
+\nde{littlestone\_dimension} & \nde{concept\_class} & \\
+\nde{star\_number} & \nde{version\_space} & \\
+\nde{eluder\_dimension} & \nde{version\_space} & \\
+\multicolumn{3}{c}{\footnotesize\itshape $\cdots$ 17 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.6\quad \rel{used\_in\_proof} (14 edges)}
+\label{sec:edges-used-in-proof}
+
+\begin{longtable}{lll}
+\caption{\rel{used\_in\_proof} edges (representative sample; 14 total).}\label{tab:used-in-proof}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\nde{gold\_theorem} & \nde{text\_presentation} & \cite{Gold1967} \\
+\nde{gold\_theorem} & \nde{concept\_class} & \cite{Gold1967} \\
+\nde{nfl\_theorem} & \nde{learner} & \cite{WolpertMacready1997} \\
+\nde{nfl\_theorem} & \nde{inductive\_bias} & \cite{WolpertMacready1997} \\
+\nde{pac\_lower\_bound} & \nde{vc\_dimension} & \cite{BlumerEhrenfeuchtHausslerWarmuth1989} \\
+\multicolumn{3}{c}{\footnotesize\itshape $\cdots$ 9 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.7\quad \rel{does\_not\_imply} (9 edges)}
+\label{sec:edges-does-not-imply}
+
+\begin{longtable}{p{3cm}p{3cm}p{5.5cm}l}
+\caption{\rel{does\_not\_imply} edges (all 9).}\label{tab:does-not-imply}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Witness} & \textbf{Citation} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Witness} & \textbf{Citation} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\nde{pac\_learning} & \nde{mistake\_bounded} & Thresholds on $\R$: $\VC = 1$, $\Ldim = \infty$ & \cite{Littlestone1988} \\
+\nde{ex\_learning} & \nde{pac\_learning} & All finite subsets of $\N$: identifiable from text, $\VC = \infty$ & \cite{Gold1967} \\
+\nde{vc\_dimension} & \nde{computational\_hardness} & Poly-size circuits under DCRA: finite $\VC$ but not efficiently PAC-learnable & \cite{KearnsValiant1994} \\
+\nde{vc\_dimension} & \nde{sq\_dimension} & Parities: $\VC = n$, $\SQdim = 2^n$ & \cite{BlumFurstJacksonKearnsMansourRudich1994} \\
+\nde{proper\_improper\_separation} & \nde{pac\_learning} & 3-term DNF: NP-hard proper, poly-time improper & \cite{PittValiant1988} \\
+\multicolumn{4}{c}{\footnotesize\itshape 4 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.8\quad \rel{upper\_bounds} (8 edges)}
+\label{sec:edges-upper-bounds}
+
+\begin{longtable}{lll}
+\caption{\rel{upper\_bounds} edges (all 8).}\label{tab:upper-bounds}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\nde{littlestone\_dimension} & \nde{vc\_dimension} & \cite{Littlestone1988} \\
+\nde{rademacher\_complexity} & \nde{generalization\_error} & \cite{BartlettMendelson2002} \\
+\nde{pac\_bayes\_bound} & \nde{generalization\_error} & \cite{McAllester1999} \\
+\nde{information\_theoretic\_bound} & \nde{generalization\_error} & \cite{XuRaginsky2017} \\
+\nde{vc\_dimension} & \nde{rademacher\_complexity} & \cite{Sauer1972} \\
+\nde{margin\_theory} & \nde{generalization\_error} & \cite{BartlettFosterTelgarsky2017} \\
+\multicolumn{3}{c}{\footnotesize\itshape 2 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.9\quad \rel{restricts} (8 edges)}
+\label{sec:edges-restricts}
+
+\begin{longtable}{lll}
+\caption{\rel{restricts} edges (representative sample; 8 total).}\label{tab:restricts}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\nde{bc\_learning} & \nde{ex\_learning} & \cite{CaseSmith1983} \\
+\nde{agnostic\_pac\_learning} & \nde{pac\_learning} & \cite{Haussler1992} \\
+\nde{universal\_learning} & \nde{pac\_learning} & \cite{BousquetHannekeMoranVanHandelYehudayoff2021} \\
+\nde{meta\_pac\_bound} & \nde{pac\_learning} & \cite{Baxter2000} \\
+\nde{anomalous\_learning} & \nde{ex\_learning} & \\
+\multicolumn{3}{c}{\footnotesize\itshape 3 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.10\quad \rel{extends\_grammar} (8 edges)}
+\label{sec:edges-extends-grammar}
+
+\begin{longtable}{llll}
+\caption{\rel{extends\_grammar} edges (representative sample; 8 total).}\label{tab:extends-grammar}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Generalization type} & \textbf{Citation} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Generalization type} & \textbf{Citation} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\nde{ordinal\_vc\_dim} & \nde{vc\_dimension} & new\_primitives\_required & \\
+\nde{pseudodimension} & \nde{vc\_dimension} & new\_primitives\_required & \\
+\nde{natarajan\_dimension} & \nde{vc\_dimension} & new\_primitives\_required & \\
+\nde{mind\_change\_ordinal} & \nde{mind\_change\_count} & new\_primitives\_required & \\
+\nde{pushdown\_automaton} & \nde{dfa} & new\_primitives\_required & \\
+\multicolumn{4}{c}{\footnotesize\itshape 3 additional edges in \texttt{flt\_concept\_graph.json}} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.11\quad \rel{lower\_bounds} (5 edges)}
+\label{sec:edges-lower-bounds}
+
+\begin{longtable}{lll}
+\caption{\rel{lower\_bounds} edges (all 5).}\label{tab:lower-bounds}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\nde{gold\_theorem} & \nde{ex\_learning} & \cite{Gold1967} \\
+\nde{pac\_lower\_bound} & \nde{pac\_learning} & \cite{BlumerEhrenfeuchtHausslerWarmuth1989} \\
+\nde{pac\_lower\_bound} & \nde{sample\_complexity} & \cite{BlumerEhrenfeuchtHausslerWarmuth1989} \\
+\nde{proper\_improper\_separation} & \nde{pac\_learning} & \cite{PittValiant1988} \\
+\nde{computational\_hardness} & \nde{pac\_learning} & \cite{KearnsValiant1994} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.12\quad \rel{strictly\_stronger} (4 edges)}
+\label{sec:edges-strictly-stronger}
+
+\begin{longtable}{p{2.8cm}p{2.8cm}p{5.5cm}l}
+\caption{\rel{strictly\_stronger} edges (all 4).}\label{tab:strictly-stronger}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Witness} & \textbf{Citation} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Witness} & \textbf{Citation} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\nde{universal\_learning} & \nde{pac\_learning} & Classes with infinite $\VC$ but no infinite Littlestone tree & \cite{BousquetHannekeMoranVanHandelYehudayoff2021} \\
+\nde{ex\_learning} & \nde{finite\_learning} & Classes requiring unbounded mind changes (e.g., pattern languages) & \cite{Gold1967} \\
+\nde{online\_learning} & \nde{pac\_learning} & Finite $\Ldim \Rightarrow$ finite $\VC$; thresholds on finite domains: $\Ldim < \VC$ & \cite{Littlestone1988} \\
+\nde{ds\_dimension} & \nde{natarajan\_dimension} & Hyperbolic pseudo-manifold construction & \cite{BrukhimCarmonDinurMoranYehudayoff2022} \\
+\end{longtable}
+
+% ----------------------------------------------------------
+\section*{A.13\quad \rel{requires\_assumption} (2 edges)}
+\label{sec:edges-requires-assumption}
+
+\begin{longtable}{lll}
+\caption{\rel{requires\_assumption} edges (all 2).}\label{tab:requires-assumption}\\
+\toprule
+\textbf{Source} & \textbf{Target} & \textbf{Citation} \\
+\midrule
+\bottomrule
+\nde{computational\_hardness} & \nde{inductive\_bias} & \cite{ApplebaumBarakXiao2008} \\
+\nde{posterior\_consistency} & \nde{bayesian\_inference} & \cite{Schwartz1965} \\
+\end{longtable}
+
+\bigskip
+\noindent\textbf{Full inventory.}\quad
+The complete 260-edge listing is available in \texttt{flt\_concept\_graph.json} (v1.0).
+Programmatic access is recommended for any systematic traversal; see Appendix~\ref{app:validation} for the validation suite.

@@ -1,0 +1,749 @@
+% Chapter 10: Combinatorial Dimensions
+% 3 revelations (ds_dimension, natarajan_dimension, star_number),
+% 10 definitions with brief treatment.
+% Technical core of Part III. Full Sauer--Shelah proof. Multiclass detective story.
+
+\chapter{Combinatorial Dimensions}
+\label{ch:dimensions}
+
+Part~II characterized learnability in four paradigms, and in each case the
+answer was a number: the VC dimension for PAC learning, the Littlestone
+dimension for online learning, the mind-change ordinal for Gold-style
+identification, the teaching dimension for exact learning.  This chapter and
+the three that follow develop these numbers---and the two dozen others in the
+concept graph---as objects of study in their own right.
+
+The present chapter treats \emph{combinatorial dimensions}: quantities defined
+by asking how richly a hypothesis class can label finite configurations of
+points.  The simplest such quantity, the VC dimension, asks how many points
+can be shattered.  The others refine, extend, or replace this question for
+settings beyond binary classification.  We prove the two foundational
+combinatorial results in full (the Sauer--Shelah lemma and the
+VC dimension characterization already established in \Cref{ch:pac}), recall the
+Littlestone dimension from \Cref{ch:online}, and then turn to the chapter's
+narrative centerpiece: the thirty-year search for the correct combinatorial
+dimension characterizing multiclass learnability, which ended only in 2022.
+
+\medskip
+
+The chapter is organized as follows.
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{VC dimension and shattering} (\Cref{sec:vc-dim}): the
+  definitions, the growth function, and the full proof of the Sauer--Shelah
+  lemma.
+\item \textbf{The Littlestone dimension} (\Cref{sec:ldim-recall}): a brief
+  recall from \Cref{ch:online} and the relationship $\VC \leq \Ldim$.
+\item \textbf{Beyond binary: pseudodimension and fat-shattering}
+  (\Cref{sec:beyond-binary}): scale-sensitive dimensions for real-valued
+  function classes.
+\item \textbf{The multiclass story: from Natarajan to DS}
+  (\Cref{sec:multiclass}): the detective story of multiclass PAC
+  characterization.
+\item \textbf{Other dimensions} (\Cref{sec:other-dims}): a concise catalog of
+  further combinatorial dimensions, with forward references.
+\end{enumerate}
+
+
+% ================================================================
+% SECTION 1: VC DIMENSION AND SHATTERING
+% ================================================================
+
+\section{VC Dimension and Shattering}
+\label{sec:vc-dim}
+
+The definitions in this section were introduced informally in \Cref{ch:objects}
+and used without proof in \Cref{ch:pac}.  We now state them precisely and prove
+the combinatorial backbone that supports the Fundamental Theorem.
+
+\begin{defn}[Restriction and Shattering]
+\label{def:shattering}
+Let $\mathcal{H} \subseteq \{0,1\}^X$ be a hypothesis class and let
+$S = \{x_1, \ldots, x_n\} \subseteq X$ be a finite set.  The
+\emph{restriction} of $\mathcal{H}$ to $S$ is
+\[
+  \mathcal{H}|_S \;=\; \bigl\{\bigl(h(x_1), \ldots, h(x_n)\bigr) : h \in \mathcal{H}\bigr\}
+  \;\subseteq\; \{0,1\}^n.
+\]
+We say $\mathcal{H}$ \emph{shatters} $S$ if $\mathcal{H}|_S = \{0,1\}^n$,
+i.e., every labeling of $S$ is realized by some hypothesis in $\mathcal{H}$.
+\end{defn}
+
+\begin{defn}[VC Dimension {\cite{VapnikChervonenkis1971}}]
+\label{def:vc-dim}
+The \emph{Vapnik--Chervonenkis dimension} of $\mathcal{H}$, denoted
+$\VC(\mathcal{H})$, is the largest cardinality of a set shattered by
+$\mathcal{H}$:
+\[
+  \VC(\mathcal{H}) \;=\; \max\bigl\{|S| : S \subseteq X,\; \mathcal{H}
+  \text{ shatters } S\bigr\}.
+\]
+If $\mathcal{H}$ shatters arbitrarily large finite sets,
+$\VC(\mathcal{H}) = \infty$.
+\end{defn}
+
+\begin{example}[Halfplanes in $\R^2$]
+\label{ex:halfplanes-shatter}
+Let $\mathcal{H}$ be the class of halfplanes in $\R^2$:
+$\mathcal{H} = \bigl\{x \mapsto \ind[\langle w, x \rangle \geq b] : w \in
+\R^2,\, b \in \R\bigr\}$.  Any three non-collinear points are shattered
+(\Cref{fig:shatter-halfplane}), but no four points can be: for any four
+points, at least one is inside the convex hull of the other three, and the
+labeling that assigns it the opposite label from the other three cannot be
+realized by a halfplane.  Hence $\VC(\mathcal{H}) = 3$.
+\end{example}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[scale=0.72,
+    point/.style={circle, fill=defblue, inner sep=1.8pt},
+    pospt/.style={circle, fill=thmred, inner sep=1.8pt},
+    negpt/.style={circle, fill=defblue, inner sep=1.8pt},
+    label0/.style={font=\scriptsize, text=defblue},
+    label1/.style={font=\scriptsize, text=thmred},
+]
+  % 8 labelings of 3 points arranged in 2 rows of 4
+  \foreach \col/\la/\lb/\lc in {
+    0/0/0/0, 1/0/0/1, 2/0/1/0, 3/0/1/1,
+    4/1/0/0, 5/1/0/1, 6/1/1/0, 7/1/1/1%
+  } {
+    \pgfmathtruncatemacro{\cx}{mod(\col,4)*3}
+    \pgfmathtruncatemacro{\cy}{-int(\col/4)*3}
+    \begin{scope}[shift={(\cx,\cy)}]
+      % Draw the three points
+      \ifnum\la=1
+        \node[pospt] (a\col) at (0,0) {};
+        \node[label1, below=1pt] at (a\col) {$1$};
+      \else
+        \node[negpt] (a\col) at (0,0) {};
+        \node[label0, below=1pt] at (a\col) {$0$};
+      \fi
+      \ifnum\lb=1
+        \node[pospt] (b\col) at (2,0) {};
+        \node[label1, below=1pt] at (b\col) {$1$};
+      \else
+        \node[negpt] (b\col) at (2,0) {};
+        \node[label0, below=1pt] at (b\col) {$0$};
+      \fi
+      \ifnum\lc=1
+        \node[pospt] (c\col) at (1,1.5) {};
+        \node[label1, above=1pt] at (c\col) {$1$};
+      \else
+        \node[negpt] (c\col) at (1,1.5) {};
+        \node[label0, above=1pt] at (c\col) {$0$};
+      \fi
+    \end{scope}
+  }
+\end{tikzpicture}
+\caption{All $2^3 = 8$ labelings of three non-collinear points in $\R^2$.
+Each labeling is realized by some halfplane, so the points are shattered.
+Red (filled dark) indicates label~$1$; blue indicates label~$0$.}
+\label{fig:shatter-halfplane}
+\end{figure}
+
+
+\subsection{The Growth Function}
+
+The growth function measures how many distinct labelings $\mathcal{H}$ can
+produce on sets of a given size.
+
+\begin{defn}[Growth Function]
+\label{def:growth-function}
+The \emph{growth function} (or \emph{shatter coefficient}) of $\mathcal{H}$ is
+\[
+  \growth_\mathcal{H}(n) \;=\; \max_{S \subseteq X,\; |S|=n}
+  \bigl|\mathcal{H}|_S\bigr|.
+\]
+Equivalently, $\growth_\mathcal{H}(n)$ is the maximum number of distinct
+behaviors $\mathcal{H}$ can exhibit on any $n$ points.
+\end{defn}
+
+The growth function satisfies $\growth_\mathcal{H}(n) \leq 2^n$ always, with
+equality when $\mathcal{H}$ shatters some set of size~$n$.  The remarkable
+content of the Sauer--Shelah lemma is that once shattering fails---at
+$n = \VC(\mathcal{H}) + 1$---the growth function drops from exponential to
+polynomial \emph{immediately and permanently}.
+
+
+\subsection{The Sauer--Shelah Lemma}
+
+\begin{lemma}[Sauer--Shelah {\cite{Sauer1972,Shelah1972}}]
+\label{lem:sauer-shelah}
+Let $\mathcal{H} \subseteq \{0,1\}^X$ with $\VC(\mathcal{H}) = d$.  Then for
+all $n \geq 1$,
+\[
+  \growth_\mathcal{H}(n) \;\leq\; \sum_{i=0}^{d} \binom{n}{i}.
+\]
+In particular, $\growth_\mathcal{H}(n) \leq \bigl(\frac{en}{d}\bigr)^d$ for
+$n \geq d \geq 1$, so the growth function is polynomial in $n$ when
+$d < \infty$.
+\end{lemma}
+
+The proof is by double induction and is one of the most elegant arguments in
+combinatorics.  The key idea is to split the hypothesis class along one
+coordinate and apply the inductive hypothesis to the two resulting classes,
+whose VC dimensions are carefully controlled.
+
+\begin{proof}
+\label{lem:sauer-shelah-proof}
+We prove a stronger statement: for any finite set $S$ with $|S| = n$ and
+any class $\mathcal{H}' \subseteq \{0,1\}^S$ (not necessarily arising from
+a restriction),
+\[
+  |\mathcal{H}'| \;\leq\; \bigl|\{A \subseteq S : \mathcal{H}' \text{ shatters } A\}\bigr|.
+  \tag{$\star$}
+\]
+This implies the lemma: if $\VC(\mathcal{H}') \leq d$, then the right-hand
+side counts only subsets $A$ with $|A| \leq d$, of which there are at most
+$\sum_{i=0}^{d}\binom{n}{i}$.
+
+We prove $(\star)$ by induction on $|S|$.
+
+\smallskip\noindent
+\textbf{Base case} ($|S| = 1$, say $S = \{x\}$).  If
+$\mathcal{H}' = \{0\}$ or $\mathcal{H}' = \{1\}$, then $|\mathcal{H}'| = 1$
+and $\mathcal{H}'$ shatters $\emptyset$, giving at least one shattered set.
+If $\mathcal{H}' = \{0,1\}$, then $|\mathcal{H}'| = 2$ and $\mathcal{H}'$
+shatters both $\emptyset$ and $\{x\}$, giving at least two shattered sets.
+In both cases $(\star)$ holds.
+
+\smallskip\noindent
+\textbf{Inductive step.}  Let $|S| = n > 1$.  Pick any element $x \in S$
+and set $S' = S \setminus \{x\}$.  Partition $\mathcal{H}'$ according to
+behavior on $x$:
+\begin{align*}
+  \mathcal{H}_0 &= \{h|_{S'} : h \in \mathcal{H}',\; h(x) = 0\}, \\
+  \mathcal{H}_1 &= \{h|_{S'} : h \in \mathcal{H}',\; h(x) = 1\}, \\
+  \mathcal{H}_\cap &= \mathcal{H}_0 \cap \mathcal{H}_1.
+\end{align*}
+Here $\mathcal{H}_\cap$ consists of the functions on $S'$ that appear with
+\emph{both} labels on $x$.
+
+Count: each $h \in \mathcal{H}'$ contributes to exactly one of $\mathcal{H}_0$
+or $\mathcal{H}_1$ (as a function on $S'$), but a function in
+$\mathcal{H}_\cap$ is contributed by two elements of $\mathcal{H}'$ (one
+with $h(x)=0$, one with $h(x)=1$).  Therefore,
+\[
+  |\mathcal{H}'| \;=\; |\mathcal{H}_0| + |\mathcal{H}_1| - |\mathcal{H}_\cap|
+  + |\mathcal{H}_\cap|
+  \;=\; |\mathcal{H}_0 \cup \mathcal{H}_1| + |\mathcal{H}_\cap|.
+\]
+More precisely, $|\mathcal{H}'| = |\mathcal{H}_0| + |\mathcal{H}_1|$, since
+functions in $\mathcal{H}_0 \setminus \mathcal{H}_\cap$ appear only from
+$h(x) = 0$, functions in $\mathcal{H}_1 \setminus \mathcal{H}_\cap$ appear
+only from $h(x) = 1$, and functions in $\mathcal{H}_\cap$ appear twice.  So
+\[
+  |\mathcal{H}'| = |\mathcal{H}_0 \cup \mathcal{H}_1| + |\mathcal{H}_\cap|.
+\]
+
+Apply the inductive hypothesis (on $S'$, which has $n-1$ elements) to both
+$\mathcal{H}_0 \cup \mathcal{H}_1$ and $\mathcal{H}_\cap$:
+\begin{align*}
+  |\mathcal{H}_0 \cup \mathcal{H}_1|
+    &\leq \bigl|\{A \subseteq S' : (\mathcal{H}_0 \cup \mathcal{H}_1) \text{ shatters } A\}\bigr|, \\
+  |\mathcal{H}_\cap|
+    &\leq \bigl|\{A \subseteq S' : \mathcal{H}_\cap \text{ shatters } A\}\bigr|.
+\end{align*}
+
+Now we connect the shattered sets of the restricted classes back to those
+of $\mathcal{H}'$:
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item If $A \subseteq S'$ is shattered by $\mathcal{H}_0 \cup \mathcal{H}_1$
+  but \emph{not} by $\mathcal{H}_\cap$, then $A$ is shattered by $\mathcal{H}'$
+  as well (since every labeling of $A$ is realized by some $h|_{S'} \in
+  \mathcal{H}_0 \cup \mathcal{H}_1$, and at least one such $h$ exists in
+  $\mathcal{H}'$).
+
+\item If $A \subseteq S'$ is shattered by $\mathcal{H}_\cap$, then every
+  labeling of $A$ is realized by functions appearing with both labels on $x$.
+  Hence $\mathcal{H}'$ shatters $A \cup \{x\}$: for any labeling of
+  $A \cup \{x\}$, pick the label $b$ assigned to $x$, then pick $h|_{S'} \in
+  \mathcal{H}_\cap$ realizing the labeling of $A$; the corresponding
+  $h \in \mathcal{H}'$ with $h(x) = b$ realizes the full labeling.
+\end{enumerate}
+
+Crucially, the sets in (1) do not contain $x$, and the sets in (2) do
+contain $x$, so they are disjoint families.  Therefore,
+\[
+  |\mathcal{H}'|
+  \;\leq\; \bigl|\{A \subseteq S : \mathcal{H}' \text{ shatters } A,\;
+  x \notin A\}\bigr|
+  + \bigl|\{A \subseteq S : \mathcal{H}' \text{ shatters } A,\;
+  x \in A\}\bigr|
+  \;=\; \bigl|\{A \subseteq S : \mathcal{H}' \text{ shatters } A\}\bigr|.
+\]
+This completes the induction.
+\end{proof}
+
+\begin{remark}
+The lemma was proved independently by Sauer~\cite{Sauer1972} and
+Shelah~\cite{Shelah1972}, with a related result by Perles and Shelah
+appearing earlier.  Vapnik and Chervonenkis~\cite{VapnikChervonenkis1971}
+proved a weaker bound in their 1971 paper.  The proof above follows the
+elegant ``number of shattered sets'' formulation due to Alon and
+Frankl.
+\end{remark}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=11cm, height=6.5cm,
+    xlabel={$n$},
+    ylabel={Number of labelings},
+    xmin=0, xmax=18, ymin=0, ymax=600,
+    xtick={0,2,...,18},
+    ytick={0,100,...,600},
+    legend pos=north west,
+    legend style={font=\small},
+    grid=major,
+    grid style={gray!20},
+    thick,
+]
+% 2^n
+\addplot[domain=0:9.2, samples=50, thick, thmred, dashed]
+    {2^x};
+\addlegendentry{$2^n$}
+
+% Sauer--Shelah bound for d=3
+\addplot[domain=0:18, samples=100, thick, defblue, solid]
+    {1 + x + x*(x-1)/2 + x*(x-1)*(x-2)/6};
+\addlegendentry{$\sum_{i=0}^{3}\binom{n}{i}$ \quad($d=3$)}
+
+% Mark d+1 = 4
+\draw[thick, dashed, notegray] (axis cs:3,0) -- (axis cs:3,600);
+\node[font=\scriptsize, text=notegray, anchor=south west] at (axis cs:3.1,520)
+    {$n = d = 3$};
+
+% Mark where they split
+\draw[thick, dashed, notegray] (axis cs:4,0) -- (axis cs:4,600);
+\node[font=\scriptsize, text=notegray, anchor=south west] at (axis cs:4.1,450)
+    {$n = d+1$: bound bites};
+
+\end{axis}
+\end{tikzpicture}
+\caption{The growth function $\growth_\mathcal{H}(n)$ versus $2^n$.  For
+$n \leq d = \VC(\mathcal{H})$, the growth function can equal $2^n$ (if
+$\mathcal{H}$ shatters some set of that size).  At $n = d + 1$, the
+Sauer--Shelah bound forces a permanent drop to polynomial growth.  The
+polynomial bound $\sum_{i=0}^{d}\binom{n}{i}$ is plotted for $d = 3$.}
+\label{fig:growth-function}
+\end{figure}
+
+The Sauer--Shelah lemma is the combinatorial engine behind the Fundamental
+Theorem of Statistical Learning (\Cref{thm:fundamental}): it converts
+a finite VC dimension into a polynomial bound on the growth function, which in
+turn yields uniform convergence of empirical risks via a symmetrization
+argument.
+
+
+% ================================================================
+% SECTION 2: THE LITTLESTONE DIMENSION (CROSS-REFERENCE)
+% ================================================================
+
+\section{The Littlestone Dimension}
+\label{sec:ldim-recall}
+
+The VC dimension measures shatterability of \emph{sets}: it asks for the
+largest set whose every labeling is realized.  The Littlestone dimension,
+introduced in \Cref{ch:online} and fully characterized there, measures
+shatterability of \emph{trees}: it asks for the deepest complete binary tree
+whose every root-to-leaf path is realized.  We recall the definition for
+reference.
+
+\begin{defn}[Mistake Tree --- Recall]
+\label{def:mistake-tree-recall}
+A \emph{mistake tree} for $\mathcal{H} \subseteq \{0,1\}^X$ is a complete
+binary tree in which each internal node is labeled with an instance $x \in X$,
+left edges correspond to label~$0$, right edges to label~$1$, and every
+root-to-leaf path is consistent with some $h \in \mathcal{H}$
+(see \Cref{def:mistake-tree}).
+\end{defn}
+
+\begin{defn}[Littlestone Dimension --- Recall]
+\label{def:ldim-recall}
+The \emph{Littlestone dimension} $\Ldim(\mathcal{H})$ is the maximum depth
+of a mistake tree for $\mathcal{H}$ (\Cref{def:ldim}).  The
+Littlestone characterization (\Cref{thm:littlestone-characterization}) establishes that
+$\Ldim(\mathcal{H})$ equals the optimal worst-case mistake bound.
+\end{defn}
+
+The relationship between the two fundamental dimensions is strict:
+
+\begin{prop}
+\label{prop:vc-leq-ldim}
+For any hypothesis class $\mathcal{H}$,
+$\VC(\mathcal{H}) \leq \Ldim(\mathcal{H})$.
+\end{prop}
+
+\begin{proof}
+If $\mathcal{H}$ shatters $\{x_1, \ldots, x_d\}$, one can construct a
+mistake tree of depth $d$ by placing $x_i$ at every node of depth $i$:
+since every labeling is realized, every root-to-leaf path is consistent with
+some $h \in \mathcal{H}$.  Hence any shattered set yields a mistake tree of
+the same depth.
+\end{proof}
+
+The converse fails: threshold classifiers on $\R$ have $\VC = 1$ but
+$\Ldim = \infty$ (\Cref{ch:separations}).  Intuitively, the Littlestone
+dimension is larger because it accounts for adaptive adversaries: the
+adversary in the online game chooses instances sequentially, seeing the
+learner's responses, while the VC dimension considers all labelings of a
+fixed set simultaneously.
+
+
+% ================================================================
+% SECTION 3: BEYOND BINARY
+% ================================================================
+
+\section{Beyond Binary: Pseudodimension and Fat-Shattering}
+\label{sec:beyond-binary}
+
+When the hypothesis class consists of real-valued functions
+$\mathcal{F} \subseteq \R^X$ rather than binary classifiers, shattering must
+be redefined.  Two progressively refined notions capture the relevant
+complexity.
+
+\begin{defn}[Pseudodimension]
+\label{def:pseudodim}
+Let $\mathcal{F} \subseteq \R^X$.  A set $S = \{x_1, \ldots, x_n\} \subseteq X$
+is \emph{pseudo-shattered} (or \emph{P-shattered}) by $\mathcal{F}$ if there
+exist thresholds $t_1, \ldots, t_n \in \R$ such that, for every labeling
+$b \in \{0,1\}^n$, there exists $f \in \mathcal{F}$ with
+\[
+  \mathrm{sgn}\bigl(f(x_i) - t_i\bigr) = (-1)^{1 - b_i}
+  \quad \text{for all } i = 1, \ldots, n.
+\]
+The \emph{pseudodimension} $\Pdim(\mathcal{F})$ is the largest cardinality of
+a P-shattered set.
+\end{defn}
+
+The thresholds $t_i$ act as ``witnesses'': they reduce a real-valued
+shattering problem to a binary one.  When $\mathcal{F}$ is already
+$\{0,1\}$-valued, the thresholds $t_i = 1/2$ recover the standard VC
+dimension, so $\Pdim$ is a proper generalization.
+
+\begin{defn}[Fat-Shattering Dimension {\cite{AlonBenDavidCesaBianchiHaussler1997}}]
+\label{def:fat-shattering}
+Let $\mathcal{F} \subseteq \R^X$ and $\gamma > 0$.  A set
+$S = \{x_1, \ldots, x_n\}$ is \emph{$\gamma$-fat-shattered} by $\mathcal{F}$
+if there exist thresholds $t_1, \ldots, t_n \in \R$ such that, for every
+labeling $b \in \{0,1\}^n$, there exists $f \in \mathcal{F}$ with
+\[
+  f(x_i) \;\geq\; t_i + \gamma \;\;\text{when } b_i = 1,
+  \qquad
+  f(x_i) \;\leq\; t_i - \gamma \;\;\text{when } b_i = 0,
+\]
+for all $i$.  The \emph{fat-shattering dimension at scale $\gamma$}, denoted
+$\fatshat_\gamma(\mathcal{F})$, is the largest cardinality of a
+$\gamma$-fat-shattered set.
+\end{defn}
+
+The margin parameter $\gamma$ makes fat-shattering \emph{scale-sensitive}:
+large margins are harder to achieve, so
+$\fatshat_\gamma(\mathcal{F}) \leq \fatshat_{\gamma'}(\mathcal{F})$ whenever
+$\gamma \geq \gamma'$.  As $\gamma \to 0$, the fat-shattering dimension
+approaches the pseudodimension.
+
+\begin{thm}[Characterization of Real-Valued Learnability
+  {\cite{AlonBenDavidCesaBianchiHaussler1997}}]
+\label{thm:fat-char}
+A real-valued function class $\mathcal{F} \subseteq [0,1]^X$ is
+\emph{agnostically PAC learnable} (with respect to the absolute loss) if and
+only if $\fatshat_\gamma(\mathcal{F}) < \infty$ for every $\gamma > 0$.
+\end{thm}
+
+This is the real-valued analogue of the Fundamental Theorem: just as finite VC
+dimension characterizes binary PAC learnability, finite fat-shattering
+dimension at every scale characterizes real-valued learnability.  The
+pseudodimension alone is not sufficient for characterization in the agnostic
+setting, as it ignores the scale structure.
+
+\begin{remark}[Dimension hierarchy]
+For a class $\mathcal{F} \subseteq [0,1]^X$:
+\[
+  \fatshat_\gamma(\mathcal{F})
+  \;\leq\; \Pdim(\mathcal{F})
+  \;\leq\; \VC\!\bigl(\mathrm{subgraph}(\mathcal{F})\bigr)
+\]
+where $\mathrm{subgraph}(\mathcal{F}) = \{(x,t) \mapsto \ind[f(x) \geq t] :
+f \in \mathcal{F}\}$.  When $\mathcal{F}$ is $\{0,1\}$-valued, all three
+quantities coincide with $\VC(\mathcal{F})$.
+\end{remark}
+
+
+% ================================================================
+% SECTION 4: THE MULTICLASS STORY
+% ================================================================
+
+\section{The Multiclass Story: From Natarajan to DS}
+\label{sec:multiclass}
+
+Binary classification has a clean answer: a class $\mathcal{H} \subseteq
+\{0,1\}^X$ is PAC learnable if and only if $\VC(\mathcal{H}) < \infty$.
+What is the corresponding answer when the label set $Y$ has $k \geq 3$
+elements?  This question, first posed in the 1980s, was open for thirty
+years.  Its resolution required not merely a new proof technique but a
+fundamentally new combinatorial dimension.  The story is worth telling in
+full, because the obvious candidate turned out to be wrong.
+
+
+\subsection{The Natarajan Dimension: The Obvious Candidate}
+
+\begin{defn}[Natarajan Dimension]
+\label{def:natarajan}
+Let $\mathcal{H} \subseteq Y^X$ with $|Y| \geq 2$.  The \emph{Natarajan
+dimension} $\Ndim(\mathcal{H})$ is the largest $d$ such that there exist
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+\item a set $S = \{x_1, \ldots, x_d\} \subseteq X$, and
+\item two functions $f_0, f_1 \colon S \to Y$ with $f_0(x_i) \neq f_1(x_i)$
+  for all $i$,
+\end{itemize}
+such that for every labeling $b \in \{0,1\}^d$, there exists $h \in
+\mathcal{H}$ with $h(x_i) = f_{b_i}(x_i)$ for all $i$.
+\end{defn}
+
+The Natarajan dimension generalizes the VC dimension in a natural way: instead
+of requiring all $2^d$ binary labelings, it requires all $2^d$ labelings
+drawn from two specified ``opposing'' functions.  When $|Y| = 2$, the
+Natarajan dimension equals the VC dimension exactly.
+
+In the 1980s and 1990s, the working conjecture was:
+\begin{quote}
+\itshape A multiclass hypothesis class $\mathcal{H} \subseteq Y^X$ is PAC
+learnable if and only if $\Ndim(\mathcal{H}) < \infty$.
+\end{quote}
+This conjecture was supported by partial results.  Ben-David, Cesa-Bianchi,
+Haussler, and Long proved that finite Natarajan dimension is
+\emph{sufficient} for multiclass PAC learnability when combined with a bound
+on $|Y|$.  The ``if'' direction seemed solid.  The conjecture survived for
+decades without a counterexample.
+
+It was wrong.
+
+
+\subsection{The Counterexample: When the Obvious Fails}
+
+\begin{thm}[Failure of Natarajan Dimension
+  {\cite{DanielyShalevShwartz2014}}]
+\label{thm:natarajan-failure}
+There exists a hypothesis class $\mathcal{H} \subseteq Y^X$ with
+$\Ndim(\mathcal{H}) = 1$ that is \emph{not} PAC learnable.
+\end{thm}
+
+This is a dramatic failure: the Natarajan dimension can be as small as
+possible (just one) and still the class can be unlearnable.  The problem lies
+in the label set: the construction uses $|Y| = \infty$, and the Natarajan
+dimension, which examines only pairs of opposing functions, fails to capture
+the combinatorial explosion that arises when the label set is large.
+
+The witness is a class constructed via a combinatorial argument.  The key
+insight is that the Natarajan dimension constrains the number of ``binary
+slices'' through the labeling space but does not constrain the total
+complexity when the label set grows without bound.
+
+\begin{separation}
+\textbf{Natarajan vs.\ PAC learnability.}  The Natarajan dimension does not
+characterize multiclass PAC learnability:
+\[
+  \Ndim(\mathcal{H}) < \infty
+  \quad\not\!\!\!\implies\quad
+  \mathcal{H} \text{ is PAC learnable}.
+\]
+The gap is witnessed by a class with $\Ndim = 1$, $|Y| = \infty$, that
+requires unbounded sample complexity.  The correct characterization requires
+the DS dimension (\Cref{def:ds-dim} below).
+\end{separation}
+
+
+\subsection{The DS Dimension: The Correct Answer}
+
+\begin{defn}[DS Dimension {\cite{BrukhimCarmonDinurMoranYehudayoff2022}}]
+\label{def:ds-dim}
+Let $\mathcal{H} \subseteq Y^X$.  The \emph{DS dimension} (named for
+Daniely and Shalev-Shwartz) $\DSdim(\mathcal{H})$ is defined via
+pseudo-cubes in the one-inclusion hypergraph of $\mathcal{H}$.
+
+Construct the \emph{one-inclusion hypergraph} $G_\mathcal{H}$ on a finite set
+$S = \{x_1, \ldots, x_n\} \subseteq X$ as follows: the vertices are the
+hypotheses $\mathcal{H}|_S$ (restrictions of $\mathcal{H}$ to $S$), and for
+each $i \in \{1, \ldots, n\}$, add a hyperedge connecting all hypotheses
+that agree on $S \setminus \{x_i\}$ (i.e., they differ only at $x_i$).
+
+A \emph{pseudo-cube of dimension $d$} in $G_\mathcal{H}$ is a subhypergraph
+isomorphic to the complete $d$-dimensional hypercube graph $\{0,1\}^d$.
+
+The DS dimension $\DSdim(\mathcal{H})$ is the supremum over all finite
+$S \subseteq X$ of the maximum dimension of a pseudo-cube in $G_\mathcal{H}$.
+\end{defn}
+
+\begin{thm}[Multiclass Characterization
+  {\cite{BrukhimCarmonDinurMoranYehudayoff2022}}]
+\label{thm:ds-char}
+A hypothesis class $\mathcal{H} \subseteq Y^X$ is PAC learnable if and only
+if $\DSdim(\mathcal{H}) < \infty$.
+\end{thm}
+
+This theorem, proved by Brukhim, Chepoi, Daniel, Moran, and Yehudayoff in
+2022, resolved the multiclass characterization problem.  It is the
+multiclass analogue of the Fundamental Theorem: the DS dimension plays
+exactly the role that the VC dimension plays for binary classification.
+
+\begin{historical}
+\textbf{Why the Natarajan dimension fails and the DS dimension succeeds.}
+The Natarajan dimension examines the labeling structure of $\mathcal{H}$ by
+projecting onto pairs of opposing functions---a fundamentally binary lens
+applied to a multiclass problem.  The DS dimension, by contrast, examines
+the full combinatorial structure of the one-inclusion hypergraph, which
+encodes all the ways hypotheses can disagree on single points.
+
+The one-inclusion hypergraph is not new: Haussler, Littlestone, and Warmuth
+introduced it in 1994 for binary classification, where it yields an optimal
+PAC learner (the one-inclusion algorithm).  What Brukhim et al.\ discovered
+is that the right way to measure the complexity of a multiclass hypothesis
+class is to look for high-dimensional pseudo-cubes inside this hypergraph.
+Pseudo-cubes are the multiclass analogue of shattered sets: they represent
+configurations where the labeling structure is rich enough to prevent
+learning.
+\end{historical}
+
+The dimension hierarchy for multiclass problems is:
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    dimbox/.style={draw, thick, rounded corners=3pt, minimum width=2.6cm,
+      minimum height=0.9cm, font=\small\bfseries, align=center},
+    arr/.style={-{Stealth[length=2.5mm]}, thick},
+    gaplabel/.style={font=\scriptsize\itshape, text=thmred, align=center},
+    implabel/.style={font=\scriptsize, text=notegray, align=center},
+]
+  \node[dimbox, fill=defblue!10] (vc) at (0,0) {$\VC$\\{\scriptsize binary}};
+  \node[dimbox, fill=edgeorange!10] (nat) at (4.5,0) {$\Ndim$\\{\scriptsize multiclass}};
+  \node[dimbox, fill=sepgreen!10] (ds) at (9,0) {$\DSdim$\\{\scriptsize multiclass}};
+
+  \draw[arr] (vc) -- node[implabel, above] {generalizes\\to $|Y| \geq 2$} (nat);
+  \draw[arr] (nat) -- node[implabel, above] {$\Ndim < \infty$\\$\Leftarrow$ $\DSdim < \infty$} (ds);
+
+  \node[gaplabel, below=0.5cm of nat] (gap)
+    {$\Ndim < \infty \not\!\Rightarrow$ learnable\\
+     witness: $\Ndim = 1$, not learnable};
+  \draw[thick, dashed, thmred] (nat.south) -- (gap.north);
+
+  \node[implabel, below=0.5cm of ds] (correct)
+    {$\DSdim < \infty \Leftrightarrow$ learnable\\
+     {\scriptsize\upshape (Brukhim et al.\ 2022)}};
+  \draw[thick, sepgreen] (ds.south) -- (correct.north);
+
+  \node[implabel, below=0.5cm of vc] (vcnote)
+    {$\VC < \infty \Leftrightarrow$ learnable\\
+     {\scriptsize\upshape (binary only)}};
+  \draw[thick, defblue] (vc.south) -- (vcnote.north);
+\end{tikzpicture}
+\caption{The multiclass dimension hierarchy.  The Natarajan dimension was the
+leading candidate for thirty years, but finite $\Ndim$ does not imply
+learnability.  The DS dimension is the correct characterization.}
+\label{fig:dimension-hierarchy}
+\end{figure}
+
+
+% ================================================================
+% SECTION 5: OTHER DIMENSIONS
+% ================================================================
+
+\section{Other Dimensions}
+\label{sec:other-dims}
+
+Several further combinatorial dimensions appear in the concept graph.  We
+collect them here in catalog form; each is developed more fully in the chapter
+where it plays a characterizing role.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Catalog of combinatorial dimensions beyond VC, Littlestone,
+pseudodimension, fat-shattering, Natarajan, and DS.}
+\label{tab:other-dims}
+\begin{tabularx}{\textwidth}{@{}l l X l@{}}
+\toprule
+\textbf{Dimension} & \textbf{Notation} & \textbf{What it measures} & \textbf{Reference} \\
+\midrule
+Star number
+  & $\mathfrak{s}(\mathcal{H})$
+  & The maximum number of sets in a sunflower whose kernel is not shattered.
+    Finiteness of $\mathfrak{s}(\mathcal{H})$ is \emph{equivalent} to
+    $\VC(\mathcal{H}) < \infty$---a surprising alternative
+    combinatorial characterization of PAC learnability.
+  & \Cref{ch:pac} \\
+\addlinespace
+Eluder dimension
+  & $\dim_E(\mathcal{F})$
+  & The length of the longest sequence of points such that each point is
+    ``independent'' of the previous ones, given the function class.
+    Measures exploration complexity in sequential decision problems.
+  & \Cref{ch:extensions} \\
+\addlinespace
+SQ dimension
+  & $\SQdim(\mathcal{C})$
+  & The largest set of nearly uncorrelated concepts.  Determines the number
+    of statistical queries needed to learn $\mathcal{C}$ in the statistical
+    query model, where the learner receives expectations
+    $\E[\phi(x,y)]$ rather than individual examples.
+  & \Cref{ch:extensions} \\
+\addlinespace
+VCL tree
+  & ---
+  & A tree structure used in the trichotomy theorem (\Cref{ch:universal})
+    to separate exponential from arbitrarily slow learners.  Combines VC
+    and Littlestone structure.
+  & \Cref{ch:universal} \\
+\addlinespace
+Ordinal VC dim
+  & $\VC^\alpha$
+  & A transfinite refinement of VC dimension, using ordinal-indexed
+    Cantor--Bendixson ranks on the space of consistent hypotheses.
+  & \Cref{ch:ordinals} \\
+\addlinespace
+Ordinal Littlestone dim
+  & $\Ldim^\alpha$
+  & A transfinite refinement of Littlestone dimension, paralleling
+    ordinal VC dimension for the online setting.
+  & \Cref{ch:ordinals} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{remark}[Star number equivalence]
+\label{rmk:star-number}
+The equivalence between finite star number and finite VC dimension is
+not obvious.  The star number counts a sunflower-type configuration that,
+on its face, looks quite different from shattering.  That these two
+combinatorial conditions coincide is one of the surprising structural
+facts of the theory: there are \emph{multiple, independently motivated}
+combinatorial properties of a hypothesis class that all turn out to be
+equivalent to PAC learnability.
+\end{remark}
+
+
+% ================================================================
+% CLOSING REMARKS
+% ================================================================
+
+\bigskip
+\begin{center}
+\rule{0.5\textwidth}{0.4pt}
+\end{center}
+\bigskip
+
+The combinatorial dimensions of this chapter are the coordinates of a map.
+The VC dimension locates a class in the PAC landscape; the Littlestone
+dimension locates it in the online landscape; the DS dimension locates it in
+the multiclass landscape; the fat-shattering dimension locates it in the
+real-valued landscape.  No single dimension suffices for all purposes, because
+the landscapes are genuinely different---as the separation results of
+\Cref{ch:separations} will make precise.
+
+The next chapter turns from combinatorial dimensions to a different family of
+complexity measures: those based on \emph{compression} and \emph{sample
+complexity}.
