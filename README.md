@@ -89,7 +89,7 @@ This textbook was written alongside a [14,945-line Lean4 formalization](https://
 
 ## The Programme
 
-This textbook is one of four public repositories. They are not independent releases.
+This textbook is one of five public repositories. They are not independent releases.
 
 | Repository | What it is | Scale |
 |-----------|-----------|-------|
@@ -97,8 +97,9 @@ This textbook is one of four public repositories. They are not independent relea
 | **[formal-learning-theory-kernel](https://github.com/Zetetic-Dhruv/formal-learning-theory-kernel)** | Machine-checked proofs in Lean4 | 14,945 LOC, 204 theorems, 2 sorry (frontier) |
 | **[formal-learning-theory-dataset](https://github.com/Zetetic-Dhruv/formal-learning-theory-dataset)** | Structured concept graph | 142 nodes, 260 edges, 13 relation types |
 | **[formal-learning-theory-discovery](https://github.com/Zetetic-Dhruv/formal-learning-theory-discovery)** | Discovery process documentation | 74 reasoning traces, 19 proof methods, 7 break points |
+| **[First-Proof-Benchmark-Results](https://github.com/Zetetic-Dhruv/First-Proof-Benchmark-Results)** | AI proof discovery benchmarks | Empirical analysis across frontier models |
 
-The textbook's logical structure is encoded in the concept graph. The concept graph informed the type architecture that structures the kernel. The kernel's proof discoveries — and its 7 dead-end branches, each a discovery of what *cannot* work — are documented in the discovery repository.
+The textbook's logical structure is encoded in the [concept graph](https://github.com/Zetetic-Dhruv/formal-learning-theory-dataset). The concept graph informed the type architecture that structures the [kernel](https://github.com/Zetetic-Dhruv/formal-learning-theory-kernel). The kernel's proof discoveries — and its 7 dead-end branches, each a discovery of what *cannot* work — are documented in the [discovery repository](https://github.com/Zetetic-Dhruv/formal-learning-theory-discovery).
 
 The textbook treats as mathematics what the kernel verifies as Lean4.
 
@@ -212,6 +213,114 @@ flowchart TB
 
 ---
 
+## Preview
+
+### Theorem and concept index
+
+The major theorems proved in full, organized by paradigm.
+
+**Characterization theorems** — the load-bearing results:
+
+| Theorem | Chapter | Statement |
+|---------|---------|-----------|
+| VC Characterization | 5 | C is PAC-learnable iff VCdim(C) < infinity |
+| Fundamental Theorem | 5 | Nine equivalent conditions for PAC learnability (5-way equivalence in the [kernel](https://github.com/Zetetic-Dhruv/formal-learning-theory-kernel)) |
+| Littlestone Characterization | 6 | C is online-learnable iff Ldim(C) < infinity |
+| Gold's Theorem | 7 | Impossibility of identification from text for classes mixing finite and infinite languages |
+| L* Correctness | 8 | Angluin's algorithm learns DFAs in polynomial time with MQ + EQ |
+| Trichotomy Theorem | 9 | Learning rates partition into exponential / linear / arbitrarily slow |
+| DS Characterization | 17 | DS dimension characterizes multiclass PAC learnability |
+
+**Separation theorems** — the negative layer:
+
+| Separation | Witness | Chapter |
+|-----------|---------|---------|
+| PAC does not imply online | Thresholds on R: VCdim = 1, Ldim = infinity | 14 |
+| Ex-learning does not imply PAC | All finite subsets of N: identifiable, VCdim = infinity | 14 |
+| Finite VCdim does not imply efficient PAC | Poly-size circuits under cryptographic assumptions | 14, 16 |
+| Low VCdim does not imply low SQdim | Parities: VCdim = n, SQdim = 2^n | 14 |
+| Proper does not imply efficient proper | 3-term DNF: NP-hard proper, poly-time improper | 14, 16 |
+| Labeled compression does not imply unlabeled | Palvolgyi-Tardos 2020: VC-2 class, no unlabeled scheme | 11, 14 |
+| Fundamental theorem breaks beyond binary | Shalev-Shwartz et al. 2010: UC does not imply learnability | 14 |
+| Natarajan dimension does not characterize multiclass | d_N = 1 but not learnable when \|Y\| = infinity | 10, 17 |
+| FIN strictly contained in Ex | Unbounded mind changes required for some classes | 7, 13 |
+
+**Complexity measures** — 33 measures across four categories:
+
+| Category | Measures | Chapters |
+|----------|---------|----------|
+| Combinatorial dimensions | VCdim, Ldim, DSdim, Natarajan dim, pseudodimension, fat-shattering dim, star number, dual VCdim, graph dimension | 10 |
+| Compression & sample complexity | Compression size, sample complexity, teaching dimension, covering number, packing number, growth function | 11 |
+| Generalization bounds | VC bound, Rademacher complexity, PAC-Bayes, algorithmic stability, mutual information bound, margin bound | 12 |
+| Mind-change ordinals | Finite mind changes, ordinal mind changes, anomaly hierarchy, BC learning | 13 |
+
+**Infrastructure theorems** — the proof machinery:
+
+| Theorem | Role | Scale |
+|---------|------|-------|
+| Sauer-Shelah Lemma | Growth function bounded by poly(VCdim) | Ch. 10, [kernel](https://github.com/Zetetic-Dhruv/formal-learning-theory-kernel): Bridge.lean |
+| Symmetrization (ghost sample) | Exchanges sup and expectation for uncountable classes | Ch. 5, [kernel](https://github.com/Zetetic-Dhruv/formal-learning-theory-kernel): 3,027 LOC |
+| Rademacher-VCdim connection | VCdim bounds Rademacher complexity | Ch. 12, [kernel](https://github.com/Zetetic-Dhruv/formal-learning-theory-kernel): 1,901 LOC |
+| Hoeffding one-sided | Concentration inequality for bounded random variables | Ch. 5, 12 |
+| Occam's Razor | Short descriptions generalize (Blumer-Ehrenfeucht-Haussler-Warmuth) | Ch. 11 |
+| Moran-Yehudayoff Compression | Finite VCdim implies exponential compression scheme | Ch. 11 (open: O(d) conjecture since 1986) |
+
+### From the textbook
+
+Excerpts that show what this book does differently.
+
+---
+
+**On why separations are first-class content** (Ch. 14):
+
+> A separation result has two components. The *statement* asserts that some implication A implies B does not hold. The *witness* is a concrete mathematical object — a concept class, a dimension pair, a computational reduction — that demonstrates the failure. The witness is the mathematics; the statement is merely its summary. Throughout this chapter, we privilege the construction over the claim.
+
+---
+
+**On the trichotomy — the revelation** (Ch. 9):
+
+> The online learning tradition introduced the Littlestone dimension to characterize mistake-bounded learning against an adversary. A worst-case combinatorial quantity, built for a worst-case adversarial game. No connection to statistical convergence rates. None expected.
+>
+> And yet. The Littlestone dimension — this adversarial, combinatorial object — is exactly what governs the boundary between exponential and polynomial convergence in the i.i.d. setting.
+
+---
+
+**On data models as the axis of fracture** (Ch. 2):
+
+> Four fundamentally different data models — i.i.d. samples, enumerative texts, query oracles, and adversarial streams — give rise to four different theories of learnability, characterized by four different complexity measures, and separated by explicit impossibility results. The data model is not a parameter of a single theory; it is the axis along which the field fractures into distinct paradigms.
+
+---
+
+**On convergence without convergence signals** (Ch. 7):
+
+> This simple algorithm illustrates a crucial asymmetry: the learner does not know when it has converged. It has no way to announce "I am done." It merely stabilizes, silently. This lack of a convergence signal is what makes Gold's impossibility theorem possible.
+
+---
+
+**On the compression conjecture** (Ch. 11):
+
+> The natural conjecture — that compression of size O(d) always suffices — has been open since 1986. It is one of the oldest and most embarrassing open problems in learning theory, and it is the centerpiece of this chapter. Everything we prove either approaches this question or illuminates why it resists resolution.
+
+---
+
+**On obstruction types as mathematical content** (Ch. 15):
+
+> The key insight of this chapter is that the obstruction type is more informative than the analogy itself. Two analogies may look superficially similar ("X is like Y because both measure complexity") but fail for entirely different reasons: one because the objects live in different type systems, another because a conjectured equivalence remains unproved. The obstruction type tells you *why* the analogy fails, and this "why" determines whether the analogy might become a theorem in the future, or is structurally blocked.
+
+---
+
+**On the epsilon vs. epsilon-squared gap** (Ch. 5):
+
+> The gap emerges only when H is infinite and VC dimension replaces log|H|. Realizability is not just a simplifying assumption — it provides a qualitatively different information structure.
+
+---
+
+**On the sparsity of the separation lattice** (Ch. 14):
+
+> The lattice is sparse. Thirteen edges connect concepts drawn from six paradigms and a dozen complexity measures. Most paradigm pairs are simply incomparable — they neither imply nor contradict each other, because they operate on different mathematical objects. The sparsity is itself informative: learning theory is not a linear hierarchy from weak to strong, but a partially ordered collection of largely independent formalisms.
+
+---
+
 ## The Concept Graph
 
 The book's logical skeleton, encoded as a typed directed graph.
@@ -275,7 +384,27 @@ supplementary/
                Characterization Theorems, and the Separations Between Them},
   year      = {2026},
   publisher = {Zetesis Labs},
-  address   = {Bangalore}
+  address   = {Bangalore},
+  note      = {202 pages, 18 chapters. Companion Lean4 formalization
+               at \url{https://github.com/Zetetic-Dhruv/formal-learning-theory-kernel}.}
+}
+
+@software{gupta2026flt_kernel,
+  author    = {Gupta, Dhruv},
+  title     = {Formal Learning Theory Kernel: {Lean4} Formalization
+               of the Fundamental Theorem of Statistical Learning},
+  year      = {2026},
+  url       = {https://github.com/Zetetic-Dhruv/formal-learning-theory-kernel},
+  note      = {14{,}945 LOC, 204 theorems, 2 sorry.}
+}
+
+@software{gupta2026flt_discovery,
+  author    = {Gupta, Dhruv},
+  title     = {Formal Learning Theory Discovery: Empirical Analysis
+               of {AI}-Guided Proof Search},
+  year      = {2026},
+  url       = {https://github.com/Zetetic-Dhruv/formal-learning-theory-discovery},
+  note      = {74 reasoning traces, 19 proof methods, 7 break points.}
 }
 ```
 
