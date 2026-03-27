@@ -27,7 +27,7 @@ The key structural innovation is not any new theorem, but a *negative layer*: th
 
 The book is accompanied by a machine-readable concept graph encoding **142 concepts** connected by **260 typed edges** across **13 relation types**: `characterizes`, `strictly_stronger`, `does_not_imply`, `analogy`, `upper_bounds`, `lower_bounds`, `measures`, `defined_using`, `instance_of`, `restricts`, `extends_grammar`, `requires_assumption`, and `used_in_proof`.
 
-The graph is in [`supplementary/flt_concept_graph.json`](supplementary/flt_concept_graph.json).
+The graph is in [`flt_concept_graph.json`](flt_concept_graph.json).
 
 ---
 
@@ -62,14 +62,13 @@ formal-learning-theory-book/
 │   │   ├── appC_validation.tex
 │   │   └── appD_notation.tex
 │   └── LICENSE
-├── supplementary/
-│   └── flt_concept_graph.json    # 142-node, 260-edge knowledge graph
+├── flt_concept_graph.json        # 142-node, 260-edge knowledge graph
+├── flt_bibliography.bib          # BibTeX bibliography (~120 entries)
 ├── scripts/
 │   ├── validate_graph.py         # Schema and constraint validator (13 checks)
 │   ├── validate_bibliography_links.py  # Bibliography cross-reference validator
 │   ├── run_reference_tasks.py    # Executes 15 benchmark tasks against the graph
 │   └── evaluate_reference_tasks.py     # Scores task outputs against gold answers
-├── flt_bibliography.bib          # BibTeX bibliography (~120 entries)
 ├── LICENSE                       # CC BY-NC-SA 4.0
 ├── Makefile
 ├── CONTRIBUTING.md
@@ -131,17 +130,16 @@ The knowledge graph and bibliography can be validated against the textbook conte
 
 ```bash
 # Validate graph schema and constraints (13 checks)
-python3 scripts/validate_graph.py supplementary/flt_concept_graph.json
+python3 scripts/validate_graph.py
 
 # Validate bibliography cross-references
-python3 scripts/validate_bibliography_links.py flt_bibliography.bib supplementary/flt_concept_graph.json
+python3 scripts/validate_bibliography_links.py
 
 # Run benchmark tasks against the graph
-python3 scripts/run_reference_tasks.py supplementary/flt_concept_graph.json
-
-# Score task outputs
-python3 scripts/evaluate_reference_tasks.py
+python3 scripts/run_reference_tasks.py
 ```
+
+All scripts auto-detect `flt_concept_graph.json` and `flt_bibliography.bib` at the repo root. Use `--graph` and `--bib` flags to override paths.
 
 See [Appendix C](textbook/appendices/appC_validation.tex) for details on what each script checks.
 

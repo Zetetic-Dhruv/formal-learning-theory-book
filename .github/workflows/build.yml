@@ -39,10 +39,10 @@ jobs:
           python-version: '3.12'
 
       - name: Validate graph schema
-        run: python3 scripts/validate_graph.py supplementary/flt_concept_graph.json
+        run: python3 scripts/validate_graph.py
 
       - name: Validate bibliography links
-        run: python3 scripts/validate_bibliography_links.py flt_bibliography.bib supplementary/flt_concept_graph.json
+        run: python3 scripts/validate_bibliography_links.py
 
   check-references:
     name: Cross-Reference Check

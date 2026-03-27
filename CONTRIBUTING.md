@@ -48,7 +48,7 @@ Thank you for your interest in improving this textbook. Contributions of all kin
 - Keep the first line under 72 characters.
 
 ### Knowledge Graph
-- The graph is in `supplementary/flt_concept_graph.json`.
+- The graph is in `flt_concept_graph.json` at the repo root.
 - Valid relation types: `characterizes`, `strictly_stronger`, `does_not_imply`, `analogy`, `upper_bounds`, `lower_bounds`, `measures`, `defined_using`, `instance_of`, `restricts`, `extends_grammar`, `requires_assumption`, `used_in_proof`.
 - Changes to the graph should reference the relevant textbook theorem or definition.
 
