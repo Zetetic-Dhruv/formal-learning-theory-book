@@ -64,7 +64,15 @@ formal-learning-theory-book/
 │   └── LICENSE
 ├── supplementary/
 │   └── flt_concept_graph.json    # 142-node, 260-edge knowledge graph
+├── scripts/
+│   ├── validate_graph.py         # Schema and constraint validator (13 checks)
+│   ├── validate_bibliography_links.py  # Bibliography cross-reference validator
+│   ├── run_reference_tasks.py    # Executes 15 benchmark tasks against the graph
+│   └── evaluate_reference_tasks.py     # Scores task outputs against gold answers
+├── flt_bibliography.bib          # BibTeX bibliography (~120 entries)
 ├── LICENSE                       # CC BY-NC-SA 4.0
+├── Makefile
+├── CONTRIBUTING.md
 └── README.md
 ```
 
@@ -114,6 +122,28 @@ pdflatex main.tex
 ```
 
 The compiled PDF is not tracked in git. Releases with pre-built PDFs are available on the [Releases](../../releases) page.
+
+---
+
+## Validation
+
+The knowledge graph and bibliography can be validated against the textbook content using the scripts in `scripts/`:
+
+```bash
+# Validate graph schema and constraints (13 checks)
+python3 scripts/validate_graph.py supplementary/flt_concept_graph.json
+
+# Validate bibliography cross-references
+python3 scripts/validate_bibliography_links.py flt_bibliography.bib supplementary/flt_concept_graph.json
+
+# Run benchmark tasks against the graph
+python3 scripts/run_reference_tasks.py supplementary/flt_concept_graph.json
+
+# Score task outputs
+python3 scripts/evaluate_reference_tasks.py
+```
+
+See [Appendix C](textbook/appendices/appC_validation.tex) for details on what each script checks.
 
 ---
 
