@@ -1,4 +1,7 @@
+# macOS
 .DS_Store
+
+# LaTeX build artifacts
 *.aux
 *.log
 *.out
@@ -8,6 +11,33 @@
 *.bbl
 *.blg
 *.idx
+*.ind
+*.ilg
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.run.xml
+*.bcf
+*-blx.bib
+
+# PDF output (use GitHub Releases for compiled PDFs)
+textbook/*.pdf
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+Thumbs.db
