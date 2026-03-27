@@ -2748,14 +2748,14 @@
       "category": "formal_object",
       "layer": 0,
       "references": [
-        "Cornelissen et al. 2011"
+        "Biermann and Krishnaswamy 1976"
       ],
       "status": "deferred",
       "description": "DEFINITION: Sequence of states/outputs from a single program execution. Formally: \u03c4 = (s\u2080, a\u2081, s\u2081, a\u2082, ...) where s_i = state, a_i = action/output. Partial traces underdetermine algorithms (Axiom 1 on programs).",
       "claim_type": "definition",
       "formal_definition": "Sequence of states/outputs from a single program execution. Formally: \u03c4 = (s\u2080, a\u2081, s\u2081, a\u2082, ...) where s_i = state, a_i = action/output.",
       "bib_keys": [
-        "Cornelissen2011"
+        "BiermanKrishnaswamy1976"
       ],
       "provenance": {
         "field_origin": "Standard computer science / formal language theory."
