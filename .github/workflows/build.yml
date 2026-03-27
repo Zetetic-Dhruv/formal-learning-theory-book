@@ -14,7 +14,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Compile PDF
-        uses: xu-cheng/latex-action@v3
+        # Pinned to v3 commit SHA for long-term stability (community-maintained action)
+        uses: xu-cheng/latex-action@e2f99d4b3685b0da93f97e1b86ad8fab81105098 # v3
         with:
           root_file: main.tex
           working_directory: textbook
