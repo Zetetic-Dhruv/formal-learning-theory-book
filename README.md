@@ -6,8 +6,7 @@ Every characterization theorem in learning theory answers one question: *when do
 
 But a field is not defined only by what holds. It is defined equally by what *does not* hold — and the witnesses that prove it.
 
-**Author:** Dhruv Gupta, Zetesis Labs, ARTPARK @ IISc Bangalore
-
+**Author:** Dhruv Gupta, Zetesis Labs, dhruv@zetesislabs.com
 ---
 
 ## The Negative Layer
