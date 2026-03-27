@@ -1,0 +1,62 @@
+name: Exercise Issue
+description: Report a problem with an exercise or submit a solution for review
+title: "[Exercise] "
+labels: ["exercise"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for exercise-related issues: errors in problem statements, ambiguous wording, missing hints, difficulty calibration, or solution submissions.
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue type
+      options:
+        - Error in problem statement
+        - Ambiguous or unclear wording
+        - Missing prerequisite or forward dependency
+        - Difficulty miscalibrated (too easy / too hard for placement)
+        - Hint is incorrect or misleading
+        - Solution submission for review
+        - Suggestion for new exercise
+    validations:
+      required: true
+
+  - type: input
+    id: exercise-location
+    attributes:
+      label: Exercise location
+      description: "Chapter and exercise number"
+      placeholder: "e.g., Chapter 6, Exercise 6.3"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: |
+        For errors/ambiguity: explain the problem and propose a fix.
+        For solution submissions: provide your solution (LaTeX math supported via code blocks).
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Perceived difficulty (if relevant)
+      description: Your assessment of the exercise's actual difficulty level.
+      options:
+        - "N/A"
+        - "★ — Routine (direct application of definitions)"
+        - "★★ — Moderate (requires combining 2–3 ideas)"
+        - "★★★ — Challenging (requires novel argument or deep insight)"
+        - "★★★★ — Research-level"
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Prerequisites used
+      description: Which definitions, theorems, or earlier exercises does this depend on?
+      placeholder: "e.g., Requires Sauer-Shelah Lemma (Lem 5.1) and growth function definition (Def 5.5)"

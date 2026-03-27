@@ -1,0 +1,66 @@
+name: Mathematical / CS Erratum
+description: Report a mathematical error, missing citation, incorrect proof, or CS formalism issue
+title: "[Erratum] "
+labels: ["erratum", "mathematical"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve the mathematical accuracy of this textbook.
+
+  - type: dropdown
+    id: erratum-type
+    attributes:
+      label: Type of error
+      options:
+        - Incorrect proof step
+        - Wrong theorem statement
+        - Missing or incorrect hypothesis/assumption
+        - Definition inconsistency
+        - Notation error or conflict
+        - Missing or incorrect citation
+        - Incorrect complexity bound
+        - Wrong dimension value or characterization
+        - Broken cross-reference
+        - Other mathematical error
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      description: "Chapter, section, and definition/theorem/lemma number"
+      placeholder: "e.g., Chapter 5, Theorem 5.4 (Fundamental Theorem), condition (F7)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: What the text currently says
+      description: Quote the relevant passage or formula verbatim.
+    validations:
+      required: true
+
+  - type: textarea
+    id: correction
+    attributes:
+      label: Proposed correction
+      description: What the text should say instead. Include reasoning or a reference if possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact on other results
+      description: Does this error propagate to other theorems, proofs, or the knowledge graph?
+      placeholder: "e.g., This also affects Corollary 5.2 which depends on the same bound."
+
+  - type: input
+    id: references
+    attributes:
+      label: Supporting references
+      description: Papers, textbooks, or other sources that confirm the correction.
+      placeholder: "e.g., Shalev-Shwartz & Ben-David (2014), Theorem 6.7"

@@ -1,0 +1,65 @@
+name: Build & Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-pdf:
+    name: LaTeX Compilation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          working_directory: textbook
+          latexmk_use_xelatex: false
+
+      - name: Upload PDF artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: textbook-pdf
+          path: textbook/main.pdf
+          retention-days: 90
+
+  validate-graph:
+    name: Knowledge Graph Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate graph schema
+        run: python3 scripts/validate_graph.py supplementary/flt_concept_graph.json
+
+      - name: Validate bibliography links
+        run: python3 scripts/validate_bibliography_links.py flt_bibliography.bib supplementary/flt_concept_graph.json
+
+  check-references:
+    name: Cross-Reference Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for undefined LaTeX references
+        run: |
+          cd textbook
+          # First pass to generate aux files
+          pdflatex -interaction=nonstopmode -halt-on-error main.tex || true
+          bibtex main || true
+          pdflatex -interaction=nonstopmode main.tex || true
+          # Check for undefined references and citations
+          if grep -q 'undefined references\|multiply-defined' main.log 2>/dev/null; then
+            echo "::warning::Found undefined or multiply-defined references:"
+            grep 'undefined\|multiply.defined' main.log || true
+          fi
+        continue-on-error: true

@@ -1,0 +1,63 @@
+name: Pedagogical Feedback
+description: Feedback on pacing, clarity, exposition, tone, or structure
+title: "[Pedagogy] "
+labels: ["pedagogy"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This template is for feedback on how the material is *presented*, not on mathematical correctness (use the Erratum template for that).
+
+  - type: dropdown
+    id: feedback-type
+    attributes:
+      label: Category
+      options:
+        - Clarity — a passage is hard to follow or ambiguous
+        - Pacing — too fast, too slow, or abrupt transition
+        - Motivation — a definition/theorem needs more context for "why"
+        - Complexity — notation or formalism is heavier than necessary
+        - Missing example — an abstract concept needs a concrete illustration
+        - Missing diagram — a visual would help understanding
+        - Tone — overly terse, overly verbose, or inconsistent register
+        - Structure — chapter/section ordering or dependency issue
+        - Accessibility — prerequisite knowledge assumed but not stated
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      description: "Chapter, section, or page range"
+      placeholder: "e.g., Chapter 13, Section 13.2 (ordinal hierarchy proof)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reader-level
+    attributes:
+      label: Your background
+      description: Helps calibrate whether the issue is about prerequisites vs. exposition.
+      options:
+        - Undergraduate (first exposure to learning theory)
+        - Graduate student (familiar with PAC/VC basics)
+        - Researcher (working in learning theory or adjacent field)
+        - Instructor (teaching from or considering adopting this book)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What made this section difficult or unclear?
+      description: Be as specific as possible. Quote the passage if helpful.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+      description: How would you rephrase, restructure, or supplement this section?
