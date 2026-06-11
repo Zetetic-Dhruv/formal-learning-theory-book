@@ -22,7 +22,8 @@ sample complexity bounds (\Cref{sec:sample-bounds}) show that the VC dimension
 $d$ determines the sample complexity up to constant factors.  Compression
 schemes (\Cref{sec:compression}) provide a different explanation of
 learnability: a class is learnable if and only if the training data can be
-``compressed'' to a small subset that determines the hypothesis.  The natural
+``compressed'' to a \emph{bounded} subset that determines the hypothesis---though
+\emph{how} small that subset can be is precisely the open question.  The natural
 conjecture---that compression of size $O(d)$ always suffices---has been open
 since 1986.  It is one of the oldest and most embarrassing open problems in
 learning theory, and it is the centerpiece of this chapter.
@@ -150,7 +151,7 @@ $\mathcal{H}$ over domain $X$ consists of two maps:
   a hypothesis $\rho(\kappa(S))$ consistent with $S$.
 \end{enumerate}
 The reconstruction function $\rho$ sees \emph{only} the compressed subsample
-$\kappa(S)$; it has no access to the remaining points.
+$\kappa(S)$; it has no access to the remaining points.\formal{FLT_Proofs.Complexity.Structures.CompressionScheme}
 \end{defn}
 
 \begin{example}[Support vectors as compression]
@@ -173,6 +174,7 @@ $\mathcal{H}$ is PAC learnable with sample complexity
   m(\varepsilon, \delta) = O\!\left(\frac{k}{\varepsilon}
     \log\frac{k}{\varepsilon} + \frac{1}{\varepsilon}\log\frac{1}{\delta}\right).
 \]
+In particular a finite compression scheme forces finite VC dimension, $\VC(\mathcal{H}) \leq 2(k+1)^2 - 1$, so compressibility implies learnability.\formal{FLT_Proofs.Complexity.Generalization.compression_imp_vcdim_finite}
 \end{thm}
 
 \begin{proof}[Proof sketch]
@@ -198,7 +200,7 @@ story becomes a forty-year open problem.
 \begin{openprob}[Sample Compression Conjecture {\cite{LittlestoneWarmuth1986,FloydWarmuth1995}}]
 \label{op:compression}
 Does every concept class $\mathcal{H}$ with $\VC(\mathcal{H}) = d$ admit a
-sample compression scheme of size $O(d)$?
+sample compression scheme of size $O(d)$?\formal{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening}
 \end{openprob}
 
 This conjecture, stated by Littlestone and Warmuth in 1986, remains open.  It
@@ -216,13 +218,17 @@ It is not known whether the obstacle is technical or fundamental.
 \begin{thm}[Exponential compression exists {\cite{MoranYehudayoff2016}}]
 \label{thm:moran-yehudayoff}
 Every concept class $\mathcal{H}$ with $\VC(\mathcal{H}) = d$ admits a sample
-compression scheme of size $2^{O(d)}$.
+compression scheme of size $2^{O(d)}$.\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression}
 \end{thm}
 
 This landmark result of Moran and Yehudayoff~\cite{MoranYehudayoff2016}
 established that compression schemes \emph{exist} for every learnable class---a
 fact that was itself unknown before 2016.  The exponential bound $2^{O(d)}$ is,
-however, vastly larger than the conjectured $O(d)$.
+however, vastly larger than the conjectured $O(d)$.  The machine-checked form of
+the existence statement is the equivalence ``finite VC dimension iff a finite
+compression scheme \emph{with side information} exists''; whether the side
+information can be removed, and whether the size can be brought to $O(d)$, are
+the open strengthenings (\cref{op:compression}).
 
 \begin{proof}[Proof sketch]
 The proof uses a topological argument.  By a result of
@@ -397,6 +403,69 @@ facts.  This incomparability is a symptom of the conjecture's
 difficulty: there is no single mechanism that explains compression
 across all class families.
 \end{example}
+
+
+\subsection{Compression for Attention Classes}
+\label{sec:attention-compression}
+
+The compression question is not a relic of classical concept classes; it
+reappears, still unsolved, for the hypothesis classes computed by modern
+attention layers.  Fix an embedding dimension $d$ and a context of $n_K$
+key--value pairs.  A single softmax-attention head maps a query $x \in \R^d$ to
+the weighted readout
+$\sum_{i=1}^{n_K} \mathrm{softmax}(\langle x, k_i\rangle)_i\, v_i$, and
+thresholding this readout at zero yields a concept
+$c_{K,V}\colon \R^d \to \{0,1\}$.  Letting the keys $K = (k_1, \ldots, k_{n_K})$
+and values $V = (v_1, \ldots, v_{n_K})$ range over all configurations gives the
+\emph{attention concept class} $\mathcal{A}_{d,n_K} = \{c_{K,V}\}$.
+
+\begin{prop}[Attention classes are compressible]
+\label{prop:attention-compression}
+For every $d$ and $n_K$, the attention concept class $\mathcal{A}_{d,n_K}$ has
+finite VC dimension and therefore admits a sample compression scheme of size
+$2^{O(\VC(\mathcal{A}_{d,n_K}))}$.
+\end{prop}
+
+\begin{proof}
+The readout map
+$(K, V, x) \mapsto \sum_i \mathrm{softmax}(\langle x,k_i\rangle)_i\, v_i$ is
+jointly continuous, hence Borel measurable, so the bad-event sets that the
+uniform-convergence argument quantifies over are measurable rather than merely
+analytic.  This is exactly the ``well-behaved measurable VC target''
+condition,\formal{TLT.Bridge.softAttention_wellBehaved} and it certifies that
+$\mathcal{A}_{d,n_K}$ is a bona fide VC class: the empirical process indexed by
+$\mathcal{A}_{d,n_K}$ converges uniformly, so the class has finite VC dimension.
+Finite VC dimension is precisely the hypothesis of the existence
+theorem,\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression} which then
+supplies a compression scheme (with side information) whose size is exponential
+in the VC dimension.
+\end{proof}
+
+The exponential bound is, as for general classes, almost certainly far from
+tight, and the argmax (hard-attention) router suggests why.  When the softmax is
+sharpened to a top-$1$ selection, the head's output on a query $x$ is determined
+entirely by the single key whose score is largest---and the routing rule that
+selects this key is again well-behaved,\formal{TLT_Proofs.Routing.MeasurableScoreRouting.multiHeadArgmax_wellBehaved}
+partitioning the query space into finitely many Borel cells.  A query's label
+depends only on \emph{which cell it lands in}, and each cell is pinned down by a
+bounded number of ``support keys''---the attention analogue of the support
+vectors of \Cref{ex:svm-compression}.  This picture predicts a compression of
+size $O(n_K)$, linear in the context length.  But turning the heuristic into a
+theorem runs into exactly the obstacle of \Cref{op:compression}: the support-key
+set is selected with knowledge of the whole sample, and pulling it back to a
+labeled subsample of size $O(\VC)$ is the open problem, now wearing the costume
+of an attention layer.
+
+\begin{remark}[The conjecture, modernized]
+\label{rmk:attention-compression}
+\Cref{prop:attention-compression} places attention classes squarely inside the
+landscape of \Cref{fig:compression-landscape}: they sit at the ``compression
+size $2^{O(d)}$'' node, with the arrow down to ``size $O(d)$'' still dashed.
+The Littlestone--Warmuth conjecture is thus load-bearing for contemporary
+architectures.  A positive resolution would bound how few training examples an
+attention head must retain to reproduce its behavior; a negative one would
+exhibit a learnable attention class that is, in a precise sense, incompressible.
+\end{remark}
 
 
 \subsection{Why the Conjecture Resists Resolution}
@@ -747,6 +816,119 @@ Occam's razor---are unified by a single idea: \emph{learnability is equivalent
 to the existence of a short summary of the evidence}.  The VC dimension tells
 us \emph{that} a short summary exists; the compression conjecture asks
 \emph{how short}.  The answer, after forty years, remains: we do not know.
+
+
+% ================================================================
+% OPEN PROBLEMS
+% ================================================================
+
+\section{Open Problems}
+\label{sec:compression-open}
+
+The $O(d)$ conjecture (\Cref{op:compression}) is the gravitational center, but
+the frontier it anchors is wider.  The following ten problems branch off it.
+Each is tagged as a \emph{known unknown} (KU)---sharply posed, the obstruction
+articulated but unresolved---or an \emph{unknown known} (UK), where even the
+right invariant or vocabulary is still missing.  Where a machine-checked
+statement or a literature anchor exists, it is named.
+
+\begin{openprob}[Compression without side information]
+\label{op:side-info}
+The machine-checked existence theorem produces a compression scheme \emph{with}
+side information: the reconstruction is handed $O(d)$ extra bits beyond the
+subsample.  Does every class of VC dimension $d$ admit a scheme of size
+$2^{O(d)}$ with \emph{no} side bits at all?  This is a known unknown; its
+formalized statement is \leanname{Open_NoInfoCompressionStrengthening}, and a
+positive answer is the first step toward \Cref{op:compression}~\cite{MoranYehudayoff2016}.
+\end{openprob}
+
+\begin{openprob}[Orientations of non-maximum graphs]
+\label{op:oig-orientation}
+\Cref{thm:one-inclusion-orientation} orients the one-inclusion graph of a
+\emph{maximum} class with in-degree $\leq d$.  Does every (non-maximum) class of
+VC dimension $d$ admit an orientation of in-degree $\mathrm{poly}(d)$?  An
+affirmative answer would yield polynomial compression.  No orientation theorem
+is known off the maximum case---an unknown known: the combinatorial object is in
+hand, the extremal lever that tames it is not~\cite{KuzminWarmuth2007}.
+\end{openprob}
+
+\begin{openprob}[Agnostic compression]
+\label{op:agnostic-compression}
+The schemes of this chapter are realizable: they reconstruct a hypothesis
+\emph{consistent} with the sample.  Does every VC-$d$ class admit an
+\emph{agnostic} compression scheme of size $O(d)$---one whose reconstruction has
+error at most $\mathrm{opt} + \varepsilon$ when no consistent hypothesis
+exists?  A known unknown, sharpened by David, Moran, and
+Yehudayoff~\cite{DavidMoranYehudayoff2016}.
+\end{openprob}
+
+\begin{openprob}[Compression for attention classes]
+\label{op:attention-compression}
+\Cref{prop:attention-compression} certifies that the softmax-attention class
+$\mathcal{A}_{d,n_K}$ is compressible at size $2^{O(d)}$
+(\leanname{softAttention_wellBehaved}), and the support-key heuristic predicts
+$O(n_K)$.  Does $\mathcal{A}_{d,n_K}$ in fact admit a compression scheme of size
+$O(n_K)$, or even $O(\VC)$?  This is \Cref{op:compression} instantiated for a
+contemporary architecture---part known unknown (the target is precise), part
+unknown known (no compression invariant specific to attention yet
+exists)~\cite{MoranYehudayoff2016}.
+\end{openprob}
+
+\begin{openprob}[Compression and recursive teaching]
+\label{op:rtd}
+The recursive teaching dimension $\mathrm{RTD}(\mathcal{H})$ is sandwiched with
+the VC dimension but the two can differ.  Is the optimal compression size
+$\Theta(\mathrm{RTD})$ rather than $\Theta(\VC)$?  A known unknown that would
+re-route the entire conjecture through teaching rather than
+shattering~\cite{SimonZilles2015}.
+\end{openprob}
+
+\begin{openprob}[Stable and replicable compression]
+\label{op:stable-compression}
+Does every VC class admit a compression scheme that is \emph{stable} under
+resampling---changing one training example changes $O(1)$ of the selected
+indices?  Stability would link compression to differential privacy and
+replicability, where an equivalence with online learnability is already
+known~\cite{BunLivniMoran2020}.  An unknown known: the stability invariant for
+compression has no accepted definition yet.
+\end{openprob}
+
+\begin{openprob}[List compression and the DS dimension]
+\label{op:list-compression}
+In multiclass learning, finite Daniely--Shalev-Shwartz (DS) dimension
+characterizes learnability.  Is finite DS dimension equivalent to a bounded
+\emph{list} compression scheme, where reconstruction outputs a short list of
+hypotheses containing a consistent one?  An unknown known---the multiclass
+compression vocabulary is still being built~\cite{BrukhimCarmonDinurMoranYehudayoff2022}.
+\end{openprob}
+
+\begin{openprob}[Fat-shattering compression]
+\label{op:fat-compression}
+For $[0,1]$-valued function classes, learnability is governed by the
+fat-shattering dimension $\mathrm{fat}_\gamma$.  Does finite $\mathrm{fat}_\gamma$
+imply a real-valued compression scheme of size $\mathrm{poly}(\mathrm{fat}_\gamma)$?
+A known unknown: the Boolean machinery does not transfer verbatim, and the
+scale parameter $\gamma$ has no settled role in the compressed object (Alon,
+Ben-David, Cesa-Bianchi, and Haussler).
+\end{openprob}
+
+\begin{openprob}[Super-linear lower bounds]
+\label{op:compression-lower}
+Every known VC-$d$ class compresses to $O(d)$ points; the obstruction to the
+conjecture is constructing schemes, not ruling them out.  Is there a VC-$d$
+class provably \emph{requiring} compression size $\omega(d)$?  No super-linear
+lower bound is known---a known unknown on the negative side of the ledger, and
+its resolution either way would be decisive.
+\end{openprob}
+
+\begin{openprob}[Boosting weak compression]
+\label{op:weak-compression}
+Call a scheme \emph{weak} if its reconstruction is correct on a
+$\tfrac{1}{2}+\gamma$ fraction of relabelings of the sample.  Does weak
+compression boost to full compression with only $O(\log(1/\gamma))$ overhead in
+size, mirroring the boosting of weak PAC learners?  An unknown known: a boosting
+operator on compression schemes has not been formulated~\cite{MoranYehudayoff2016}.
+\end{openprob}
 
 
 % ================================================================
