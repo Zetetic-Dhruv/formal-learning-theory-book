@@ -1,4 +1,7 @@
 % Chapter 1: The Objects of Learning
+% Rewritten against the design-lab Lean 4 kernel (FLT_Proofs.*):
+% typed definitions, full proofs isomorphic to the verified arguments,
+% audit-driven corrections, and a closing set of open problems.
 % concept_class = Profile G (hub node, parallax),
 % inductive_bias = Profile D (negative result centerpiece),
 % MDL/MML/Bayesian = Profile E (analogy triangle obstruction analysis)
@@ -8,7 +11,9 @@
 
 Every learning problem begins with the same question: given data drawn from an unknown source, find a rule that predicts well on future data. This chapter introduces the mathematical vocabulary for making that question precise.
 
-The vocabulary divides into three groups of unequal importance. The first group---domain, label, concept, hypothesis---is atomic: these are the sets and functions from which everything else is built. They require only brief definitions. The second group---concept class, hypothesis space, inductive bias---carries genuine mathematical content, because the relationships between these objects determine what is learnable. The third group---Bayesian inference, minimum description length, minimum message length---appears to be vocabulary but is actually a network of near-miss analogies, each encoding a different answer to the same question about model selection.
+The vocabulary divides into three groups of unequal importance. The first group---domain, label, concept, hypothesis---is atomic: these are the sets and functions from which everything else is built. They require only brief definitions. The second group---concept class, hypothesis space, version space, inductive bias---carries genuine mathematical content, because the relationships between these objects determine what is learnable; we prove the load-bearing facts in full. The third group---Bayesian inference, minimum description length, minimum message length---appears to be vocabulary but is actually a network of near-miss analogies, each encoding a different answer to the same question about model selection.
+
+Every typed object in this chapter has a counterpart in a machine-checked Lean~4 development, and every theorem whose proof we give is mirrored there. Where a result has a verified companion we name it in a footnote; where one does not exist, we cite the literature instead.
 
 \section{Atomic Vocabulary}
 \label{sec:atoms}
@@ -17,14 +22,19 @@ The following objects are the type-level substrate of learning theory. They are 
 
 \begin{defn}[Domain, Label, Concept]
 \label{def:domain-label-concept}
-A \emph{domain} $X$ is a set whose elements are called \emph{instances}. A \emph{label set} $Y$ is a set of possible outputs; in binary classification, $Y = \{0, 1\}$. A \emph{concept} is a function $c : X \to Y$.
+A \emph{domain} $X$ is a set whose elements are called \emph{instances}. A \emph{label set} $Y$ is a set of possible outputs; in binary classification, $Y = \{0, 1\}$. A \emph{concept} is a function $c : X \to Y$.\formal{FLT_Proofs.Basic.Concept}
 
-Equivalently, when $Y = \{0,1\}$, a concept $c$ can be identified with the subset $\{x \in X : c(x) = 1\} \subseteq X$. Both perspectives---function and set---are used throughout the literature. We adopt the function view as primary and the set view when it simplifies combinatorial arguments (as in shattering, \Cref{ch:dimensions}).
+Equivalently, when $Y = \{0,1\}$, a concept $c$ can be identified with the subset $\{x \in X : c(x) = 1\} \subseteq X$. Both perspectives---function and set---are used throughout the literature. We adopt the function view as primary, matching the typed definition $\leanname{Concept X Y} := X \to Y$, and switch to the set view when it simplifies combinatorial arguments (as in shattering, \cref{def:shatter-vc}).
 \end{defn}
 
-\begin{defn}[Hypothesis, Target Concept, Proper/Improper Flag]
+\begin{defn}[Hypothesis, Target Concept, Proper/Improper]
 \label{def:hypothesis-target}
-A \emph{hypothesis} $h : X \to Y$ is a candidate prediction rule that a learning algorithm might output. The \emph{target concept} $c^* \in \mathcal{C}$ is the specific concept that generated the training data. Learning is \emph{proper} if the algorithm's output is constrained to lie in $\mathcal{C}$, and \emph{improper} if it may use a larger hypothesis space $\mathcal{H} \supseteq \mathcal{C}$.
+A \emph{hypothesis} $h : X \to Y$ is a candidate prediction rule that a learning algorithm might output; as a type it is a concept by another name, $\leanname{Hypothesis X Y} := \leanname{Concept X Y}$, and the distinction is semantic: a hypothesis is the learner's guess, a concept is ground truth. The \emph{target concept} $c^\ast \in \mathcal{C}$ is the specific concept that generated the training data, an element of the subtype $\{c : c \in \mathcal{C}\}$. Learning is \emph{proper} when the learner's hypothesis space equals the concept class, $\mathcal{H} = \mathcal{C}$, and \emph{improper} when it may use a larger space $\mathcal{H} \supseteq \mathcal{C}$.\formal{FLT_Proofs.Basic.IsProper}
+\end{defn}
+
+\begin{defn}[Realizable and Agnostic]
+\label{def:realizable}
+The learning problem $(\mathcal{C}, \mathcal{H})$ is \emph{realizable} when every target is available to the learner, $\mathcal{C} \subseteq \mathcal{H}$.\formal{FLT_Proofs.Basic.Realizable} It is \emph{agnostic} when no such containment is assumed; the agnostic setting is precisely the \emph{absence} of a realizability hypothesis, and the learner competes against the best hypothesis in $\mathcal{H}$ rather than against a perfect one.
 \end{defn}
 
 An \emph{alphabet} $\Sigma$ is a finite symbol set; it appears only in the formal language chapters (\Cref{ch:automata,ch:gold}) and plays no role in statistical learning theory.
@@ -43,7 +53,7 @@ These definitions are unremarkable individually. The mathematical content begins
 
 \begin{defn}[Concept Class]
 \label{def:concept-class}
-A \emph{concept class} $\mathcal{C} \subseteq Y^X$ is a collection of concepts over a common domain. The class is the primary object of study: every major question in learning theory is a question about concept classes.
+A \emph{concept class} $\mathcal{C} \subseteq Y^X$ is a collection of concepts over a common domain; as a type, $\leanname{ConceptClass X Y} := \mathrm{Set}\,(\leanname{Concept X Y})$.\formal{FLT_Proofs.Basic.ConceptClass} The class is the primary object of study: every major question in learning theory is a question about concept classes.
 \end{defn}
 
 This definition is simple. Its importance is not. In the companion knowledge graph, \nde{concept\_class} is the single most connected node: 21 edges point into it, including \emph{every} complexity measure in the graph (Figure~\ref{fig:concept-class-hub}).
@@ -110,27 +120,77 @@ Each measure asks a different question about the same object:
 
 These 13 measures are not independent. Many of them are related by \rel{upper\_bounds}, \rel{lower\_bounds}, and \rel{characterizes} edges in the graph. But none of them is reducible to another. Each captures a genuine aspect of $\mathcal{C}$'s complexity that the others miss. The fact that a single mathematical object---a set of functions---supports 13 inequivalent complexity measures is one of the structural surprises of the field.
 
+The reason the concept class is the hub, rather than any one paradigm or measure, is a single theorem. To state it we need the first of the measures.
+
+\begin{defn}[Shattering and VC dimension]
+\label{def:shatter-vc}
+A finite set $S \subseteq X$ is \emph{shattered} by $\mathcal{C}$ if every labeling of $S$ is realized by some concept in $\mathcal{C}$:
+\[
+\text{$S$ shattered} \iff \forall\, f : S \to \{0,1\},\ \exists\, c \in \mathcal{C},\ \forall\, x \in S,\ c(x) = f(x).
+\]\formal{FLT_Proofs.Complexity.VCDimension.Shatters}
+The \emph{VC dimension} $\VC(\mathcal{C}) \in \N \cup \{\infty\}$ is the supremum of the cardinalities of shattered sets:
+\[
+\VC(\mathcal{C}) = \sup\{\,|S| : S \subseteq X \text{ finite and shattered by } \mathcal{C}\,\}.
+\]\formal{FLT_Proofs.Complexity.VCDimension.VCDim}
+\end{defn}
+
+The full theory of VC dimension is the subject of \Cref{ch:dimensions}; here we need only the definition and one elementary closure property, used repeatedly below: a subset of a shattered set is shattered. If $T \subseteq S$ and $S$ is shattered, then any labeling of $T$ extends to a labeling of $S$, which some concept realizes; restricting to $T$ proves $T$ shattered.\formal{FLT_Proofs.Complexity.Littlestone.Shatters.subset}
+
+\begin{thm}[VC characterization of PAC learnability]
+\label{thm:vc-char}
+For a concept class $\mathcal{C}$ over a measurable domain $X$ (subject to the mild measurability conditions of \Cref{ch:generalization}),
+\[
+\mathcal{C} \text{ is PAC learnable} \iff \VC(\mathcal{C}) < \infty.
+\]\formal{FLT_Proofs.Theorem.PAC.vc_characterization}
+\end{thm}
+
+The proof occupies \Cref{ch:pac} (sufficiency, via empirical risk minimization and uniform convergence) and \Cref{ch:dimensions} (necessity, via a hard distribution on a shattered set); it is the reason the concept class is the hub of \cref{fig:concept-class-hub}. The class, through a single combinatorial invariant of itself, decides its own learnability. The equivalence extends to a five-way characterization---PAC learnability, finite VC dimension, the existence of a bounded sample compression scheme, uniform convergence of Rademacher complexity, and a finite sample-complexity bound are all equivalent.\formal{FLT_Proofs.Theorem.PAC.fundamental_theorem} We meet the compression and Rademacher faces in \Cref{ch:compression,ch:generalization}.
+
+\begin{remark}[The equivalence is asymmetric]
+\label{rmk:vc-asymmetry}
+\Cref{thm:vc-char} is an ``iff'', but its two halves are proved by opposite kinds of argument. The sufficiency direction ($\VC < \infty \Rightarrow$ learnable) is constructive: it exhibits an algorithm---empirical risk minimization---and bounds its error. The necessity direction (learnable $\Rightarrow \VC < \infty$) is non-constructive: from an infinite VC dimension it produces a distribution on which every learner fails, without exhibiting any particular hard instance the learner must confront in advance. The two directions cross the boundary between combinatorics and measure theory in opposite directions, and whether the necessity direction admits a constructive proof is open (\cref{op:asymmetry}).
+\end{remark}
+
+We can now compute the invariant on the smallest interesting classes, and in doing so witness a separation that recurs throughout the book.
+
 \begin{example}[Four concept classes of increasing complexity]
 \label{ex:concept-classes}
 Fix $X = \R$.
 \begin{enumerate}[label=(\alph*),leftmargin=*,itemsep=3pt]
-\item \textbf{Thresholds:} $\mathcal{C}_1 = \{x \mapsto \ind[x \geq \theta] : \theta \in \R\}$.
-\begin{itemize}[nosep]
-\item $\VC = 1$, $\Ldim = \infty$, teaching dimension $= 2$.
-\item PAC learnable (1 sample suffices up to $\varepsilon$). Not online learnable (adversary forces arbitrarily many mistakes by approaching the threshold).
-\end{itemize}
-\item \textbf{Intervals:} $\mathcal{C}_2 = \{x \mapsto \ind[a \leq x \leq b] : a \leq b \in \R\}$.
-\begin{itemize}[nosep]
-\item $\VC = 2$, $\Ldim = \infty$.
-\end{itemize}
-\item \textbf{Unions of $k$ intervals:} $\mathcal{C}_3^{(k)}$. $\VC = 2k$.
-\item \textbf{All measurable functions:} $\mathcal{C}_4 = \{0,1\}^X$.
-\begin{itemize}[nosep]
-\item $\VC = \infty$. Not PAC learnable, not online learnable, not identifiable in the limit. The NFL theorem (\Cref{sec:inductive-bias}) applies in full force.
-\end{itemize}
+\item \textbf{Thresholds:} $\mathcal{C}_1 = \{x \mapsto \ind[x \geq \theta] : \theta \in \R\}$. Here $\VC(\mathcal{C}_1) = 1$ and $\Ldim(\mathcal{C}_1) = \infty$ (\cref{prop:threshold-vc,prop:threshold-ldim}).
+\item \textbf{Intervals:} $\mathcal{C}_2 = \{x \mapsto \ind[a \leq x \leq b] : a \leq b \in \R\}$. Here $\VC(\mathcal{C}_2) = 2$: the two-point set $\{0,1\}$ is shattered (the four labelings are realized by intervals disjoint from both, containing only $0$, only $1$, or both), while no three points $x_1 < x_2 < x_3$ are, because the labeling $(1,0,1)$ would require an interval containing $x_1$ and $x_3$ but not $x_2$.
+\item \textbf{Unions of $k$ intervals:} $\mathcal{C}_3^{(k)}$, with $\VC(\mathcal{C}_3^{(k)}) = 2k$ by the same argument applied $k$ times; the detailed counting is deferred to \Cref{ch:dimensions}.
+\item \textbf{All measurable functions:} $\mathcal{C}_4 = \{0,1\}^X$, with $\VC(\mathcal{C}_4) = \infty$. By \cref{thm:vc-char} it is not PAC learnable; by the same token it is not online learnable nor identifiable in the limit. The No-Free-Lunch theorem (\cref{thm:nfl}) applies to it in full force.
 \end{enumerate}
-The thresholds example deserves attention: $\VC = 1$ but $\Ldim = \infty$. This single class witnesses the separation between PAC and online learning (\Cref{ch:separations}).
+The thresholds deserve attention: finite VC dimension but infinite Littlestone dimension. This single class witnesses the separation between PAC and online learning (\Cref{ch:separations}). We prove both values now, because the proofs are the prototypes for the shattering and adversary arguments used throughout.
 \end{example}
+
+\begin{prop}[Thresholds have VC dimension one]
+\label{prop:threshold-vc}
+The class $\mathcal{C}_1 = \{x \mapsto \ind[x \geq \theta] : \theta \in \R\}$ has $\VC(\mathcal{C}_1) = 1$.
+\end{prop}
+
+\begin{proof}
+\emph{At least one.} The singleton $\{x_0\}$ is shattered: the labeling $x_0 \mapsto 1$ is realized by any $\theta \leq x_0$, and $x_0 \mapsto 0$ by any $\theta > x_0$.
+
+\emph{Not two.} Let $x_1 < x_2$. The labeling $f(x_1) = 1$, $f(x_2) = 0$ asks for a threshold $\theta$ with $x_1 \geq \theta$ and $x_2 < \theta$, hence $x_2 < \theta \leq x_1$, contradicting $x_1 < x_2$. So no two-point set is shattered. By \cref{def:shatter-vc}, $\VC(\mathcal{C}_1) = 1$.
+\end{proof}
+
+\begin{prop}[Thresholds have infinite Littlestone dimension]
+\label{prop:threshold-ldim}
+The class $\mathcal{C}_1$ admits, against any online learner, a realizable sequence forcing an unbounded number of mistakes; hence $\Ldim(\mathcal{C}_1) = \infty$.
+\end{prop}
+
+\begin{proof}
+We exhibit an adversary that forces a mistake every round while keeping the transcript consistent with some threshold. The adversary maintains an open interval $(a,b)$ of still-admissible thresholds, initialized to $(0,1)$. At each round it presents the midpoint $x = (a+b)/2$ and reads the learner's prediction $\hat{y} = \ind[x \geq \hat\theta]$. It then declares the true label to be $1 - \hat{y}$ and updates:
+\begin{itemize}[nosep]
+\item if $\hat{y} = 1$, declare label $0$ (meaning $x < \theta$, i.e.\ $\theta > x$) and set $(a,b) \leftarrow (x, b)$;
+\item if $\hat{y} = 0$, declare label $1$ (meaning $x \geq \theta$, i.e.\ $\theta \leq x$) and set $(a,b) \leftarrow (a, x)$.
+\end{itemize}
+After the update the interval $(a,b)$ remains nonempty (the midpoint strictly separates it), and \emph{every} $\theta$ in it is consistent with the entire transcript so far: each declared label $\ind[x_i \geq \theta]$ is correct for such $\theta$ by construction. Thus the sequence is realizable by the class at every finite stage, yet the learner errs at every round. Since the number of rounds is unbounded, the realizable mistake bound is infinite, and therefore $\Ldim(\mathcal{C}_1) = \infty$.\formal{FLT_Proofs.Theorem.Separation.adversary_from_shatters}
+\end{proof}
+
+\Cref{prop:threshold-vc,prop:threshold-ldim} together discharge the claim of \cref{ex:concept-classes}(a): the same class is trivially PAC learnable (one example pins the threshold up to $\varepsilon$) yet admits no finite online mistake bound. Because \cref{prop:threshold-ldim} forces unbounded mistakes against every learner, the gap is a genuine separation; we return to it in \Cref{ch:separations}.
 
 % ================================================================
 % HYPOTHESIS SPACE: Profile B-light
@@ -142,7 +202,7 @@ The thresholds example deserves attention: $\VC = 1$ but $\Ldim = \infty$. This 
 
 \begin{defn}[Hypothesis Space]
 \label{def:hypothesis-space}
-A \emph{hypothesis space} $\mathcal{H} \subseteq Y^X$ is the set of functions available to the learner as candidate outputs. When $\mathcal{H} = \mathcal{C}$, learning is \emph{proper}; when $\mathcal{H} \supsetneq \mathcal{C}$, learning is \emph{improper}.
+A \emph{hypothesis space} $\mathcal{H} \subseteq Y^X$ is the set of functions available to the learner as candidate outputs. As a type it is structurally identical to a concept class, $\leanname{HypothesisSpace X Y} := \mathrm{Set}\,(\leanname{Concept X Y})$, and semantically distinct: $\mathcal{C}$ is the ground-truth collection, $\mathcal{H}$ is what the learner may return. When $\mathcal{H} = \mathcal{C}$, learning is \emph{proper}; when $\mathcal{H} \supsetneq \mathcal{C}$, learning is \emph{improper}.
 \end{defn}
 
 The proper--improper distinction is not merely notational. It has computational consequences that are among the sharpest in the theory:
@@ -152,19 +212,67 @@ The proper--improper distinction is not merely notational. It has computational 
 
 \item \textbf{Computational hardness often depends on properness.} Cryptographic hardness results (Kearns--Valiant, 1994) typically establish hardness of \emph{proper} learning; improper learners may circumvent the barrier by using richer representations~\cite{KearnsValiant1994}.
 
-\item \textbf{The fundamental theorem is representation-independent.} The VC characterization of PAC learnability holds regardless of whether learning is proper or improper---what matters is the VC dimension of the \emph{target} class $\mathcal{C}$, not of the learner's hypothesis space $\mathcal{H}$.
+\item \textbf{The characterization is representation-independent.} \Cref{thm:vc-char} holds regardless of whether learning is proper or improper. What decides learnability is $\VC(\mathcal{C})$, the VC dimension of the \emph{target} class, not any property of the learner's hypothesis space $\mathcal{H}$. The learner's freedom to range outside $\mathcal{C}$ affects cost, not possibility.
 \end{enumerate}
+
+The simplest object built from $\mathcal{H}$ and data together is the set of survivors.
 
 \begin{defn}[Version Space]
 \label{def:version-space}
-Given a training sample $S = \{(x_i, y_i)\}_{i=1}^m$, the \emph{version space} is
-$\mathrm{VS}_{\mathcal{H},S} = \{h \in \mathcal{H} : h(x_i) = y_i \text{ for all } i\},$
-the set of hypotheses consistent with all observed data.
+Given a hypothesis space $\mathcal{H}$ and a sample $S = \{(x_i, y_i)\}_{i=1}^m$, the \emph{version space} is
+\[
+\mathrm{VS}_{\mathcal{H},S} = \{h \in \mathcal{H} : h(x_i) = y_i \text{ for all } i\},
+\]
+the set of hypotheses consistent with all observed data.\formal{FLT_Proofs.Complexity.GameInfra.versionSpace} The verified development carries both this operational form and a bundled structure $\leanname{VersionSpace}$ packaging $\mathcal{H}$, the data, and the consistency proof obligations together.\formal{FLT_Proofs.Basic.VersionSpace}
 \end{defn}
 
-The version space is the simplest object one can define from $\mathcal{H}$ and $S$ together: just the set of survivors. Version space elimination---outputting any element of $\mathrm{VS}_{\mathcal{H},S}$---is perhaps the most natural learning algorithm imaginable.
+Version-space elimination---returning any element of $\mathrm{VS}_{\mathcal{H},S}$---is perhaps the most natural learning algorithm imaginable. Its basic behavior is captured by four propositions, each a one-line consequence of the definition, and each the prototype for the convergence arguments of \Cref{ch:gold}.
 
-The trouble is computational. For most hypothesis classes of interest, the version space cannot be efficiently represented, enumerated, or even sampled from. The \emph{star number} of $\mathcal{H}$ (\Cref{ch:dimensions}) measures one aspect of this difficulty: it is the size of the largest star-shaped substructure in $\mathcal{H}$'s dual, and its finiteness turns out to be equivalent to finite VC dimension. The \emph{eluder dimension}~\cite{RussoVanRoy2013} measures another aspect relevant to exploration--exploitation tradeoffs.
+\begin{prop}[Soundness, persistence, and monotonicity of the version space]
+\label{prop:version-space}
+Fix $\mathcal{H}$, a target $c \in \mathcal{H}$, and a sample $S$ labeled by $c$. Then
+\begin{enumerate}[label=(\roman*),leftmargin=*,itemsep=2pt]
+\item $\mathrm{VS}_{\mathcal{H},S} \subseteq \mathcal{H}$;\formal{FLT_Proofs.Complexity.GameInfra.versionSpace_subset}
+\item $c \in \mathrm{VS}_{\mathcal{H},S}$;\formal{FLT_Proofs.Complexity.GameInfra.target_in_versionSpace}
+\item $\mathrm{VS}_{\mathcal{H},\,S \cup \{(x,y)\}} \subseteq \mathrm{VS}_{\mathcal{H},S}$ for any further labeled example $(x,y)$;\formal{FLT_Proofs.Complexity.GameInfra.versionSpace_append}
+\item $\Ldim(\mathrm{VS}_{\mathcal{H},S}) \leq \Ldim(\mathcal{H})$.\formal{FLT_Proofs.Complexity.GameInfra.ldim_versionSpace_le}
+\end{enumerate}
+\end{prop}
+
+\begin{proof}
+(i) An element of $\mathrm{VS}_{\mathcal{H},S}$ is by definition a member of $\mathcal{H}$ satisfying the consistency constraints; forgetting the constraints gives membership in $\mathcal{H}$.
+
+(ii) The target $c$ lies in $\mathcal{H}$ by hypothesis, and since $S$ is labeled by $c$ we have $c(x_i) = y_i$ for every $i$; so $c$ meets both defining conditions and lies in the version space. In particular the version space is never empty in the realizable case.
+
+(iii) Adding a labeled example $(x,y)$ adjoins the constraint $h(x) = y$ to the defining conjunction. Any $h$ satisfying the larger conjunction satisfies the smaller one, so the consistent set can only shrink.
+
+(iv) By (i), $\mathrm{VS}_{\mathcal{H},S} \subseteq \mathcal{H}$. The Littlestone dimension is monotone under inclusion: a mistake tree shattered by a subclass is shattered, unchanged, by the superclass (each labeling realized inside the subclass is realized inside the superclass). Taking the supremum of shattered-tree depths over the smaller class gives a value no larger than over the larger one.
+\end{proof}
+
+Item (iii) is the engine of identification in the limit: as data accumulates, the version space contracts monotonically, and the question of \Cref{ch:gold} is whether it contracts to the target. Item (iv) says that this contraction never makes the residual problem harder in the online sense---a fact the Standard Optimal Algorithm exploits to achieve the optimal mistake bound.
+
+The trouble with version-space elimination is computational. For most hypothesis classes of interest, the version space cannot be efficiently represented, enumerated, or sampled from. Two dual invariants quantify aspects of this difficulty. The \emph{eluder dimension}~\cite{RussoVanRoy2013} measures how long an adversary can keep producing examples on which consistent hypotheses still disagree, controlling exploration--exploitation tradeoffs. The \emph{star number} measures a complementary, purely combinatorial quantity.
+
+\begin{defn}[Star number]
+\label{def:star-number}
+The \emph{star number} of $\mathcal{C}$ is the largest $d$ for which there is a set $S = \{x_1,\dots,x_d\}$ such that each point can be isolated: for every $x \in S$ there is a concept $c_x \in \mathcal{C}$ with $c_x(x) = 1$ and $c_x(y) = 0$ for all other $y \in S$.\formal{FLT_Proofs.Complexity.VCDimension.StarNumber}
+\end{defn}
+
+The star number is never smaller than the VC dimension, and the proof is immediate from shattering.
+
+\begin{prop}[Star number dominates VC dimension]
+\label{prop:star-ge-vc}
+For every concept class, $\VC(\mathcal{C}) \leq \mathrm{star}(\mathcal{C})$.
+\end{prop}
+
+\begin{proof}
+Let $S$ be a shattered set of size $d = \VC(\mathcal{C})$ (if $\VC(\mathcal{C}) = \infty$, apply the argument to shattered sets of every size). For each $x \in S$ the single labeling ``$x \mapsto 1$, all other points of $S$ $\mapsto 0$'' is one of the labelings realized by shattering, so there is a concept isolating $x$ within $S$. Hence $S$ witnesses the star condition, and $\mathrm{star}(\mathcal{C}) \geq |S| = d$.
+\end{proof}
+
+\begin{warning}[The reverse inequality fails, and so does the folklore equivalence]
+\label{rmk:star-not-equiv}
+It is tempting to believe that finiteness of the star number is \emph{equivalent} to finiteness of the VC dimension. It is not. Consider the class of singletons on an infinite domain, $\mathcal{C} = \{\ind[\cdot = a] : a \in X\}$. Its VC dimension is $1$: a single point $\{a\}$ is shattered ($\ind[\cdot=a]$ labels it $1$, any other singleton labels it $0$), but no pair $\{a,b\}$ is, because labeling both points $1$ would require a single concept true at $a$ and $b$, which no singleton is. Yet its star number is infinite: for \emph{any} finite set $S$ and any $x \in S$, the concept $\ind[\cdot = x]$ isolates $x$ within $S$, so every finite $S$ is a star set. Thus $\VC = 1$ while $\mathrm{star} = \infty$. Finiteness of the star number is therefore strictly stronger than finiteness of the VC dimension; the implication runs one way only (\cref{prop:star-ge-vc}). The star number governs the label complexity of \emph{active} learning, where this gap is exactly the point~\cite{HannekeYang2015}; we return to it in \Cref{ch:dimensions}. Identifying which finite-VC classes have finite star number is open (\cref{op:star}).
+\end{warning}
 
 % ================================================================
 % INDUCTIVE BIAS: Profile D (Negative Result)
@@ -179,7 +287,14 @@ The trouble is computational. For most hypothesis classes of interest, the versi
 The \emph{inductive bias} of a learner is the set of assumptions---explicit or implicit---that it uses to generalize from training data to unseen instances.
 \end{defn}
 
-This definition is deliberately informal, because inductive bias is not a single mathematical object. It is a meta-concept whose formalization changes across paradigms:
+This informal definition is the one usually given, and it suggests that inductive bias is not a single mathematical object. That suggestion is half right. The \emph{content} of a bias does change across paradigms, as the table below records. But the \emph{form} is uniform, and can be typed: a bias is a hypothesis space together with a real-valued preference ranking on concepts, structured so that nothing outside the space is preferred to anything inside it.
+
+\begin{defn}[Inductive bias, typed]
+\label{def:inductive-bias-typed}
+An \emph{inductive bias} over $X, Y$ is a triple $(\mathcal{H}, \mathrm{pref}, \pi)$ where $\mathcal{H} \subseteq Y^X$ is a hypothesis space, $\mathrm{pref} : Y^X \to \R$ is a preference score (lower is more preferred), and $\pi$ is the constraint that every concept outside $\mathcal{H}$ is scored at least as high as every concept inside it: $h \notin \mathcal{H} \Rightarrow \mathrm{pref}(h') \leq \mathrm{pref}(h)$ for all $h' \in \mathcal{H}$.\formal{FLT_Proofs.Basic.InductiveBias}
+\end{defn}
+
+This single structure subsumes the standard readings. Reading $\mathrm{pref}(h) = -\log P(h)$ recovers the Bayesian prior; reading $\mathrm{pref}(h)$ as description length recovers minimum description length; reading it as the index of the first class in a nested hierarchy containing $h$ recovers structural risk minimization. The differences between these readings are real (\cref{sec:model-selection}), but they are differences of \emph{which} preference score, inside one type.
 
 \begin{center}\small
 \begin{tabularx}{\textwidth}{@{}l l X@{}}
@@ -194,28 +309,55 @@ Computational & Cryptographic assumption restricting efficient search & \rel{req
 \end{tabularx}
 \end{center}
 
-The reason inductive bias is not merely a design choice but a \emph{mathematical necessity} is the No-Free-Lunch theorem.
+Inductive bias is not a design choice but a \emph{mathematical necessity}, and the reason is the No-Free-Lunch theorem. We prove it through its combinatorial engine, then read off the classical statement and the necessity of bias as corollaries.
+
+\begin{lemma}[Shattering forces a hard concept]
+\label{lem:nfl-engine}
+Let $T \subseteq X$ be shattered by $\mathcal{C}$ with $|T| > 2m$. For any $m$ instances $x_1,\dots,x_m$ and any hypothesis $h : X \to \{0,1\}$, there is a concept $c \in \mathcal{C}$ such that
+\begin{enumerate}[label=(\roman*),leftmargin=*,nosep]
+\item $c$ agrees with $h$ on every sample point that lies in $T$: $c(x_i) = h(x_i)$ whenever $x_i \in T$; and
+\item $c$ disagrees with $h$ on more than a quarter of $T$: $\bigl|\{x \in T : c(x) \neq h(x)\}\bigr| > |T|/4$.
+\end{enumerate}\formal{FLT_Proofs.Complexity.Generalization.nfl_per_sample_shattered}
+\end{lemma}
+
+\begin{proof}
+Define an adversarial labeling $f : T \to \{0,1\}$ that copies $h$ on the seen points and flips it on the rest:
+\[
+f(x) = \begin{cases} h(x) & \text{if } x \in \{x_1,\dots,x_m\},\\ 1 - h(x) & \text{otherwise.}\end{cases}
+\]
+Because $T$ is shattered, some $c \in \mathcal{C}$ realizes $f$ on $T$, i.e.\ $c(x) = f(x)$ for all $x \in T$. On a seen point $x_i \in T$ we have $c(x_i) = f(x_i) = h(x_i)$, giving (i). On an unseen point $x \in T$ we have $c(x) = f(x) = 1 - h(x) \neq h(x)$, so $c$ disagrees with $h$ on the entire unseen part of $T$. The unseen part has size at least $|T| - m$, since the $m$ sample points can cover at most $m$ elements of $T$. Finally, $|T| > 2m$ gives $|T| - m > |T|/2 > |T|/4$, so the disagreement count exceeds $|T|/4$, which is (ii).
+\end{proof}
 
 \begin{thm}[No Free Lunch {\cite{Wolpert1996}}]
 \label{thm:nfl}
-Let $A$ be any learning algorithm. For any sample size $m \leq |X|/2$:
+Let $A$ be any learning algorithm that observes $m$ labeled examples, and suppose $\mathcal{C}$ shatters some set $T$ with $|T| \geq 2m$. Then there is a target concept $c^\ast \in \mathcal{C}$ and the uniform distribution $D$ on $T$ such that
 \[
-\max_{c \in \{0,1\}^X} \E_{S \sim D^m}[\risk_D(A(S))] \geq \frac{1}{4}.
+\E_{S \sim D^m}\bigl[\risk_D(A(S))\bigr] \geq \tfrac{1}{4},
 \]
-That is, for every learner, there exists a target function on which the learner's expected error is at least $1/4$---no better than random guessing on two labels.
+where $S$ is labeled by $c^\ast$. In particular, no learner does better than this on its worst target: averaging cannot rescue what shattering has spoiled.
 \end{thm}
 
 \begin{proof}
-Fix any algorithm $A$. Consider the uniform distribution on $X$. For any training sample $S$ of size $m$, let $T = X \setminus \{x_1, \ldots, x_m\}$ be the unseen instances ($|T| \geq |X|/2$).
-
-The labels on $T$ are unconstrained by $S$ (since we average over all target functions). For each $x \in T$, the target label is equally likely to be $0$ or $1$ under the uniform distribution over target functions. Therefore the expected error of $A(S)$ on each unseen point is exactly $1/2$. Since $|T|/|X| \geq 1/2$, the overall error is at least $1/4$.
+Take $|T| = 2m$ and let $D$ be uniform on $T$. Shattering realizes all $2^{|T|}$ labelings of $T$ inside $\mathcal{C}$; let $c$ range uniformly over these $2^{2m}$ concepts. It suffices to bound the average risk over $c$ from below by $1/4$, since the maximum over targets is at least the average. Writing the risk as an average of disagreement indicators over $T$ and exchanging the (finite) expectations,
+\[
+\E_{c}\,\E_{S \sim D^m}\bigl[\risk_D(A(S))\bigr]
+= \frac{1}{|T|}\sum_{x \in T} \E_{S}\,\E_{c}\bigl[\ind[A(S)(x) \neq c(x)]\bigr].
+\]
+Fix a draw $S$ of $m$ points and a point $x \in T$ not among them. The learner's output $A(S)$ depends on $c$ only through the labels at the seen points, so $A(S)(x)$ is independent of $c(x)$; and $c(x)$ is a uniform bit. Hence the inner expectation is exactly $\tfrac{1}{2}$ for every unseen $x$. The unseen points number at least $|T| - m = m = |T|/2$, so the average is at least $\tfrac{1}{|T|}\cdot \tfrac{|T|}{2}\cdot\tfrac{1}{2} = \tfrac14$. Some target $c^\ast$ therefore attains $\E_S[\risk_D(A(S))] \geq \tfrac14$. (The per-sample form of this argument, which builds the hard target adversarially rather than on average, is \cref{lem:nfl-engine}.)
 \end{proof}
 
-The NFL theorem has a precise structural consequence. It says that the class $\{0,1\}^X$ of \emph{all} binary functions is not learnable. Therefore any learnable class must be a \emph{proper subset} of $\{0,1\}^X$. The choice of which proper subset---the choice of $\mathcal{C}$---is exactly the inductive bias. This is why inductive bias is mandatory, not optional.
+\begin{cor}[Inductive bias is mandatory]
+\label{cor:bias-mandatory}
+A concept class of infinite VC dimension is not PAC learnable; in particular the class $\{0,1\}^X$ of all binary functions on an infinite domain is not learnable. Consequently every learnable class is a proper subset of $\{0,1\}^X$, and the choice of which subset is exactly the inductive bias.
+\end{cor}
 
-\begin{remark}[NFL as a Pl-boundary]
+\begin{proof}
+If $\VC(\mathcal{C}) = \infty$, then $\mathcal{C}$ shatters sets of every size, so for each sample budget $m$ it shatters some $T$ with $|T| \geq 2m$. \Cref{thm:nfl} then supplies, for every learner, a target and distribution on which the expected error is at least $1/4$; taking $\varepsilon, \delta < 1/4$ shows the PAC criterion cannot be met. Hence infinite VC dimension precludes PAC learning---the necessity half of \cref{thm:vc-char}, here proved directly.\formal{FLT_Proofs.Complexity.Generalization.vcdim_infinite_not_pac} Since $\{0,1\}^X$ has infinite VC dimension, it is unlearnable, so any learnable class omits some functions; the omission \emph{is} the assumption that those functions are not the target.
+\end{proof}
+
+\begin{remark}[No-Free-Lunch as a boundary of askability]
 \label{rmk:nfl-pl}
-In the language of the graph, the NFL theorem establishes that \nde{inductive\_bias} is a \rel{requires\_assumption} dependency for \nde{computational\_hardness}: without inductive bias, the question ``which classes are efficiently learnable?'' is not even askable, because no class is learnable at all. The NFL theorem is a plausibility boundary---it tells you what is not even admissible to ask about learning without first restricting $\mathcal{C}$.
+\Cref{cor:bias-mandatory} is more than a negative result; it relocates inductive bias from the engineering of a learner to the precondition of the question. Before a class is fixed, ``which functions are efficiently learnable?'' has no nontrivial answer, because none are. Inductive bias is what makes the learnability question askable at all. The graph encodes this as a \rel{requires\_assumption} dependency from \nde{inductive\_bias} into \nde{computational\_hardness}: the hardness theory presupposes the restriction that No-Free-Lunch shows to be unavoidable.
 \end{remark}
 
 % ================================================================
@@ -226,13 +368,13 @@ In the language of the graph, the NFL theorem establishes that \nde{inductive\_b
 \section{Three Faces of Model Selection}
 \label{sec:model-selection}
 
-Bayesian inference, minimum description length, and minimum message length are often described informally as ``the same idea.'' They are not. Each formalizes a different answer to the question ``which hypothesis should I prefer?''---and the differences between them are more instructive than any individual definition.
+Bayesian inference, minimum description length, and minimum message length are often described informally as ``the same idea.'' They are not. Each formalizes a different answer to the question ``which hypothesis should I prefer?''---and the differences between them are more instructive than any individual definition. Each is, in the sense of \cref{def:inductive-bias-typed}, a choice of preference score; the analogies among them are analogies among scores, and the obstructions are precisely where the scores fail to agree.
 
 \subsection{The Definitions}
 
 \begin{defn}[Bayesian Inference]
 \label{def:bayesian}
-Given a prior $P(h)$ over $\mathcal{H}$ and a likelihood $P(S \mid h)$, the posterior is $P(h \mid S) \propto P(S \mid h) \cdot P(h)$. The Bayesian learner outputs $\hat{h} = \arg\max_{h} P(h \mid S)$ (MAP) or the full posterior $P(\cdot \mid S)$.
+Given a prior $P(h)$ over $\mathcal{H}$ and a likelihood $P(S \mid h)$, the posterior is $P(h \mid S) \propto P(S \mid h) \cdot P(h)$. The Bayesian learner outputs $\hat{h} = \arg\max_{h} P(h \mid S)$ (MAP) or the full posterior $P(\cdot \mid S)$. As a type, a Bayesian learner bundles a prior with the posterior-update rule and converts to an ordinary batch learner by MAP read-off.\formal{FLT_Proofs.Learner.Bayesian.BayesianLearner}
 \end{defn}
 
 \begin{defn}[Minimum Description Length {\cite{Rissanen1978}}]
@@ -290,36 +432,108 @@ These three methods sit in a triangular analogy network in the graph, connected 
 \textbf{MDL $\leftrightarrow$ Bayesian:} obstruction type \emph{type\_mismatch}. MDL uses description lengths (integers under a code); Bayesian inference uses probability densities (reals under a measure). The connection $L(h) = -\log P(h)$ identifies description lengths with log-probabilities, but this identification breaks down when the code is not prefix-free or the prior is improper.
 \end{obstbox}
 
-The fact that three different formalization of ``prefer the simpler hypothesis'' are \emph{not} equivalent---and that the reasons for non-equivalence are themselves different (missing witness, missing witness, and type mismatch)---is a structural feature of learning theory that no single definition can convey. It is visible only in the graph.
+That three different formalizations of ``prefer the simpler hypothesis'' are \emph{not} equivalent---and that the reasons for non-equivalence are themselves different (missing witness, missing witness, and type mismatch)---is a structural feature of learning theory that no single definition can convey. It is visible only in the graph.
+
+One bridge across this network is an actual theorem. The preference score of a Bayesian or MDL learner does control generalization, through the PAC-Bayes bound: for any prior fixed before seeing the data and any posterior, the expected risk is bounded by the empirical risk plus a complexity term governed by the $\KL$ divergence from prior to posterior~\cite{McAllester1999}. The bound is proved for finite hypothesis spaces in the verified development.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite} The obstruction boxes concern the three \emph{procedures}, which are not interchangeable; PAC-Bayes concerns the \emph{quantity} they share, a prior-weighted complexity, and shows it bounds error.
+
+\subsection{Compression, Occam, and the Fundamental Theorem}
+
+The MDL idea---prefer the hypothesis that compresses the data---connects directly to \cref{thm:vc-char}. A \emph{sample compression scheme} of size $k$ reconstructs any consistent labeling from a subsequence of at most $k$ of its own examples. Compression and finite VC dimension are equivalent.
+
+\begin{thm}[Compression characterizes finite VC dimension {\cite{MoranYehudayoff2016}}]
+\label{thm:compression-char}
+A concept class has finite VC dimension if and only if it admits a sample compression scheme of bounded size (with side information):
+\[
+\VC(\mathcal{C}) < \infty \iff \exists\, k,\ \mathcal{C} \text{ has a size-}k\text{ compression scheme with side information.}
+\]\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression}
+\end{thm}
+
+We prove this in \Cref{ch:compression}; here it closes the circle. Through \cref{thm:vc-char,thm:compression-char}, ``prefer the hypothesis that compresses'' and ``prefer the learnable hypothesis'' are the same condition on the class. The qualification ``with side information'' carries weight: whether every class of VC dimension $d$ admits a compression scheme of size $O(d)$ \emph{without} side information is the Littlestone--Warmuth conjecture, still open, and isolated as such in the verified development (\cref{op:compression}).\formal{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening}
 
 \subsection{Structural Risk Minimization}
 
 \begin{defn}[Structural Risk Minimization {\cite{Vapnik1998}}]
 \label{def:srm}
-Given a nested sequence of hypothesis classes $\mathcal{H}_1 \subset \mathcal{H}_2 \subset \cdots$ with $\VC(\mathcal{H}_k) = d_k$, select $k^*$ minimizing $\emprisk_{\mathcal{H}_k}(h) + \mathrm{penalty}(d_k, m, \delta)$.
+Given a nested sequence of hypothesis classes $\mathcal{H}_1 \subset \mathcal{H}_2 \subset \cdots$ with $\VC(\mathcal{H}_k) = d_k$, select $k^\ast$ minimizing $\emprisk_{\mathcal{H}_k}(h) + \mathrm{penalty}(d_k, m, \delta)$.
 \end{defn}
 
-SRM is the operational realization of inductive bias within VC theory: instead of choosing a single $\mathcal{H}$, choose a hierarchy indexed by complexity, and let the data select the level. The graph records this as an \rel{analogy} edge from \nde{srm} to \nde{inductive\_bias} with a \emph{type\_mismatch} obstruction: SRM constructs inductive bias via structural nesting, but the concept of ``inductive bias'' itself is broader than any single construction.
+SRM is the operational realization of inductive bias within VC theory: instead of choosing a single $\mathcal{H}$, choose a hierarchy indexed by complexity, and let the data select the level. In the language of \cref{def:inductive-bias-typed}, SRM's preference score is the index $k$ of the first class containing $h$; the nesting guarantees the monotonicity condition $\pi$. The graph records an \rel{analogy} edge from \nde{srm} to \nde{inductive\_bias} with a \emph{type\_mismatch} obstruction, because SRM constructs a bias by structural nesting while ``inductive bias'' as a concept is broader than any one construction.
 
 \begin{defn}[Algorithmic Probability {\cite{Solomonoff1964}}]
 \label{def:alg-prob}
 The \emph{Solomonoff prior} assigns to each string $x$ the probability $M(x) = \sum_{p : U(p)=x} 2^{-|p|}$, summing over all programs $p$ that produce $x$ on a universal Turing machine $U$. This is the ``prior that assigns higher probability to simpler explanations'' in the most literal possible sense.
 \end{defn}
 
-Algorithmic probability connects directly to Kolmogorov complexity ($K(x) \approx -\log M(x)$) and provides the information-theoretic foundation for MDL. Its detailed treatment belongs to \Cref{ch:compression}, where it interacts with compression schemes and Occam's razor.
+Algorithmic probability connects to Kolmogorov complexity through the coding theorem, $K(x) = -\log M(x) + O(1)$, and provides the information-theoretic foundation for MDL. Its detailed treatment belongs to \Cref{ch:compression}, where it interacts with compression schemes and Occam's razor; the explicit constant in the coding theorem is itself a target for formalization (\cref{op:solomonoff}).
 
 \section{What This Chapter Established}
 \label{sec:ch1-summary}
 
-The base vocabulary of learning theory is small: domain, label, concept, concept class, hypothesis space. But even at this level, three structural features are already visible:
+The base vocabulary of learning theory is small: domain, label, concept, concept class, hypothesis space, version space. Each is a type, and each typed object has a machine-checked counterpart. At this level alone, four structural features are already visible.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item The concept class is a hub node: the same object is measured by 13 inequivalent complexity measures. This multiplicity is not redundancy---it reflects the fact that learnability has 13 genuinely different aspects.
+\item The concept class is a hub node: the same object is measured by 13 inequivalent complexity measures, and one of them---the VC dimension---decides learnability outright (\cref{thm:vc-char}). The multiplicity is not redundancy; it reflects 13 genuinely different aspects of a single object.
 
-\item Inductive bias is not optional. The NFL theorem converts it from a design choice to a mathematical necessity.
+\item Inductive bias is not optional. The No-Free-Lunch theorem (\cref{thm:nfl}), proved here through its shattering engine, converts bias from a design choice into a precondition for the learnability question to be askable at all (\cref{cor:bias-mandatory}).
 
-\item The three standard model selection principles (Bayesian, MDL, MML) form a triangle of near-miss analogies. They look equivalent; they are not; and the reasons for non-equivalence are themselves informative.
+\item Negative results are content, and rigor catches folklore. The asserted equivalence between finiteness of the star number and of the VC dimension is false, with singletons as an explicit witness (\cref{rmk:star-not-equiv}); the true relationship is a one-sided inequality (\cref{prop:star-ge-vc}).
+
+\item The three standard model-selection principles---Bayesian, MDL, MML---form a triangle of near-miss analogies whose obstructions differ pair by pair, while a genuine theorem (PAC-Bayes) and a genuine equivalence (compression $\leftrightarrow$ finite VC, \cref{thm:compression-char}) sit nearby and are often confused with them.
 \end{enumerate}
 
-These patterns---hub nodes, negative results as content, analogy obstructions---recur throughout the book.
+These patterns---hub nodes, negative results as content, analogy obstructions, and the discipline of separating what is proved from what is merely said---recur throughout the book.
 
+\section{Exercises and Open Problems}
+\label{sec:ch1-open}
+
+The following ten problems are research-grade. Each is anchored to a concept introduced above and tagged by its epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated question awaiting an answer; an \emph{unknown known} (\textsc{uk}) is a regularity present in the verified development or the literature that the surrounding theory has not yet absorbed into a clean statement. Where a verified handle exists, it is named.
+
+\begin{openprob}[Sample compression conjecture, \textsc{ku}]
+\label{op:compression}
+\Cref{thm:compression-char} characterizes finite VC dimension by compression \emph{with} side information. Prove or refute the Littlestone--Warmuth conjecture: every class of VC dimension $d$ admits a sample compression scheme of size $O(d)$ \emph{without} side information. The gap is isolated in the verified development as \leanname{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening}; the best known unconditional bound is exponential in $d$, and $O(d)$ would tighten every compression-based generalization bound in \Cref{ch:compression}.
+\end{openprob}
+
+\begin{openprob}[The optimal No-Free-Lunch constant, \textsc{ku}]
+\label{op:nfl-constant}
+\Cref{lem:nfl-engine} forces disagreement on more than a quarter of a shattered set, and \cref{thm:nfl} yields expected error $\geq 1/4$. Determine the exact minimax expected error as a function of the ratio $m/|T|$ of sample size to shattered-set size, and identify the largest constant replacing $1/4$ in the averaged bound. The verified engine proves the factor-$4$ form; is $1/2 - o(1)$ attainable as $m/|T| \to 0$?
+\end{openprob}
+
+\begin{openprob}[Which finite-VC classes have finite star number? \textsc{ku}]
+\label{op:star}
+\Cref{prop:star-ge-vc} gives $\VC \leq \mathrm{star}$, and \cref{rmk:star-not-equiv} shows the gap can be infinite (singletons: $\VC = 1$, $\mathrm{star} = \infty$). Give a structural characterization---ideally a forbidden-subclass criterion---of the concept classes with finite VC dimension and finite star number. Because the star number controls active-learning label complexity~\cite{HannekeYang2015}, such a characterization would delimit exactly the classes for which active learning yields an exponential saving.
+\end{openprob}
+
+\begin{openprob}[An inductive-bias dimension, \textsc{uk}]
+\label{op:bias-dimension}
+\Cref{cor:bias-mandatory} makes bias mandatory but offers no measure of how much bias a class encodes. Construct a complexity measure $b(\mathcal{C})$---an ``inductive-bias dimension''---that is monotone under inclusion, well-behaved under products, and lower-bounds achievable sample complexity uniformly over distributions, so that the No-Free-Lunch barrier becomes quantitative rather than merely qualitative. The typed bias of \cref{def:inductive-bias-typed} (a preference score with a monotonicity constraint) is the natural carrier for such a measure.
+\end{openprob}
+
+\begin{openprob}[The proper/improper gap, \textsc{ku}]
+\label{op:proper-improper}
+It is known that proper learning can be super-polynomially costlier than improper learning~\cite{PittValiant1988}. Exhibit a single combinatorial invariant of $\mathcal{C}$ that controls the proper-versus-improper sample (or time) complexity ratio, and characterize the classes for which the ratio is bounded. The qualitative separation is settled; the separating dimension is not.
+\end{openprob}
+
+\begin{openprob}[Model-selection equivalence witnesses, \textsc{ku}]
+\label{op:model-selection}
+For each edge of the triangle in \cref{fig:model-selection-triangle}, either supply the missing equivalence witness or prove non-equivalence as a theorem rather than an obstruction. Concretely: characterize the parametric model families on which two-part MML coincides with Bayesian MAP beyond the constant-Fisher-information case, and decide whether the residual discrepancy can be absorbed into the side information of a compression scheme.
+\end{openprob}
+
+\begin{openprob}[Efficient version-space representation, \textsc{ku}]
+\label{op:version-space}
+\Cref{prop:version-space} shows the version space shrinks monotonically and never increases Littlestone dimension, yet for most classes it cannot be efficiently represented or sampled. Characterize the classes whose version space admits a polynomial-size representation under arbitrary consistent data, and relate this property to the eluder dimension~\cite{RussoVanRoy2013} and the star number (\cref{def:star-number}).
+\end{openprob}
+
+\begin{openprob}[The coding-theorem constant, \textsc{uk}]
+\label{op:solomonoff}
+The coding theorem $K(x) = -\log M(x) + O(1)$ (\cref{def:alg-prob}) hides an additive constant depending on the universal machine. Formalize the theorem in a proof assistant with the constant made explicit as a function of the reference machine's description, closing the gap between the algorithmic-probability and Kolmogorov-complexity foundations of MDL. No verified companion currently exists for this result.
+\end{openprob}
+
+\begin{openprob}[Constructive necessity in the fundamental theorem, \textsc{uk}]
+\label{op:asymmetry}
+\Cref{thm:vc-char} is proved with a constructive sufficiency direction (empirical risk minimization) and a non-constructive necessity direction (\cref{rmk:vc-asymmetry}). Give a constructive necessity proof: an explicit algorithm that, from oracle access to a class of infinite VC dimension, produces the hard distribution witnessing non-learnability with a stated dependence on the sample budget. This would remove the asymmetry noted at \leanname{FLT_Proofs.Theorem.PAC.vc_characterization} and yield effective, rather than existential, lower bounds.
+\end{openprob}
+
+\begin{openprob}[A functorial account of the thirteen measures, \textsc{ku}]
+\label{op:dimension-multiplicity}
+\Cref{fig:concept-class-hub} shows 13 complexity measures targeting the concept class. Determine whether they organize into a single partial order---or a functor from the category of concept classes (with label-preserving maps) to $\N \cup \{\infty\}$---and classify the pairs that admit two-sided polynomial comparisons against the pairs that are provably incomparable. A clean answer would explain why no measure subsumes the others while many pairs are nonetheless linked.
+\end{openprob}
