@@ -91,9 +91,10 @@ The positive direction is settled in a weak sense.
 \item \textbf{Special cases are resolved.}  Maximum classes (those achieving
   the Sauer--Shelah bound $\growth_\mathcal{H}(n) = \binom{n}{\leq d}$)
   admit compression of size exactly $d$, as shown by Floyd and
-  Warmuth~\cite{FloydWarmuth1995}.  Intersection-closed classes, classes of
-  bounded recursive teaching dimension, and several other families satisfy the
-  conjecture.
+  Warmuth~\cite{FloydWarmuth1995}.  Intersection-closed classes admit
+  compression of size $d$~\cite{Helmbold2018}, and classes of small recursive
+  teaching dimension compress to that dimension; these are the established
+  families, not a complete list.
 
 \item \textbf{Compression implies learning.}  The converse direction is
   established: a compression scheme of size $k$ yields PAC learning with
@@ -227,6 +228,19 @@ Several partial explanations exist, none fully satisfactory.
   observations---that trained networks contain sparse subnetworks matching
   full performance---provide indirect evidence for compression, but no
   rigorous connection to sample complexity has been established.
+
+\item \textbf{Machine-checked certificates.}  For the specific function class
+  of a multi-head attention block, the generalization certificate of
+  \Cref{ch:generalization} has been formalized: a proof assistant verifies
+  that the executed (finite-precision) network's true risk exceeds its
+  empirical risk by more than an explicit Dudley-capacity budget only on a
+  sample event of probability at most~$\delta$.\formal{TLT.CertifiedGeneralization}
+  The budget is discharged from the layer norms and depth of the
+  stack,\formal{TLT.config_capacity_law} so the bound is correct by
+  construction.  Like its hand-proved cousins, however, it grows with depth and
+  norm and is not yet non-vacuous on large models: it answers
+  \Cref{op:deep-gen} on the axis of \emph{trust} rather than \emph{tightness},
+  adding a kernel-audited guarantee, not a smaller number.
 \end{itemize}
 
 \begin{computational}
@@ -238,12 +252,14 @@ Empirically, the test error \emph{decreases again} for $p \gg n$,
 forming a double descent curve.  This was systematically documented
 by Belkin et al.~\cite{BelkinHsuMaMandal2019}.
 
-The double descent phenomenon is observed across architectures (linear
-models, random features, deep networks) and datasets.  No existing
-generalization bound fully explains it: all known bounds are monotone in
-model complexity and cannot predict the second descent.  The phenomenon
-suggests that the relevant notion of complexity for overparameterized models
-is not a simple function of parameter count.
+The double descent phenomenon is observed across several model families
+(linear models, random features, deep networks)~\cite{BelkinHsuMaMandal2019}.
+The classical complexity-based bounds---VC, Rademacher, and the parameter-count
+bounds of \Cref{ch:generalization}---are monotone in model complexity and so
+cannot predict the second descent; whether \emph{some} data-dependent bound can
+is itself part of \Cref{op:deep-gen}.  The phenomenon suggests that the
+relevant notion of complexity for overparameterized models is not a simple
+function of parameter count.
 \end{computational}
 
 \subsection{Where the Gap Is}
@@ -251,11 +267,12 @@ is not a simple function of parameter count.
 The gap has three aspects.
 
 \begin{enumerate}[leftmargin=*]
-\item \textbf{Quantitative vacuity.}  Most existing bounds, when evaluated
-  on practical networks, predict generalization error close to 1 (i.e.,
-  they are vacuous).  The margin bounds of Bartlett--Foster--Telgarsky are
-  the tightest known, but still far from observed test error on benchmarks
-  such as ImageNet.
+\item \textbf{Quantitative vacuity.}  Most norm- and parameter-count-based
+  bounds, when evaluated on practical networks, predict generalization error
+  close to~$1$---that is, they are vacuous.  The PAC-Bayes certificates of
+  Dziugaite and Roy~\cite{DziugaiteRoy2017} are a notable exception, giving
+  non-vacuous numbers for specific small networks, but no bound is yet both
+  non-vacuous and tight on large benchmark models.
 
 \item \textbf{Architecture dependence.}  Existing bounds treat networks as
   generic function classes parameterized by weight norms.  They do not
@@ -412,17 +429,21 @@ feature of learning or an artifact of our inability to prove $P \neq NP$.
   captures one type of computational constraint but not all.
 
 \item \textbf{Planted clique and related problems.}  A growing body of work
-  studies problems where the information-theoretic threshold differs from
-  the apparent computational threshold: planted clique, sparse PCA,
-  community detection.  In each case, $\Theta(\sqrt{n})$ appears to be a
-  computational barrier, while information-theoretically $O(\log n)$ samples
-  suffice.  But none of these gaps are proven unconditionally.
+  studies problems where the information-theoretic threshold differs from the
+  conjectured computational threshold: planted clique, sparse PCA, community
+  detection.  For planted clique, a planted clique of size $\Theta(\sqrt{n})$
+  is the conjectured threshold for polynomial-time detection, while one of
+  size $\sim 2\log_2 n$ is already detectable information-theoretically.  None
+  of these gaps is proven unconditionally; the evidence comes from restricted
+  models (sum-of-squares, low-degree polynomials) rather than from
+  unconditional separations.
 
-\item \textbf{The barrier of Applebaum--Barak--Xiao.}  One cannot prove
-  ``$P \neq NP$ implies hard PAC learning'' via standard Karp reductions.
-  Cryptographic or average-case assumptions are inherently necessary for
-  hardness results in PAC learning.  This is a meta-theoretic constraint on
-  the kind of hardness proofs that are possible.
+\item \textbf{The barrier of Applebaum--Barak--Xiao.}  Applebaum, Barak, and
+  Xiao~\cite{ApplebaumBarakXiao2008} showed that one cannot prove
+  ``$\mathrm{P} \neq \mathrm{NP}$ implies hard PAC learning'' via standard
+  (black-box) reductions.  Cryptographic or average-case assumptions are
+  inherently necessary for hardness results in PAC learning.  This is a
+  meta-theoretic constraint on the kind of hardness proofs that are possible.
 \end{itemize}
 
 \begin{historical}
@@ -624,57 +645,68 @@ theory is actively expanding.  Each lies at the boundary of the framework
 developed in Chapters~1--17 and involves mathematical structures that do
 not reduce to the types established there.
 
-\begin{description}[leftmargin=*,itemsep=6pt]
+\begin{openprob}[Private agnostic learning]
+\label{op:private}
+Differential privacy constrains the learner: the output must not reveal too
+much about any individual example.  Kasiviswanathan et
+al.~\cite{KasiviswanathanLeeNissimRaskhodnikovaSmith2011} showed that private
+PAC learning under \emph{pure} differential privacy has sample complexity
+$\Theta\bigl(d/\varepsilon + \log|\mathcal{X}|/(\varepsilon\alpha)\bigr)$, and
+for \emph{approximate} privacy the Littlestone dimension characterizes private
+learnability~\cite{AlonLivniMalliarisMoran2019,BunLivniMoran2020}, linking
+online learning to privacy.  What is the tight sample complexity of private
+\emph{agnostic} learning?
+\end{openprob}
 
-\item[Private learning.]
-  Differential privacy constrains the learner: the output hypothesis must
-  not reveal too much about any individual training example.  Kasiviswanathan
-  et al.\ showed that the sample complexity of private PAC learning is
-  $\Theta(d/\varepsilon + \log|\mathcal{X}|/(\varepsilon\alpha))$ for pure
-  differential privacy, where $\alpha$ is the privacy parameter.  For
-  approximate differential privacy, the Littlestone dimension characterizes
-  private learnability (Alon et al., Bun et al.), connecting online learning
-  theory to privacy in an unexpected way.  The tight sample complexity of
-  private agnostic learning remains open.
+\begin{openprob}[Active learning under agnostic noise]
+\label{op:active}
+An active learner queries labels selectively, and the label complexity can be
+exponentially smaller than passive sample complexity \emph{for favorable
+classes and distributions} (for instance, halfspaces under a margin).
+Hanneke~\cite{Hanneke2014} showed that the disagreement coefficient controls
+label complexity for general classes.  What is the tight characterization of
+active learning under \emph{agnostic} noise, and what is its computational
+complexity?
+\end{openprob}
 
-\item[Active learning.]
-  An active learner chooses which examples to query, rather than receiving
-  them passively.  The label complexity---the number of label queries needed
-  for PAC learning---can be exponentially smaller than the sample complexity
-  of passive learning.  Hanneke showed that the disagreement coefficient
-  controls the label complexity for general hypothesis classes.  Open
-  problems include tight characterizations of active learning under agnostic
-  noise and the computational complexity of active learning algorithms.
+\begin{openprob}[Transfer, meta-, and continual learning]
+\label{op:meta}
+Formal frameworks for learning across related tasks exist---Baxter's model of
+learning to learn~\cite{Baxter2000}, and the PAC-Bayes approach to
+meta-learning---but no characterization theorem analogous to the VC
+characterization is known.  Can the combinatorial objects governing multi-task
+learning be expressed through the single-task dimensions of this book, or are
+genuinely new measures required?
+\end{openprob}
 
-\item[Transfer, meta-learning, and continual learning.]
-  These paradigms concern learning from multiple related tasks.  Transfer
-  learning asks: when does experience on a source task improve learning on
-  a target task?  Meta-learning asks: can the learner learn to learn faster
-  across a distribution of tasks?  Continual learning asks: can the learner
-  acquire new tasks without forgetting old ones?  Formal frameworks exist
-  (e.g., Baxter's model of learning to learn, the PAC-Bayes approach to
-  meta-learning), but no characterization theorems analogous to the VC
-  characterization have been established.  The fundamental question is whether
-  the combinatorial objects governing multi-task learning can be expressed
-  in terms of the single-task dimensions of this book, or whether genuinely
-  new complexity measures are needed.
+\begin{openprob}[Online multiclass learnability]
+\label{op:online-multiclass}
+The Littlestone dimension characterizes online binary learnability, but the
+Littlestone dimension of the binary reductions does not always capture the
+optimal multiclass mistake bound.  What combinatorial parameter characterizes
+online multiclass learnability, and how does it relate to the DS dimension
+(\Cref{ch:extensions})?
+\end{openprob}
 
-\item[Online multiclass learnability.]
-  The Littlestone dimension characterizes online binary learnability.
-  For multiclass online learning, the situation is more complex: the
-  Littlestone dimension of the binary reductions does not always capture
-  the optimal mistake bound.  A combinatorial characterization of online
-  multiclass learnability, and its relationship to the DS dimension, is
-  an active area of research.
+\begin{openprob}[Quantum sample complexity]
+\label{op:quantum}
+In quantum PAC learning the learner receives quantum superpositions of labeled
+examples.  For binary classification the quantum and classical sample
+complexities are equal up to constant factors, but for other tasks and for
+\emph{time} complexity the relationship is unsettled.  Characterize, in terms
+of classical complexity measures, exactly when quantum examples reduce the cost
+of learning.
+\end{openprob}
 
-\item[Quantum sample complexity.]
-  Quantum PAC learning, where the learner receives quantum superpositions
-  of labeled examples, can have polynomially different sample complexity
-  from the classical setting.  The no-signaling constraint on learnability
-  is a recent development.  A full characterization of when quantum
-  examples help---in terms of classical complexity measures---is open.
-
-\end{description}
+\begin{openprob}[A non-vacuous \emph{verified} bound for transformers]
+\label{op:certified-transformer}
+\Cref{sec:deep-generalization} notes that a machine-checked generalization
+certificate already exists for an attention block
+(\leanname{config_capacity_law}), but its Dudley budget grows with depth and
+norm.  Can a generalization bound for a realistic transformer be \emph{both}
+machine-checked and non-vacuous on a benchmark---closing \Cref{op:deep-gen} on
+the trust and tightness axes at once?  A known unknown on the transformer side.
+\end{openprob}
 
 \bigskip
 
