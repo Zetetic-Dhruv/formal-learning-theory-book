@@ -129,7 +129,7 @@ classification).
 % --- Separation 1 ---
 
 \begin{separation}
-\textbf{PAC learning $\not\Rightarrow$ mistake-bounded learning.}
+\textbf{PAC learning $\not\Rightarrow$ mistake-bounded learning.}\formal{FLT_Proofs.Theorem.Separation.pac_not_implies_online}
 
 \medskip\noindent
 \emph{Witness.}
@@ -138,11 +138,11 @@ thresholds on $\R$, where $h_\theta(x) = \ind[x \geq \theta]$.
 
 This class has $\VC(\mathcal{H}) = 1$: a single point $x$ is shattered
 (choose $\theta < x$ or $\theta > x$), but no two points can be
-simultaneously shattered. By the fundamental theorem of statistical
+simultaneously shattered.\formal{FLT_Proofs.Theorem.Separation.vcdim_threshold_finite} By the fundamental theorem of statistical
 learning, $\mathcal{H}$ is PAC learnable with sample complexity
 $O(1/\varepsilon)$.
 
-However, $\Ldim(\mathcal{H}) = \infty$. An adaptive adversary can force
+However, $\Ldim(\mathcal{H}) = \infty$.\formal{FLT_Proofs.Theorem.Separation.ldim_threshold_top} An adaptive adversary can force
 arbitrarily many mistakes by binary search: maintain an interval
 $(a, b)$ of uncertainty, present the midpoint, and whichever label the
 learner predicts, place the true threshold on the opposite side. Each
@@ -163,7 +163,7 @@ but a random sample reveals it with high probability.
 % --- Separation 2 ---
 
 \begin{separation}
-\textbf{Ex-learning $\not\Rightarrow$ PAC learning.}
+\textbf{Ex-learning $\not\Rightarrow$ PAC learning.}\formal{FLT_Proofs.Theorem.Separation.ex_not_implies_pac}
 
 \medskip\noindent
 \emph{Witness.}
@@ -197,28 +197,29 @@ have no finite VC dimension.
 
 \medskip\noindent
 \emph{Witness.}
-PAC learning requires only $\varepsilon$-approximate identification
-under an unknown distribution; exact learning requires zero-error
-identification via query access. These are different success criteria on
-different data models, and neither subsumes the other.
+Exact learning in the sense of Angluin~\cite{Angluin1988} identifies the
+target \emph{exactly}, with zero error, from membership and equivalence
+queries.  It departs from PAC learning along \emph{two} axes at once: the
+success criterion (zero error versus $\varepsilon$-approximate) and the
+data model (active queries versus a passive i.i.d.\ sample).  A
+PAC-learnable class need not be exactly learnable on either count.
 
-More concretely, consider any concept class $\mathcal{C}$ that is PAC
-learnable (finite VC dimension) but for which proper hypothesis
-selection is NP-hard---for instance, intersections of halfspaces in
-$\R^d$ for sufficiently large $d$. An improper PAC learner can achieve
-low error using a surrogate hypothesis class, but the exact learning
-model requires the learner to output a hypothesis \emph{exactly equal}
-to the target. When the class is rich enough that finding the exact
-target is computationally intractable, PAC learnability does not deliver
-exact learnability.
+The criterion axis alone already bites computationally. Consider a class
+$\mathcal{C}$ that is PAC learnable (finite VC dimension) but for which
+finding a hypothesis \emph{exactly} consistent in the proper representation
+is NP-hard---intersections of halfspaces in $\R^d$ are the standard
+example~\cite{PittValiant1988}. An improper PAC learner attains low error
+through a surrogate class, yet exact identification of the target is
+intractable.
 
 \medskip\noindent
 \emph{What the witness exploits.}
-The gap between approximate and exact success criteria. PAC tolerates
-$\varepsilon$ error; exact learning tolerates none. This is a
-criterion mismatch, not a data mismatch.
+Two mismatches stacked: approximate-versus-exact in the criterion, and
+i.i.d.-sample-versus-query in the data model. PAC tolerates
+$\varepsilon$~error and reads a passive sample; exact learning tolerates
+none and may interrogate the target. Neither model subsumes the other.
 
-\hfill\cite{Valiant1984}
+\hfill\cite{Angluin1988, PittValiant1988}
 \end{separation}
 
 % --- Separation 4 ---
@@ -327,8 +328,9 @@ learning.}
 \emph{Witness.}
 The class of 3-term DNF formulas over $\{0,1\}^n$. Pitt and
 Valiant~\cite{PittValiant1988} showed that \emph{proper} PAC
-learning---where the hypothesis must itself be a 3-term DNF---is
-NP-hard, assuming $\mathrm{RP} \neq \mathrm{NP}$. Yet the same class
+learning\formal{FLT_Proofs.Basic.IsProper}---where the hypothesis must
+itself be a 3-term DNF---is NP-hard, assuming
+$\mathrm{RP} \neq \mathrm{NP}$. Yet the same class
 is efficiently PAC learnable \emph{improperly}: every 3-term DNF can be
 represented as a 3-CNF, and 3-CNFs are efficiently PAC learnable.
 
@@ -392,9 +394,11 @@ It does not survive contact with real-valued loss.
 Shalev-Shwartz et al.~\cite{ShalevShwartzShamir2010} construct a
 learning problem---arbitrary loss, multi-valued output---that is
 learnable, yet for which uniform convergence fails outright.  The
-nine-way equivalence collapses.  In its place, a different quantity
-takes over: algorithmic stability, measuring how much a learner's output
-changes when a single training point is perturbed.
+nine-way equivalence collapses.  In its place they prove a different
+characterization: in the general learning setting, a problem is learnable
+if and only if it admits a \emph{stable}, asymptotically
+empirical-risk-minimizing learner.  Uniform convergence is demoted from
+characterization to a sufficient condition.
 
 \medskip\noindent
 \emph{What the witness exploits.}
@@ -403,7 +407,8 @@ proof requires the loss to take finitely many values.  Specifically:
 two.  That assumption is invisible in the binary setting---it looks like
 a harmless feature of the problem.  Make the loss real-valued and
 symmetrization breaks.  Uniform convergence stops characterizing
-learnability.  Stability, indifferent to loss cardinality, remains.
+learnability; the stable-AERM condition takes over as the
+characterization, indifferent to the cardinality of the loss.
 
 The Fundamental Theorem is not wrong.  It is \emph{local}---an artifact
 of the 0-1 loss that does not announce itself as such.
@@ -428,7 +433,7 @@ gap.
 % --- Strict 1 ---
 
 \begin{separation}
-\textbf{Ex-learning $\supsetneq$ FIN-learning.}
+\textbf{Ex-learning $\supsetneq$ FIN-learning.}\formal{FLT_Proofs.Theorem.Separation.ex_strictly_stronger_finite}
 
 \medskip\noindent
 \emph{Forward implication.} Every FIN-learnable class is trivially
@@ -461,14 +466,15 @@ changes (any finite number, not bounded in advance).
 % --- Strict 2 ---
 
 \begin{separation}
-\textbf{Online learning $\supsetneq$ PAC learning.}
+\textbf{Online learning $\supsetneq$ PAC learning.}\formal{FLT_Proofs.Theorem.Separation.online_strictly_stronger_pac}
 
 \medskip\noindent
 \emph{Forward implication.}
 If $\mathcal{H}$ has finite Littlestone dimension $\Ldim(\mathcal{H})
-= d$, then in particular $\VC(\mathcal{H}) \leq d$ (every shattered
-set in the VC sense is a path in a Littlestone tree). By the fundamental
-theorem, $\mathcal{H}$ is PAC learnable.
+= d$, then in particular $\VC(\mathcal{H}) \leq d$.\formal{FLT_Proofs.Theorem.Separation.vcdim_le_of_mistake_bounded} (Every shattered
+set in the VC sense extends to a path in a Littlestone tree, so a
+mistake-bounded learner with bound $d$ forces $\VC \leq d$.) By the
+fundamental theorem, $\mathcal{H}$ is PAC learnable.
 
 \medskip\noindent
 \emph{Witness for strictness.}
@@ -494,11 +500,13 @@ every level of the hierarchy.
 
 \medskip\noindent
 \emph{Forward implication.}
-Every PAC learnable class (finite VC dimension) is universally learnable
-with exponential learning rates. Universal learning requires learning
-under \emph{every} distribution individually, whereas PAC learning
-requires a single learner that works uniformly over all distributions.
-The PAC guarantee is a special case.
+Universal learnability is the \emph{weaker} requirement: it asks only for a
+learner whose error decays at some rate under each distribution
+\emph{separately}, whereas PAC learning demands a single sample-complexity
+bound uniform over all distributions. Removing the uniformity, every
+PAC-learnable class (finite VC dimension) is therefore universally
+learnable---indeed at an exponential rate. The strictness below shows the
+converse fails.
 
 \medskip\noindent
 \emph{Witness for strictness.}
@@ -565,24 +573,30 @@ The separation lattice of \Cref{fig:separation-lattice} carries a
 meta-theorem about the structure of formal learning theory, which we
 can now state explicitly.
 
-\begin{thm}[Sparsity of the separation lattice]
+\begin{remark}[The separation lattice is sparse]
 \label{thm:sparsity}
-Of the $\binom{k}{2}$ potential pairwise implications among the $k$
-major learning paradigms and complexity measures in the graph, only
-13 have been either established or refuted with witnesses. The
-remaining pairs are either unrelated (operating on different
-mathematical types) or connected by non-implicational relations
-(analogy, measurement, assumption).
-\end{thm}
+This chapter establishes thirteen edges with explicit witnesses among the
+major learning paradigms and complexity measures of
+\Cref{fig:separation-lattice}---far fewer than the $\binom{k}{2}$ relations
+that $k$ such concepts could \emph{a priori} exhibit.  We do not claim a
+complete census of the lattice; the point is that the witnessed edges are
+scarce, and that many remaining pairs appear unrelated---they operate on
+different mathematical types, or are connected only by non-implicational
+relations (analogy, measurement, assumption) rather than by an implication
+that could be witnessed or refuted.
+\end{remark}
 
-This sparsity is not an artifact of incomplete knowledge. It reflects a
-genuine structural fact: the major paradigms of learning theory are
-\emph{largely incomparable}. PAC learning and Gold-style identification
-operate on different data models (i.i.d.\ samples vs.\ infinite
-enumerations). Online learning and exact learning use different
-interaction protocols (adversarial instances vs.\ query access).
-VC dimension and SQ dimension measure different properties
-(combinatorial shattering vs.\ correlation structure).
+This scarcity is not merely an artifact of incomplete knowledge.  Many of
+the major paradigms operate on different mathematical types: PAC learning
+and Gold-style identification take different data models (i.i.d.\ samples
+versus infinite enumerations); online and exact learning use different
+interaction protocols (adversarial instances versus query access); VC and
+SQ dimension measure different properties (combinatorial shattering versus
+correlation structure).  Between such concepts a clean implication is often
+not even the right question.  Where we \emph{can} ask it, this chapter
+witnesses one direction---Gold identification does not imply PAC learning,
+say---while establishing the reverse non-implication is, in several cases, a
+separate open problem rather than a settled fact.
 
 The witnesses in this chapter make the incomparability concrete.
 Thresholds on $\R$ separate PAC from online learning. All finite subsets
@@ -606,3 +620,129 @@ containment is proved by a single, explicit construction.
 
 These are the theorems that textbooks usually omit. They deserve
 their chapter.
+
+
+\subsection{Where Attention Sits}
+\label{sec:attention-lattice}
+
+A separation lattice is a map, and it is natural to ask where a modern
+hypothesis class lands on it. The softmax-attention concept class of
+\Cref{ch:generalization} is machine-checked to be
+well-behaved,\formal{TLT.Bridge.softAttention_wellBehaved} and with
+norm-bounded parameters it has finite capacity
+(\Cref{prop:certified-attention}); it therefore sits on the PAC node---it
+is PAC learnable.
+
+Its position relative to the \emph{online} node is open.  The
+witness for Separation~1 was a class of finite VC dimension and infinite
+Littlestone dimension---thresholds on~$\R$.  Attention compares query--key
+scores, and threshold behavior on a score is exactly the structure that
+sends the Littlestone dimension to infinity while the VC dimension stays
+finite.  It is therefore possible that the softmax-attention class is its
+\emph{own} witness for $\text{PAC} \not\Rightarrow \text{online}$, joining
+thresholds on that dashed red edge.  Whether it is so is
+\Cref{op:attention-littlestone}; the machine-checked
+separation~\leanname{pac_not_implies_online} already supplies the template
+a proof would instantiate.
+
+
+% ================================================================
+% OPEN PROBLEMS
+% ================================================================
+
+\section{Open Problems}
+\label{sec:separations-open}
+
+A separation chapter generates two kinds of open problem: the missing
+\emph{reverse} of a one-sided non-implication, and the missing
+\emph{formal proof} of a separation so far only cited.  Each problem below
+is tagged a \emph{known unknown} (KU), sharply posed but unresolved, or an
+\emph{unknown known} (UK), where the right object or invariant is still
+missing; a design-lab or literature anchor is named where one exists.
+
+\begin{openprob}[The Littlestone dimension of attention]
+\label{op:attention-littlestone}
+Is the Littlestone dimension of the softmax-attention concept class finite
+or infinite?  If infinite, attention is its own witness for
+$\text{PAC} \not\Rightarrow \text{online}$
+(\leanname{pac_not_implies_online}); if finite, attention is online
+learnable and the score comparisons are tamer than thresholds.  A known
+unknown on the transformer side (\leanname{softAttention_wellBehaved}).
+\end{openprob}
+
+\begin{openprob}[Does PAC imply Ex?]
+\label{op:reverse-pac-ex}
+The chapter proves Gold identification does not imply PAC learning
+(\leanname{ex_not_implies_pac}), but never the reverse.  Is there a
+PAC-learnable concept class that is not Ex-learnable as a class of
+functions, so that PAC and Gold are genuinely incomparable rather than
+one-sidedly separated?  A known unknown.
+\end{openprob}
+
+\begin{openprob}[Formalizing the DS/Natarajan gap]
+\label{op:formalize-ds-natarajan}
+The pseudo-manifold witness with $\Ndim = 1$ and $\DSdim = \infty$ is cited
+from Brukhim et al., not derived.  Can the construction---and the
+non-learnability it implies---be machine-checked?  An unknown known: the
+oriented-hypergraph combinatorics has no formal
+home~\cite{BrukhimCarmonDinurMoranYehudayoff2022}.
+\end{openprob}
+
+\begin{openprob}[Formalizing the universal-learning trichotomy]
+\label{op:formalize-trichotomy}
+The forward edge universal$\,\Rightarrow\,$PAC is machine-checked, but the
+trichotomy that witnesses Strict~3---exponential, arbitrarily slow, or not
+at all---is not.  Can the Bousquet et al.\ trichotomy be formalized,
+closing the strictness direction?  An unknown
+known~\cite{BousquetHannekeMoranVanHandelYehudayoff2021}.
+\end{openprob}
+
+\begin{openprob}[VC versus SQ, quantitatively]
+\label{op:sq-vc-quantitative}
+Parities give $\VC = n$, $\SQdim = 2^n$ under the uniform distribution.
+Across all distributions, what is the tightest possible relationship
+between VC and SQ dimension---is the exponential gap always achievable, or
+distribution-dependent?  A known
+unknown~\cite{BlumFurstJacksonKearnsMansourRudich1994}.
+\end{openprob}
+
+\begin{openprob}[Formalizing labeled versus unlabeled compression]
+\label{op:formalize-compression-sep}
+The P\'alv\"olgyi--Tardos $\VC = 2$ class separating labeled from unlabeled
+size-2 compression is cited, not constructed here.  Can the separation be
+machine-checked, and does it persist at larger VC dimension and scheme
+size?  An unknown known~\cite{PalvolgyiTardos2020}.
+\end{openprob}
+
+\begin{openprob}[Is the lattice complete?]
+\label{op:lattice-completeness}
+For each pair of paradigms with no witnessed edge, is the pair provably
+incomparable, or merely unstudied?  A census distinguishing genuine
+incomparability from undiscovered implications would turn the informal
+sparsity of \Cref{thm:sparsity} into a theorem.  A known unknown.
+\end{openprob}
+
+\begin{openprob}[Characterizing the proper/improper gap]
+\label{op:proper-improper}
+3-DNF has an efficient improper learner but no efficient proper one
+(\leanname{IsProper}, under $\mathrm{RP}\neq\mathrm{NP}$).  Which structural
+property of a class forces a proper/improper efficiency gap, and which
+classes have none?  A known unknown~\cite{PittValiant1988}.
+\end{openprob}
+
+\begin{openprob}[The scope of the stability characterization]
+\label{op:stability-scope}
+Stable AERM characterizes learnability in the general learning setting
+(\Cref{sec:separations}, Separation~9).  Exactly which loss families and
+hypothesis structures fall inside that characterization, and where does
+even stability cease to characterize?  A known
+unknown~\cite{ShalevShwartzShamir2010}.
+\end{openprob}
+
+\begin{openprob}[The SQ dimension of attention]
+\label{op:attention-sq}
+Parities resist statistical-query learning despite small VC.  Does the
+softmax-attention class behave like a VC class under SQ, or can it encode
+parity-like correlations that make it SQ-hard?  An unknown known on the
+transformer side (\leanname{softAttention_wellBehaved}).
+\end{openprob}
