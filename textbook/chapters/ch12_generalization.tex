@@ -193,7 +193,8 @@ binary vector in $\{0,1\}^m$, and the Sauer--Shelah lemma
 \end{equation}
 
 Applying Massart's finite lemma to the at most $\growth_\mathcal{H}(m)$
-distinct vectors, each with Euclidean norm at most $\sqrt{m}$:
+distinct vectors, each with Euclidean norm at most
+$\sqrt{m}$,\formal{FLT_Proofs.Complexity.Rademacher.finite_massart_lemma}
 \begin{equation}
 \label{eq:massart}
   \E_\sigma\!\left[\sup_{h} \frac{1}{m}\sum_{i=1}^m \sigma_i \ell(h,z_i)
@@ -286,7 +287,7 @@ Rademacher complexity} of $\mathcal{F}$ on~$S$ is
 where $\sigma_1, \ldots, \sigma_m$ are independent Rademacher random
 variables (uniform on $\{-1, +1\}$).  The \emph{Rademacher complexity} of
 $\mathcal{F}$ at sample size~$m$ is
-$\mathcal{R}_m(\mathcal{F}) = \E_S[\Rad_S(\mathcal{F})]$.
+$\mathcal{R}_m(\mathcal{F}) = \E_S[\Rad_S(\mathcal{F})]$.\formal{FLT_Proofs.Complexity.Rademacher.EmpiricalRademacherComplexity}
 \end{defn}
 
 The Rademacher complexity measures how well $\mathcal{F}$ can
@@ -375,6 +376,7 @@ $\VC(\mathcal{H}) = d$:
   \mathcal{R}_m(\mathcal{H})
   \;\leq\; \sqrt{\frac{2d \log(em/d)}{m}}.
 \]
+This quantitative bound is machine-checked.\formal{FLT_Proofs.Complexity.Rademacher.vcdim_bounds_rademacher_quantitative}
 \end{prop}
 
 \begin{proof}
@@ -445,7 +447,7 @@ function is a whole sequence.
 The Sauer--Shelah lemma (\Cref{ch:dimensions}) provides the critical
 link: if $\VC(\mathcal{H}) = d$, then
 $\growth_\mathcal{H}(m) \leq \sum_{i=0}^d \binom{m}{i}
-\leq (em/d)^d$ for $m \geq d$.
+\leq (em/d)^d$ for $m \geq d$.\formal{FLT_Proofs.Complexity.Rademacher.sauer_shelah_exp_bound}
 The dichotomy is sharp: either $\growth_\mathcal{H}(m) = 2^m$ for all~$m$
 (when $\VC = \infty$) or $\growth_\mathcal{H}(m) = O(m^d)$
 (when $\VC = d < \infty$).  There is no intermediate growth rate.
@@ -472,7 +474,8 @@ $\ell \colon \mathcal{H} \times (X \times Y) \to [0,1]$,
 a \emph{prior} distribution~$\pi$ over~$\mathcal{H}$ chosen
 \emph{before} seeing data, and a training sample $S \sim D^m$.
 A \emph{posterior}~$\rho$ is any distribution over~$\mathcal{H}$ that
-may depend on~$S$.  Define
+may depend on~$S$.  Define the Gibbs (mixture)
+risks\formal{FLT_Proofs.Theorem.PACBayes.gibbsError}
 \[
   \risk_D(\rho) = \E_{h \sim \rho}[\risk_D(h)], \qquad
   \emprisk_S(\rho) = \E_{h \sim \rho}[\emprisk_S(h)].
@@ -490,6 +493,8 @@ simultaneously,
   \risk_D(\rho) \leq \emprisk_S(\rho)
     + \sqrt{\frac{\KL(\rho \| \pi) + \log(2\sqrt{m}/\delta)}{2m}}.
 \]
+For finite~$\mathcal{H}$, the bound---with a cross-entropy complexity term in
+place of $\KL(\rho\|\pi)$---is machine-checked.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite}
 \end{thm}
 
 \begin{proof}
@@ -550,8 +555,12 @@ $\lambda = \sqrt{8m(\KL(\rho\|\pi) + \log(1/\delta))}$ yields
   \risk_D(\rho) - \emprisk_S(\rho)
   \leq \sqrt{\frac{2(\KL(\rho \| \pi) + \log(1/\delta))}{m}}.
 \]
-The slightly refined constant in \Cref{thm:pac-bayes} follows from
-a tighter application using Catoni's approach~\cite{Catoni2007}.
+The displayed change-of-measure argument yields the constant
+$\sqrt{2(\KL(\rho\|\pi) + \log(1/\delta))/m}$.  The sharper form stated in
+\Cref{thm:pac-bayes}---with $1/(2m)$ rather than $2/m$ under the root---requires
+either Catoni's thermodynamic refinement~\cite{Catoni2007} or, for
+finite~$\mathcal{H}$, the direct union bound over hypotheses that the
+machine-checked companion follows; we do not reproduce either sharpening here.
 \end{proof}
 
 
@@ -667,13 +676,15 @@ generalization~\cite{BousquetElisseeff2002}.
 
 \begin{remark}[Stability beyond binary classification]
 \label{rmk:stability-beyond}
-The deepest result in stability theory is due to Shalev-Shwartz et
-al.\ (2010): beyond binary classification with 0--1 loss,
-\emph{learnability is equivalent to the existence of a stable empirical
-risk minimizer}.  Uniform convergence fails to characterize learnability
-in this more general setting, but stability succeeds.  This is a
-fundamental structural result: stability replaces uniform convergence as
-the correct notion when one leaves the binary classification world.
+A central result in stability theory is due to Shalev-Shwartz, Shamir,
+Srebro, and Sridharan~\cite{ShalevShwartzShamir2010}: beyond binary
+classification with 0--1 loss, \emph{learnability is equivalent to the
+existence of a stable empirical risk minimizer}.  In this more general
+setting---for instance, certain convex stochastic optimization
+problems---uniform convergence provably fails to characterize learnability,
+yet stability succeeds.  We state this without proof; the construction
+separating learnability from uniform convergence is the technical core of
+the cited paper.
 \end{remark}
 
 
@@ -713,10 +724,12 @@ For each~$i$, the function $g_i$ satisfies $|g_i| \leq 1$, so $g_i(W)$
 is $1$-sub-Gaussian under the marginal distribution of~$W$ given all
 other samples.  The transportation lemma gives
 $|\E[g_i(W)]| \leq \sqrt{2 I(W; Z_i)}$.
-Averaging over~$i$ and using the chain rule
-$\sum_i I(W; Z_i) \leq I(W; S)$ (by the data-processing inequality
-applied to the Markov chain
-$Z_i \to S \to W$) yields the result.
+Averaging over~$i$ and using $\sum_i I(W; Z_i) \leq I(W; S)$ yields the
+result.  This last inequality is \emph{not} the data-processing inequality:
+it follows from the chain rule
+$I(W; S) = \sum_i I(W; Z_i \mid Z_{<i})$ together with
+$I(W; Z_i \mid Z_{<i}) \geq I(W; Z_i)$, the latter holding because the $Z_i$
+are independent (equivalently, $I(Z_i; Z_{<i} \mid W) \geq 0$).
 \end{proof}
 
 \begin{remark}[Conditional mutual information]
@@ -850,8 +863,8 @@ three simultaneously.
 \section{Meta-Learning Bounds}
 \label{sec:meta-pac}
 
-\begin{defn}[Meta-PAC Bound {\cite{Baxter2000}}]
-\label{def:meta-pac}
+\begin{thm}[Meta-PAC Bound {\cite{Baxter2000}}]
+\label{thm:meta-pac}
 In the meta-learning setting, the learner observes $T$ tasks, each
 providing $m$ samples from a task-specific distribution~$D_t$.  The tasks
 are drawn from a task distribution~$\mathcal{T}$.  Baxter's meta-PAC
@@ -864,8 +877,10 @@ then with $T$ tasks and $m$ samples per task:
 \]
 where $d_{\mathrm{task}}$ is the VC dimension of the task-level
 hypothesis class induced by the bias.  The first term controls
-meta-generalization; the second controls within-task generalization.
-\end{defn}
+meta-generalization; the second controls within-task generalization.  We
+state the bound without proof; the argument combines a covering-number bound
+at the meta level with a VC bound within each task~\cite{Baxter2000}.
+\end{thm}
 
 
 % ================================================================
@@ -1001,10 +1016,12 @@ and obstruction relationships connect them:
   applied to the ramp loss, so margin bounds are a specialization.
 
 \item \textbf{Stability $\Rightarrow$ Information.}  A $\beta$-uniformly
-  stable algorithm satisfies $I(S; W) \leq O(m \beta^2)$ (via the
-  data-processing inequality applied to the Markov chain
-  $Z_i \to S \to W$).  Thus stability bounds imply information-theoretic
-  bounds.
+  stable randomized algorithm satisfies $I(S; W) = O(m \beta^2)$.  The
+  operative step is a stability-to-divergence bound---replacing one example
+  perturbs the output distribution by $O(\beta)$ in KL divergence---not the
+  data-processing inequality; summing the per-coordinate contributions gives
+  the $m\beta^2$ scaling.  Thus, for noisy algorithms, stability bounds imply
+  information-theoretic bounds.
 
 \item \textbf{PAC-Bayes $\leftrightarrow$ Information.}  The PAC-Bayes
   bound with a data-independent prior can be interpreted as an
@@ -1016,10 +1033,10 @@ and obstruction relationships connect them:
 
 \item \textbf{Obstruction: Information $\not\Rightarrow$ Rademacher.}
   Information-theoretic bounds depend on the \emph{algorithm}; Rademacher
-  bounds depend on the \emph{class}.  A deterministic ERM algorithm has
-  maximal $I(S; W)$ but may operate on a class with small Rademacher
-  complexity.  The two frameworks capture orthogonal aspects of
-  generalization.
+  bounds depend on the \emph{class}.  A deterministic ERM algorithm can have
+  $I(S; W)$ as large as $H(W)$---the full entropy of its output---while
+  operating on a class with small Rademacher complexity.  The two frameworks
+  capture orthogonal aspects of generalization.
 
 \item \textbf{Obstruction: Stability $\not\Rightarrow$ PAC-Bayes.}
   Stability measures perturbation sensitivity of the \emph{algorithm}.
@@ -1153,7 +1170,8 @@ Margin & $O(\|v\|_1 \|W\|_\sigma / (\gamma\sqrt{m}))$
 \end{tabular}
 
 \smallskip
-The VC bound is vacuous because it counts parameters ($\sim 10^5$).
+The VC bound is vacuous because it scales with the parameter count
+($\sim 10^5$, via the proxy $\VC = \tilde{O}(\#\text{params})$).
 Rademacher and margin bounds depend on norms, which can be controlled by
 regularization.  PAC-Bayes gives the tightest bound when a meaningful
 prior is available (e.g., the initialization distribution of SGD).
@@ -1162,6 +1180,190 @@ ensure~$\beta = O(1/m)$.  The information-theoretic bound depends on the
 noise level of SGD: more noise means less $I(S;W)$ and a tighter bound,
 but also worse training performance.
 \end{computational}
+
+
+\subsection{A Certified Bound for Attention}
+\label{sec:certified-attention}
+
+The five frameworks are theorems about hypothesis classes and algorithms in
+the abstract.  For one concrete modern architecture---a softmax-attention
+head---the pipeline of \Cref{sec:uniform-convergence,sec:rademacher} has been
+carried out inside a proof assistant, producing a generalization guarantee
+that is machine-checked down to the floating-point execution of the head.
+
+\begin{prop}[Certified generalization for an attention head]
+\label{prop:certified-attention}
+Fix a context length~$n$, embedding dimension~$d$, and a bounded,
+$L_\ell$-Lipschitz loss~$\ell$ with $|\ell| \leq b$.  Consider a single
+attention head $f_\theta(x) = \mathrm{attn}\bigl(W_{\mathrm{dec}}(\theta);
+\mathrm{prep}(x)\bigr)$ with a continuous, $L_W$-Lipschitz parameter map
+$W_{\mathrm{dec}}$, over parameters $\theta$ in a Euclidean ball of
+radius~$R$ in $\R^p$.  Set $\kappa = 4R\,L_\ell\,(dB)\,L_W$.  Then for every
+$\varepsilon \geq 0$ and sample size~$m$, with probability at least
+$1 - \exp\!\bigl(-\varepsilon^2 m / (2b^2)\bigr)$ over $S \sim P^m$,
+\[
+  \E_{x \sim P}[\ell(f_\theta(x))]
+  \;\leq\; \frac{1}{m}\sum_{i=1}^m \ell(f_\theta(S_i))
+    \;+\; \frac{24\sqrt{2}}{\sqrt{m}}
+      \int_0^{2b}\!\Bigl(\sqrt{\log 2}
+        + \sqrt{p\,\kappa}\;\eta^{-1/2}\Bigr)\mathrm{d}\eta
+    \;+\; 2\varepsilon
+    \;+\; 2 L_\ell\,\mathrm{env}(f_\theta),
+\]
+where $\mathrm{env}(f_\theta)$ is the floating-point execution envelope of
+the head.
+\end{prop}
+
+\begin{proof}[Proof idea]
+The bound instantiates the chapter's machinery on the attention head viewed
+as a real-valued function class indexed by~$\theta$.  The middle term is the
+\emph{Dudley entropy integral} (\Cref{ch:compression}) of the
+parameter-perturbation cover of the head: the Lipschitz constant $\kappa$
+controls the covering numbers, and the integral $\int_0^{2b}\sqrt{\log
+\mathcal{N}(\eta)}\,\mathrm{d}\eta$ takes the displayed closed form because a
+radius-$R$ ball in $\R^p$ has metric entropy $O(p\log(1/\eta))$.  The
+high-probability lift is the bounded-differences (McDiarmid) step of
+\Cref{thm:rademacher-bound}, with per-example increment $2b/m$.  The one new
+ingredient is the rounding term: the verified statement bounds the
+\emph{executed}, finite-precision head, so it carries an explicit envelope
+$\mathrm{env}(f_\theta)$ separating the idealized map from its floating-point
+realization.  The full derivation is
+formalized.\formal{TLT.attnHead_certified_generalization}
+\end{proof}
+
+The construction lifts from one head to a depth-graded multi-head encoder
+stack: the budget becomes the Dudley capacity of the depth-replicated block,
+growing through the per-layer perturbation envelope with depth and head
+count, and the resulting predicate---true risk exceeds empirical risk plus
+budget plus rounding only on a $\delta$-event---is discharged for the stack
+indexed by its architectural
+configuration.\formal{TLT.config_capacity_law}  That predicate is itself the
+machine-checked definition of a generalization
+certificate.\formal{TLT.CertifiedGeneralization}
+
+\begin{remark}[What the certificate settles, and what it does not]
+\label{rmk:certified-attention}
+\Cref{prop:certified-attention} is an end-to-end verified generalization
+bound for a transformer component: the abstract theory of this chapter,
+instantiated and checked for attention.  It does \emph{not} resolve
+\Cref{op:deep-margins}.  The Dudley budget still grows with the parameter
+radius~$R$, the depth, and the head count, so on a large pretrained model the
+certificate is correct but loose---exactly as the classical bounds are.
+What it adds is a different axis of progress: a \emph{trustworthy} bound,
+whose constants and finite-precision corrections have been audited by a
+kernel rather than estimated by hand.
+\end{remark}
+
+
+% ================================================================
+% OPEN PROBLEMS
+% ================================================================
+
+\section{Open Problems}
+\label{sec:generalization-open}
+
+The deep-network gap of \Cref{op:deep-margins} is the headline question, but
+the chapter's five frameworks and their machine-checked fragments open a
+wider frontier.  Each problem below is tagged as a \emph{known unknown} (KU),
+sharply posed but unresolved, or an \emph{unknown known} (UK), where the
+right invariant or formal object is still missing; a design-lab or literature
+anchor is named where one exists.
+
+\begin{openprob}[Formalizing the data-dependent Rademacher bound]
+\label{op:formalize-rademacher}
+The empirical Rademacher complexity, the Massart finite lemma, and the VC
+bound $\mathcal{R}_m \leq \sqrt{2d\log(em/d)/m}$ are machine-checked
+(\Cref{def:rademacher,prop:rad-vc}), but the assembled high-probability bound
+of \Cref{thm:rademacher-bound}---symmetrization plus the two McDiarmid
+applications---is so far only a placeholder in the companion development.  Can
+the full data-dependent bound be formalized end to end?  A known unknown:
+classical on paper~\cite{BartlettMendelson2002}, open as a verified artifact.
+\end{openprob}
+
+\begin{openprob}[A non-vacuous certified bound for attention]
+\label{op:tighten-certified-attention}
+The certificate of \Cref{prop:certified-attention} is correct but its Dudley
+budget grows with the parameter radius, depth, and head count
+(\leanname{config_capacity_law}).  Can one machine-check a bound for a
+realistic attention stack that is also \emph{non-vacuous} on a benchmark---a
+verified analogue of the PAC-Bayes results for deep networks?  A known
+unknown, and the verified counterpart of \Cref{op:deep-margins}.
+\end{openprob}
+
+\begin{openprob}[Discharging the expressivity leg]
+\label{op:expressivity-leg}
+The transformer design law assembles a certified capacity bound but states an
+\emph{expressivity} obligation as an open hypothesis: that the stack can
+realize a target risk at all.  Can the expressivity leg be discharged with
+explicit width/depth, turning the design law into an unconditional
+generalization-and-approximation guarantee?  An unknown known: the
+approximation invariant for the certified stack is not yet
+formalized~\cite{XuRaginsky2017}.
+\end{openprob}
+
+\begin{openprob}[Making the CMI unification precise]
+\label{op:cmi-unification}
+The conditional-mutual-information framework (\Cref{rmk:cmi}) is said to
+unify PAC-Bayes, VC, and stability bounds.  Is there a single CMI inequality
+from which all three are recovered as corollaries, with explicit constants?
+An unknown known: the unification is asserted but no master theorem with the
+three recoveries written out exists~\cite{SteinkeZakynthinou2020}.
+\end{openprob}
+
+\begin{openprob}[When is uniform convergence necessary?]
+\label{op:uniform-necessity}
+Shalev-Shwartz et al.\ show that beyond binary classification, learnability
+can hold without uniform convergence (\Cref{rmk:stability-beyond}).  Exactly
+which loss/hypothesis structures force uniform convergence to be necessary,
+not merely sufficient?  A known unknown: the boundary between the two regimes
+is uncharted~\cite{ShalevShwartzShamir2010}.
+\end{openprob}
+
+\begin{openprob}[Generalization of interpolators]
+\label{op:benign-overfitting}
+Modern networks interpolate the training data ($\emprisk_S = 0$) yet
+generalize, contradicting the intuition behind every bound in this chapter.
+Is there a complexity measure that is small precisely for the interpolators
+that generalize (benign overfitting) and large for those that do not (the
+double-descent peak)?  A known unknown driving current theory.
+\end{openprob}
+
+\begin{openprob}[Optimal data-dependent priors]
+\label{op:pac-bayes-prior}
+PAC-Bayes is tightest with a prior close to the learned posterior, but the
+prior must be data-independent.  Is there a principled, optimal way to build
+a data-dependent prior (via data splitting or differential privacy) that
+provably minimizes the bound?  A known unknown opened by the non-vacuous
+deep-network results~\cite{DziugaiteRoy2017}.
+\end{openprob}
+
+\begin{openprob}[A formal margin bound for attention]
+\label{op:margin-attention}
+The spectral-norm margin bound for deep networks (\Cref{ex:neural-margin})
+has no verified counterpart for attention.  Can one machine-check a
+margin-based bound for a softmax-attention class, with the product of
+query/key/value operator norms in place of the layer spectral
+norms~\cite{BartlettFosterTelgarsky2017}?  A known unknown on the transformer
+side, complementary to \Cref{prop:certified-attention}.
+\end{openprob}
+
+\begin{openprob}[Rademacher lower bounds]
+\label{op:rademacher-lower}
+Every bound here is an upper bound on the generalization gap.  For which
+classes is the Rademacher complexity also a \emph{lower} bound on the
+worst-case gap, so that $\mathcal{R}_m$ exactly captures learnability rather
+than merely bounding it?  An unknown known: a matching lower-bound invariant
+is missing for general classes.
+\end{openprob}
+
+\begin{openprob}[Non-vacuous information bounds for deterministic learners]
+\label{op:info-deterministic}
+The Xu--Raginsky bound is vacuous when $W = A(S)$ is deterministic, since
+$I(S;W) = H(W)$ (\Cref{rmk:cmi}).  Apart from the CMI construction, is there a
+generalization bound for deterministic algorithms phrased in genuinely
+information-theoretic quantities that stays finite?  A known unknown at the
+frontier of the information-theoretic tradition.
+\end{openprob}
 
 
 % ================================================================
