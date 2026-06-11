@@ -86,7 +86,7 @@ The function $m_\mathcal{H}(\varepsilon, \delta)$ is the \emph{sample
 complexity} of $\mathcal{H}$.  When $m_\mathcal{H}$ is polynomial in
 $1/\varepsilon$ and $1/\delta$, the class is \emph{efficiently PAC learnable}
 (information-theoretically); computational efficiency is a separate
-requirement.
+requirement.\formal{FLT_Proofs.Criterion.PAC.PACLearnable}
 \end{defn}
 
 Before unpacking the definition, we illustrate the full PAC cycle on a
@@ -200,7 +200,7 @@ equivalent:
 \begin{enumerate}[label=(\roman*)]
 \item $\mathcal{H}$ is PAC learnable.
 \item $\mathcal{H}$ has the uniform convergence property.
-\item $\VC(\mathcal{H}) < \infty$.
+\item $\VC(\mathcal{H}) < \infty$.\formal{FLT_Proofs.Theorem.PAC.vc_characterization}
 \end{enumerate}
 Moreover, if $d = \VC(\mathcal{H}) < \infty$, then $\mathcal{H}$ is PAC
 learnable with sample complexity
@@ -257,7 +257,7 @@ If $\VC(\mathcal{H}) = d$, then for all $m \geq d$,
   \growth_\mathcal{H}(m)
   \leq \sum_{i=0}^d \binom{m}{i}
   \leq \left(\frac{em}{d}\right)^d.
-\]
+\]\formal{FLT_Proofs.Theorem.PAC.sauer_shelah_quantitative}
 \end{lemma}
 
 The proof of the Sauer--Shelah lemma is combinatorial, proceeding by induction
@@ -395,7 +395,7 @@ be removed entirely, establishing the tight bound.
 \begin{prop}[ERM is a PAC learner under uniform convergence]
 \label{prop:erm-pac}
 If $\mathcal{H}$ has the uniform convergence property, then $\ERM_\mathcal{H}$
-is a PAC learner for $\mathcal{H}$.
+is a PAC learner for $\mathcal{H}$.\formal{FLT_Proofs.Complexity.Generalization.uc_imp_pac}
 \end{prop}
 
 \begin{proof}
@@ -431,7 +431,7 @@ In the general (non-realizable) case, let $h^* = \arg\min_{h \in \mathcal{H}}
 
 \begin{thm}[Converse of the VC Characterization]
 \label{thm:vc-converse}
-If $\VC(\mathcal{H}) = \infty$, then $\mathcal{H}$ is not PAC learnable.
+If $\VC(\mathcal{H}) = \infty$, then $\mathcal{H}$ is not PAC learnable.\formal{FLT_Proofs.Complexity.Generalization.vcdim_infinite_not_pac}
 \end{thm}
 
 \begin{proof}
@@ -509,9 +509,9 @@ The following are equivalent:
 \item \label{F:agpac} $\mathcal{H}$ is agnostic PAC learnable.
 \item \label{F:erm} $\ERM_\mathcal{H}$ is a PAC learner for $\mathcal{H}$.
 \item \label{F:uc} $\mathcal{H}$ has the uniform convergence property.
-\item \label{F:finvc} $\VC(\mathcal{H}) < \infty$.
+\item \label{F:finvc} $\VC(\mathcal{H}) < \infty$.\formal{FLT_Proofs.Theorem.PAC.fundamental_theorem}
 \item \label{F:fingrowth} $\growth_\mathcal{H}(m) < 2^m$ for some $m$.
-\item \label{F:compression} $\mathcal{H}$ has a finite compression scheme.
+\item \label{F:compression} $\mathcal{H}$ has a finite compression scheme (with side information).\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression}
 \item \label{F:finiteness} Any finite subclass of $\mathcal{H}$ over a
   finite domain is PAC learnable (with bounds depending on $|\mathcal{H}|$),
   and this property ``lifts'' to $\mathcal{H}$.
@@ -655,11 +655,15 @@ Moran and Yehudayoff~\cite{MoranYehudayoff2016}.
 \begin{historical}
 \textbf{The compression conjecture.}
 Littlestone and Warmuth conjectured in 1986 that every class of VC dimension
-$d$ has a compression scheme of size $O(d)$.  The conjecture was resolved
-positively by Moran and Yehudayoff (2016), who proved that every class of
-VC dimension $d$ has a compression scheme of size at most $2^{O(d)}$.
-The $O(d)$ bound remains open; the exponential gap between $d$ and $2^{O(d)}$
-is one of the field's remaining structural questions.
+$d$ has a sample compression scheme of size $O(d)$.  What Moran and
+Yehudayoff~\cite{MoranYehudayoff2016} established in 2016 is the
+\emph{finiteness} direction: every class of finite VC dimension has a
+compression scheme of size $2^{O(d)}$, which closes the equivalence
+\ref{F:finvc} $\Leftrightarrow$ \ref{F:compression} of the Fundamental
+Theorem.  The original $O(d)$ conjecture remains \emph{open}; the
+exponential gap between $d$ and $2^{O(d)}$, and the question of whether
+side information can be removed, are among the field's outstanding
+structural questions (\cref{op:compression-od}).
 \end{historical}
 
 \begin{proof}[Proof sketch (Moran--Yehudayoff)]
@@ -683,6 +687,22 @@ one-inclusion hypergraph, which blows up the size to $2^{O(d)}$.
 % ================================================================
 % SECTION 4: THE AGNOSTIC SETTING AND THE ε² PRICE
 % ================================================================
+
+\subsection{A modern instance: attention is PAC learnable}
+\label{sec:attention-pac}
+
+The Fundamental Theorem reaches well beyond the geometric classes of \cref{ex:pac-rectangles}: its hypotheses are met by the attention mechanism at the centre of the transformer.  Fix an input dimension $d$ and a number of keys $n_K$.  The \emph{soft-attention concept class} $\mathcal{A}_{d,n_K}$ consists of the binary concepts on $\R^d$ obtained by softmax-scoring an input against $n_K$ keys and thresholding the routed output.
+
+\begin{prop}[Soft attention meets the Fundamental Theorem's hypotheses]
+\label{prop:attention-pac}
+The soft-attention concept class $\mathcal{A}_{d,n_K}$ is a well-behaved VC-measurable target: every concept in it is measurable, and the class satisfies the regularity condition under which \cref{thm:vc-char,thm:fundamental} were proved.\formal{TLT.Bridge.softAttention_wellBehaved} Consequently the equivalence web applies to it verbatim: $\mathcal{A}_{d,n_K}$ is PAC learnable if and only if $\VC(\mathcal{A}_{d,n_K}) < \infty$, with the sample complexity of \cref{thm:vc-char}.
+\end{prop}
+
+\begin{proof}
+The softmax routing map is continuous in the input, hence Borel; the score-comparison cells that select the attended key are measurable, so the joint map $(\text{parameters}, x) \mapsto$ concept value is measurable.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.FiniteScoreRouterCode.route_measurable} This is exactly the Krapp--Wirth well-behaved VC-measurable target hypothesis carried silently by the measure-theoretic steps of \cref{sec:vc-char}.  With that hypothesis discharged, the chain Sauer--Shelah $\to$ uniform convergence $\to$ ERM applies to $\mathcal{A}_{d,n_K}$ unchanged, as does the converse (\cref{thm:vc-converse}); the equivalences of \cref{thm:fundamental} therefore hold for the attention class.
+\end{proof}
+
+What \cref{prop:attention-pac} does \emph{not} settle is whether the VC dimension is finite, and that is the substantive question.  For a fixed architecture it is finite: the concepts of $\mathcal{A}_{d,n_K}$ are cut out by a bounded number of smooth inequalities in finitely many parameters, and such parametric families have finite VC dimension by the parameter-counting bounds of Goldberg--Jerrum and Anthony--Bartlett~\cite{AnthonyBartlett1999}.  A fixed attention head is therefore PAC learnable.  The \emph{sharp} VC dimension and sample complexity as functions of $d$, $n_K$, and the score temperature are not pinned down by the measurability result; determining them---in particular whether the dependence on $n_K$ is logarithmic or linear---is open (\cref{op:attention-vc}).
 
 \section{The Agnostic Setting and the \texorpdfstring{$\varepsilon^2$}{epsilon-squared} Price}
 \label{sec:agnostic}
@@ -780,7 +800,7 @@ PAC learner for $\mathcal{H}$ requires sample complexity
 \[
   m(\varepsilon, \delta) = \Omega\!\left(\frac{d}{\varepsilon}\right)
 \]
-for $\varepsilon \leq 1/8$ and $\delta \leq 1/7$.
+for $\varepsilon \leq 1/8$ and $\delta \leq 1/7$.\formal{FLT_Proofs.Theorem.PAC.pac_lower_bound}
 \end{thm}
 
 \begin{proof}
@@ -822,7 +842,7 @@ Let $|X| \geq 2m$.  For any learning algorithm $A$,
   \max_{c \in \{0,1\}^X}\;
   \E_{S \sim D_c^m}\!\bigl[\risk_{D_c}(A(S))\bigr] \geq \frac{1}{4},
 \]
-where $D_c$ is the uniform distribution on $X$ with target $c$.
+where $D_c$ is the uniform distribution on $X$ with target $c$.\formal{FLT_Proofs.Complexity.Generalization.nfl_per_sample_shattered}
 \end{thm}
 
 \begin{proof}
@@ -1038,4 +1058,59 @@ Hanneke~\cite{Hanneke2016}.
   that this matches the agnostic gap of \Cref{thm:agnostic-gap}.
 
 \end{enumerate}
+
+\section{Open Problems}
+\label{sec:ch5-open}
+
+Each problem is anchored to a result above and tagged: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result in the literature or the verified development not yet absorbed into a clean statement.  Verified handles are named where they exist.
+
+\begin{openprob}[The $O(d)$ sample-compression conjecture, \textsc{ku}]
+\label{op:compression-od}
+The Fundamental Theorem's compression equivalence \ref{F:compression} is the finiteness statement: finite VC dimension yields a compression scheme of size $2^{O(d)}$ (with side information).\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression} Prove or refute the Littlestone--Warmuth conjecture that every class of VC dimension $d$ admits a scheme of size $O(d)$ \emph{without} side information; the gap is isolated as \leanname{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening} and recurs from \Cref{ch:objects}.
+\end{openprob}
+
+\begin{openprob}[The VC dimension of attention, \textsc{uk}]
+\label{op:attention-vc}
+\Cref{prop:attention-pac} reduces ``is soft attention PAC learnable?'' to ``is its VC dimension finite?'', and parameter counting answers yes for fixed architectures.  Determine the sharp VC dimension and realizable sample complexity of $\mathcal{A}_{d,n_K}$ as functions of $d$, $n_K$, and the score temperature, deciding whether the dependence on the number of keys $n_K$ is logarithmic or linear, using the chaining and covering-number machinery proved for attention (\leanname{TLT_Proofs.Capacity.Chaining.RademacherSymmetrization}).
+\end{openprob}
+
+\begin{openprob}[Optimal constants in the sample complexity, \textsc{ku}]
+\label{op:sample-constant}
+\Cref{thm:vc-char,thm:pac-lower} bracket the realizable sample complexity as $\Theta(d/\varepsilon)$, and Hanneke~\cite{Hanneke2016} removed the logarithmic factor.  Determine the exact leading constant in both the realizable $\Theta(d/\varepsilon)$ and agnostic $\Theta(d/\varepsilon^2)$ rates, matching the verified lower bound \leanname{FLT_Proofs.Theorem.PAC.pac_lower_bound} to a constant-tight upper bound.
+\end{openprob}
+
+\begin{openprob}[A characterization of efficient PAC learnability, \textsc{ku}]
+\label{op:efficient-pac}
+\Cref{thm:kearns-valiant} exhibits classes that are PAC learnable but not efficiently so.  The Fundamental Theorem characterizes information-theoretic learnability by a single dimension; give a combinatorial or complexity-theoretic characterization of which finite-VC classes are \emph{polynomial-time} PAC learnable, or prove (under standard assumptions) that no purely combinatorial characterization exists.
+\end{openprob}
+
+\begin{openprob}[Unifying the Rademacher face, \textsc{uk}]
+\label{op:rademacher-unify}
+The development proves a Rademacher-complexity face of the Fundamental Theorem---PAC learnability is equivalent to uniform vanishing of the Rademacher complexity.\formal{FLT_Proofs.Theorem.PAC.fundamental_rademacher} Integrate it into the equivalence web of \cref{fig:equivalence-web} as a tenth condition with explicit quantitative links to the VC and compression faces, and formalize the two-sided VC$\leftrightarrow$Rademacher comparison.
+\end{openprob}
+
+\begin{openprob}[The proper/improper price in PAC, \textsc{ku}]
+\label{op:proper-improper-pac}
+The Fundamental Theorem is representation-independent (\Cref{ch:objects}), yet \cref{thm:kearns-valiant} and the computational interlude show the proper/improper distinction is computationally sharp.  Exhibit an invariant of $\mathcal{H}$ that controls the proper-versus-improper sample or time gap, and characterize the classes for which proper PAC learning is no costlier than improper.
+\end{openprob}
+
+\begin{openprob}[Distribution-dependent learnability, \textsc{ku}]
+\label{op:distribution-dependent}
+Exercise~2 shows finite VC dimension is not necessary for fixed-distribution PAC learning.  Characterize distribution-dependent PAC learnability by a metric-entropy condition on $\mathcal{H}$ under $L^1(D)$, and determine exactly how the distribution-free VC characterization is recovered as the supremum over $D$.
+\end{openprob}
+
+\begin{openprob}[The multiclass Fundamental Theorem, \textsc{uk}]
+\label{op:multiclass-fundamental}
+For multiclass and real-valued prediction the VC dimension is replaced by the DS, Natarajan, and fat-shattering dimensions (\Cref{ch:dimensions,ch:extensions}).  Determine which of the nine equivalences of \cref{thm:fundamental} survive, and in particular whether a clean five-way equivalence holds with the DS dimension in place of $\VC$.
+\end{openprob}
+
+\begin{openprob}[The agnostic price for attention, \textsc{uk}]
+\label{op:attention-agnostic}
+Combine \cref{thm:agnostic-gap,prop:attention-pac}: does the $\varepsilon$-vs-$\varepsilon^2$ agnostic price hold for the soft-attention class, and is the classification-noise robustness of attention learning (the analogue of \cref{thm:noise-robust} for $\mathcal{A}_{d,n_K}$) quantifiable in terms of the score temperature?
+\end{openprob}
+
+\begin{openprob}[The one-inclusion graph predictor, \textsc{ku}]
+\label{op:one-inclusion}
+The optimal expected-error predictor in the realizable case is the one-inclusion graph algorithm, and its analysis underlies both the Hanneke bound and the compression direction.  Formalize the one-inclusion graph predictor and prove its $\le d/(m+1)$ leave-one-out error bound, connecting it to the compression scheme of \cref{def:compression} and the open $O(d)$ conjecture (\cref{op:compression-od}).
+\end{openprob}
 
