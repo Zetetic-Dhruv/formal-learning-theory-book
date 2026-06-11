@@ -95,14 +95,14 @@ A \emph{mistake tree} for $\mathcal{H}$ over $X$ is a complete binary tree $T$ i
 \item The left child of $v$ corresponds to the label $y = 0$ and the right child to $y = 1$.
 \item For every root-to-leaf path $(v_1, y_1), (v_2, y_2), \ldots, (v_d, y_d)$, there exists a hypothesis $h \in \mathcal{H}$ consistent with all labels along the path: $h(x_{v_i}) = y_i$ for all $i$.
 \end{itemize}
-The \emph{depth} of the tree is the number of internal nodes on any root-to-leaf path (all paths have the same length since the tree is complete).
+The \emph{depth} of the tree is the number of internal nodes on any root-to-leaf path (all paths have the same length since the tree is complete).\formal{FLT_Proofs.Complexity.Littlestone.MistakeTree.isShattered}
 \end{defn}
 
 The key idea is that a mistake tree encodes an adversary strategy. Starting at the root, the adversary presents $x_{v_1}$. Whatever the learner predicts, the adversary can label $x_{v_1}$ to make the prediction wrong and descend to the corresponding child. Realizability is maintained because every root-to-leaf path is consistent with some $h \in \mathcal{H}$. Thus a mistake tree of depth $d$ represents an adversary strategy that forces \emph{any} learner to make at least $d$ mistakes.
 
 \begin{defn}[Littlestone Dimension {\cite{Littlestone1988}}]
 \label{def:ldim}
-The \emph{Littlestone dimension} of a hypothesis class $\mathcal{H}$, denoted $\Ldim(\mathcal{H})$, is the maximum depth of a complete mistake tree for $\mathcal{H}$. If arbitrarily deep mistake trees exist, $\Ldim(\mathcal{H}) = \infty$.
+The \emph{Littlestone dimension} of a hypothesis class $\mathcal{H}$, denoted $\Ldim(\mathcal{H})$, is the maximum depth of a complete mistake tree for $\mathcal{H}$. If arbitrarily deep mistake trees exist, $\Ldim(\mathcal{H}) = \infty$.\formal{FLT_Proofs.Complexity.GameInfra.LittlestoneDim}
 \end{defn}
 
 \begin{figure}[ht]
@@ -199,14 +199,14 @@ Given a hypothesis class $\mathcal{H}$, the $\SOA$ maintains a version space $V_
 \item Predict $\hat{y}_t = \arg\max_{b \in \{0,1\}} \Ldim(V_t^b)$.
 \item After observing the true label $y_t$, update $V_{t+1} = V_t^{y_t}$.
 \end{enumerate}
-Ties in step 2 are broken arbitrarily.
+Ties in step 2 are broken arbitrarily.\formal{FLT_Proofs.Complexity.GameInfra.SOA}
 \end{defn}
 
 The intuition behind the $\SOA$ is a tree-based version of binary search. At each round, the algorithm asks: ``If I predict $0$ and am wrong, what is the worst the adversary can do to $V_t^1$? And if I predict $1$ and am wrong, what can the adversary do to $V_t^0$?'' By choosing the side with the larger Littlestone dimension, the $\SOA$ ensures that every mistake reduces the Littlestone dimension of the version space by at least one.
 
 \begin{thm}[Upper Bound: $\SOA$ achieves $\Ldim(\mathcal{H})$ mistakes {\cite{Littlestone1988}}]
 \label{thm:soa-upper}
-For any hypothesis class $\mathcal{H}$ with $\Ldim(\mathcal{H}) = d < \infty$, the $\SOA$ makes at most $d$ mistakes against any adversary.
+For any hypothesis class $\mathcal{H}$ with $\Ldim(\mathcal{H}) = d < \infty$, the $\SOA$ makes at most $d$ mistakes against any adversary.\formal{FLT_Proofs.Theorem.Online.soa_mistakes_bounded}
 \end{thm}
 
 \begin{proof}
@@ -214,7 +214,8 @@ We show that the Littlestone dimension of the version space drops by at least on
 \begin{equation}
 \label{eq:ldim-drop}
 \text{If the $\SOA$ makes a mistake at round } t, \text{ then } d_{t+1} \leq d_t - 1.
-\end{equation}
+\end{equation}%
+\formal{FLT_Proofs.Theorem.Online.ldim_strict_decrease_on_mistake}
 
 \emph{Proof of the claim.} Suppose the $\SOA$ makes a mistake at round $t$. This means $\hat{y}_t \neq y_t$. By the algorithm's rule, $\hat{y}_t$ was chosen so that $\Ldim(V_t^{\hat{y}_t}) \geq \Ldim(V_t^{y_t})$, i.e., the $\SOA$ predicted the side with the \emph{larger} (or equal) Littlestone dimension. After the mistake, the version space updates to $V_{t+1} = V_t^{y_t}$, the side with the \emph{smaller} (or equal) Littlestone dimension.
 
@@ -247,7 +248,7 @@ The upper bound shows that the $\SOA$ can limit mistakes to $\Ldim(\mathcal{H})$
 
 \begin{thm}[Lower Bound: Any learner makes at least $\Ldim(\mathcal{H})$ mistakes {\cite{Littlestone1988}}]
 \label{thm:lower-bound}
-For any hypothesis class $\mathcal{H}$ with $\Ldim(\mathcal{H}) = d$ and any (possibly randomized) learner $A$, there exists an adversary strategy that forces $A$ to make at least $d$ mistakes.
+For any hypothesis class $\mathcal{H}$ with $\Ldim(\mathcal{H}) = d$ and any (possibly randomized) learner $A$, there exists an adversary strategy that forces $A$ to make at least $d$ mistakes.\formal{FLT_Proofs.Theorem.Online.adversary_lower_bound}
 \end{thm}
 
 \begin{proof}
@@ -274,7 +275,7 @@ For any hypothesis class $\mathcal{H}$:
 \[
 \mathrm{Opt}(\mathcal{H}) = \Ldim(\mathcal{H}).
 \]
-That is, the optimal mistake bound of $\mathcal{H}$ in the online learning game is exactly the Littlestone dimension of $\mathcal{H}$. In particular, $\mathcal{H}$ admits a finite mistake bound if and only if $\Ldim(\mathcal{H}) < \infty$.
+That is, the optimal mistake bound of $\mathcal{H}$ in the online learning game is exactly the Littlestone dimension of $\mathcal{H}$. In particular, $\mathcal{H}$ admits a finite mistake bound if and only if $\Ldim(\mathcal{H}) < \infty$.\formal{FLT_Proofs.Theorem.Online.optimal_mistake_bound_eq_ldim}
 \end{thm}
 
 \begin{historical}
@@ -333,6 +334,27 @@ Ben-David, P\'al, and Shalev-Shwartz~\cite{BenDavidPalShalevShwartz2009} showed 
 % VC ≤ Ldim always; thresholds show the gap can be infinite.
 % ================================================================
 
+\subsection{Attention as exponential weights}
+\label{sec:attention-online}
+
+The multiplicative-weights update of \cref{thm:weighted-majority} is the computational core of the attention mechanism.  Fix scores $s(x) \in \R^k$ assigned to $k$ keys by a parametric router on input $x$.  The soft-attention weight on key $i$ is the softmax $w_i(x) = e^{s_i(x)} / \sum_j e^{s_j(x)}$, which is exactly the exponential-weights (Hedge) distribution with the scores in the role of cumulative gains.
+
+\begin{prop}[Softmax attention is an exponential-weights step]
+\label{prop:attention-hedge}
+The soft-attention weights $w_i(x) \propto \exp(s_i(x))$ are the Hedge distribution of \cref{thm:weighted-majority} over the $k$ keys.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.softmaxWeight} The weight order matches the score order---$w_i(x) \le w_j(x)$ if and only if $s_i(x) \le s_j(x)$---so the hard, argmax route attends to the maximally-weighted key, the Halving-style greedy specialization of the same update.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.softmaxWeight_le_iff_score}
+\end{prop}
+
+\begin{proof}
+Both claims unfold the softmax.  The normalization $\sum_j e^{s_j(x)}$ is positive, so $w_i \propto e^{s_i}$ is a probability vector, and it coincides termwise with the exponential-weights distribution that assigns mass $\propto e^{\eta G_i}$ to expert $i$ of cumulative gain $G_i$ at learning rate $\eta$ (the inverse temperature, absorbed into the score scale).  Since $t \mapsto e^t$ is strictly increasing, $w_i \le w_j \Leftrightarrow e^{s_i} \le e^{s_j} \Leftrightarrow s_i \le s_j$, and the $\arg\max$ of the weights is the $\arg\max$ of the scores.
+\end{proof}
+
+The correspondence makes the regret framework of \cref{sec:regret} the right setting for a routed transformer: a layer attending over $k$ keys runs one exponential-weights step, and the regret bound $2\sqrt{T \ln k}$ bounds how much worse the routed predictions are than the single best key in hindsight.
+
+\begin{remark}[Route stability]
+\label{rmk:route-stability}
+A tempered attention router's hard route is stable: away from a score tie, a small perturbation of the scores---or of the parameters and temperature that produce them---leaves the routed key unchanged.\formal{TLT_Proofs.TemperedDesignLaw.Stability.TD7_route_stable_proof} The inputs at which the route flips form the score-tie boundary, of the same measure-zero character that the mistake-tree analysis of \cref{sec:soa} exploits when it splits the version space by a single instance's label.  Stability is what lets the discrete, argmax-routed learner inherit the regret guarantee of its smooth softmax surrogate.
+\end{remark}
+
 \section{The PAC--Online Gap}
 \label{sec:pac-online-gap}
 
@@ -340,7 +362,7 @@ The VC dimension and the Littlestone dimension both measure the complexity of a 
 
 \begin{prop}[$\VC \leq \Ldim$]
 \label{prop:vc-leq-ldim}
-For any hypothesis class $\mathcal{H}$, $\VC(\mathcal{H}) \leq \Ldim(\mathcal{H})$.
+For any hypothesis class $\mathcal{H}$, $\VC(\mathcal{H}) \leq \Ldim(\mathcal{H})$.\formal{FLT_Proofs.Complexity.Littlestone.BranchWiseLittlestoneDim_ge_VCDim}
 \end{prop}
 
 \begin{proof}
@@ -387,7 +409,7 @@ The inequality $\VC \leq \Ldim$ is often tight (e.g., for halfspaces, where both
 
 \begin{prop}[The PAC--Online separation: thresholds on $\R$]
 \label{prop:pac-online-sep}
-Let $\mathcal{H}_{\mathrm{thr}} = \{x \mapsto \ind[x \geq \theta] : \theta \in \R\}$. Then $\VC(\mathcal{H}_{\mathrm{thr}}) = 1$ and $\Ldim(\mathcal{H}_{\mathrm{thr}}) = \infty$.
+Let $\mathcal{H}_{\mathrm{thr}} = \{x \mapsto \ind[x \geq \theta] : \theta \in \R\}$. Then $\VC(\mathcal{H}_{\mathrm{thr}}) = 1$ and $\Ldim(\mathcal{H}_{\mathrm{thr}}) = \infty$.\formal{FLT_Proofs.Theorem.Separation.pac_not_implies_online}
 \end{prop}
 
 \begin{proof}
@@ -396,7 +418,7 @@ $\VC = 1$: Any single point $x$ is shattered (take thresholds $\theta < x$ and $
 $\Ldim = \infty$: We construct mistake trees of arbitrary depth. For any $d$, consider the domain restricted to $\{1, 2, \ldots, 2^d\}$. The adversary can perform binary search: at depth $k$, present the midpoint of the current interval. Whatever the learner predicts, the adversary labels to force a mistake (and narrows the interval by half). After $d$ rounds, the adversary has traced a path from root to leaf, consistent with the threshold at the boundary of the final interval. Since $d$ was arbitrary, $\Ldim = \infty$.
 \end{proof}
 
-This separation is the most important non-implication in the concept graph. It witnesses the edge $\nde{pac\_learning} \xrightarrow{\rel{does\_not\_imply}} \nde{online\_learning}$: a class can be PAC learnable (finite VC dimension) yet not online learnable (infinite Littlestone dimension). The converse implication does hold: $\Ldim < \infty$ implies $\VC < \infty$ (by $\VC \leq \Ldim$), so online learnability implies PAC learnability.
+This separation is the most important non-implication in the concept graph. It witnesses the edge $\nde{pac\_learning} \xrightarrow{\rel{does\_not\_imply}} \nde{online\_learning}$: a class can be PAC learnable (finite VC dimension) yet not online learnable (infinite Littlestone dimension). The converse implication does hold: $\Ldim < \infty$ implies $\VC < \infty$ (by $\VC \leq \Ldim$), so online learnability implies PAC learnability.\formal{FLT_Proofs.Theorem.Separation.online_imp_pac}
 
 \begin{separation}
 \textbf{PAC $\not\Rightarrow$ Online.} Witness: $\mathcal{H}_{\mathrm{thr}}$ on $\R$. The adversary in the online game can exploit the \emph{order structure} of $\R$ by performing binary search on the threshold. A random sample from a fixed distribution cannot exploit this ordering---with high probability, the sample reveals the threshold's location to within $\varepsilon$. The gap between PAC and online learnability is not a technicality: it reflects a fundamental difference between random and adversarial data.
@@ -425,4 +447,59 @@ The online learning model replaces PAC's probabilistic framework with a game bet
 \end{enumerate}
 
 The combinatorial and algorithmic flavor of this chapter is not accidental. Online learning theory is fundamentally about trees and algorithms, where PAC learning theory is about sets and probabilities. Both paradigms measure the complexity of the same object (a hypothesis class $\mathcal{H}$), but through different instruments---and the instruments are not interchangeable.
+
+\section{Open Problems}
+\label{sec:ch6-open}
+
+Each problem is anchored to a result above and tagged: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result in the literature or the verified development not yet absorbed into a clean statement.  Verified handles are named where they exist.
+
+\begin{openprob}[The Littlestone dimension of attention, \textsc{uk}]
+\label{op:ldim-attention}
+\Cref{prop:attention-hedge} identifies soft attention with exponential weights.  Determine the Littlestone dimension of a finite-head attention class as a function of the architecture and the inverse temperature: is it finite (so the class is online learnable, \cref{thm:littlestone-characterization}), and does it diverge as the temperature grows and the router approaches a hard threshold---the regime in which thresholds on $\R$ already give $\Ldim = \infty$ (\cref{prop:pac-online-sep})?
+\end{openprob}
+
+\begin{openprob}[Regret of online attention routing, \textsc{uk}]
+\label{op:attention-regret}
+Via \cref{prop:attention-hedge}, a layer routing over $k$ keys runs one Hedge step.  Prove the $O(\sqrt{T \ln k})$ regret bound for online attention routing with the inverse temperature as the learning rate, and determine the optimal temperature schedule, connecting it to the route-stability margin (\cref{rmk:route-stability}, \leanname{TLT_Proofs.TemperedDesignLaw.Stability.TD7_route_stable_proof}).
+\end{openprob}
+
+\begin{openprob}[Computable optimal online learners, \textsc{ku}]
+\label{op:soa-computable}
+\Cref{rmk:soa-computability} notes the $\SOA$ may be uncomputable because $\Ldim(V_t^b)$ can be undecidable.  Characterize the classes for which the $\SOA$ is computable in polynomial time per round, and decide whether every class of finite Littlestone dimension admits \emph{some} efficient optimal online learner, or whether an information--computation gap separates online learnability from efficient online learnability as it does in the PAC setting (\Cref{ch:pac}).
+\end{openprob}
+
+\begin{openprob}[The optimal regret constant, \textsc{ku}]
+\label{op:regret-constant}
+Ben-David--P\'al--Shalev-Shwartz~\cite{BenDavidPalShalevShwartz2009} give minimax regret $\Theta(\sqrt{\Ldim(\mathcal{H}) \cdot T})$ in the agnostic setting (\cref{rmk:regret-ldim}).  Determine the exact leading constant, and the finite-$T$ correction, matching upper and lower bounds in terms of the Littlestone dimension alone.
+\end{openprob}
+
+\begin{openprob}[The multiclass online characterization, \textsc{uk}]
+\label{op:online-multiclass}
+The mistake tree and $\SOA$ are defined for binary labels.  Determine the multiclass online characterization: which tree dimension (a multiclass Littlestone dimension over $|Y| > 2$) governs the optimal mistake bound, and whether the clean $\mathrm{Opt} = \Ldim$ identity of \cref{thm:littlestone-characterization} survives, paralleling the multiclass PAC question of \Cref{ch:extensions}.
+\end{openprob}
+
+\begin{openprob}[Online learnability and privacy, \textsc{ku}]
+\label{op:private-online}
+Alon--Livni--Malliaris--Moran established that a class is online learnable if and only if it is differentially-privately PAC learnable---finite Littlestone dimension on both sides.  Formalize this equivalence on top of the verified Littlestone characterization (\leanname{FLT_Proofs.Theorem.Online.optimal_mistake_bound_eq_ldim}), and determine the quantitative dependence of the private sample complexity on $\Ldim(\mathcal{H})$.
+\end{openprob}
+
+\begin{openprob}[Quantitative route stability, \textsc{uk}]
+\label{op:route-stability-quant}
+\Cref{rmk:route-stability} asserts stability away from score ties.  Quantify it: bound the measure of the score-tie boundary set, and the perturbation margin that preserves the route, as functions of the inverse temperature, exhibiting the trade-off between routing sharpness (which improves the Hedge approximation) and stability (which preserves the inherited regret guarantee).
+\end{openprob}
+
+\begin{openprob}[Bandit attention, \textsc{ku}]
+\label{op:bandit-attention}
+In the partial-information (bandit) setting only the loss of the routed key is observed, not the full label.  Determine the regret of online attention routing under bandit feedback---the $\sqrt{kT}$-versus-$\sqrt{T\ln k}$ gap between bandit and full-information exponential weights---and whether route stability mitigates the exploration cost.
+\end{openprob}
+
+\begin{openprob}[Halving versus the $\SOA$, \textsc{ku}]
+\label{op:halving-soa}
+\Cref{rmk:soa-halving} contrasts cardinality with Littlestone dimension.  Characterize the classes on which Halving is sub-optimal by an unbounded factor---where $\log_2|\mathcal{H}|$ (or its effective analogue) exceeds $\Ldim(\mathcal{H})$ arbitrarily---and give the structural property of $\mathcal{H}$ that the $\SOA$ exploits and Halving does not.
+\end{openprob}
+
+\begin{openprob}[Online-to-batch for attention, \textsc{uk}]
+\label{op:online-to-batch-attention}
+The implication online $\Rightarrow$ PAC is verified (\leanname{FLT_Proofs.Theorem.Separation.online_imp_pac}).  Make it quantitative for attention: convert the online mistake bound of a finite-Littlestone attention class into a PAC sample-complexity bound via online-to-batch, and decide whether the conversion is tight or loses a factor, sharpening the relation between \cref{op:ldim-attention} here and the VC question \cref{op:attention-vc} of \Cref{ch:pac}.
+\end{openprob}
 
