@@ -66,7 +66,7 @@ $S = \{x_1, \ldots, x_n\} \subseteq X$ be a finite set.  The
   \;\subseteq\; \{0,1\}^n.
 \]
 We say $\mathcal{H}$ \emph{shatters} $S$ if $\mathcal{H}|_S = \{0,1\}^n$,
-i.e., every labeling of $S$ is realized by some hypothesis in $\mathcal{H}$.
+i.e., every labeling of $S$ is realized by some hypothesis in $\mathcal{H}$.\formal{FLT_Proofs.Complexity.VCDimension.Shatters}
 \end{defn}
 
 \begin{defn}[VC Dimension {\cite{VapnikChervonenkis1971}}]
@@ -79,7 +79,7 @@ $\mathcal{H}$:
   \text{ shatters } S\bigr\}.
 \]
 If $\mathcal{H}$ shatters arbitrarily large finite sets,
-$\VC(\mathcal{H}) = \infty$.
+$\VC(\mathcal{H}) = \infty$.\formal{FLT_Proofs.Complexity.VCDimension.VCDim}
 \end{defn}
 
 \begin{example}[Halfplanes in $\R^2$]
@@ -155,7 +155,7 @@ The \emph{growth function} (or \emph{shatter coefficient}) of $\mathcal{H}$ is
   \bigl|\mathcal{H}|_S\bigr|.
 \]
 Equivalently, $\growth_\mathcal{H}(n)$ is the maximum number of distinct
-behaviors $\mathcal{H}$ can exhibit on any $n$ points.
+behaviors $\mathcal{H}$ can exhibit on any $n$ points.\formal{FLT_Proofs.Complexity.VCDimension.GrowthFunction}
 \end{defn}
 
 The growth function satisfies $\growth_\mathcal{H}(n) \leq 2^n$ always, with
@@ -176,7 +176,7 @@ all $n \geq 1$,
 \]
 In particular, $\growth_\mathcal{H}(n) \leq \bigl(\frac{en}{d}\bigr)^d$ for
 $n \geq d \geq 1$, so the growth function is polynomial in $n$ when
-$d < \infty$.
+$d < \infty$.\formal{FLT_Proofs.Theorem.PAC.sauer_shelah_quantitative}
 \end{lemma}
 
 The proof is by double induction and is one of the most elegant arguments in
@@ -374,7 +374,7 @@ The relationship between the two fundamental dimensions is strict:
 \begin{prop}
 \label{prop:vc-leq-ldim}
 For any hypothesis class $\mathcal{H}$,
-$\VC(\mathcal{H}) \leq \Ldim(\mathcal{H})$.
+$\VC(\mathcal{H}) \leq \Ldim(\mathcal{H})$.\formal{FLT_Proofs.Complexity.Littlestone.BranchWiseLittlestoneDim_ge_VCDim}
 \end{prop}
 
 \begin{proof}
@@ -416,7 +416,7 @@ $b \in \{0,1\}^n$, there exists $f \in \mathcal{F}$ with
   \quad \text{for all } i = 1, \ldots, n.
 \]
 The \emph{pseudodimension} $\Pdim(\mathcal{F})$ is the largest cardinality of
-a P-shattered set.
+a P-shattered set.\formal{FLT_Proofs.Complexity.Structures.Pseudodimension}
 \end{defn}
 
 The thresholds $t_i$ act as ``witnesses'': they reduce a real-valued
@@ -437,7 +437,7 @@ labeling $b \in \{0,1\}^n$, there exists $f \in \mathcal{F}$ with
 \]
 for all $i$.  The \emph{fat-shattering dimension at scale $\gamma$}, denoted
 $\fatshat_\gamma(\mathcal{F})$, is the largest cardinality of a
-$\gamma$-fat-shattered set.
+$\gamma$-fat-shattered set.\formal{FLT_Proofs.Complexity.Structures.FatShatteringDim}
 \end{defn}
 
 The margin parameter $\gamma$ makes fat-shattering \emph{scale-sensitive}:
@@ -501,7 +501,7 @@ dimension} $\Ndim(\mathcal{H})$ is the largest $d$ such that there exist
   for all $i$,
 \end{itemize}
 such that for every labeling $b \in \{0,1\}^d$, there exists $h \in
-\mathcal{H}$ with $h(x_i) = f_{b_i}(x_i)$ for all $i$.
+\mathcal{H}$ with $h(x_i) = f_{b_i}(x_i)$ for all $i$.\formal{FLT_Proofs.Complexity.Structures.NatarajanDim}
 \end{defn}
 
 The Natarajan dimension generalizes the VC dimension in a natural way: instead
@@ -575,7 +575,7 @@ A \emph{pseudo-cube of dimension $d$} in $G_\mathcal{H}$ is a subhypergraph
 isomorphic to the complete $d$-dimensional hypercube graph $\{0,1\}^d$.
 
 The DS dimension $\DSdim(\mathcal{H})$ is the supremum over all finite
-$S \subseteq X$ of the maximum dimension of a pseudo-cube in $G_\mathcal{H}$.
+$S \subseteq X$ of the maximum dimension of a pseudo-cube in $G_\mathcal{H}$.\formal{FLT_Proofs.Complexity.Structures.DSDim}
 \end{defn}
 
 \begin{thm}[Multiclass Characterization
@@ -671,11 +671,12 @@ pseudodimension, fat-shattering, Natarajan, and DS.}
 \midrule
 Star number
   & $\mathfrak{s}(\mathcal{H})$
-  & The maximum number of sets in a sunflower whose kernel is not shattered.
-    Finiteness of $\mathfrak{s}(\mathcal{H})$ is \emph{equivalent} to
-    $\VC(\mathcal{H}) < \infty$---a surprising alternative
-    combinatorial characterization of PAC learnability.
-  & \Cref{ch:pac} \\
+  & The largest set on which each point can be isolated by some concept.
+    It satisfies $\mathfrak{s}(\mathcal{H}) \geq \VC(\mathcal{H})$, so finite
+    star number implies finite VC, but \emph{not} conversely (singletons:
+    $\mathfrak{s} = \infty$, $\VC = 1$).  It governs active-learning label
+    complexity.
+  & \Cref{ch:objects} \\
 \addlinespace
 Eluder dimension
   & $\dim_E(\mathcal{F})$
@@ -714,15 +715,18 @@ Ordinal Littlestone dim
 \end{tabularx}
 \end{table}
 
-\begin{remark}[Star number equivalence]
+\begin{remark}[Star number versus VC dimension]
 \label{rmk:star-number}
-The equivalence between finite star number and finite VC dimension is
-not obvious.  The star number counts a sunflower-type configuration that,
-on its face, looks quite different from shattering.  That these two
-combinatorial conditions coincide is one of the surprising structural
-facts of the theory: there are \emph{multiple, independently motivated}
-combinatorial properties of a hypothesis class that all turn out to be
-equivalent to PAC learnability.
+It is tempting to believe that finite star number and finite VC dimension
+coincide.  They do not.  The star number dominates the VC dimension,
+$\mathfrak{s}(\mathcal{H}) \geq \VC(\mathcal{H})$ (\Cref{prop:star-ge-vc}),
+because a shattered set is in particular a set on which each point can be
+isolated; but the reverse fails, and fails infinitely.  The class of
+singletons on an infinite domain has $\VC = 1$ yet $\mathfrak{s} = \infty$
+(\Cref{rmk:star-not-equiv}).\formal{FLT_Proofs.Complexity.VCDimension.StarNumber} Finiteness of the star number is therefore
+\emph{strictly stronger} than PAC learnability, not equivalent to it; its
+proper role is in active learning, where it controls the label
+complexity~\cite{HannekeYang2015}.
 \end{remark}
 
 
@@ -747,3 +751,74 @@ the landscapes are genuinely different---as the separation results of
 The next chapter turns from combinatorial dimensions to a different family of
 complexity measures: those based on \emph{compression} and \emph{sample
 complexity}.
+
+\section{The Dimensions of an Attention Class}
+\label{sec:attention-dimensions}
+
+The combinatorial dimensions of this chapter take concrete values on the attention classes of a transformer, and those values control its sample complexity, its online learnability, and its learning rate.  Fix a finite-head attention class $\mathcal{A}_{d,n_K}$ on $\R^d$ with $n_K$ keys.
+
+\begin{prop}[The VC dimension of attention is finite]
+\label{prop:attention-vc-dim}
+A fixed-architecture soft-attention class has finite VC dimension, so the Sauer--Shelah bound (\cref{lem:sauer-shelah}) applies: its growth function is polynomial.\formal{FLT_Proofs.Complexity.VCDimension.VCDim}
+\end{prop}
+
+\begin{proof}
+The class is a well-behaved VC-measurable target (\cref{prop:attention-pac}), and its concepts are cut out by a bounded number of smooth inequalities in finitely many parameters; such parametric families shatter no arbitrarily large set, so $\VC(\mathcal{A}_{d,n_K}) < \infty$.  Sauer--Shelah then bounds $\growth_{\mathcal{A}}(n) \leq (en/\VC)^{\VC}$.
+\end{proof}
+
+The other dimensions of this chapter then read off the rest of the attention class's profile.  Its \emph{Littlestone} dimension---finite or infinite---decides whether the class is online learnable and whether its universal rate is exponential or linear (\Cref{ch:universal}); finiteness is open (\cref{op:attention-dim-profile}).  Its \emph{star number} governs how cheaply an active learner can extract the head's behaviour by querying, the methodology of \Cref{ch:exact}.  And when attention routes over a label set of size $n_K \geq 3$---a genuine multiclass head---its \emph{DS} dimension, not its Natarajan dimension, is what decides learnability, by the same thirty-year correction told above.  The single architecture is thus a point in every one of this chapter's dimension spaces at once, and the spaces disagree about it in exactly the ways the separation results of \Cref{ch:separations} predict.
+
+\section{Open Problems}
+\label{sec:ch10-open}
+
+Each problem is anchored to a result above and tagged: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result in the literature or the verified development not yet absorbed into a clean statement.  Verified handles are named where they exist.
+
+\begin{openprob}[The dimension profile of attention, \textsc{uk}]
+\label{op:attention-dim-profile}
+\Cref{prop:attention-vc-dim} pins the VC dimension of a finite-head attention class as finite.  Compute the full dimension profile---VC, Littlestone, star number, and (for multiclass heads) DS---as functions of the architecture and score temperature, settling the regime questions of \Cref{ch:online,ch:universal} for attention in one stroke.
+\end{openprob}
+
+\begin{openprob}[The optimal compression of VC classes, \textsc{ku}]
+\label{op:od-compression-dim}
+The Sauer--Shelah lemma (\cref{lem:sauer-shelah}) converts finite VC dimension into a polynomial growth function.  Determine whether every class of VC dimension $d$ admits a sample compression scheme of size $O(d)$ (Littlestone--Warmuth), the open conjecture isolated in \leanname{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening} and recurring from \Cref{ch:objects,ch:compression}.
+\end{openprob}
+
+\begin{openprob}[A combinatorial proof that DS characterizes multiclass learning, \textsc{uk}]
+\label{op:ds-formal}
+The DS characterization (\cref{thm:ds-char}) is cited, not verified; the development types the DS dimension (\leanname{FLT_Proofs.Complexity.Structures.DSDim}) and the Natarajan dimension but not the characterization theorem.  Formalize the Brukhim et al.\ proof that $\DSdim(\mathcal{H}) < \infty$ iff $\mathcal{H}$ is multiclass PAC learnable, and verify the exact relationship between the DS and Natarajan dimensions.
+\end{openprob}
+
+\begin{openprob}[Closing the Natarajan--DS gap quantitatively, \textsc{ku}]
+\label{op:natarajan-ds-gap}
+\Cref{thm:natarajan-failure} shows $\Ndim$ can be $1$ while the class is unlearnable ($\DSdim = \infty$).  Characterize exactly how large the DS dimension can be as a function of the Natarajan dimension and the label-set size $|Y|$, and identify the structural feature of the label set that makes the gap appear.
+\end{openprob}
+
+\begin{openprob}[Fat-shattering rates for attention, \textsc{uk}]
+\label{op:fat-attention}
+Soft attention outputs real-valued scores before thresholding.  Compute the fat-shattering dimension $\fatshat_\gamma$ (\cref{def:fat-shattering}) of the real-valued attention-score class as a function of the margin $\gamma$ and the temperature, giving margin-based generalization bounds for attention via \cref{thm:fat-char}.
+\end{openprob}
+
+\begin{openprob}[A unifying dimension functor, \textsc{ku}]
+\label{op:dimension-functor}
+The chapter catalogs a dozen dimensions, each governing one paradigm.  Determine whether they are values of a single functor from concept classes (with label-preserving maps) to ordinals, recovering VC, Littlestone, DS, and fat-shattering by specializing a data-model and a scale parameter, or prove the dimensions are provably non-unifiable.
+\end{openprob}
+
+\begin{openprob}[The exact star-number--VC gap, \textsc{ku}]
+\label{op:star-vc-gap}
+\Cref{rmk:star-number} corrects the folklore: $\mathfrak{s} \geq \VC$ with an infinite gap for singletons.  Characterize the classes for which $\mathfrak{s}(\mathcal{H}) = O(\VC(\mathcal{H}))$, and determine the active-learning label-complexity speed-up that finiteness of the star number buys over the worst case, on top of \leanname{FLT_Proofs.Complexity.VCDimension.StarNumber}.
+\end{openprob}
+
+\begin{openprob}[Pseudodimension versus fat-shattering for neural classes, \textsc{uk}]
+\label{op:pdim-fat}
+\Cref{thm:fat-char} shows the pseudodimension alone does not characterize agnostic real-valued learnability; the scale-sensitive fat-shattering dimension does.  Determine, for the score class of a transformer, how far the pseudodimension over-estimates the learnable complexity, and whether the gap shrinks with depth.
+\end{openprob}
+
+\begin{openprob}[Ordinal dimensions and the slow regime, \textsc{uk}]
+\label{op:ordinal-dim-slow}
+\Cref{tab:other-dims} lists the ordinal VC and Littlestone dimensions (\leanname{FLT_Proofs.Complexity.Ordinal.OrdinalLittlestoneDim}).  Determine whether a single ordinal-valued dimension characterizes the boundary between the linear and arbitrarily-slow universal rates of \Cref{ch:universal}, completing the dimension story of the trichotomy.
+\end{openprob}
+
+\begin{openprob}[The dual VC dimension and attention routing, \textsc{uk}]
+\label{op:dual-vc-attention}
+The development types the dual class and proves a dual-to-primal shattering transfer (\leanname{FLT_Proofs.Complexity.DualVC.dual_shatters_imp_original_shatters}).  Interpret the dual VC dimension of an attention class---shattering by the \emph{keys} rather than the inputs---and determine what it measures about a transformer's routing capacity.
+\end{openprob}
