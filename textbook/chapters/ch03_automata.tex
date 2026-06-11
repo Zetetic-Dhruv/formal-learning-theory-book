@@ -1,4 +1,7 @@
 % Chapter 3: Automata, Languages, and Computability
+% Rewritten against the design-lab Lean 4 kernel (FLT_Proofs.Computation, FLT_Proofs.Complexity.MindChange):
+% every model typed against the verified computability substrate; full proofs for the
+% pumping separation, the subset construction, and the limit-lemma direction.
 %   dfa, nfa, pushdown_automaton, turing_machine, cfg = Profile A (vocabulary)
 %   regular_language, cfl, re_set, partial_computable = Profile A (one-line)
 %   godel_numbering = Profile A-plus (brief but load-bearing for Gold)
@@ -8,19 +11,18 @@
 \chapter{Automata, Languages, and Computability}
 \label{ch:automata}
 
-This chapter assembles the automata-theoretic and computability-theoretic vocabulary required by Gold's model of identification in the limit (\Cref{ch:gold}). Most of the material is standard and is presented without proof; the reader who needs full development should consult Hopcroft and Ullman~\cite{HopcroftUllman1979} or Sipser~\cite{Sipser2013}.
+This chapter assembles the automata-theoretic and computability-theoretic vocabulary required by Gold's model of identification in the limit (\Cref{ch:gold}). Much of the material is standard; the reader who needs the full classical development should consult Hopcroft and Ullman~\cite{HopcroftUllman1979} or Sipser~\cite{Sipser2013}. Every model defined here is typed in the companion Lean~4 development's computability substrate, and three results---the pumping separation of regular from context-free languages, the subset construction, and one direction of the limit lemma---are proved in full.
 
-Two things in this chapter are \emph{not} standard vocabulary. First, the distinction between \emph{restricts} and \emph{extends\_grammar} edges---two ways a computational model can generalize another, one conservative and one genuinely new---is illustrated here for the first time through the NFA/DFA and PDA/DFA pairs (\S\ref{sec:restricts-extends}). This distinction pervades the entire knowledge graph. Second, the notion of limiting recursion connects computability theory to learning theory by placing Gold's identification in the limit at a precise level of the arithmetical hierarchy (\S\ref{sec:bridge}).
-
+Two things here are not standard vocabulary. First, the distinction between \emph{restricts} and \emph{extends\_grammar} edges---two ways one computational model can generalize another, one conservative and one genuinely new---is illustrated through the NFA/DFA and PDA/DFA pairs (\S\ref{sec:restricts-extends}); the distinction pervades the entire knowledge graph. Second, limiting recursion connects computability to learning by placing Gold's identification in the limit at a precise level of the arithmetical hierarchy (\S\ref{sec:bridge}).
 
 % ================================================================
-% SECTION 1: The Chomsky Hierarchy (~1 page)
+% SECTION 1: The Chomsky Hierarchy
 % ================================================================
 
 \section{The Chomsky Hierarchy}
 \label{sec:chomsky}
 
-The Chomsky hierarchy classifies formal languages by the computational resources needed to recognize them. Figure~\ref{fig:chomsky} displays the containment structure; the definitions follow.
+The Chomsky hierarchy classifies formal languages by the computational resources needed to recognize them. Figure~\ref{fig:chomsky} displays the containment structure; the definitions follow. A \emph{formal language} over an alphabet $\Sigma$ is a set of finite words, $L \subseteq \Sigma^\ast$.\formal{FLT_Proofs.Computation.FormalLanguage}
 
 \begin{figure}[ht]
 \centering
@@ -55,43 +57,74 @@ The Chomsky hierarchy classifies formal languages by the computational resources
 
 \begin{defn}[Deterministic Finite Automaton]
 \label{def:dfa}
-A \emph{DFA} is a 5-tuple $M = (Q, \Sigma, \delta, q_0, F)$ where $Q$ is a finite state set, $\Sigma$ is a finite input alphabet, $\delta : Q \times \Sigma \to Q$ is a total transition function, $q_0 \in Q$ is the start state, and $F \subseteq Q$ is the set of accepting states. $M$ accepts a string $w \in \Sigma^*$ if the unique run on $w$ ends in a state in $F$.
+A \emph{DFA} is a 5-tuple $M = (Q, \Sigma, \delta, q_0, F)$ where $Q$ is a finite state set, $\Sigma$ a finite input alphabet, $\delta : Q \times \Sigma \to Q$ a total transition function, $q_0 \in Q$ the start state, and $F \subseteq Q$ the accepting states. $M$ accepts $w \in \Sigma^\ast$ if the unique run on $w$ ends in $F$; the accepted language is $\{w : \hat\delta(q_0, w) \in F\}$, where $\hat\delta$ folds $\delta$ along $w$.\formal{FLT_Proofs.Computation.DFA'}
 \end{defn}
 
 \begin{defn}[Nondeterministic Finite Automaton]
 \label{def:nfa}
-An \emph{NFA} is a 5-tuple $M = (Q, \Sigma, \delta, q_0, F)$ identical to a DFA except that $\delta : Q \times (\Sigma \cup \{\varepsilon\}) \to \mathcal{P}(Q)$ maps each state--symbol pair to a \emph{set} of successor states, and $\varepsilon$-transitions are permitted. $M$ accepts $w$ if \emph{some} run on $w$ ends in $F$.
+An \emph{NFA} is a 5-tuple identical to a DFA except that $\delta : Q \times (\Sigma \cup \{\varepsilon\}) \to \mathcal{P}(Q)$ maps each state--symbol pair to a \emph{set} of successors and $\varepsilon$-transitions are permitted; $M$ accepts $w$ if \emph{some} run ends in $F$.\formal{FLT_Proofs.Computation.NFA'}
 \end{defn}
 
 \begin{defn}[Pushdown Automaton]
 \label{def:pda}
-A \emph{pushdown automaton} (PDA) is a 7-tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, Z_0, F)$ where $\Gamma$ is a finite stack alphabet, $Z_0 \in \Gamma$ is the initial stack symbol, and $\delta : Q \times (\Sigma \cup \{\varepsilon\}) \times \Gamma \to \mathcal{P}(Q \times \Gamma^*)$ maps each state--input--stack-top triple to a set of (state, stack-replacement) pairs. The PDA has access to an unbounded LIFO stack; it accepts by final state or empty stack.
+A \emph{pushdown automaton} (PDA) is a 7-tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, Z_0, F)$ where $\Gamma$ is a finite stack alphabet, $Z_0 \in \Gamma$ the initial stack symbol, and $\delta : Q \times (\Sigma \cup \{\varepsilon\}) \times \Gamma \to \mathcal{P}(Q \times \Gamma^\ast)$ maps each state--input--stack-top triple to a set of (state, stack-replacement) pairs. The PDA has an unbounded LIFO stack and accepts by final state or empty stack.\formal{FLT_Proofs.Computation.PDA}
 \end{defn}
 
 \begin{defn}[Turing Machine]
 \label{def:tm}
-A \emph{Turing machine} is a 7-tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, q_{\mathrm{acc}}, q_{\mathrm{rej}})$ where $\Gamma \supseteq \Sigma$ is the tape alphabet (including a blank symbol), and $\delta : Q \times \Gamma \to Q \times \Gamma \times \{L, R\}$ is a partial transition function specifying the next state, symbol to write, and head movement. $M$ accepts $w$ if it halts in $q_{\mathrm{acc}}$.
+A \emph{Turing machine} is a 7-tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, q_{\mathrm{acc}}, q_{\mathrm{rej}})$ where $\Gamma \supseteq \Sigma$ is the tape alphabet (with a blank), and $\delta : Q \times \Gamma \to Q \times \Gamma \times \{L, R\}$ is a partial transition function specifying the next state, the symbol to write, and head movement; $M$ accepts $w$ if it halts in $q_{\mathrm{acc}}$.\formal{FLT_Proofs.Computation.TuringMachine}
 \end{defn}
 
 \begin{defn}[Context-Free Grammar]
 \label{def:cfg}
-A \emph{context-free grammar} (CFG) is a 4-tuple $G = (V, \Sigma, R, S)$ where $V$ is a finite set of variables, $\Sigma$ is the terminal alphabet, $R \subseteq V \times (V \cup \Sigma)^*$ is a finite set of production rules, and $S \in V$ is the start variable. $G$ generates the language $L(G) = \{w \in \Sigma^* : S \Rightarrow^* w\}$.
+A \emph{context-free grammar} (CFG) is a 4-tuple $G = (V, \Sigma, R, S)$ with $V$ a finite variable set, $\Sigma$ the terminal alphabet, $R \subseteq V \times (V \cup \Sigma)^\ast$ a finite rule set, and $S \in V$ the start variable; $G$ generates $L(G) = \{w \in \Sigma^\ast : S \Rightarrow^\ast w\}$, the reflexive--transitive closure of one-step derivation.\formal{FLT_Proofs.Computation.CFG}
 \end{defn}
 
 \subsection{Language classes}
 
-A language $L \subseteq \Sigma^*$ is \emph{regular} if it is accepted by some DFA. It is \emph{context-free} if it is generated by some CFG (equivalently, accepted by some PDA). It is \emph{recursively enumerable} (r.e.) if it is accepted by some Turing machine. It is \emph{recursive} (decidable) if it is accepted by a Turing machine that halts on every input.
+A language $L \subseteq \Sigma^\ast$ is \emph{regular} if accepted by some DFA;\formal{FLT_Proofs.Computation.IsRegularLang} \emph{context-free} if generated by some CFG (equivalently, accepted by some PDA);\formal{FLT_Proofs.Computation.IsContextFree} \emph{recursively enumerable} (r.e.) if accepted by some Turing machine;\formal{FLT_Proofs.Computation.RESet} and \emph{recursive} (decidable) if accepted by a Turing machine that halts on every input. A function $f : \N \rightharpoonup \N$ is \emph{partial computable} if some Turing machine outputs $f(n)$ when $f(n)$ is defined and diverges otherwise.\formal{FLT_Proofs.Computation.PartialComputable}
 
-A function $f : \N \rightharpoonup \N$ is \emph{partial computable} if there exists a Turing machine $M$ such that $M$ on input $n$ halts with output $f(n)$ when $f(n)$ is defined and diverges otherwise.
+\subsection{Separating the levels by pumping}
+
+The containments of \cref{fig:chomsky} are proper, and the regular/context-free gap drives the edge distinction of \S\ref{sec:restricts-extends}. We prove it from a single combinatorial lemma, whose only input is that a DFA has finitely many states.
+
+\begin{lemma}[Pumping lemma for regular languages {\cite{HopcroftUllman1979}}]
+\label{lemma:pumping}
+For every regular $L$ there is a length $p$ such that every $w \in L$ with $|w| \geq p$ factors as $w = xyz$ with $|xy| \leq p$, $|y| \geq 1$, and $xy^iz \in L$ for all $i \geq 0$.
+\end{lemma}
+
+\begin{proof}
+Let $M$ be a DFA accepting $L$, with $p = |Q|$ states. Take $w \in L$ with $|w| \geq p$. The run of $M$ on $w$ passes through the states $r_0, r_1, \ldots, r_{|w|}$ with $r_0 = q_0$; among the first $p+1$ of these, two coincide by the pigeonhole principle, say $r_j = r_k$ with $j < k \leq p$. Set $x = w_{1\ldots j}$, $y = w_{j+1\ldots k}$, $z = w_{k+1\ldots |w|}$. Then $|xy| = k \leq p$ and $|y| = k - j \geq 1$. Reading $y$ takes state $r_j$ back to itself, so reading $y$ any number of times leaves the run in $r_j$; hence $xy^iz$ drives $M$ from $q_0$ to the same accepting state $r_{|w|}$ for every $i \geq 0$, and $xy^iz \in L$.
+\end{proof}
+
+\begin{prop}[The language $\{a^n b^n\}$ is context-free but not regular]
+\label{prop:anbn}
+$L = \{a^n b^n : n \geq 0\}$ is context-free and not regular; hence $\mathrm{REG} \subsetneq \mathrm{CFL}$.
+\end{prop}
+
+\begin{proof}
+$L$ is generated by the CFG $S \to aSb \mid \varepsilon$ (equivalently, accepted by a PDA that pushes on each $a$ and pops on each $b$), so $L$ is context-free. Suppose $L$ were regular, with pumping length $p$ from \cref{lemma:pumping}. Apply the lemma to $w = a^p b^p \in L$, with $|w| = 2p \geq p$. The factorization $w = xyz$ has $|xy| \leq p$, so $xy$ lies within the initial block of $a$'s and $y = a^k$ for some $k \geq 1$. Then $xy^2z = a^{p+k} b^p$, which has more $a$'s than $b$'s and so is not in $L$, contradicting the lemma. Therefore $L$ is not regular, and since $L \in \mathrm{CFL}$, the containment $\mathrm{REG} \subseteq \mathrm{CFL}$ is proper.
+\end{proof}
 
 \subsection{Closure properties}
 
-The language classes differ sharply in their closure properties. Table~\ref{tab:closure} summarizes the facts needed in later chapters.
+The classes differ sharply in closure. Table~\ref{tab:closure} records the facts used in later chapters; the proofs are standard~\cite{HopcroftUllman1979}, and we give the two that recur. Regular languages are closed under union by the product construction; context-free languages are \emph{not} closed under intersection.
+
+\begin{prop}[Two closure facts]
+\label{prop:closure}
+(i) If $L_1, L_2$ are regular then so is $L_1 \cup L_2$. (ii) Context-free languages are not closed under intersection.
+\end{prop}
+
+\begin{proof}
+(i) Let $M_1 = (Q_1,\Sigma,\delta_1,s_1,F_1)$ and $M_2 = (Q_2,\Sigma,\delta_2,s_2,F_2)$ accept $L_1, L_2$. The product DFA on state set $Q_1 \times Q_2$ with transition $\delta((q_1,q_2),a) = (\delta_1(q_1,a),\delta_2(q_2,a))$, start $(s_1,s_2)$, and accepting set $\{(q_1,q_2): q_1 \in F_1 \text{ or } q_2 \in F_2\}$ simulates both machines in parallel and accepts exactly $L_1 \cup L_2$.
+
+(ii) The languages $L_1 = \{a^n b^n c^m : n,m \geq 0\}$ and $L_2 = \{a^m b^n c^n : n,m \geq 0\}$ are each context-free (a single matched block, the other free), but $L_1 \cap L_2 = \{a^n b^n c^n : n \geq 0\}$, which is not context-free---the pumping lemma for context-free languages forces any pumped factor to disturb the three-way balance. Hence the context-free languages are not closed under intersection.
+\end{proof}
 
 \begin{table}[ht]
 \centering
 \small
-\caption{Closure properties of the Chomsky hierarchy classes. $\checkmark$ = closed, $\times$ = not closed. All proofs are standard; see~\cite{HopcroftUllman1979}.}
+\caption{Closure properties of the Chomsky hierarchy classes. $\checkmark$ = closed, $\times$ = not closed. Union for regular and intersection for context-free are proved in \cref{prop:closure}; the remaining entries are standard~\cite{HopcroftUllman1979}.}
 \label{tab:closure}
 \begin{tabular}{lccccc}
 \toprule
@@ -105,28 +138,26 @@ R.E.          & $\checkmark$ & $\checkmark$ & $\times$     & $\checkmark$ & $\ch
 \end{tabular}
 \end{table}
 
-
 % ================================================================
 % SECTION 2: restricts vs extends_grammar (Profile C — Revelation)
-% Conceptual centerpiece of the chapter
 % ================================================================
 
 \section{Two Kinds of Generalization: Restricts vs.\ Extends}
 \label{sec:restricts-extends}
 
-The Chomsky hierarchy is a containment chain. But the \emph{edges} in this chain are not all of the same type. Moving from one level to another sometimes removes a constraint (making the model less restrictive without adding new primitives) and sometimes adds a genuinely new resource (granting the model access to a mechanism it did not previously have). This distinction---between \emph{conservative} and \emph{generative} generalization---is one of the recurring structural motifs of the knowledge graph, and the automata hierarchy provides its first concrete instance.
+The Chomsky hierarchy is a containment chain, but its edges are not all of one type. Moving between levels sometimes removes a constraint (a more flexible model with no new primitive) and sometimes adds a genuinely new resource (a model with a mechanism it lacked). This distinction---conservative versus generative generalization---is a recurring structural motif of the knowledge graph, and the automata hierarchy provides its first concrete instance.
 
 \begin{defn}[Restricts]
 \label{def:restricts}
-Model $B$ \rel{restricts} model $A$ if $B$ is obtained from $A$ by \emph{removing a constraint}: every instance of $A$ is already an instance of $B$ (after trivial embedding), and the two models accept exactly the same class of languages. The generalization is conservative---it adds flexibility in representation without expanding expressive power.
+Model $B$ \rel{restricts} model $A$ if $B$ is obtained from $A$ by \emph{removing a constraint}: every $A$ is already a $B$ (after trivial embedding), and the two recognize the same class of languages. The generalization is conservative---it adds representational flexibility without expanding expressive power.
 \end{defn}
 
 \begin{defn}[Extends Grammar]
 \label{def:extends-grammar}
-Model $B$ \rel{extends\_grammar} model $A$ if $B$ is obtained from $A$ by \emph{adding a new computational primitive}: $B$ recognizes a strictly larger class of languages than $A$. The generalization is generative---it requires a fundamentally new resource.
+Model $B$ \rel{extends\_grammar} model $A$ if $B$ is obtained by \emph{adding a new computational primitive}: $B$ recognizes a strictly larger class. The generalization is generative---it requires a fundamentally new resource.
 \end{defn}
 
-The DFA is the anchor point for both edges. Figure~\ref{fig:restricts-extends} displays the structure.
+The DFA is the anchor for both edges. Figure~\ref{fig:restricts-extends} displays the structure, and the two propositions below supply the rigorous content of each edge.
 
 \begin{figure}[ht]
 \centering
@@ -146,96 +177,167 @@ The DFA is the anchor point for both edges. Figure~\ref{fig:restricts-extends} d
 \node[font=\scriptsize, text=sepgreen!70!black, anchor=west] at (6, 1.5) {Regular languages};
 \node[font=\scriptsize, text=edgeorange!80!black, anchor=west] at (6, -1.5) {Context-free languages};
 \end{tikzpicture}
-\caption{Two generalizations of the DFA. The NFA removes the determinism constraint (conservative: same expressive power). The PDA adds a stack (generative: strictly more expressive power). Both arrows point toward the DFA to indicate that the DFA is the more constrained model.}
+\caption{Two generalizations of the DFA. The NFA removes the determinism constraint (conservative: same expressive power, \cref{thm:nfa-dfa}). The PDA adds a stack (generative: strictly more power, \cref{prop:anbn}). Both arrows point toward the DFA to indicate that the DFA is the more constrained model.}
 \label{fig:restricts-extends}
 \end{figure}
 
 \paragraph{The NFA--DFA edge: conservative generalization.}
-An NFA differs from a DFA by allowing multiple successor states per transition and $\varepsilon$-moves. This \emph{removes} the determinism constraint. Yet the subset construction shows that every NFA with $n$ states has an equivalent DFA with at most $2^n$ states~\cite{HopcroftUllman1979}. The class of languages recognized is unchanged: $\mathrm{REG}_{\mathrm{NFA}} = \mathrm{REG}_{\mathrm{DFA}}$. The NFA is a more flexible \emph{representation} of the same expressive power.
+An NFA relaxes the DFA by allowing several successors per transition and $\varepsilon$-moves, removing the determinism constraint. The subset construction shows this buys no expressive power.
 
-This is a \rel{restricts} edge. The NFA does not need any new grammar or computational primitive---it simply relaxes a structural requirement. The cost is representational blowup (exponential in the worst case), not a change in what can be expressed.
+\begin{thm}[Subset construction {\cite{RabinScott1959}}]
+\label{thm:nfa-dfa}
+Every NFA with $n$ states has an equivalent DFA with at most $2^n$ states; hence $\mathrm{REG}_{\mathrm{NFA}} = \mathrm{REG}_{\mathrm{DFA}}$.
+\end{thm}
+
+\begin{proof}
+Let $N = (Q, \Sigma, \Delta, S_0, F)$ be an NFA (with $S_0$ the set of start states after $\varepsilon$-closure). Define a DFA $D$ on the power set $2^Q$ by $\delta(T, a) = \bigcup_{q \in T} \Delta(q, a)$ (each set extended by $\varepsilon$-closure), start state $S_0$, and accepting sets $\{T : T \cap F \neq \varnothing\}$. By induction on $|w|$, the state $\hat\delta(S_0, w)$ of $D$ after reading $w$ is exactly the set of states $N$ can occupy after $w$: the base case is $S_0$, and the inductive step is the definition of $\delta$. Thus $D$ accepts $w$ iff some run of $N$ ends in $F$ iff $N$ accepts $w$, so $L(D) = L(N)$. The DFA has $|2^Q| = 2^n$ states.
+\end{proof}
+
+This is a \rel{restricts} edge: the NFA needs no new primitive, only a relaxed structural requirement. The cost is representational---an exponential blow-up in states---not expressive.
 
 \paragraph{The PDA--DFA edge: generative generalization.}
-A pushdown automaton extends a finite automaton by adding an unbounded stack. This is not the removal of a constraint but the \emph{introduction of a new primitive}: the ability to store and retrieve unbounded auxiliary information in LIFO order. The consequence is a strict increase in expressive power. The language $\{a^n b^n : n \geq 0\}$ is context-free (accepted by a PDA that pushes $a$'s and pops on $b$'s) but not regular (by the pumping lemma). The containment is proper: $\mathrm{REG} \subsetneq \mathrm{CFL}$.
-
-This is an \rel{extends\_grammar} edge. The PDA requires a fundamentally new mechanism---a stack---and this mechanism purchases genuinely new expressive power.
+A PDA adds an unbounded stack: not the removal of a constraint but the introduction of a new primitive, the ability to store and retrieve unbounded LIFO information. By \cref{prop:anbn}, the consequence is a strict increase in power---$\{a^n b^n\}$ is context-free but not regular, so $\mathrm{REG} \subsetneq \mathrm{CFL}$. This is an \rel{extends\_grammar} edge, and the gap is witnessed by the failure of the pumping lemma, a property that holds for every regular language and fails for $\{a^n b^n\}$.
 
 \paragraph{Why this distinction matters.}
-The \rel{restricts}/\rel{extends\_grammar} pair recurs throughout the graph. When a new model \rel{restricts} an old one, the theory of the old model transfers intact---the same characterization theorems, the same closure properties, the same complexity measures apply. When a new model \rel{extends\_grammar}, the old theory typically \emph{breaks}: new characterization theorems are needed, closure properties may change (\Cref{tab:closure}: context-free languages lose closure under intersection and complement), and new complexity measures may be required.
-
-This distinction will reappear in the learning-theoretic setting: when a learning criterion generalizes another by relaxing a convergence requirement (e.g., behaviorally correct learning relaxes syntactic convergence), it is a conservative generalization. When it adds a new resource (e.g., adding a teacher who provides counterexamples), it is generative. Recognizing which type of generalization is at work is essential for predicting whether existing results transfer to the new setting.
-
+When $B$ \rel{restricts} $A$, the theory of $A$ transfers intact---same characterization theorems, same closure properties, same complexity measures. When $B$ \rel{extends\_grammar} $A$, the old theory typically breaks: new characterization theorems are needed, and closure properties change (\cref{tab:closure}: context-free languages lose closure under intersection and complement, \cref{prop:closure}). The distinction reappears in the learning setting. Relaxing a convergence requirement (behaviorally correct learning relaxing syntactic convergence) is conservative; adding a resource (a teacher who supplies counterexamples) is generative. Recognizing which is at work predicts whether existing results transfer.
 
 % ================================================================
-% SECTION 3: Computability Foundations (~0.5 page)
+% SECTION 3: Computability Foundations
 % ================================================================
 
 \section{Computability Foundations for Learning}
 \label{sec:computability}
 
-Gold's model of identification in the limit requires learners to be effective procedures that output hypotheses from an effective enumeration. This section fixes the relevant computability-theoretic vocabulary.
+Gold's model requires learners to be effective procedures that output hypotheses from an effective enumeration. This section fixes the computability vocabulary; each notion is typed in the verified development's computability substrate.
 
 \begin{defn}[G\"odel Numbering]
 \label{def:godel-numbering}
-A \emph{G\"odel numbering} is an effective bijection between natural numbers and programs (or, equivalently, Turing machines). We write $\varphi_e$ for the partial computable function computed by the program with index $e$, and $W_e = \mathrm{dom}(\varphi_e)$ for the $e$-th r.e.\ set. The sequence $\varphi_0, \varphi_1, \varphi_2, \ldots$ is a \emph{universal effective enumeration} of all partial computable functions, and $W_0, W_1, W_2, \ldots$ is an effective enumeration of all r.e.\ sets.
+A \emph{G\"odel numbering} of a countable set is an effective bijection with $\N$.\formal{FLT_Proofs.Computation.GodelNumbering} We write $\varphi_e$ for the partial computable function with index $e$, and $W_e = \mathrm{dom}(\varphi_e)$ for the $e$-th r.e.\ set; the sequences $\varphi_0, \varphi_1, \ldots$ and $W_0, W_1, \ldots$ are universal effective enumerations of all partial computable functions and all r.e.\ sets.
 \end{defn}
 
-In Gold's framework, a learner receiving a text for a language $L$ outputs, at each time step, a natural number $e_t$. This number is interpreted as a hypothesis via the G\"odel numbering: the learner conjectures that $L = W_{e_t}$. Identification in the limit means that the sequence $e_0, e_1, e_2, \ldots$ eventually stabilizes on an index $e^*$ with $W_{e^*} = L$.
-
-The critical point is that learners are themselves programs: a learner is a computable function $M : \Sigma^* \to \N$ mapping finite data sequences to hypothesis indices. The set of admissible learners is thus the set of total computable functions from finite sequences to $\N$. This effectivity requirement is what distinguishes Gold's model from a purely set-theoretic notion of convergence.
-
+In Gold's framework a learner reading a text for $L$ outputs at each step a number $e_t$, interpreted through the G\"odel numbering as the conjecture $L = W_{e_t}$. Identification in the limit means the sequence $e_0, e_1, \ldots$ stabilizes on an index $e^\ast$ with $W_{e^\ast} = L$. The learner is itself a program: a computable map $M : \Sigma^\ast \to \N$ from finite data sequences to hypothesis indices, and the admissible learners are exactly the total computable such maps. This effectivity requirement separates Gold's model from a purely set-theoretic notion of convergence.
 
 % ================================================================
-% SECTION 4: The Learning-Theoretic Bridge (~1 page)
+% SECTION 4: The Learning-Theoretic Bridge
 % ================================================================
 
 \section{The Learning-Theoretic Bridge: Limiting Recursion and $\Delta^0_2$}
 \label{sec:bridge}
 
-The deepest connection between computability theory and learning theory is not a definition but an equivalence. It identifies Gold's criterion of identification in the limit with a precise level of the arithmetical hierarchy.
+The connection between computability and learning is an equivalence that identifies Gold's criterion with a precise level of the arithmetical hierarchy.
 
 \begin{defn}[Limiting Recursion]
 \label{def:limiting-recursion}
-A function $f : \N \to \N$ is \emph{limiting recursive} (or \emph{$\Delta^0_2$-computable}) if there exists a total computable function $\hat{f} : \N \times \N \to \N$ such that for every $x$,
-\[
-f(x) = \lim_{s \to \infty} \hat{f}(x, s).
-\]
-That is, $f$ is the pointwise limit of a computable approximation sequence. For each input $x$, the approximation $\hat{f}(x, 0), \hat{f}(x, 1), \hat{f}(x, 2), \ldots$ eventually stabilizes on $f(x)$, but the time of stabilization is not itself computable.
+A function $f : \N \to \N$ is \emph{limiting recursive} if there is a total computable $\hat{f} : \N \times \N \to \N$ with $f(x) = \lim_{s \to \infty} \hat{f}(x, s)$ for every $x$: the approximation $\hat{f}(x,0), \hat{f}(x,1), \ldots$ stabilizes on $f(x)$, though the stabilization time is not itself computable.\formal{FLT_Proofs.Computation.LimitingRecursive}
 \end{defn}
 
 \begin{defn}[$\Delta^0_2$ Class]
 \label{def:delta-02}
-A set $A \subseteq \N$ is \emph{$\Delta^0_2$} if both $A$ and its complement $\bar{A}$ are $\Sigma^0_2$---that is, both are expressible as $\{x : \exists y\, \forall z\, R(x,y,z)\}$ for some computable predicate $R$. Equivalently, $A$ is $\Delta^0_2$ if and only if its characteristic function is limiting recursive.
+A set $A \subseteq \N$ is \emph{$\Delta^0_2$} if both $A$ and $\bar{A}$ are $\Sigma^0_2$, that is, of the form $\{x : \exists y\, \forall z\, R(x,y,z)\}$ for a computable $R$.\formal{FLT_Proofs.Computation.Delta02Class}
 \end{defn}
 
-The connection to learning is the following classical result.
+The two notions coincide, and one direction is a clean unfolding of the definitions; this is the half we prove. The converse is Shoenfield's limit lemma.
 
-\begin{thm}[Limiting Recursion and Learnability {\cite{Gold1965,Putnam1965,Shoenfield1959}}]
-\label{thm:limit-bridge}
-A family of r.e.\ sets $\mathcal{L} = \{L_i\}_{i \in I}$ is identifiable in the limit (in the sense of Gold) if and only if the index function $i \mapsto e_i$, mapping each language to a correct hypothesis index, is limiting recursive. The classes identifiable in the limit are exactly those whose index sets are $\Delta^0_2$.
+\begin{prop}[Limiting recursion gives $\Delta^0_2$]
+\label{prop:limit-delta}
+If the characteristic function $\chi_A$ of $A \subseteq \N$ is limiting recursive, then $A$ is $\Delta^0_2$.
+\end{prop}
+
+\begin{proof}
+Let $\hat{\chi} : \N \times \N \to \{0,1\}$ be a total computable approximation with $\chi_A(x) = \lim_s \hat{\chi}(x,s)$ for all $x$. Because the limit exists, the approximation is eventually constant at each $x$, so
+\[
+x \in A \iff \exists s_0\, \forall s \geq s_0\ \hat{\chi}(x,s) = 1, \qquad
+x \notin A \iff \exists s_0\, \forall s \geq s_0\ \hat{\chi}(x,s) = 0 .
+\]
+The right-hand side of the first equivalence is $\Sigma^0_2$ (an $\exists\forall$ over the computable predicate $\hat{\chi}(x,s)=1$), and the second exhibits $\bar{A}$ as $\Sigma^0_2$ likewise. Both $A$ and $\bar A$ are $\Sigma^0_2$, so $A$ is $\Delta^0_2$.
+\end{proof}
+
+\begin{thm}[Shoenfield's limit lemma {\cite{Shoenfield1959}}]
+\label{thm:shoenfield}
+$A \subseteq \N$ is $\Delta^0_2$ if and only if $\chi_A$ is limiting recursive, equivalently iff $A$ is computable from an oracle for the halting problem.
 \end{thm}
 
-This theorem is the bridge between two fields. On the computability side, the $\Delta^0_2$ sets occupy a precise position in the arithmetical hierarchy: they are the sets computable with an oracle for the halting problem, equivalently, the sets whose membership can be decided by a procedure that is allowed to change its mind finitely many times. On the learning side, identification in the limit is exactly the requirement that the learner's conjecture sequence stabilizes---which is exactly the requirement that the hypothesis function be a limit of computable approximations.
+The forward direction is \cref{prop:limit-delta}; the converse extracts a computable mind-changing approximation from a $\Delta^0_2$ definition, and the oracle reformulation is the relativization. The lemma is the hinge of the following bridge.
 
-The equivalence tells us three things that will be used in \Cref{ch:gold}:
+\begin{thm}[Limiting recursion and learnability {\cite{Gold1965,Putnam1965,Shoenfield1959}}]
+\label{thm:limit-bridge}
+A family of r.e.\ sets $\mathcal{L} = \{L_i\}_{i \in I}$ is identifiable in the limit (Gold) if and only if the index function $i \mapsto e_i$, returning a correct hypothesis index for each $L_i$, is limiting recursive; the classes identifiable in the limit are exactly those whose index sets are $\Delta^0_2$.
+\end{thm}
+
+On the computability side, $\Delta^0_2$ is the level computable with a halting oracle, equivalently the sets decidable by a procedure allowed finitely many mind changes (\cref{thm:shoenfield}). On the learning side, identification in the limit is exactly the requirement that the conjecture sequence stabilize, which is exactly limiting recursion. The learning half of the bridge is verified: explanatory (Gold) identifiability is equivalent to the existence of a learner converging with finitely many conjecture changes.\formal{FLT_Proofs.Theorem.Gold.mind_change_characterization} The number of changes is itself a complexity measure, recorded as an ordinal that is finite exactly when the learner converges correctly.\formal{FLT_Proofs.Complexity.MindChange.MindChangeOrdinal}
+
+The equivalence settles three points used in \Cref{ch:gold}.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{Upper bound on learnability.} No class whose index set lies above $\Delta^0_2$ in the arithmetical hierarchy can be identified in the limit. This bounds what Gold-style learning can achieve from above.
+\item \textbf{Upper bound on learnability.} No class whose index set lies above $\Delta^0_2$ in the arithmetical hierarchy is identifiable in the limit. This bounds Gold-style learning from above.
 
-\item \textbf{Mind changes as approximation stages.} The number of times a limiting-recursive function changes its approximation on input $x$---the number of $s$ for which $\hat{f}(x,s) \neq \hat{f}(x,s+1)$---corresponds to the number of mind changes a learner makes before converging. The mind-change ordinals of \Cref{ch:ordinals} refine this correspondence into a full hierarchy.
+\item \textbf{Mind changes as approximation stages.} The number of $s$ with $\hat{f}(x,s) \neq \hat{f}(x,s+1)$ is the number of mind changes the learner makes before converging. The mind-change ordinals of \Cref{ch:ordinals} refine this into a transfinite hierarchy.
 
-\item \textbf{Identification in the limit is not ad hoc.} Gold's criterion might appear to be one arbitrary convergence requirement among many. The $\Delta^0_2$ characterization shows it is not arbitrary at all: it is the \emph{canonical} notion of computability-in-the-limit, the natural first level above the computable in the arithmetical hierarchy.
+\item \textbf{Identification in the limit is canonical.} Gold's criterion is the natural first level above the computable: computability-in-the-limit, equivalently $\Delta^0_2$-computability. It is not one convergence requirement among many but the $\Delta^0_2$ one.
 \end{enumerate}
-
 
 \section{What This Chapter Established}
 \label{sec:ch3-summary}
 
-This chapter served two functions. As vocabulary, it fixed the definitions---DFA, NFA, PDA, Turing machine, CFG, G\"odel numbering, partial computable function---needed for the identification-in-the-limit chapters. As conceptual contribution, it introduced two structural ideas:
+The chapter fixed the definitions---DFA, NFA, PDA, Turing machine, CFG, G\"odel numbering, partial computable function---needed for the identification-in-the-limit chapters, each typed against the verified computability substrate, and proved the load-bearing facts in full. Two structural ideas carry forward.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The \rel{restricts}/\rel{extends\_grammar} distinction.} The NFA--DFA pair (conservative generalization, same power) and the PDA--DFA pair (generative generalization, strictly more power) provide the first concrete illustration of an edge-type distinction that recurs throughout the graph. Whether a generalization is conservative or generative determines whether existing theory transfers or must be rebuilt.
+\item \textbf{The \rel{restricts}/\rel{extends\_grammar} distinction.} The NFA--DFA pair (conservative, same power, \cref{thm:nfa-dfa}) and the PDA--DFA pair (generative, strictly more power, \cref{prop:anbn}) are the first concrete instance of an edge-type distinction that recurs throughout the graph. Whether a generalization is conservative or generative determines whether existing theory transfers or must be rebuilt.
 
-\item \textbf{The $\Delta^0_2$ bridge.} Identification in the limit is not merely a learning-theoretic desideratum but a precise computability-theoretic concept: it is computation in the limit, equivalent to $\Delta^0_2$-computability. This equivalence anchors Gold's model in the arithmetical hierarchy and provides the foundation for the mind-change hierarchy of \Cref{ch:ordinals}.
+\item \textbf{The $\Delta^0_2$ bridge.} Identification in the limit is a precise computability concept: computation in the limit, equivalent to $\Delta^0_2$-computability (\cref{thm:shoenfield,thm:limit-bridge}). The equivalence anchors Gold's model in the arithmetical hierarchy and grounds the mind-change hierarchy of \Cref{ch:ordinals}.
 \end{enumerate}
 
+\section{Exercises and Open Problems}
+\label{sec:ch3-open}
+
+Each problem is anchored to a concept above and tagged: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result present in the literature or the verified development but not yet absorbed into a clean general statement. Verified handles are named where they exist.
+
+\begin{openprob}[Formalizing the limit-lemma bridge, \textsc{uk}]
+\label{op:bridge-formal}
+\Cref{prop:limit-delta} proves one direction. The computability substrate types both sides (\leanname{FLT_Proofs.Computation.LimitingRecursive}, \leanname{FLT_Proofs.Computation.Delta02Class}) and verifies the learning half (\leanname{FLT_Proofs.Theorem.Gold.mind_change_characterization}). Formalize the converse of Shoenfield's limit lemma and assemble the full bridge of \cref{thm:limit-bridge} ($\mathrm{Ex}$-identifiable $\Leftrightarrow$ $\Delta^0_2$ index set) inside the development.
+\end{openprob}
+
+\begin{openprob}[Optimal NFA determinization blow-up, \textsc{ku}]
+\label{op:subset-tight}
+\Cref{thm:nfa-dfa} gives a DFA with at most $2^n$ states. Exhibit, for each $n$, an $n$-state NFA whose minimal equivalent DFA has exactly $2^n$ states (Moore, Meyer--Fischer), and formalize the matching lower bound on top of \leanname{FLT_Proofs.Computation.NFA'} and \leanname{FLT_Proofs.Computation.DFA'}, so that the conservative-generalization cost is pinned exactly.
+\end{openprob}
+
+\begin{openprob}[Myhill--Nerode and the exact regularity criterion, \textsc{uk}]
+\label{op:myhill-nerode}
+The pumping lemma (\cref{lemma:pumping}) is necessary but not sufficient for regularity. Formalize the Myhill--Nerode theorem---$L$ is regular iff its right-congruence has finite index, which also yields the unique minimal DFA---on top of \leanname{FLT_Proofs.Computation.IsRegularLang}. This is the structural foundation that the $L^\ast$ learner of \Cref{ch:exact} exploits.
+\end{openprob}
+
+\begin{openprob}[Arithmetical complexity of the criterion hierarchy, \textsc{ku}]
+\label{op:criterion-hierarchy}
+\Cref{thm:limit-bridge} places explanatory identification at $\Delta^0_2$. Locate the other Gold criteria---behaviorally correct, vacillatory, anomalous, finite---in the arithmetical hierarchy, and determine which strictly exceed $\Delta^0_2$. The criteria are typed (\leanname{FLT_Proofs.Criterion.Gold.BCLearnable} and siblings) but their hierarchy positions are not yet pinned.
+\end{openprob}
+
+\begin{openprob}[A functorial account of restricts vs.\ extends, \textsc{uk}]
+\label{op:restricts-functor}
+\Cref{def:restricts,def:extends-grammar} distinguish conservative from generative generalization informally. Make it precise: define a category of computational models and a notion of generalization morphism such that \rel{restricts} morphisms provably transport characterization theorems and \rel{extends\_grammar} morphisms provably need not, and decide whether the classification of a given pair is itself decidable.
+\end{openprob}
+
+\begin{openprob}[Learnability of context-free languages, \textsc{ku}]
+\label{op:cfl-learnable}
+$\{a^n b^n\}$ (\cref{prop:anbn}) is context-free. Characterize which subclasses of the context-free languages are identifiable in the limit from text and from informant, extending the text/informant separation of \Cref{ch:data} up one level of the Chomsky hierarchy, and relate the answer to the $\Delta^0_2$ ceiling of \cref{thm:limit-bridge}.
+\end{openprob}
+
+\begin{openprob}[The coding theorem for the computability substrate, \textsc{uk}]
+\label{op:coding-theorem}
+The substrate types Kolmogorov complexity and algorithmic probability (\leanname{FLT_Proofs.Computation.KolmogorovComplexity}, \leanname{FLT_Proofs.Computation.AlgorithmicProbability}). Formalize the coding theorem $K(x) = -\log \mathrm{P}(x) + O(1)$ relating them, with the constant explicit in the reference machine---the same gap left open for model selection in \Cref{ch:objects} (Problem in \S\ref{sec:ch1-open}).
+\end{openprob}
+
+\begin{openprob}[The transfinite mind-change hierarchy, \textsc{uk}]
+\label{op:mind-change-ordinals}
+The mind-change count is typed as an ordinal (\leanname{FLT_Proofs.Complexity.MindChange.MindChangeOrdinal}), finite exactly when the learner converges correctly. Formalize the Freivalds--Smith transfinite mind-change hierarchy---identification with at most $\alpha$ mind changes for a countable ordinal $\alpha$---and prove the strictness of the resulting hierarchy, which \Cref{ch:ordinals} develops informally.
+\end{openprob}
+
+\begin{openprob}[Closure of the recursive languages under learning operations, \textsc{ku}]
+\label{op:recursive-closure}
+\Cref{prop:closure} and \cref{tab:closure} record language-class closure. Determine the closure of the \emph{identifiable-in-the-limit} classes under union, intersection, and complement: if $\mathcal{C}_1$ and $\mathcal{C}_2$ are each identifiable from text, when is $\mathcal{C}_1 \cup \mathcal{C}_2$, and does the answer mirror the regular/context-free split of \cref{tab:closure}?
+\end{openprob}
+
+\begin{openprob}[Effective separation witnesses, \textsc{uk}]
+\label{op:effective-witness}
+\Cref{prop:anbn} witnesses $\mathrm{REG} \subsetneq \mathrm{CFL}$ by a single language. Give a uniform, effective procedure that, from a description of any two adjacent Chomsky levels, outputs a witness language separating them together with its non-membership proof, turning the proper-containment chain of \cref{fig:chomsky} into one constructive theorem rather than four independent separations.
+\end{openprob}
