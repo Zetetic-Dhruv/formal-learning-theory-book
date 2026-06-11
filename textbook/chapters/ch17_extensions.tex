@@ -106,8 +106,14 @@ The chapter has six sections.
 
 \caption{Concept map for this chapter.  Orange:~\rel{extends\_grammar}.
 Dashed red:~\rel{strictly\_stronger}.  Blue:~\rel{characterizes}.
-Green:~\rel{restricts}.  Brown:~\rel{lower\_bounds}.  Each arrow
-represents an edge in the concept graph.}
+Green:~\rel{restricts}.  Brown:~\rel{lower\_bounds}.  Each arrow represents an
+edge in the concept graph.  The \rel{characterizes} edges target the
+appropriate variant of PAC learning for each source: VC dimension for binary
+(and agnostic binary) PAC, the DS dimension for \emph{multiclass} PAC, the
+fat-shattering dimension for \emph{agnostic real-valued} PAC.  The Natarajan
+dimension does \emph{not} characterize multiclass PAC---it only extends the
+grammar and is dominated by DS (\Cref{prop:ds-vs-nat}, with the $\Ndim=1$,
+$\DSdim=\infty$ obstruction).}
 \label{fig:ch17-concept-map}
 \end{figure}
 
@@ -143,7 +149,7 @@ $f_0, f_1 \colon \{x_1, \ldots, x_d\} \to Y$ satisfying:
 \begin{enumerate}[leftmargin=*,nosep]
 \item $f_0(x_i) \neq f_1(x_i)$ for all $i \in [d]$, and
 \item for every binary string $b \in \{0,1\}^d$, there exists $h \in
-  \mathcal{H}$ with $h(x_i) = f_{b_i}(x_i)$ for all $i$.
+  \mathcal{H}$ with $h(x_i) = f_{b_i}(x_i)$ for all $i$.\formal{FLT_Proofs.Complexity.Structures.NatarajanDim}
 \end{enumerate}
 \end{defn}
 
@@ -382,13 +388,17 @@ Moreover, when $|Y| = k < \infty$:
 \end{prop}
 
 \begin{proof}
-For the first inequality, suppose $S = \{x_1,\ldots, x_d\}$ is
-DS-shattered via default $f$ and witnesses $h_1, \ldots, h_d$.
-Define $f_0 = f|_S$ and, for each $i$, define $f_1(x_i) = h_i(x_i) \neq f(x_i)$.
-Then $S$ is N-shattered by $(f_0, f_1)$, but only for binary strings that
-flip at most one coordinate.  The full $2^d$ interpolation requirement of
-Natarajan shattering may not hold, so DS-shattering is a weaker condition
-per set, hence $\Ndim \leq \DSdim$.
+For the first inequality, we show that every N-shattered set is also
+DS-shattered.  Suppose $S = \{x_1, \ldots, x_d\}$ is N-shattered by a pair
+$(f_0, f_1)$.  Take the default labeling $f = f_0$.  For each $i$, the binary
+string $e_i$ (with a $1$ in coordinate $i$ and $0$ elsewhere) is realized by
+some $h_i \in \mathcal{H}$ with $h_i(x_i) = f_1(x_i) \neq f_0(x_i) = f(x_i)$
+and $h_i(x_j) = f_0(x_j) = f(x_j)$ for $j \neq i$.  Thus $f$ together with
+$h_1, \ldots, h_d$ witnesses that $S$ is DS-shattered.  Every N-shattered set
+is therefore DS-shattered, so $\Ndim \leq \DSdim$.  DS-shattering is the
+\emph{weaker} requirement---only $d$ single-coordinate deviations, not all
+$2^d$ interpolations---which is exactly why $\DSdim$ can be infinite while
+$\Ndim$ stays finite, as in the obstruction above.
 
 For the second inequality (finite $k$), suppose $\DSdim = D$.  Any
 DS-shattered set provides $D$ witness hypotheses deviating from a default.
@@ -438,7 +448,7 @@ $\mathcal{F} \subseteq \R^X$ is the VC dimension of the class of subgraphs:
 Equivalently, $\Pdim(\mathcal{F}) = d$ if there exist $x_1, \ldots, x_d \in X$
 and thresholds $t_1, \ldots, t_d \in \R$ such that for every
 $b \in \{0,1\}^d$, there exists $f \in \mathcal{F}$ with
-$f(x_i) \geq t_i \iff b_i = 1$.
+$f(x_i) \geq t_i \iff b_i = 1$.\formal{FLT_Proofs.Complexity.Structures.Pseudodimension}
 \end{defn}
 
 The new primitive is the \emph{threshold vector} $(t_1, \ldots, t_d)$.
@@ -462,6 +472,15 @@ $P$ on $X$ and every $\varepsilon > 0$:
   \;\leq\; \left(\frac{2e}{\varepsilon}\right)^d.
 \]
 \end{prop}
+
+\begin{proof}[Proof sketch]
+The subgraph class $\{x \mapsto \ind[f(x) \geq t] : f \in \mathcal{F},\,
+t \in \R\}$ has VC dimension $\Pdim(\mathcal{F}) = d$ by definition.  Applying
+the Sauer--Shelah bound and the standard covering-number estimate for VC
+classes (\Cref{ch:generalization}) to this binary class, then transferring
+back to $L_1(P)$ through the layer-cake identity
+$f = \int_0^1 \ind[f \geq t]\,\mathrm{d}t$, yields the stated bound.
+\end{proof}
 
 \begin{graphnode}[title={Graph Node: \nde{pseudodimension}}]
 Layer~5: \texttt{complexity\_measure}.  Key edge:
@@ -489,7 +508,8 @@ for every $b \in \{0,1\}^d$, there exists $f \in \mathcal{F}$ with
 \]
 \end{defn}
 
-The new primitive beyond pseudodimension is the \emph{margin} $\gamma$.
+The new primitive beyond pseudodimension is the \emph{margin}
+$\gamma$.\formal{FLT_Proofs.Complexity.Structures.FatShatteringDim}
 As $\gamma \to 0$, the fat-shattering dimension approaches the
 pseudodimension.
 
@@ -681,8 +701,11 @@ complexity
 \]
 \end{thm}
 
-The sample complexity degrades as $\eta \to 1/2$---the noise rate approaches
-the information-theoretic limit where labels carry no signal.
+The bound is an upper bound, achieved by a noise-robust empirical risk
+minimizer~\cite{AngluinLaird1988}; the $(1-2\eta)^{-2}$ dependence is also
+necessary, so the rate is tight.  The sample complexity degrades as
+$\eta \to 1/2$, where the noise rate approaches the information-theoretic
+limit at which labels carry no signal.
 
 \begin{remark}[SQ connection]
 \label{rmk:sq-noise}
@@ -714,13 +737,19 @@ Partial concepts arise naturally in many settings: medical diagnosis where
 only symptomatic patients have definite diagnoses, or feature spaces where
 certain regions are ``don't care'' zones.
 
-The VC dimension of a partial concept class is defined by restricting
-shattering to the promise region.  The fundamental theorem extends:
-finite VC dimension of the promise-restricted class characterizes PAC
-learnability of partial concepts.  However, the \emph{computational}
-landscape changes: problems that are efficiently learnable as total concepts
-may become hard when restricted to a promise set, because the promise
-constraint interacts with the hypothesis representation.
+Alon, Hanneke, Holzman, and Moran~\cite{AlonHannekeHolzmanMoran2021}
+developed the PAC theory of partial concept classes, and the picture is
+genuinely new.  A partial class is PAC learnable if and only if its
+(partial) VC dimension is finite, where shattering is restricted to the
+promise region---so far, the binary analogue carries over.  What does
+\emph{not} carry over is the reduction to total concepts: they exhibit
+partial classes of VC dimension~$1$ that admit \emph{no} total extension of
+finite VC dimension, and that cannot be learned by empirical risk
+minimization at all.  Partial-concept learning is therefore not a special
+case of the total theory; it is a setting where proper and ERM-based
+learning provably fail while improper learning succeeds, and where the
+computational landscape shifts---problems easy as total concepts can become
+hard under a promise constraint.
 
 
 % ================================================================
@@ -976,13 +1005,51 @@ an \rel{extends\_grammar} edge: the extension requires new primitives
 \end{figure}
 
 
-The grammar growth \emph{is} the extension.  A multiclass learning theory that
-avoids two-function shattering will not characterize learnability.  A
-real-valued theory that avoids scale sensitivity will not capture the agnostic
-setting.  In each case, the new primitive is not an optional enrichment but a
-structural necessity: without it, the characterization theorem fails.
+The grammar growth \emph{is} the extension.  For the multiclass case this
+necessity is a theorem: the Natarajan--DS gap---the class with $\Ndim = 1$
+and $\DSdim = \infty$---shows that no two-function dimension can characterize
+learnability when $|Y| = \infty$.  For the real-valued, agnostic, and noisy
+settings the necessity is the working understanding rather than a proven
+impossibility (no simpler characterization is known), but the pattern is the
+same: each new primitive expresses what the existing one cannot.
 
-\bigskip
+
+\subsection{Where Transformers Live}
+\label{sec:transformer-grammar}
+
+The extensions of this chapter are not abstractions a practitioner can avoid;
+a transformer inhabits several at once.  Its next-token head is a
+\emph{multiclass} hypothesis class over the vocabulary---tens of thousands of
+labels, and unbounded in the limit of growing vocabularies---so it sits in
+exactly the regime where the Natarajan dimension fails and the DS dimension is
+the right measure.  Its logits are \emph{real-valued}, so its capacity is
+governed by a scale-sensitive dimension; the certified generalization bound of
+\Cref{ch:generalization} is, in this language, a fat-shattering and
+covering-number control of the attention head.  And training is
+\emph{agnostic}: no realizable $h^\star$ is assumed.
+
+What is machine-checked is the binary core.  A softmax-attention head induces
+a concept class verified to be
+well-behaved,\formal{TLT.Bridge.softAttention_wellBehaved} hence of finite VC
+dimension in the binary setting.  Whether that control \emph{lifts} to the
+multiclass next-token head---whether the DS dimension of an attention class
+over a large label set is finite---is open, and is the form the central
+question of this chapter takes for transformers (\Cref{open:attention-ds}).
+
+
+% ================================================================
+% OPEN PROBLEMS
+% ================================================================
+
+\section{Open Problems}
+\label{sec:extensions-open}
+
+Extending a characterization is where learning theory most often stumbles---a
+dimension that works for binary classification need not, and the multiclass
+history is the cautionary tale.  Each problem below is tagged a \emph{known
+unknown} (KU), sharply posed but unresolved, or an \emph{unknown known} (UK),
+where the right object or its formalization is still missing; a design-lab or
+literature anchor is named where one exists.
 
 \begin{openprob}[Tight multiclass sample complexity]
 \label{open:multiclass-tight}
@@ -998,6 +1065,79 @@ The DS dimension characterizes PAC learnability in the multiclass setting.
 What is the correct characterization of \emph{online} multiclass learnability?
 Is there a multiclass analogue of the Littlestone dimension, and does it
 relate to the DS dimension as the Littlestone dimension relates to VC?
+\end{openprob}
+
+\begin{openprob}[Formalizing the DS dimension]
+\label{open:formalize-ds}
+The Natarajan, pseudo-, and fat-shattering dimensions are machine-checked
+(\leanname{NatarajanDim}, \leanname{Pseudodimension}, \leanname{FatShatteringDim}),
+but the genuine Daniely--Shalev-Shwartz DS dimension is not: the kernel's
+\leanname{DSDim} is the \emph{all-labelings} dimension (every $f \colon S \to Y$
+realizable), which satisfies $\DSdim \leq \Ndim$, the \emph{opposite} of the
+real DS relationship.  Can the true DS dimension---default plus single-coordinate
+deviations---and the multiclass characterization be
+formalized~\cite{BrukhimCarmonDinurMoranYehudayoff2022}?  An unknown known.
+\end{openprob}
+
+\begin{openprob}[The DS dimension of attention]
+\label{open:attention-ds}
+A softmax-attention head is verified well-behaved, hence finite-VC, in the
+binary setting (\leanname{softAttention_wellBehaved}).  Is the DS dimension of
+the multiclass next-token attention class---over a vocabulary of size $k$, and
+as $k \to \infty$---finite?  A known unknown on the transformer side, and the
+multiclass form of this chapter's central question.
+\end{openprob}
+
+\begin{openprob}[The fat-shattering dimension of attention]
+\label{open:attention-fat}
+The certified generalization bound for attention (\Cref{ch:generalization}) is
+a covering-number control of real-valued logits.  Does it match the
+fat-shattering dimension (\leanname{FatShatteringDim}) of the attention logit
+class, and is that dimension finite at every scale $\gamma$?  A known unknown on
+the transformer side.
+\end{openprob}
+
+\begin{openprob}[A realizable characterization via pseudodimension]
+\label{open:pdim-realizable}
+\Cref{prop:pdim-covering} bounds covering numbers, and
+\Cref{thm:real-valued-char} characterizes the \emph{agnostic} case via
+fat-shattering.  Is finiteness of the pseudodimension (\leanname{Pseudodimension})
+exactly the characterization of \emph{realizable} real-valued learnability, and
+can it be proved as a clean biconditional?  A known unknown.
+\end{openprob}
+
+\begin{openprob}[Formalizing partial-concept learnability]
+\label{open:partial-formal}
+The partial VC dimension characterizes partial-concept PAC learnability, with
+the surprise that learnable partial classes need not extend to finite-VC total
+classes~\cite{AlonHannekeHolzmanMoran2021}.  Can this be formalized, including
+the no-finite-extension witness?  An unknown known: the partial-concept model
+is absent from the kernel.
+\end{openprob}
+
+\begin{openprob}[List learning]
+\label{open:list-learning}
+A list learner outputs a short list of labels and succeeds if the true label
+is among them.  What combinatorial dimension characterizes list PAC
+learnability, and how does it relate to the DS
+dimension~\cite{BrukhimCarmonDinurMoranYehudayoff2022}?  A known unknown.
+\end{openprob}
+
+\begin{openprob}[Agnostic proper versus improper]
+\label{open:agnostic-proper}
+In the realizable case, proper and improper PAC have the same sample
+complexity (\Cref{sec:proper-improper}).  In the \emph{agnostic} case, is there
+a class for which proper learning needs strictly more samples than improper
+learning---an information-theoretic, not merely computational, separation?  A
+known unknown.
+\end{openprob}
+
+\begin{openprob}[Noise-tolerant real-valued learning]
+\label{open:noise-fat}
+Classification noise tolerance is understood for binary VC classes
+(\Cref{thm:noise-tolerant}).  What is the fat-shattering analogue---how does
+label noise on real-valued targets degrade the scale-sensitive sample
+complexity?  A known unknown.
 \end{openprob}
 
 \bigskip
