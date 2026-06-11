@@ -63,7 +63,7 @@ After seeing the first $n$ data points $(t_0, \ldots, t_{n-1})$, the learner out
 \label{def:ex-learning}
 A learner $M$ \emph{$\Ex$-identifies} a language $L$ from text if, for every text $t$ for $L$, there exists an index $e$ and a time $n_0$ such that $M(t_0, \ldots, t_n) = e$ for all $n \geq n_0$, and $W_e = L$ (where $W_e$ is the language computed by program $e$).
 
-A class $\mathcal{L}$ of languages is \emph{$\Ex$-identifiable} if there exists a single learner $M$ that $\Ex$-identifies every $L \in \mathcal{L}$ from text.
+A class $\mathcal{L}$ of languages is \emph{$\Ex$-identifiable} if there exists a single learner $M$ that $\Ex$-identifies every $L \in \mathcal{L}$ from text.\formal{FLT_Proofs.Criterion.Gold.EXLearnable}
 \end{defn}
 
 The definition requires \emph{syntactic convergence}: the learner must eventually output the same index forever. It is not enough to output a sequence of indices that all happen to compute the correct language---the index itself must stabilize. (Relaxing this requirement gives BC-learning; see \Cref{sec:bc-learning}.)
@@ -77,7 +77,7 @@ This simple algorithm illustrates a crucial asymmetry: the learner does not know
 
 \begin{thm}[Gold's Impossibility Theorem {\cite{Gold1967}}]
 \label{thm:gold}
-Let $\mathcal{L}$ be any class of languages that contains all finite languages and at least one infinite language. Then $\mathcal{L}$ is not $\Ex$-identifiable from text.
+Let $\mathcal{L}$ be any class of languages that contains all finite languages and at least one infinite language. Then $\mathcal{L}$ is not $\Ex$-identifiable from text.\formal{FLT_Proofs.Theorem.Gold.gold_theorem}
 \end{thm}
 
 This is the centerpiece of the chapter. The proof is a diagonalization argument: we defeat \emph{every} candidate learner by constructing a text that forces it to fail. The construction is adversarial, not probabilistic---there is no distribution, no $\varepsilon$-net, no covering number. The adversary simply watches the learner and manipulates the future of the stream to prevent convergence.
@@ -134,7 +134,7 @@ Gold's impossibility theorem says that $\Ex$-identification is limited. Two natu
 
 \begin{defn}[Finite Identification ($\FIN$)]
 \label{def:fin-learning}
-A learner $M$ \emph{$\FIN$-identifies} a language $L$ from text if, for every text $t$ for $L$, there exists a time $n_0$ such that $M$ outputs exactly one hypothesis---$M$ outputs ``?'' (no guess) for $n < n_0$ and outputs a single index $e$ at time $n_0$ with $W_e = L$, never changing its mind. A class $\mathcal{L}$ is \emph{$\FIN$-identifiable} if a single learner $\FIN$-identifies every $L \in \mathcal{L}$.
+A learner $M$ \emph{$\FIN$-identifies} a language $L$ from text if, for every text $t$ for $L$, there exists a time $n_0$ such that $M$ outputs exactly one hypothesis---$M$ outputs ``?'' (no guess) for $n < n_0$ and outputs a single index $e$ at time $n_0$ with $W_e = L$, never changing its mind. A class $\mathcal{L}$ is \emph{$\FIN$-identifiable} if a single learner $\FIN$-identifies every $L \in \mathcal{L}$.\formal{FLT_Proofs.Criterion.Gold.FiniteLearnable}
 \end{defn}
 
 $\FIN$ is the strongest identification criterion: the learner must produce the correct answer in finitely many steps with no subsequent revision. The class of $\FIN$-identifiable families is a strict subset of $\Ex$-identifiable families; for instance, the class of all finite languages is $\Ex$-identifiable (\Cref{ex:finite-languages}) but not $\FIN$-identifiable, since the learner cannot know when the last element has been seen.
@@ -144,14 +144,14 @@ $\FIN$ is the strongest identification criterion: the learner must produce the c
 
 \begin{defn}[Behaviorally Correct Learning ($\BC$)]
 \label{def:bc-learning}
-A learner $M$ \emph{$\BC$-identifies} a language $L$ from text if, for every text $t$ for $L$, there exists a time $n_0$ such that $W_{M(t_0, \ldots, t_n)} = L$ for all $n \geq n_0$. That is, from time $n_0$ onward, every hypothesis the learner outputs is \emph{extensionally correct} (computes the right language), but the indices may keep changing.
+A learner $M$ \emph{$\BC$-identifies} a language $L$ from text if, for every text $t$ for $L$, there exists a time $n_0$ such that $W_{M(t_0, \ldots, t_n)} = L$ for all $n \geq n_0$. That is, from time $n_0$ onward, every hypothesis the learner outputs is \emph{extensionally correct} (computes the right language), but the indices may keep changing.\formal{FLT_Proofs.Criterion.Gold.BCLearnable}
 \end{defn}
 
 The distinction between $\Ex$ and $\BC$ is subtle but consequential. $\Ex$ requires \emph{syntactic} convergence: the index stabilizes. $\BC$ requires only \emph{semantic} convergence: the computed language stabilizes, even if the learner keeps switching between different programs that all compute the same language. At first glance, this seems like a minor relaxation. It is not.
 
 \begin{thm}[Case--Smith {\cite{CaseSmith1983}}]
 \label{thm:bc-strictly-stronger}
-$\BC$ is strictly more powerful than $\Ex$: there exists a class of languages that is $\BC$-identifiable but not $\Ex$-identifiable from text.
+$\BC$ is strictly more powerful than $\Ex$: there exists a class of languages that is $\BC$-identifiable but not $\Ex$-identifiable from text.\formal{FLT_Proofs.Criterion.Gold.BCLearnable}
 \end{thm}
 
 \begin{proof}
@@ -226,7 +226,7 @@ The $\FIN$--$\Ex$--$\BC$ chain is the spine of the hierarchy. Several natural re
 
 \begin{defn}[Anomalous Learning ($\Ex^*$)]
 \label{def:anomalous}
-A learner \emph{$\Ex^*$-identifies} a language $L$ if it $\Ex$-converges to an index $e$ such that $W_e$ differs from $L$ on at most finitely many strings. That is, the final hypothesis may contain finitely many errors---finitely many strings incorrectly included or excluded.
+A learner \emph{$\Ex^*$-identifies} a language $L$ if it $\Ex$-converges to an index $e$ such that $W_e$ differs from $L$ on at most finitely many strings. That is, the final hypothesis may contain finitely many errors---finitely many strings incorrectly included or excluded.\formal{FLT_Proofs.Criterion.Gold.AnomalousLearnable}
 \end{defn}
 
 Anomalous learning relaxes $\Ex$ by removing the requirement of exact correctness, replacing it with correctness up to a finite set. In graph terms, this is a \rel{restricts} edge from $\nde{anomalous\_learning}$ to $\nde{ex\_learning}$: the constraint (zero anomalies) is removed, and no new grammatical structure is introduced. The class of $\Ex^*$-identifiable families strictly contains the class of $\Ex$-identifiable families~\cite{CaseSmith1983}.
@@ -236,7 +236,7 @@ Anomalous learning relaxes $\Ex$ by removing the requirement of exact correctnes
 
 \begin{defn}[Monotonic Learning ($\mathrm{Mon}\Ex$)]
 \label{def:monotonic}
-A learner \emph{monotonically} $\Ex$-identifies $L$ if it $\Ex$-identifies $L$ and, whenever it changes its hypothesis from $e$ to $e'$, the new hypothesis is at least as inclusive on the data seen so far: $W_e \cap \{t_0, \ldots, t_n\} \subseteq W_{e'} \cap \{t_0, \ldots, t_n\}$. Once a datum is correctly classified, that classification is never retracted.
+A learner \emph{monotonically} $\Ex$-identifies $L$ if it $\Ex$-identifies $L$ and, whenever it changes its hypothesis from $e$ to $e'$, the new hypothesis is at least as inclusive on the data seen so far: $W_e \cap \{t_0, \ldots, t_n\} \subseteq W_{e'} \cap \{t_0, \ldots, t_n\}$. Once a datum is correctly classified, that classification is never retracted.\formal{FLT_Proofs.Criterion.Gold.MonotonicLearnable}
 \end{defn}
 
 Monotonic learning \emph{strengthens} $\Ex$ by adding a constraint. The class of $\mathrm{Mon}\Ex$-identifiable families is a strict subset of $\Ex$-identifiable families. In the graph, $\nde{monotonic\_learning} \xrightarrow{\rel{restricts}} \nde{ex\_learning}$.
@@ -246,7 +246,7 @@ Monotonic learning \emph{strengthens} $\Ex$ by adding a constraint. The class of
 
 \begin{defn}[Vacillatory Learning ($\mathrm{Vex}$)]
 \label{def:vacillatory}
-A learner \emph{vacillatorily} identifies $L$ if it eventually oscillates among finitely many indices $e_1, \ldots, e_k$, all satisfying $W_{e_i} = L$. The learner never settles on a single index, but all its eventual outputs are extensionally correct and drawn from a finite set.
+A learner \emph{vacillatorily} identifies $L$ if it eventually oscillates among finitely many indices $e_1, \ldots, e_k$, all satisfying $W_{e_i} = L$. The learner never settles on a single index, but all its eventual outputs are extensionally correct and drawn from a finite set.\formal{FLT_Proofs.Criterion.Gold.VacillatoryLearnable}
 \end{defn}
 
 Vacillatory learning sits between $\Ex$ (which requires convergence to a single index) and $\BC$ (which allows infinitely many correct indices). It is strictly more powerful than $\Ex$ and strictly less powerful than $\BC$.
@@ -256,10 +256,10 @@ Vacillatory learning sits between $\Ex$ (which requires convergence to a single 
 
 \begin{defn}[Trial-and-Error Learning]
 \label{def:trial-error}
-A \emph{trial-and-error} predicate for a set $A \subseteq \N$ is a computable function $f : \N \to \{0, 1\}$ such that $\lim_{s \to \infty} f_s(n)$ exists for all $n$ and equals the characteristic function of $A$. The learner may ``retract'' previous outputs: it learns by making mistakes and correcting them.
+A \emph{trial-and-error} predicate for a set $A \subseteq \N$ is a computable function $f : \N \to \{0, 1\}$ such that $\lim_{s \to \infty} f_s(n)$ exists for all $n$ and equals the characteristic function of $A$. The learner may ``retract'' previous outputs: it learns by making mistakes and correcting them.\formal{FLT_Proofs.Criterion.Gold.TrialAndErrorLearnable}
 \end{defn}
 
-Trial-and-error learning connects identification in the limit to the arithmetical hierarchy. A set $A$ is trial-and-error learnable if and only if $A \in \Delta^0_2$---the class of sets that are both $\Sigma^0_2$ and $\Pi^0_2$. This is the precise recursion-theoretic characterization, due to Putnam~\cite{Gold1965} and Gold: the limit-computable functions are exactly the $\Delta^0_2$ functions. This connection places Gold-style learning firmly within the landscape of classical recursion theory.
+Trial-and-error learning connects identification in the limit to the arithmetical hierarchy. A set $A$ is trial-and-error learnable if and only if $A \in \Delta^0_2$---the class of sets that are both $\Sigma^0_2$ and $\Pi^0_2$. This is the precise recursion-theoretic characterization, due to Putnam~\cite{Gold1965} and Gold: the limit-computable functions are exactly the $\Delta^0_2$ functions.\formal{FLT_Proofs.Computation.Delta02Class} This connection places Gold-style learning firmly within the landscape of classical recursion theory.
 
 % ================================================================
 % SECTION 5: Mind-Change Complexity and Ordinals
@@ -272,7 +272,7 @@ Gold's impossibility theorem tells us that certain classes cannot be identified 
 
 \begin{defn}[Mind Change]
 \label{def:mind-change}
-A \emph{mind change} occurs at time $n$ if the learner's output satisfies $M(t_0, \ldots, t_n) \neq M(t_0, \ldots, t_{n-1})$. The \emph{mind-change count} of $M$ on text $t$ is the number of times $M$ changes its hypothesis.
+A \emph{mind change} occurs at time $n$ if the learner's output satisfies $M(t_0, \ldots, t_n) \neq M(t_0, \ldots, t_{n-1})$. The \emph{mind-change count} of $M$ on text $t$ is the number of times $M$ changes its hypothesis.\formal{FLT_Proofs.Complexity.MindChange.MindChangeCount}
 \end{defn}
 
 For finite mind-change bounds, the theory is straightforward: we say that $M$ identifies $\mathcal{L}$ with at most $k$ mind changes if, on every text for every $L \in \mathcal{L}$, the mind-change count is at most $k$. The class of all finite languages is identifiable with 0 mind changes after the first hypothesis (the learner in \Cref{ex:finite-languages} changes its mind every time a new element appears, but a more careful learner can be designed with bounded mind changes for restricted subclasses).
@@ -286,7 +286,7 @@ The mind-change complexity of $\Ex$-identification is naturally measured by \emp
 \item For every countable ordinal $\alpha$, one can define what it means for a learner to identify a class with mind-change bound $\alpha$.
 \item There exist classes identifiable with mind-change bound $\omega$ (the first infinite ordinal) that cannot be identified with any finite mind-change bound.
 \item More generally, for every ordinal $\alpha < \omega_1$, there exist classes identifiable with mind-change bound $\alpha$ but not with any bound $\beta < \alpha$.
-\end{enumerate}
+\end{enumerate}\formal{FLT_Proofs.Complexity.MindChange.MindChangeOrdinal}\formal{FLT_Proofs.Theorem.Gold.mind_change_characterization}
 \end{thm}
 
 The idea behind ordinal mind-change bounds is as follows. A learner with mind-change bound $\omega$ begins with an ordinal counter set to $\omega$. At each mind change, the counter must decrease---but it may decrease to any smaller ordinal. Since there is no infinite descending sequence of ordinals (ordinals are well-ordered), the learner must eventually stop changing its mind. The counter $\omega$ allows finitely many mind changes, but the \emph{number} of mind changes need not be bounded in advance by any fixed integer---it may depend on the input.
@@ -307,6 +307,22 @@ The mind-change ordinal is a complexity measure on $\Ex$-identifiable classes, a
 % SECTION 6: The Three-Paradigm Separation
 % ================================================================
 
+\subsection{In-context learning as identification in the limit}
+\label{sec:icl-gold}
+
+Gold's framework---infinite horizon, a stream of data, a sequence of conjectures---describes a learning mode that modern transformers exhibit directly: in-context learning.  A transformer fed a growing prompt of labelled examples produces, at each prefix length, a prediction rule: its conjecture given what it has seen so far.  The conjecture map ``finite data so far $\mapsto$ predictor'' is exactly the type of a Gold learner.
+
+\begin{prop}[A transformer in context is a Gold learner]
+\label{prop:transformer-gold}
+A parametric attention learner $T$, read as the map from a finite prefix $((x_1,y_1),\dots,(x_n,y_n))$ to the predictor it computes in context, is a Gold learner: a function from finite labelled sequences to concepts.\formal{FLT_Proofs.Learner.Core.GoldLearner} Its behaviour on a target and data stream is therefore classified by the criteria of this chapter---$\Ex$, $\BC$, vacillatory---and its mind-change complexity is the ordinal-valued measure of \cref{thm:mind-change-ordinal} applied to $T$.\formal{FLT_Proofs.Complexity.MindChange.MindChangeOrdinal}
+\end{prop}
+
+\begin{proof}
+The Gold-learner type is a conjecture map from $\mathrm{List}(X \times Y)$ to concepts, and the in-context predictor of $T$ at prefix $s$ is such a map: feed $s$ as context and return the function $x \mapsto T(s)(x)$.  The mind-change count and ordinal of \cref{def:mind-change,thm:mind-change-ordinal} are defined for every Gold learner, so they apply to $T$ verbatim.
+\end{proof}
+
+The proposition turns a practical question---does in-context learning ``converge''?---into the precise question of which identification criterion $T$ meets.  Syntactic convergence, where the in-context predictor stops changing, is $\Ex$; extensional convergence, where the predictor keeps changing but computes a fixed function, is $\BC$; oscillation among finitely many correct predictors is vacillatory.  Gold's impossibility theorem then bites: no transformer $\Ex$-identifies, from positive data alone, a class containing all finite concepts and one infinite concept (\cref{thm:gold}).  Whether realistic in-context learning $\Ex$-converges, $\BC$-converges, or vacillates---and with what mind-change ordinal---is open (\cref{op:icl-identification}).
+
 \section{Three Paradigms, Incomparable}
 \label{sec:three-paradigm}
 
@@ -315,7 +331,7 @@ We now have three learning paradigms: PAC (\Cref{ch:pac}), online (\Cref{ch:onli
 The answer is that they are \emph{pairwise incomparable}. No paradigm subsumes another. There exist classes learnable under one criterion but not another, in every direction. This is the most important structural fact about the landscape of learning theory.
 
 \begin{separation}
-\textbf{Theorem} (Three-Paradigm Separation). \textit{The following four separations hold:}
+\textbf{Theorem} (Three-Paradigm Separation).\formal{FLT_Proofs.Theorem.Separation.online_pac_gold_separation} \textit{The following four separations hold:}
 
 \begin{enumerate}[label=(\alph*),leftmargin=*,itemsep=4pt]
 \item \textbf{$\Ex$-learnable but not PAC-learnable.} The class $\mathcal{L}_{\mathrm{fin}}$ of all finite subsets of $\N$ is $\Ex$-identifiable from text (\Cref{ex:finite-languages}). But the associated concept class has infinite VC dimension---any finite set of points can be shattered---so it is not PAC-learnable.
@@ -445,4 +461,59 @@ The recursion-theoretic character of this chapter---diagonalization proofs, conn
   \end{enumerate}
 
 \end{enumerate}
+
+\section{Open Problems}
+\label{sec:ch7-open}
+
+Each problem is anchored to a result above and tagged: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result in the literature or the verified development not yet absorbed into a clean statement.  Verified handles are named where they exist.
+
+\begin{openprob}[The identification criterion of in-context learning, \textsc{uk}]
+\label{op:icl-identification}
+\Cref{prop:transformer-gold} casts a transformer's in-context predictor as a Gold learner.  Determine which criterion it meets on natural concept classes: does a fixed transformer $\Ex$-converge (the in-context rule stabilizes), $\BC$-converge (it stabilizes only extensionally), or vacillate, and what is its mind-change ordinal (\leanname{FLT_Proofs.Complexity.MindChange.MindChangeOrdinal}) as a function of context length and model size?
+\end{openprob}
+
+\begin{openprob}[Formalizing the $\BC > \Ex$ separation, \textsc{uk}]
+\label{op:bc-ex-formal}
+Gold's impossibility theorem is verified (\leanname{FLT_Proofs.Theorem.Gold.gold_theorem}) and the criterion hierarchy is typed, but the Case--Smith strict separation (\cref{thm:bc-strictly-stronger}) is not.  Formalize the construction of a class that is $\BC$-identifiable but not $\Ex$-identifiable, on top of \leanname{FLT_Proofs.Criterion.Gold.BCLearnable} and \leanname{FLT_Proofs.Criterion.Gold.EXLearnable}.
+\end{openprob}
+
+\begin{openprob}[The Freivalds--Smith ordinal hierarchy, \textsc{uk}]
+\label{op:fs-ordinal}
+\Cref{thm:mind-change-ordinal} is stated but its strictness is cited.  Formalize the transfinite mind-change hierarchy on top of the typed ordinal measure (\leanname{FLT_Proofs.Complexity.MindChange.MindChangeOrdinal}): prove that for each constructive ordinal $\alpha$ the $\alpha$-bounded classes strictly contain the $\beta$-bounded classes for $\beta < \alpha$, connecting to the constructive ordinal notations of \Cref{ch:ordinals}.
+\end{openprob}
+
+\begin{openprob}[Angluin's telltale characterization, \textsc{ku}]
+\label{op:telltale}
+Gold's theorem is an impossibility result; the matching characterization is Angluin's: a class is $\Ex$-identifiable from text if and only if every language in it has a finite ``telltale'' subset that no proper sublanguage in the class contains~\cite{Angluin1980}.  Formalize this characterization on top of \leanname{FLT_Proofs.Criterion.Gold.EXLearnable}, giving the exact condition that separates the identifiable classes from those Gold's theorem rules out.
+\end{openprob}
+
+\begin{openprob}[The vacillatory hierarchy, \textsc{ku}]
+\label{op:vex-hierarchy}
+Vacillatory identification (\cref{def:vacillatory}) allows oscillation among at most $k$ correct indices.  Determine whether the $\mathrm{Vex}_k$ hierarchy is strict in $k$ and where $\mathrm{Vex} = \bigcup_k \mathrm{Vex}_k$ sits strictly between $\Ex$ and $\BC$, formalizing on top of \leanname{FLT_Proofs.Criterion.Gold.VacillatoryLearnable}.
+\end{openprob}
+
+\begin{openprob}[A meta-measure across the three paradigms, \textsc{ku}]
+\label{op:meta-measure}
+The three-paradigm separation (\cref{sec:three-paradigm}, \leanname{FLT_Proofs.Theorem.Separation.online_pac_gold_separation}) shows PAC, online, and Gold are pairwise incomparable.  Determine whether a single parameterized complexity measure specializes to the VC dimension, the Littlestone dimension, and the mind-change ordinal under three settings of a data-model parameter, or prove that the three invariants are provably non-unifiable.
+\end{openprob}
+
+\begin{openprob}[Anomalous in-context learning, \textsc{uk}]
+\label{op:anomalous-icl}
+Anomalous identification (\cref{def:anomalous}, \leanname{FLT_Proofs.Criterion.Gold.AnomalousLearnable}) permits finitely many errors in the final hypothesis.  Determine whether relaxing exactness to bounded anomaly enlarges what a transformer can identify in context, and relate the anomaly count to the approximation error of the attention learner on the tail of the data stream.
+\end{openprob}
+
+\begin{openprob}[Identification from informant versus text for attention, \textsc{ku}]
+\label{op:informant-attention}
+Exercise~1 shows informant is strictly more powerful than text.  Quantify the gap for a transformer: how much does access to negative examples (an informant-style prompt) reduce the mind-change ordinal of in-context identification relative to a positive-only (text-style) prompt, and is the separation as sharp for bounded-context transformers as it is in the recursive setting?
+\end{openprob}
+
+\begin{openprob}[Monotonic in-context learning, \textsc{uk}]
+\label{op:monotonic-icl}
+Monotonic identification (\cref{def:monotonic}, \leanname{FLT_Proofs.Criterion.Gold.MonotonicLearnable}) forbids retracting a correct classification.  Determine whether attention learners can be constrained to be monotonic without loss of identification power on natural classes, and whether monotonicity corresponds to a stability property of the routing under prefix extension.
+\end{openprob}
+
+\begin{openprob}[Effective three-paradigm witnesses, \textsc{uk}]
+\label{op:effective-three-paradigm}
+The three-paradigm separation produces its witnesses existentially.  Give a single parameterized family of concept classes that realizes each of the four pairwise separations of \cref{sec:three-paradigm} with explicit witnesses and explicit obstructions, turning the separation lattice into one constructive theorem rather than four independent constructions.
+\end{openprob}
 
