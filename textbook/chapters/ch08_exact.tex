@@ -23,10 +23,10 @@ The query model was introduced in \Cref{sec:queries}, where membership and equiv
 \label{def:mat}
 A \emph{minimally adequate teacher} (MAT) for a target concept $c$ over domain $X$ provides two oracles:
 \begin{itemize}[leftmargin=*, itemsep=2pt]
-\item $\mathrm{MQ}(x)$: returns $c(x)$ for any $x \in X$ chosen by the learner.
-\item $\mathrm{EQ}(h)$: if $h = c$, returns \textsc{yes}. Otherwise, returns a counterexample $z \in X$ with $h(z) \neq c(z)$.
+\item $\mathrm{MQ}(x)$: returns $c(x)$ for any $x \in X$ chosen by the learner.\formal{FLT_Proofs.Data.MembershipOracle}
+\item $\mathrm{EQ}(h)$: if $h = c$, returns \textsc{yes}. Otherwise, returns a counterexample $z \in X$ with $h(z) \neq c(z)$.\formal{FLT_Proofs.Data.EquivalenceOracle}
 \end{itemize}
-The teacher is ``minimally adequate'' in the sense that it provides exactly these two capabilities and nothing more: no distributional information, no structural hints, no preference among counterexamples.
+The teacher is ``minimally adequate'' in the sense that it provides exactly these two capabilities and nothing more: no distributional information, no structural hints, no preference among counterexamples.\formal{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}
 \end{defn}
 
 \begin{defn}[Exact Learning]
@@ -35,7 +35,7 @@ A concept class $\mathcal{C}$ is \emph{exactly learnable in polynomial time} if 
 \begin{enumerate}[leftmargin=*, nosep]
 \item the representation size $n$ of the target $c$, and
 \item the length $m$ of the longest counterexample returned by $\mathrm{EQ}$.
-\end{enumerate}
+\end{enumerate}\formal{FLT_Proofs.Criterion.PAC.ExactLearnable}
 \end{defn}
 
 \begin{remark}[The role of counterexample length]
@@ -235,6 +235,22 @@ The Kearns--Valiant result is \emph{conditional}: it assumes that certain crypto
 % SECTION 4: QUERY COMPLEXITY AND FORWARD REFERENCES
 % ================================================================
 
+\subsection{Extracting an automaton from a transformer}
+\label{sec:dfa-extraction}
+
+The passive--active gap has a direct modern use: it is the principle behind \emph{automaton extraction} from trained neural sequence models.  A trained attention model computes a binary string function---accept/reject, or a thresholded next-token decision---and we may treat that function as the unknown target of an exact-learning game, with the model itself playing the minimally adequate teacher.
+
+\begin{prop}[A trained transformer is an $L^*$ target]
+\label{prop:transformer-extraction}
+Let $f$ be the binary string function computed by a trained attention model.  Answer membership queries by a forward pass, $\mathrm{MQ}(s) = f(s)$, and equivalence queries by sampling-based testing of a conjectured DFA against $f$.  Running $L^*$ against this teacher (\cref{thm:lstar-complexity}) yields a DFA consistent with $f$ on the queried strings, and the minimal DFA for $f$ if the equivalence oracle is exact.\formal{FLT_Proofs.Computation.DFA'} The teacher is a minimally adequate teacher in the sense of \cref{def:mat}, with the model's forward pass as the membership oracle.\formal{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}
+\end{prop}
+
+\begin{proof}
+The membership oracle $\mathrm{MQ}(s) = f(s)$ is total and truthful: a forward pass computes $f(s)$ exactly up to the bounded finite-precision forward error of the attention layer.\formal{TLT.Fp32AttnLit.attnLiteralForwardError} The equivalence oracle is approximate---it certifies $L(M) = f$ on a sampled test set rather than on all strings---so the conjecture is exact on the queries made and probably-approximately correct off them; with an exact equivalence oracle $L^*$ returns the minimal DFA for $f$ by \cref{thm:lstar-complexity}.  Either way the model is a legitimate $L^*$ teacher.
+\end{proof}
+
+This is how Weiss, Goldberg, and Yahav~\cite{WeissGoldbergYahav2018} extract interpretable automata from recurrent networks, and the construction applies to attention models verbatim.  It turns the passive--active gap into a methodology: a model opaque under passive inspection becomes a queryable teacher, and $L^*$ distills its regular core into a DFA one can read.  The caveat is the one above---the equivalence oracle is only approximate, so extraction is sound on the queries and heuristic beyond them, and whether a transformer's string function even \emph{has} a finite regular core is itself open (\cref{op:transformer-regular}).
+
 \section{Query Complexity}
 \label{sec:query-complexity}
 
@@ -247,10 +263,14 @@ The \emph{membership query complexity} $\mathrm{MQ}(\mathcal{C}, n)$ and \emph{e
 
 For DFAs, $L^*$ achieves $\mathrm{EQ} \leq n - 1$ and $\mathrm{MQ} = O(n^2 |\Sigma| m)$. The equivalence query count has a direct connection to the combinatorial structure of the hypothesis class.
 
-\begin{prop}[EQ lower bound via teaching dimension]
+\begin{prop}[Equivalence queries alone are expensive {\cite{Angluin1988}}]
 \label{prop:eq-lower}
-For any class $\mathcal{C}$ that is exactly learnable, $\mathrm{EQ}(\mathcal{C}, n) \geq \lceil \log_2 |\mathcal{C}_n| \rceil$, where $\mathcal{C}_n$ is the set of concepts in $\mathcal{C}$ of representation size $n$. Each equivalence query eliminates at most half the version space (by returning a counterexample that is consistent with the target but not the conjecture).
+With equivalence queries alone---no membership queries---exactly learning a finite class of $N$ concepts requires at most $N - 1$ queries always, and $N - 1$ in the worst case. Membership queries break this bound: $L^*$ uses only $n - 1$ equivalence queries for an $n$-state DFA, although $|\mathcal{C}_n|$ is exponential in $n$.
 \end{prop}
+
+\begin{proof}
+Maintain the version space $V$ of candidates consistent with every counterexample received, initially the whole class.  Each query $\mathrm{EQ}(h)$ either returns \textsc{yes} (and the learner halts) or a counterexample that is inconsistent with $h$, so it removes at least $h$ from $V$; hence $|V|$ drops by at least one per query and $N - 1$ queries suffice to reach $|V| = 1$.  For the matching lower bound, take a class in which each concept differs from every other at a point unique to that pair, so that for any conjecture $h$ the adversary can return a counterexample consistent with all surviving candidates except $h$; then exactly one candidate is eliminated per query and $N - 1$ are forced.  The contrast with $L^*$ is the content of the chapter: membership queries supply the structural information---which Myhill--Nerode class a string belongs to---that equivalence queries alone cannot, collapsing an exponential query count to a linear one (\cref{prop:eq-alone} of \Cref{ch:data}).
+\end{proof}
 
 \begin{remark}[Certificate complexity]
 \label{rmk:certificate}
@@ -271,4 +291,59 @@ The exact learning framework connects to \emph{certificate complexity} in Boolea
 \end{enumerate}
 
 The gap between passive and active learning demonstrated by DFAs is not an isolated curiosity. It reflects a structural principle: the information geometry of a learning problem can change qualitatively when the learner moves from passive observation to active interrogation. This principle recurs in statistical experimental design, active learning in the PAC setting, and reinforcement learning---all settings where the learner's ability to choose which data to collect transforms the computational landscape.
+
+\section{Open Problems}
+\label{sec:ch8-open}
+
+Each problem is anchored to a result above and tagged: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result in the literature or the verified development not yet absorbed into a clean statement.  Verified handles are named where they exist.
+
+\begin{openprob}[The regular core of a transformer, \textsc{uk}]
+\label{op:transformer-regular}
+\Cref{prop:transformer-extraction} extracts a DFA from a trained attention model, exact only on the queried strings.  Determine when a transformer's binary string function has a finite Myhill--Nerode index---a genuine regular core---so that $L^*$ extraction is exact rather than heuristic, and bound the number of states as a function of the architecture (depth, heads, context length).
+\end{openprob}
+
+\begin{openprob}[An exact equivalence oracle for neural models, \textsc{ku}]
+\label{op:exact-eq-oracle}
+Extraction is approximate because the equivalence oracle samples rather than verifies.  Determine for which model classes an \emph{exact} equivalence query---``does this DFA agree with the model on all strings?''---is decidable, turning approximate extraction into exact $L^*$ learning, and relate the cost to formal verification of the attention layer.
+\end{openprob}
+
+\begin{openprob}[Formalizing $L^*$, \textsc{uk}]
+\label{op:lstar-formal}
+The $L^*$ correctness and complexity theorem (\cref{thm:lstar-complexity}) is cited, not verified.  Formalize $L^*$---the observation table, closedness, consistency, and the Myhill--Nerode termination argument---on top of the typed minimally adequate teacher (\leanname{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}) and \leanname{FLT_Proofs.Computation.DFA'}, with the $n-1$ equivalence-query bound proved.
+\end{openprob}
+
+\begin{openprob}[A combinatorial dimension for MAT-learnability, \textsc{ku}]
+\label{op:mat-dimension}
+Which classes are exactly learnable from a minimally adequate teacher in polynomial time?  Beyond DFAs (decision trees, certain Boolean formulas, residual automata are known), give a combinatorial dimension that characterizes polynomial-query MAT-learnability the way $\VC$ characterizes PAC learnability, or prove the query model admits none.
+\end{openprob}
+
+\begin{openprob}[The reverse separation, \textsc{ku}]
+\label{op:reverse-separation}
+The passive--active gap (\cref{sec:passive-active-gap}) is verified in one direction (DFAs: exact yes, PAC no).  Make the reverse precise: exhibit a class that is efficiently PAC-learnable but not efficiently exactly learnable, pinning down why simulating an equivalence oracle in the PAC setting is computationally intractable for it.
+\end{openprob}
+
+\begin{openprob}[Sharp equivalence-query complexity, \textsc{ku}]
+\label{op:eq-sharp}
+\Cref{prop:eq-lower} gives the worst-case $N-1$ bound for equivalence queries alone.  Characterize the exact equivalence-query complexity of a class by a combinatorial parameter (a ``certificate'' or ``extended teaching'' dimension), interpolating between the $N-1$ of unstructured classes and the $n-1$ of DFAs under added membership queries.
+\end{openprob}
+
+\begin{openprob}[Query complexity versus teaching dimension, \textsc{uk}]
+\label{op:query-teaching}
+\Cref{rmk:certificate} connects equivalence queries to teaching dimension and certificate complexity.  Make the connection quantitative: prove two-sided bounds relating $\mathrm{EQ}(\mathcal{C}, n)$ to the teaching dimension (\leanname{FLT_Proofs.Learner.Active.IsOptimalTeacher}) and the certificate complexity of $\mathcal{C}$, unifying the active-learning and teaching pictures of \Cref{ch:dimensions}.
+\end{openprob}
+
+\begin{openprob}[Test complexity of attention extraction, \textsc{uk}]
+\label{op:extraction-samples}
+The approximate equivalence oracle of \cref{prop:transformer-extraction} samples strings to test a conjecture.  Determine the number of test samples needed to certify $L(M) = f$ with confidence $1 - \delta$ as a function of the DFA size and the model's margin, giving a PAC guarantee on the extracted automaton.
+\end{openprob}
+
+\begin{openprob}[Counterexample length, \textsc{ku}]
+\label{op:counterexample-length}
+The $L^*$ membership-query count carries a factor $m$, the longest counterexample length (\cref{rmk:counterexample-length}).  Determine whether a learner or a cooperative teacher can avoid the linear dependence on $m$---for instance by binary-searching counterexamples (Rivest--Schapire)---and what the optimal dependence is.
+\end{openprob}
+
+\begin{openprob}[An LLM as a minimally adequate teacher, \textsc{uk}]
+\label{op:llm-teacher}
+The development types an LLM critic as a teacher (\leanname{FLT_Proofs.Learner.Active.LLMCritic}).  Determine the soundness conditions under which a large language model can serve as the membership and equivalence oracle for a downstream exact learner---when its answers are reliable enough that $L^*$ converges to the intended concept---bounding the error introduced by an unreliable teacher.
+\end{openprob}
 
