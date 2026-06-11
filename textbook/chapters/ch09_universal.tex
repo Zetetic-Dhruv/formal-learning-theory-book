@@ -58,7 +58,7 @@ and every $n \in \N$:
   \E_{S \sim D^n}\!\bigl[\risk_D(A(S))\bigr] \leq R(n).
 \]
 The \emph{optimal universal rate} is the fastest-decaying $R$ achievable by
-any learner.
+any learner.\formal{FLT_Proofs.Criterion.Extended.UniversalLearnable}
 \end{defn}
 
 Three features distinguish this from the PAC formulation:
@@ -130,7 +130,7 @@ any single path).  The converse fails: a VCL tree requires shattering along
 each path, which is a weaker global condition than the Littlestone tree's
 requirement that \emph{every} root-to-leaf path has a \emph{single}
 consistent hypothesis.  The distinction matters: infinite VCL trees can
-exist even when $\Ldim(\mathcal{H}) < \infty$.
+exist even when $\Ldim(\mathcal{H}) < \infty$.  The combined VC--Littlestone measure underlying these trees is typed in the development as a pair of ordinal-valued dimensions.\formal{FLT_Proofs.Complexity.Ordinal.OrdinalLittlestoneDim}
 \end{remark}
 
 \begin{thm}[The Trichotomy Theorem {\cite{BousquetHannekeMoranVanHandelYehudayoff2021}}]
@@ -158,6 +158,11 @@ Exactly one of the following three cases holds:
   rate $R(n)$ on some realizable distribution $D$.
 \end{enumerate}
 \end{thm}
+
+\begin{remark}[Formalization status]
+\label{rmk:trichotomy-formal}
+The trichotomy's three \emph{regimes} are typed in the companion development---the universal-rate criterion (\cref{def:universal-rate}) and the ordinal VC and Littlestone dimensions---and the boundary case ``$\Ldim < \infty$ iff online learnable'' is verified (\cref{thm:littlestone-characterization}).  The trichotomy theorem itself is \emph{not} yet machine-checked: the middle branch (infinite Littlestone, finite VC, hence linear rate) rests on the Bousquet--Hanneke--Moran--Ramanan doubling construction, which the development marks as pending, and the universal-to-PAC direction routes through a boosting lemma that is currently incomplete.  Closing these is \cref{op:trichotomy-formal}; we present the proof as a sketch throughout, following~\cite{BousquetHannekeMoranVanHandelYehudayoff2021}.
+\end{remark}
 
 The three cases are exhaustive and mutually exclusive.  Every learnable class
 (i.e., every class with $\VC(\mathcal{H}) < \infty$ and
@@ -481,6 +486,22 @@ with accidental parallels, but different projections of a single
 combinatorial landscape.
 
 
+\subsection{Where attention sits in the trichotomy}
+\label{sec:attention-trichotomy}
+
+The trichotomy classifies every fixed-architecture attention class, and the classification turns on a single question carried over from \Cref{ch:online}: is the Littlestone dimension of the attention class finite?
+
+\begin{prop}[A fixed attention class is not arbitrarily slow]
+\label{prop:attention-trichotomy}
+A finite-head attention class on $\R^d$ has finite VC dimension (\cref{prop:attention-pac}), so it has no infinite VCL tree and is not in the arbitrarily-slow regime~\ref{T:arb}: it is universally learnable at a uniform rate.\formal{FLT_Proofs.Criterion.Extended.UniversalLearnable} Its regime is exponential~\ref{T:exp} when its Littlestone dimension is finite and linear~\ref{T:linear} when its Littlestone dimension is infinite.
+\end{prop}
+
+\begin{proof}
+Finite VC dimension rules out infinite VCL trees---an infinite VCL tree shatters sets of every size, forcing infinite VC dimension---so by \cref{thm:trichotomy} the class lies in regime~\ref{T:exp} or~\ref{T:linear}.  Which of the two is decided by the Littlestone dimension: finite gives the exponential rate via the version-space strategy of \cref{sec:exp-case}, infinite gives the linear rate via the one-inclusion predictor of \cref{sec:linear-case}.
+\end{proof}
+
+The rate at which a transformer head learns its target---exponential or merely linear---is therefore governed by exactly the invariant whose finiteness for attention is open (\cref{op:ldim-attention} of \Cref{ch:online}).  A fixed attention class behaves like halfspaces (exponential) if its score-induced order structure has bounded Littlestone depth, and like thresholds on $\R$ (linear) if the temperature lets the router resolve an unbounded ordering; deciding which is the content of \cref{op:attention-regime}.
+
 \section{What This Chapter Established}
 \label{sec:ch9-summary}
 
@@ -506,4 +527,59 @@ Two results, one structural lesson.
   just what the rate regimes are, but what combinatorial objects govern
   them---and the answer came from an unexpected paradigm.
 \end{enumerate}
+
+\section{Open Problems}
+\label{sec:ch9-open}
+
+Each problem is anchored to a result above and tagged: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result in the literature or the verified development not yet absorbed into a clean statement.  Verified handles are named where they exist.
+
+\begin{openprob}[Formalizing the trichotomy, \textsc{uk}]
+\label{op:trichotomy-formal}
+The regimes are typed (\leanname{FLT_Proofs.Criterion.Extended.UniversalLearnable}, the ordinal dimensions) but the trichotomy theorem is not machine-checked (\cref{rmk:trichotomy-formal}).  Formalize the Bousquet--Hanneke--Moran--Ramanan middle branch---infinite Littlestone, finite VC, hence linear rate---via the doubling/aggregation construction, and complete the boosting lemma in the universal-to-PAC direction (\leanname{FLT_Proofs.Theorem.Separation.universal_imp_pac}) that currently rests on an unfinished step.
+\end{openprob}
+
+\begin{openprob}[The trichotomy regime of attention, \textsc{uk}]
+\label{op:attention-regime}
+\Cref{prop:attention-trichotomy} places a fixed-head attention class in the exponential or linear regime according to its Littlestone dimension.  Decide which: compute the Littlestone dimension of the $k$-head attention class as a function of architecture and temperature, settling whether a transformer head learns its target exponentially or only linearly (tied to \cref{op:ldim-attention} of \Cref{ch:online}).
+\end{openprob}
+
+\begin{openprob}[A single dimension for the linear/slow boundary, \textsc{ku}]
+\label{op:vcl-characterization}
+The boundary between linear and arbitrarily-slow rates is ``no infinite VCL tree''.  Give a clean combinatorial dimension---an ordinal-valued measure on the class---whose finiteness is equivalent to the absence of an infinite VCL tree, the way $\Ldim < \infty$ captures the exponential/linear boundary, building on the typed ordinal dimensions (\leanname{FLT_Proofs.Complexity.Ordinal.OrdinalLittlestoneDim}).
+\end{openprob}
+
+\begin{openprob}[Intermediate rates beyond the realizable case, \textsc{ku}]
+\label{op:intermediate-rates}
+The trichotomy is sharp in the realizable setting: only $e^{-n}$, $1/n$, and arbitrarily slow occur.  Determine the rate landscape in the agnostic and bounded-noise settings: do intermediate rates such as $1/\sqrt{n}$ appear, and is there a corresponding finer trichotomy or a genuine continuum?
+\end{openprob}
+
+\begin{openprob}[The rate constants, \textsc{ku}]
+\label{op:rate-constants}
+\Cref{sec:exp-case,sec:linear-case} give $\Theta(e^{-n})$ and $\Theta(1/n)$ with unspecified constants.  Determine the leading constant in each regime as a function of the Littlestone dimension (exponential) and of the one-inclusion graph degree (linear), matching upper and lower bounds.
+\end{openprob}
+
+\begin{openprob}[The multiclass trichotomy, \textsc{uk}]
+\label{op:universal-multiclass}
+The trichotomy is stated for binary classification.  Determine whether it survives for multiclass and real-valued prediction, with the DS or fat-shattering tree in place of the VCL tree, and whether the three-regime structure persists or splits further (\Cref{ch:extensions}).
+\end{openprob}
+
+\begin{openprob}[Distribution-dependent universal rates, \textsc{ku}]
+\label{op:adaptive-rates}
+The universal rate is uniform over all realizable distributions.  Characterize the finer, distribution-dependent rates---the fastest rate achievable on each fixed $D$---and determine how the per-distribution rate relates to the worst-case regime of \cref{thm:trichotomy}.
+\end{openprob}
+
+\begin{openprob}[Temperature and the rate transition, \textsc{uk}]
+\label{op:attention-temperature-rate}
+\Cref{prop:attention-trichotomy} ties an attention class's regime to its Littlestone dimension.  Determine how the score temperature drives the transition: as the temperature grows and the router approaches a hard argmax, does the Littlestone dimension diverge (pushing the class from exponential to linear), and is there a sharp temperature threshold?
+\end{openprob}
+
+\begin{openprob}[The one-inclusion predictor for attention, \textsc{uk}]
+\label{op:oneinclusion-attention}
+The linear regime is achieved by the one-inclusion predictor (\cref{def:oip}).  Give an efficient implementation of the one-inclusion predictor for a finite-head attention class and bound the constant $C$ in its $C/n$ rate in terms of the architecture, since the abstract predictor is not obviously tractable on attention hypothesis classes.
+\end{openprob}
+
+\begin{openprob}[Why online governs statistical rates, \textsc{ku}]
+\label{op:universal-online-bridge}
+The trichotomy's central surprise is that the Littlestone dimension---an adversarial, online quantity---draws the exponential/linear boundary in the i.i.d.\ setting (\cref{sec:surprise}).  Find a single structural principle, beyond the trichotomy proof, that explains the cross-paradigm bridge: a reason the same combinatorial object should control both worst-case mistakes and average-case rates.
+\end{openprob}
 
