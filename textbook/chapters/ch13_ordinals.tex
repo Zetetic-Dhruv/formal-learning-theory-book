@@ -195,6 +195,21 @@ of all concept classes $\mathcal{C}$ such that some learner
 $\alpha$-bounds its mind changes and $\Ex$-identifies $\mathcal{C}$.
 \end{defn}
 
+\begin{remark}[The hierarchy is notation-relative]
+\label{rem:notation-dependence}
+A subtlety underlies every statement that follows.  The class
+$\Ex_\alpha$ is defined through a \emph{notation} $a \in \mathcal{O}$
+for~$\alpha$, not through the ordinal $|a|$ alone, because the learner
+decrements along the computable predecessor sequence that the notation
+supplies.  Two notations $a, a'$ with $|a| = |a'|$ can give
+$\Ex_a \neq \Ex_{a'}$ (Exercise~6).  When the theorems below write
+``$\Ex_\alpha$'' and ``for all constructive~$\alpha$,'' they mean: fix a
+notation for each ordinal; the strictness statements hold for these
+fixed notations.  Which ordinals---as opposed to notations---admit a
+notation-invariant $\Ex_\alpha$ is the subject
+of~\cite{MartinSharmaStephan2006} and is only partially understood.
+\end{remark}
+
 The key insight is operational: a counter initialized to $\omega$ can
 be decremented to any finite value $n$, but a counter initialized to
 $n$ can only be decremented $n$ times.  So $\Ex_\omega$ is strictly
@@ -356,11 +371,13 @@ moves to the next candidate, decrementing its counter.
 
 The counter is initialized to $\alpha + 1$.  The first mind change
 (from the initial hypothesis to the first genuine candidate)
-decrements the counter from $\alpha + 1$ to $\alpha$.  Subsequent
-mind changes are bounded by $\alpha$ because the search through
-candidates is guided by the ordinal structure of the construction.
-(The precise argument uses the recursion theorem to ensure that $M^*$
-can reconstruct the diagonal construction from the data.)
+decrements the counter from $\alpha + 1$ to $\alpha$.  That the
+subsequent mind changes are bounded by~$\alpha$ is the crux of the
+construction, and it is exactly here that this proof is a sketch: the
+$\alpha$-bound on $M^*$'s residual revisions follows by reconstructing
+the diagonal construction from the data via the recursion theorem, a
+priority argument we do not carry out.  See Freivalds and
+Smith~\cite{FreivaldsSmith1993} for the complete construction.
 \end{proof}
 
 \begin{proof}[Proof of \Cref{thm:ordinal-hierarchy}]
@@ -558,17 +575,23 @@ produce infinitely many distinct convergent hypotheses $h_{e_0}^*,
 h_{e_1}^*, h_{e_2}^*, \ldots$, all determined by the single initial
 datum $f(0)$ and the same infinite tail.
 
-We now apply the recursion theorem to derive a contradiction.  Define
-$g$ via a fixed point: let $e_0$ be an index such that $\varphi_{e_0}$
-is defined by simulating $M$ on $(e_0, \varphi_{e_0}(1),
-\varphi_{e_0}(2), \ldots)$.  By the recursion theorem, such $e_0$
-exists.  Running $M$ on $f_{g,e_0}$ determines a convergent hypothesis
-$h^*$.  But we can then define $\varphi_{e_0}(0) = e_0$ and ensure
-that $\varphi_{h^*}(0) \neq e_0$ for a second index $e_1 \neq e_0$
-with $\varphi_{e_1} = g$, contradicting the assumption that $M$
-correctly $\Ex$-identifies $f_{g,e_1}$.  (The point is that $M$
-cannot distinguish infinitely many functions from identical tails,
-yet must converge to distinct correct hypotheses for each.)
+The contradiction is now information-theoretic, sharpened by the
+recursion theorem.  Fix any total recursive~$g$ and let
+$e_0, e_1, e_2, \ldots$ be infinitely many indices with
+$\varphi_{e_i} = g$.  The inputs $f_{g,e_0}, f_{g,e_1}, \ldots$ share
+the identical tail $g(1), g(2), \ldots$ and differ only in the initial
+label.  After processing that label, $M$'s subsequent behavior is driven
+by the \emph{same} tail, so it follows a single hypothesis trajectory;
+yet $\Ex$-identification demands a \emph{distinct} final index
+$h_{e_i}^*$ for each~$i$, since $\varphi_{h_{e_i}^*}(0) = e_i$.  A single
+convergent trajectory cannot end at infinitely many distinct indices.
+To turn this tension into a concrete failure, the operator recursion
+theorem~\cite{CaseSmith1983} supplies a total recursive~$g$ together with
+two of its indices $e \neq e'$ on which $M$ produces the \emph{same}
+limiting hypothesis~$h^*$; then $\varphi_{h^*}(0)$ cannot equal both
+$e$ and~$e'$, so $M$ misidentifies at least one of
+$f_{g,e}, f_{g,e'}$.  We do not reproduce the priority bookkeeping of the
+operator recursion theorem here.
 \end{proof}
 
 \begin{separation}
@@ -733,7 +756,8 @@ if the minimum exists, and $\infty$ otherwise.
 \begin{example}
 \label{ex:pattern-languages}
 Unions of $n$ pattern languages have mind-change complexity exactly
-$\omega^n$ (Ambainis--Jain--Sharma~\cite{AmbainisJainSharma1999}).
+$\omega^n$ (Ambainis--Jain--Sharma~\cite{AmbainisJainSharma1999}, who
+establish both the $\omega^n$ upper bound and a matching lower bound).
 This provides a natural example of classes at each level $\omega^n$
 in the hierarchy.
 \end{example}
@@ -757,6 +781,172 @@ $\nde{bc\_learning} \xrightarrow{\rel{restricts}} \nde{ex\_learning}$
 (constraint removal: drops syntactic convergence requirement).\\
 \textbf{Provenance:} Case--Smith 1983.
 \end{graphnode}
+
+
+\subsection{A Machine-Checked Ordinal Rank}
+\label{sec:ordinal-rank-formal}
+
+The mind-change ordinal is one ordinal-valued complexity measure, native
+to recursion-theoretic identification.  The combinatorial dimensions of
+\Cref{ch:dimensions} carry a second one, and that one has been formalized.
+
+The Littlestone and VC dimensions take values in $\N \cup \{\infty\}$.
+There is a machine-checked, order-preserving embedding of this value type
+into the ordinals that fixes each finite dimension and sends the infinite
+value to~$\omega$,\formal{FLT_Proofs.Bridge.withTopNatToOrdinal} and under
+it the VC dimension is dominated by its ordinal lift,
+$\mathrm{withTopNatToOrdinal}(\VC(\mathcal{C})) \leq
+\mathrm{OrdinalVCDim}(\mathcal{C})$.\formal{FLT_Proofs.Bridge.vcdim_to_ordinal_vcdim}
+This is the verified core of the ``ordinal VC dimension'' of Martin,
+Sharma, and Stephan~\cite{MartinSharmaStephan2006}: a class of infinite VC
+dimension sits at the first transfinite rank~$\omega$, finite-dimension
+classes strictly below it.
+
+\begin{prop}[Online mistakes descend an ordinal rank]
+\label{prop:online-ordinal-descent}
+In the online (Littlestone) model, the optimal mistake bound of a class
+equals its Littlestone dimension.\formal{FLT_Proofs.Theorem.Online.optimal_mistake_bound_eq_ldim}
+For a class of \emph{finite} Littlestone dimension, the Standard Optimal
+Algorithm realizes this bound by treating the dimension as a rank: each
+time it errs, the Littlestone dimension of the surviving version space
+strictly decreases.  Lifted through the embedding above, this rank is a
+finite ordinal, and the strict decrease on each mistake is precisely the
+well-founded descent that \Cref{def:ordinal-mc} carries into the
+transfinite.
+\end{prop}
+
+\begin{proof}[Proof idea]
+The mistake-bound equality is an adversary argument matched against the
+algorithm's potential.  Its engine is the machine-checked descent step:
+a mistake on a version space of finite Littlestone dimension strictly
+lowers that dimension, so iterating bounds the mistakes by the initial
+rank.  The online counter never passes~$\omega$---it starts at a finite
+rank (or, for an infinite-dimensional class, at~$\omega$) and counts down
+by ordinary induction.  The transfinite levels $\Ex_{\omega^2},
+\Ex_{\omega^\omega}, \ldots$ of this chapter are the price of
+\emph{identifying programs} rather than \emph{predicting labels}; the
+prediction game stays at the bottom of the ordinal tower.
+\end{proof}
+
+\begin{remark}[Attention sits at a finite rank]
+\label{rem:attention-ordinal}
+The softmax-attention concept class of \Cref{ch:generalization} is a
+machine-checked well-behaved class,\formal{TLT.Bridge.softAttention_wellBehaved}
+and \Cref{prop:certified-attention} gives it a finite Dudley capacity once
+its parameters are norm-bounded.  Its ordinal rank is therefore finite:
+attention lives at the very bottom of the ordinal picture, alongside
+halfspaces and the other geometric classes.  The transfinite mind-change
+hierarchy is invisible to such classes.  It becomes necessary only when
+the objects learned are programs and the success criterion is exact
+identification---the recursion-theoretic regime of this chapter, which no
+finite-capacity concept class can reach.  Placing attention in the ordinal
+landscape thus also marks where that landscape first becomes non-trivial.
+\end{remark}
+
+
+% ================================================================
+% OPEN PROBLEMS
+% ================================================================
+
+\section{Open Problems}
+\label{sec:ordinals-open}
+
+The mind-change hierarchy is classically complete in its main lines, but
+its formal status, its interaction with the verified online rank, and its
+two-dimensional refinement remain open.  Each problem is tagged a
+\emph{known unknown} (KU), sharply posed but unresolved, or an
+\emph{unknown known} (UK), where the right object or invariant is still
+missing; a design-lab or literature anchor is named where one exists.
+
+\begin{openprob}[The mind-change/anomaly lattice]
+\label{op:two-dim-lattice}
+Does every point of the two-dimensional mind-change$\,\times\,$anomaly
+lattice admit a natural characterization, as unions of $n$ pattern
+languages characterize $\omega^n$?  A known unknown left open by Sharma,
+Stephan, and Ventsov~\cite{SharmaStephanVentsov2004}.
+\end{openprob}
+
+\begin{openprob}[Formalizing the transfinite hierarchy]
+\label{op:formalize-ordinal-hierarchy}
+The dimension-to-ordinal bridge is machine-checked
+(\leanname{withTopNatToOrdinal}), but the Freivalds--Smith hierarchy
+itself---constructive ordinals, $\alpha$-bounded learners, the strict
+inclusions of \Cref{thm:ordinal-hierarchy}---has no verified counterpart.
+Can the ordinal mind-change hierarchy be formalized in a proof assistant,
+including the priority constructions?  An unknown known: the recursion-
+theoretic machinery has no formal home yet.
+\end{openprob}
+
+\begin{openprob}[Notation-invariant levels]
+\label{op:notation-invariance}
+\Cref{rem:notation-dependence} records that $\Ex_a$ can depend on the
+notation~$a$, not just the ordinal~$|a|$.  Characterize exactly which
+ordinals admit a notation-invariant $\Ex_\alpha$, and whether the
+strictness theorem survives the quotient by notation.  A known
+unknown~\cite{MartinSharmaStephan2006}.
+\end{openprob}
+
+\begin{openprob}[The ordinal rank of attention]
+\label{op:attention-ordinal-rank}
+\Cref{rem:attention-ordinal} places the attention class at a finite VC
+rank, but its \emph{Littlestone} dimension---the online mind-change
+rank---may still be infinite (thresholds already are).  Is the Littlestone
+dimension of a softmax-attention class finite, and if so what is its exact
+ordinal rank?  A known unknown on the transformer side
+(\leanname{softAttention_wellBehaved}, \leanname{optimal_mistake_bound_eq_ldim}).
+\end{openprob}
+
+\begin{openprob}[A verified online-to-transfinite bridge]
+\label{op:online-transfinite}
+The online descent---each mistake strictly lowers the Littlestone
+dimension---is machine-checked (\leanname{ldim_strict_decrease_on_mistake})
+and stays below~$\omega$.  Is there a single formal framework in which this
+verified finite descent and the transfinite mind-change counter are
+instances of one well-founded-recursion principle?  An unknown known: the
+unifying ordinal-recursion abstraction is not yet written down.
+\end{openprob}
+
+\begin{openprob}[Formalizing $\BC \setminus \Ex$]
+\label{op:formalize-bc}
+The separation of \Cref{thm:bc-separation} rests on the operator recursion
+theorem, which we sketched rather than proved.  Can the Case--Smith
+separation be machine-checked, operator recursion theorem
+included~\cite{CaseSmith1983}?  A known unknown of formalization.
+\end{openprob}
+
+\begin{openprob}[Tightness of the Hessenberg bound]
+\label{op:hessenberg-tight}
+Exercise~3 gives $\mathcal{C}_1 \cup \mathcal{C}_2 \in
+\Ex_{\alpha \oplus \beta}$ for the natural (Hessenberg) sum.  Is this bound
+tight---are there classes whose union's mind-change ordinal is exactly
+$\alpha \oplus \beta$ and no smaller?  A known unknown about resource
+composition.
+\end{openprob}
+
+\begin{openprob}[Natural classes at each ordinal]
+\label{op:natural-witnesses}
+Pattern-language unions populate the levels $\omega^n$.  Is there a natural
+family of concept classes populating the levels up to $\varepsilon_0$, or
+does naturalness break down past $\omega^\omega$?  A known
+unknown~\cite{AmbainisJainSharma1999}.
+\end{openprob}
+
+\begin{openprob}[An ordinal anomaly hierarchy]
+\label{op:ordinal-anomaly}
+The anomaly count~$a$ in $\Ex_a^*$ is a natural number.  Is there a
+well-founded transfinite anomaly hierarchy---an $\Ex_\beta^*$ indexed by
+ordinals---and does it interleave with the mind-change ordinals?  An
+unknown known: the transfinite anomaly object has not been defined.
+\end{openprob}
+
+\begin{openprob}[Mind-change ordinals and ordinal VC dimension]
+\label{op:mco-vs-ordinalvc}
+The chapter's mind-change ordinal and the verified ordinal VC dimension
+(\leanname{vcdim_to_ordinal_vcdim}) are two ordinal-valued measures on
+overlapping domains.  For classes where both are defined, how are they
+related---is one always a bound on the other?  A known
+unknown~\cite{MartinSharmaStephan2006}.
+\end{openprob}
 
 
 % ================================================================
