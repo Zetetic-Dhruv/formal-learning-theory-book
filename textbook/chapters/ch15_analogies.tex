@@ -162,9 +162,13 @@ examples to reconstruct $h$). The notion of shortness differs. \\
 The pattern across these 12 edges is consistent: the analogy identifies
 a genuine structural parallel, but the source and target live in
 different parts of the type system. Making the analogy formal would
-require a bridging theorem that relates the two types, and in most cases
-no such theorem is expected. These are permanent features of the
-landscape, not temporary gaps in knowledge.
+require a bridging theorem that relates the two types. We conjecture that
+most of these gaps are structural rather than temporary, but this is a
+judgment, not a theorem: no impossibility result rules out a bridge for
+any individual pair, and at least one---information-theoretic bounds versus
+PAC-Bayes---already has partial bridges~\cite{HellstromDurisi2020}. The
+classification records where bridges are currently absent, not where they
+are provably impossible.
 
 
 % ================================================================
@@ -179,6 +183,17 @@ class of analogies: those where a formal equivalence is plausible but
 unproved. Some of these may become theorems; others may eventually be
 disproved. They represent the active frontier of the field.
 
+A caveat on membership: not all nine edges are genuinely open.  Three are
+settled, and appear here only because the analogy is \emph{commonly drawn}
+as an equivalence.  The mistake-bound/Littlestone pair \emph{is} an
+equivalence (Littlestone's theorem, below); the Rademacher/VC and
+label-complexity/sample-complexity pairs are established
+\emph{non}-equivalences (the separations below are known, not
+conjectural).  For these three the missing witness is not a proof of
+equivalence but the recognition that the naive equivalence is false, or
+holds only in limited scope.  The genuinely open conjectures are
+compression/VC and the two MML edges.
+
 \begin{obstbox}
 \textbf{Compression $\leftrightarrow$ VC dimension.}
 
@@ -187,7 +202,8 @@ The sample compression conjecture asserts that every concept class with
 VC dimension $d$ admits a sample compression scheme of size $O(d)$.
 Moran and Yehudayoff~\cite{MoranYehudayoff2016} proved that finite VC
 dimension implies \emph{some} finite compression scheme (of size
-exponential in $d$), establishing one direction. The conjecture that
+exponential in $d$), establishing one
+direction.\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression} The conjecture that
 compression size is $O(d)$ remains open. If proved, this would upgrade
 the analogy to an equivalence; if disproved, it would become a
 separation.
@@ -219,7 +235,8 @@ Both theorems have the same logical form: ``a class is learnable in
 paradigm $P$ if and only if combinatorial dimension $d$ is finite.''
 The parallel is exact at the level of logical structure. But the
 dimensions measure different adversarial strengths---batch (VC) vs.\
-adaptive (Littlestone)---and $\VC \leq \Ldim$ with no reverse bound.
+adaptive (Littlestone)---and $\VC \leq \Ldim$ with no reverse
+bound.\formal{FLT_Proofs.Theorem.Separation.vcdim_le_of_mistake_bounded}
 The gap can be infinite (thresholds on $\R$). Alon et
 al.~\cite{AlonLivniMalliarisMoran2019} connected the two via
 differential privacy, but no equivalence between the dimensions exists.
@@ -271,9 +288,10 @@ under a misspecified prior, and vice versa.
 
 \medskip\noindent
 The optimal mistake bound for a concept class equals its Littlestone
-dimension (this is Littlestone's theorem). However, the \emph{analogy}
-edge in the graph refers to the structural parallel between the two as
-complexity measures in their own right. The mistake bound is defined
+dimension (this is Littlestone's
+theorem).\formal{FLT_Proofs.Theorem.Online.optimal_mistake_bound_eq_ldim}
+However, the \emph{analogy} edge in the graph refers to the structural
+parallel between the two as complexity measures in their own right. The mistake bound is defined
 operationally (worst-case mistakes of the best algorithm); the
 Littlestone dimension is defined combinatorially (depth of the largest
 shattered tree). Their equivalence is a theorem, but as stand-alone
@@ -322,16 +340,19 @@ false. The analogy is ``half-true'': the structural parallel exists, but
 it is asymmetric.
 
 \begin{obstbox}
-\textbf{Sample complexity $\rightarrow$ VC dimension} (but not
-$\leftarrow$).
+\textbf{Sample complexity $\leftrightarrow$ VC dimension}
+(a theorem, not a definition).
 
 \medskip\noindent
-The fundamental theorem establishes: $\VC(\mathcal{H}) < \infty
-\Leftrightarrow$ finite sample complexity. The two are functionally
-related, but sample complexity is defined independently as the minimum
-number of examples needed, while VC dimension is a combinatorial
-property. The relationship is a theorem, not a definition; treating
-them as interchangeable obscures the logical structure.
+The fundamental theorem establishes the biconditional
+$\VC(\mathcal{H}) < \infty \Leftrightarrow$ finite sample
+complexity.\formal{FLT_Proofs.Theorem.PAC.fundamental_theorem} Unlike the
+other entries in this section, this relationship runs \emph{both} ways; it
+appears here as a cautionary case.  The analogy is usually stated as an
+identity---``sample complexity just \emph{is} VC dimension''---which
+collapses a two-directional theorem (an explicit upper bound one way, a
+matching lower bound the other, proved by different arguments) into a
+definition, erasing exactly the content the fundamental theorem supplies.
 \end{obstbox}
 
 \begin{obstbox}
@@ -354,7 +375,7 @@ $\leftarrow$).
 \medskip\noindent
 The Sauer--Shelah lemma gives: $\log N(\varepsilon, \mathcal{H},
 L_1(P)) \leq d \cdot \log(2e/\varepsilon)$, bounding covering numbers
-from VC dimension. But covering numbers are defined for arbitrary
+from VC dimension.\formal{FLT_Proofs.Complexity.Rademacher.sauer_shelah_exp_bound} But covering numbers are defined for arbitrary
 metric spaces, while VC dimension applies only to binary hypothesis
 classes. VC dimension is a sufficient condition for covering number
 bounds, not a necessary one; the covering number framework is strictly
@@ -686,8 +707,175 @@ Rademacher to function classes, VC dimension to binary classes. Each
 step downward in generality tightens the bound but loses applicability.
 
 Together, the 32 analogy edges and their obstructions form a map of what
-formal learning theory does \emph{not yet} know how to unify. The
-obstructions are not obstacles to be removed; most of them are permanent
-features of the mathematical landscape. Understanding why an analogy
-fails is, in this field, as valuable as understanding why a theorem
-holds.
+formal learning theory does \emph{not yet} know how to unify. Many of the
+obstructions appear to be structural features of the landscape rather than
+removable obstacles---though, as noted above, that is a working judgment
+rather than a proven impossibility. Understanding why an analogy fails is,
+in this field, as valuable as understanding why a theorem holds.
+
+
+% ================================================================
+% SECTION 8: REALIZED ANALOGIES (the verified counterpoint)
+% ================================================================
+
+\section{When the Analogy Is a Theorem}
+\label{sec:realized-analogies}
+
+The obstruction taxonomy earns its keep only because the alternative is
+real: some analogies carry no obstruction at all. They began as loose
+parallels and were discharged into theorems, and the cleanest of them is
+now machine-checked.
+
+The flagship is the correspondence \emph{online learning
+$\leftrightarrow$ zero-sum games}. A learner facing an adversary and a row
+player in a matrix game are, at first glance, only analogous---both react
+to a worst-case opponent. The analogy is realized by the
+multiplicative-weights (Hedge) algorithm: run on the game matrix, it
+produces a distribution over rows whose guaranteed payoff is within
+$\varepsilon$ of the game's value. No-regret online play \emph{is}
+approximate game solving.
+
+\begin{thm}[Multiplicative weights solve the game]
+\label{thm:mwu-minimax}
+Let $M \colon R \times C \to \{0,1\}$ be a finite Boolean game whose value
+is at least~$v$ (every column distribution admits a row response of payoff
+$\geq v$). For every $\varepsilon > 0$, the multiplicative-weights
+algorithm returns a row distribution~$p$ with payoff $\geq v - \varepsilon$
+against every column~$c$.\formal{ProbabilityTheory.mwu_approx_minimax} In
+particular the minimax value is attained in the limit, recovering the
+finite minimax theorem.\formal{ProbabilityTheory.finite_approx_minimax}
+\end{thm}
+
+\begin{proof}[Proof idea]
+The algorithm keeps a weight per row, multiplied by a factor $e^{\eta}$
+whenever that row would have scored against the observed column, then
+renormalized to a distribution. A potential argument bounds the gap
+between the algorithm's cumulative payoff and the best fixed row by
+$O(\sqrt{\log|R| / T})$ after $T$ rounds; taking $T$ large enough drives
+the gap below~$\varepsilon$. Those same weights, read as a mixed strategy,
+certify the minimax value---the boosting-as-a-game and regret-as-minimax
+correspondence, formalized end to end.
+\end{proof}
+
+This realized analogy has a transformer face. The multiplicative-weights
+distribution is a softmax over accumulated scores---exactly the operation
+a softmax-attention head performs over its key scores. Attention is, in
+this precise sense, one step of the Hedge update, and the head's induced
+concept class is machine-checked to be
+well-behaved.\formal{TLT.Bridge.softAttention_wellBehaved} The
+online$\,\leftrightarrow\,$game analogy thus reaches into the architecture
+of \Cref{ch:generalization}: the potential argument that solves a matrix
+game is the same normalization that sits inside every attention layer.
+
+\begin{remark}[Why the realized case matters]
+\label{rem:realized-matters}
+A taxonomy of obstructions would be vacuous if every analogy were blocked.
+\Cref{thm:mwu-minimax} is the existence proof that the frontier of
+\Cref{sec:missing-equiv} is worth pushing: an analogy that looked like a
+metaphor---``learning against an adversary is like playing a game''---is a
+theorem, machine-checked, with a softmax at its center. The obstruction
+types classify only the analogies not yet so discharged.
+\end{remark}
+
+
+% ================================================================
+% OPEN PROBLEMS
+% ================================================================
+
+\section{Open Problems}
+\label{sec:analogies-open}
+
+An analogy chapter's open problems are of two kinds: \emph{discharge} a
+parallel into a theorem, or \emph{prove} that no such theorem can exist.
+Each problem below is tagged a \emph{known unknown} (KU), sharply posed but
+unresolved, or an \emph{unknown known} (UK), where the right bridging
+object is still missing; a design-lab or literature anchor is named where
+one exists.
+
+\begin{openprob}[The sample compression conjecture]
+\label{op:compression-vc-analogy}
+Does every class of VC dimension~$d$ admit a compression scheme of
+size~$O(d)$, discharging the compression$\,\leftrightarrow\,$VC analogy
+into an equivalence?  The exponential-size direction is machine-checked
+(\leanname{fundamental_vc_compression}); the $O(d)$ conjecture is the most
+prominent missing witness.  A known unknown~\cite{MoranYehudayoff2016}.
+\end{openprob}
+
+\begin{openprob}[MML versus MDL]
+\label{op:mml-mdl}
+Is there a formal theorem relating Minimum Message Length and Minimum
+Description Length---an equivalence on a restricted class of priors, or a
+separation?  Both coding objects are formalizable (\leanname{MDLPrinciple},
+\leanname{KolmogorovComplexity}); neither direction has a witness.  A known
+unknown.
+\end{openprob}
+
+\begin{openprob}[Completing the information--PAC-Bayes bridge]
+\label{op:itb-pacbayes-bridge}
+Hellstr\"om et al.\ partially bridge information-theoretic and PAC-Bayes
+bounds via change-of-measure.  Can the partial bridge be completed to a
+theorem that recovers each bound from the other with explicit constants,
+turning a ``type mismatch'' into a realized analogy?  An unknown
+known~\cite{HellstromDurisi2020}.
+\end{openprob}
+
+\begin{openprob}[Formalizing the obstruction taxonomy]
+\label{op:formalize-taxonomy}
+Can ``type mismatch,'' ``one-way theorem,'' and the other obstruction
+types be made precise---categorically, say---so that the classification of
+the 32 edges becomes a theorem rather than an expert judgment?  An unknown
+known: the meta-level vocabulary has no formal definition yet.
+\end{openprob}
+
+\begin{openprob}[Attention as Hedge, at scale]
+\label{op:attention-hedge}
+\Cref{thm:mwu-minimax} identifies a single softmax with one Hedge step.
+Does the no-regret guarantee survive composition---does a stacked
+attention model inherit a minimax/regret certificate, or does depth break
+the correspondence?  A known unknown on the transformer side
+(\leanname{mwu_approx_minimax}, \leanname{softAttention_wellBehaved}).
+\end{openprob}
+
+\begin{openprob}[Provable permanence of a type mismatch]
+\label{op:type-mismatch-impossibility}
+For a specific pair---algorithmic stability versus PAC-Bayes, say---is
+there a proof that \emph{no} bridging theorem exists, or is the
+``permanence'' of \Cref{sec:type-mismatch} merely the current absence of a
+bridge?  A known unknown: the chapter conjectures permanence but proves
+none.
+\end{openprob}
+
+\begin{openprob}[Where Rademacher beats VC]
+\label{op:rademacher-vc-dist}
+Characterize the distributions under which the empirical Rademacher
+complexity is exponentially smaller than the VC bound.  A sharp
+distributional characterization would convert the
+Rademacher$\,\leftrightarrow\,$VC ``missing witness'' into a precise
+separation theorem.  A known unknown.
+\end{openprob}
+
+\begin{openprob}[Ordinal VC versus mind-change ordinals]
+\label{op:ordinal-vc-mindchange}
+The two transfinite measures are linked here only by a proof-method
+mismatch.  Is there a direct theorem relating the ordinal VC dimension
+(\leanname{vcdim_to_ordinal_vcdim}) to the mind-change ordinal of
+\Cref{ch:ordinals}?  An unknown known~\cite{MartinSharmaStephan2006}.
+\end{openprob}
+
+\begin{openprob}[The active--passive gap]
+\label{op:active-passive}
+Characterize exactly the classes for which label complexity is
+exponentially smaller than sample complexity.  A structural
+characterization would turn the label$\,\leftrightarrow\,$sample
+``missing witness'' into a theorem about which classes benefit from active
+querying.  A known unknown.
+\end{openprob}
+
+\begin{openprob}[Minimax for continuous attention]
+\label{op:minimax-attention}
+The verified minimax theorem (\leanname{finite_approx_minimax}) is finite.
+Does it lift to the continuous game a softmax-attention head plays over an
+unbounded key set, giving a verified value for attention as an adversarial
+prediction game?  An unknown known on the transformer side
+(\leanname{softAttention_wellBehaved}).
+\end{openprob}
