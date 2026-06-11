@@ -114,7 +114,7 @@ Relation-specific columns (\emph{Witness}, \emph{Obstruction type}, \emph{Genera
 \endlastfoot
 \nde{sample\_complexity} & \nde{vc\_dimension} & one\_way\_theorem\_only & \\
 \nde{ordinal\_vc\_dim} & \nde{mind\_change\_ordinal} & proof\_method\_mismatch & \\
-\nde{mistake\_bound} & \nde{littlestone\_dimension} & missing\_equiv\_witness & \\
+\nde{mistake\_bound} & \nde{littlestone\_dimension} & \textit{none: proved equivalence} & \cite{Littlestone1988} \\
 \nde{label\_complexity} & \nde{sample\_complexity} & missing\_equiv\_witness & \\
 \nde{concept\_drift} & \nde{online\_learning} & data\_model\_mismatch & \\
 \multicolumn{4}{c}{\footnotesize\itshape $\cdots$ 27 additional edges in \texttt{flt\_concept\_graph.json}} \\
@@ -329,11 +329,28 @@ Relation-specific columns (\emph{Witness}, \emph{Obstruction type}, \emph{Genera
 \textbf{Source} & \textbf{Target} & \textbf{Citation} \\
 \midrule
 \bottomrule
-\nde{computational\_hardness} & \nde{inductive\_bias} & \cite{ApplebaumBarakXiao2008} \\
+\nde{computational\_hardness} & \nde{cryptographic\_hardness} & \cite{ApplebaumBarakXiao2008} \\
 \nde{posterior\_consistency} & \nde{bayesian\_inference} & \cite{Schwartz1965} \\
 \end{longtable}
 
 \bigskip
+\noindent\textbf{Machine-checked witnesses.}\quad
+A growing subset of these edges carries a witness that is not merely cited but
+verified in the companion Lean~4 development.  The \rel{characterizes} edge
+$\nde{ds\_dimension}\to\nde{pac\_learning}$ aside (whose witness is the
+Brukhim et al.\ construction, cited not formalized), several
+\rel{does\_not\_imply} separations are machine-checked---thresholds for
+$\nde{pac\_learning}\not\to\nde{mistake\_bounded}$, all finite subsets for
+$\nde{ex\_learning}\not\to\nde{pac\_learning}$, and parities for
+$\nde{vc\_dimension}\not\to\nde{sq\_dimension}$---as are the
+\rel{strictly\_stronger} edges of \Cref{tab:strictly-stronger}.  In the main
+text these rows carry \texttt{\textbackslash formal} footnotes naming their
+verified counterparts.  The transformer instances---softmax attention as a
+well-behaved VC class, and the certified generalization bound for an attention
+block (\Cref{ch:generalization})---enter the inventory as verified witnesses
+for the VC-dimension and generalization edges.
+
+\medskip
 \noindent\textbf{Full inventory.}\quad
 The complete 260-edge listing is available in \texttt{flt\_concept\_graph.json} (v1.0).
 Programmatic access is recommended for any systematic traversal; see Appendix~\ref{app:validation} for the validation suite.
