@@ -95,49 +95,74 @@ realized by a halfplane.  Hence $\VC(\mathcal{H}) = 3$.
 
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}[scale=0.72,
-    point/.style={circle, fill=defblue, inner sep=1.8pt},
+\begin{tikzpicture}[scale=0.7,
     pospt/.style={circle, fill=thmred, inner sep=1.8pt},
     negpt/.style={circle, fill=defblue, inner sep=1.8pt},
     label0/.style={font=\scriptsize, text=defblue},
     label1/.style={font=\scriptsize, text=thmred},
+    sep/.style={thick, black!65},
+    poshalf/.style={fill=thmred!9},
 ]
-  % 8 labelings of 3 points arranged in 2 rows of 4
-  \foreach \col/\la/\lb/\lc in {
-    0/0/0/0, 1/0/0/1, 2/0/1/0, 3/0/1/1,
-    4/1/0/0, 5/1/0/1, 6/1/1/0, 7/1/1/1%
+  % Header note: the eight witnesses give VC >= 3
+  \node[font=\footnotesize, text=black!78, align=center] at (5.5,2.95)
+    {All $2^3=8$ labelings realized by a halfplane: the three points are shattered, so $\VC\ge 3$.};
+  % 8 labelings, each WITH its separating halfplane, in 2 rows of 4.
+  % fields: col / la / lb / lc / lt(1=horiz,2=vert) / lp(line position) / pd(1=upper|right shaded,0=lower|left)
+  \foreach \col/\la/\lb/\lc/\lt/\lp/\pd in {
+    0/0/0/0/1/2.0/1,
+    1/0/0/1/1/0.85/1,
+    2/0/1/0/2/1.5/1,
+    3/0/1/1/2/0.5/1,
+    4/1/0/0/2/0.5/0,
+    5/1/0/1/2/1.5/0,
+    6/1/1/0/1/0.85/0,
+    7/1/1/1/1/-0.6/1%
   } {
     \pgfmathtruncatemacro{\cx}{mod(\col,4)*3}
-    \pgfmathtruncatemacro{\cy}{-int(\col/4)*3}
-    \begin{scope}[shift={(\cx,\cy)}]
-      % Draw the three points
-      \ifnum\la=1
-        \node[pospt] (a\col) at (0,0) {};
-        \node[label1, below=1pt] at (a\col) {$1$};
+    \pgfmathtruncatemacro{\cyr}{int(\col/4)}
+    \begin{scope}[shift={(\cx,{-\cyr*3.4})}]
+      % separating line + lightly shaded label-1 (positive) halfplane, drawn first (behind points)
+      \ifnum\lt=1
+        \ifnum\pd=1
+          \fill[poshalf] (-0.45,\lp) rectangle (2.45,2.2);
+        \else
+          \fill[poshalf] (-0.45,-0.9) rectangle (2.45,\lp);
+        \fi
+        \draw[sep] (-0.45,\lp) -- (2.45,\lp);
       \else
-        \node[negpt] (a\col) at (0,0) {};
-        \node[label0, below=1pt] at (a\col) {$0$};
+        \ifnum\pd=1
+          \fill[poshalf] (\lp,-0.9) rectangle (2.45,2.2);
+        \else
+          \fill[poshalf] (-0.45,-0.9) rectangle (\lp,2.2);
+        \fi
+        \draw[sep] (\lp,-0.9) -- (\lp,2.2);
       \fi
-      \ifnum\lb=1
-        \node[pospt] (b\col) at (2,0) {};
-        \node[label1, below=1pt] at (b\col) {$1$};
-      \else
-        \node[negpt] (b\col) at (2,0) {};
-        \node[label0, below=1pt] at (b\col) {$0$};
-      \fi
-      \ifnum\lc=1
-        \node[pospt] (c\col) at (1,1.5) {};
-        \node[label1, above=1pt] at (c\col) {$1$};
-      \else
-        \node[negpt] (c\col) at (1,1.5) {};
-        \node[label0, above=1pt] at (c\col) {$0$};
-      \fi
+      % the three points, on top of the shade
+      \ifnum\la=1 \node[pospt] (a\col) at (0,0) {}; \node[label1, below=1pt] at (a\col) {$1$};
+      \else        \node[negpt] (a\col) at (0,0) {}; \node[label0, below=1pt] at (a\col) {$0$};\fi
+      \ifnum\lb=1 \node[pospt] (b\col) at (2,0) {}; \node[label1, below=1pt] at (b\col) {$1$};
+      \else        \node[negpt] (b\col) at (2,0) {}; \node[label0, below=1pt] at (b\col) {$0$};\fi
+      \ifnum\lc=1 \node[pospt] (c\col) at (1,1.5) {}; \node[label1, above=1pt] at (c\col) {$1$};
+      \else        \node[negpt] (c\col) at (1,1.5) {}; \node[label0, above=1pt] at (c\col) {$0$};\fi
     \end{scope}
   }
+  % The d=4 obstruction (Radon): VC < 4, hence VC = 3.
+  \begin{scope}[shift={(4.0,-7.9)}]
+    \coordinate (p1) at (0,0);
+    \coordinate (p2) at (3,0);
+    \coordinate (p3) at (1.5,2.2);
+    \coordinate (pin) at (1.5,0.75);
+    \fill[black!6] (p1) -- (p2) -- (p3) -- cycle;
+    \draw[black!40, dashed] (p1) -- (p2) -- (p3) -- cycle;
+    \node[negpt] at (p1) {}; \node[label0, below=1pt] at (p1) {$0$};
+    \node[negpt] at (p2) {}; \node[label0, below=1pt] at (p2) {$0$};
+    \node[negpt] at (p3) {}; \node[label0, above=1pt] at (p3) {$0$};
+    \node[pospt] at (pin) {}; \node[label1, right=1pt] at (pin) {$1$};
+    \node[font=\footnotesize, text=black!78, align=center] at (1.5,-1.2)
+      {No four points are shattered: the inner point lies in the hull of the others, so the\\labeling isolating it is unrealizable by a halfplane (Radon). Hence $\VC<4$, so $\VC=3$.};
+  \end{scope}
 \end{tikzpicture}
-\caption{All $2^3 = 8$ labelings of three non-collinear points in $\R^2$.
-Each labeling is realized by some halfplane, so the points are shattered.
-Red (filled dark) indicates label~$1$; blue indicates label~$0$.}
+\caption[Shattering three points: each of the eight labelings realized by a separating halfplane, and no four points shattered, so the VC dimension is three.]{The eight labelings of three non-collinear points, each drawn with a separating halfplane that realizes it: the boundary splits the label-one points (red) from the label-zero points (blue), and the label-one side is lightly shaded.  A witness line in every cell means the restriction of the halfplane class to these three points is the full set of eight labelings, so the points are shattered (\leanname{Shatters}) and the VC dimension is at least three.  The lower panel shows why no four points are shattered: one of any four lies in the convex hull of the others, and the labeling isolating it is unrealizable by a halfplane (Radon), so the VC dimension (\leanname{VCDim}) equals three, which is $d+1$ for halfspaces in $d$ dimensions.  The shattering and VC-dimension concepts are the verified definitions; the value three and the four-point obstruction are classical.}
 \label{fig:shatter-halfplane}
 \end{figure}
 
@@ -821,3 +846,29 @@ The chapter catalogs a dozen dimensions, each governing one paradigm.  Determine
 \label{op:dual-vc-attention}
 The development types the dual class and proves a dual-to-primal shattering transfer (\leanname{FLT_Proofs.Complexity.DualVC.dual_shatters_imp_original_shatters}).  Interpret the dual VC dimension of an attention class (shattering by the \emph{keys} rather than the inputs) and determine what it measures about a transformer's routing capacity.
 \end{openprob}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:shatter-halfplane}}
+
+Each exercise perturbs the shattering picture.  Argue, in the figure's grammar (a $2^d$-cell grid in which each cell carries one labeling of a fixed $d$-point set together with the separating halfplane that realizes it, so that filling every cell with a witness exhibits the restriction $\mathcal{H}|_S$ as the full cube $\{0,1\}^d$, drawn solid where the kernel certifies the concept (the definitions \leanname{Shatters} and \leanname{VCDim} and the deep role \leanname{vc_characterization}) and dashed where the \emph{value} $\VC=3$, its generalization $\VC=d+1$, and the four-point obstruction are classical, cited not proved), that the perturbed picture subsumes the concrete one as an \emph{instance} (a class whose largest fillable grid is exhibited), a \emph{boundary} (one labeling or one point toggled so a cell becomes unrealizable), or a \emph{frontier} (a dashed, open or literature-only edge).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The grid is the definition of shattering, not a fact about the plane.} Read each filled cell not as a colored triangle but as one element of the restriction. Show this is the figure's defining instance of the verified concept: a witness in every cell says exactly $\mathcal{H}|_S = \{0,1\}^{|S|}$, which is the definition of shattering (\cref{def:shattering}, \leanname{Shatters}), so the eight halfplanes are not decoration but the constructive content of ``$S$ is shattered''; the picture certifies \leanname{Shatters} cell by cell rather than asserting it.
+
+\item \textbf{The value three is the largest fillable grid, and it is literature.} Read the whole figure as a single number. Show this is the instance that names the second object: $\VC(\mathcal{H})$ is the largest $|S|$ for which the grid fills (\cref{def:vc-dim}, \leanname{VCDim}), so the figure exhibits $\VC(\mathcal{H}) \ge 3$ by construction, but the matching upper bound $\VC = 3$ is the classical value (\cite{VapnikChervonenkis1971}, \cite{BlumerEhrenfeuchtHausslerWarmuth1989}), drawn dashed because the kernel types \leanname{VCDim} without proving the halfplane value; the concept is verified, the number is cited.
+
+\item \textbf{The fourth point empties a cell.} Add a fourth point inside the convex hull of the other three and ask for the labeling that flips it against the rest. Show this is the figure's principal boundary: that single cell of the $2^4$ grid can never carry a separating line, because one point in the hull of the others forbids the opposite-label halfplane (Radon, \Cref{ex:halfplanes-shatter}), so the grid for $d=4$ has a permanently empty cell and $\VC = 3$; the obstruction is convex-geometric and classical, with no kernel theorem, so it is drawn dashed.
+
+\item \textbf{Why filling the grid is what makes the class learnable.} Ask why the largest-fillable-grid number governs anything. Show this is the frontier that gives the figure its weight: the very finiteness the grid measures is what the Fundamental Theorem turns into PAC learnability, since $\mathcal{H}$ is PAC learnable if and only if $\VC(\mathcal{H}) < \infty$ (\cref{thm:fundamental}, \leanname{vc_characterization}, \leanname{fundamental_theorem}); the halfplane class, with its grid stalling at $d=4$, is therefore learnable, and this if-and-only-if is the one solidly verified edge attached to the picture.
+
+\item \textbf{Shrink to intervals on the line.} Replace halfplanes in $\R^2$ by halflines, or by intervals, on $\R$. Show this is the instance one dimension down: a single threshold shatters one point but not two of the right pattern, so the largest fillable grid is the $2^1$ grid and $\VC = 1$ for halflines, while intervals fill the $2^2$ grid and $\VC = 2$; both values instantiate the same \leanname{VCDim} definition and are the classical geometric values (\cite{BlumerEhrenfeuchtHausslerWarmuth1989}), so the picture's $d$ is a free parameter, not fixed at three.
+
+\item \textbf{Grow to axis-aligned rectangles.} Replace halfplanes by axis-aligned rectangles in $\R^2$. Show this is the instance that raises the number without changing the grammar: four points placed as the extreme north, south, east, and west witnesses fill the $2^4$ grid, while no five points do, so $\VC = 4$ for rectangles (\cite{BlumerEhrenfeuchtHausslerWarmuth1989}); the figure's $2^d$ grid is unchanged, only the witness shape (a rectangle in each cell instead of a line) and the largest fillable $d$ differ, both still instances of \leanname{VCDim}.
+
+\item \textbf{Climb to halfspaces in $d$ dimensions.} Replace the plane by $\R^d$ and halfplanes by halfspaces. Show this is the instance that states the figure's general value: $d+1$ points in general position fill the $2^{d+1}$ grid and no $d+2$ do, so $\VC = d+1$ for halfspaces (\cite{BlumerEhrenfeuchtHausslerWarmuth1989}), with the $d=2$ picture as the case $\VC = 3$; the value $d+1$ is classical and not in the kernel (there is no halfspace dimension theorem), so it is dashed, and formalizing it together with the Radon upper bound is open.
+
+\item \textbf{The grid never reaches the Littlestone grid.} Ask whether filling the static $2^d$ grid is the same as winning the adaptive online game. Show this is the boundary between two dimensions: shattering a set is non-adaptive (one fixed $S$, all labelings at once), so $\VC(\mathcal{H}) \le \Ldim(\mathcal{H})$ always (\cref{prop:vc-leq-ldim-dim}, \leanname{BranchWiseLittlestoneDim_ge_VCDim}), and the gap is infinite for thresholds, whose static grid fills only to $d=1$ yet whose adaptive mistake tree is unbounded; the figure draws the static witness, and the adaptive refinement is a strictly larger object certified by the same kernel.
+
+\item \textbf{Swap the points and the halfplanes.} Read the figure with roles reversed: let the eight labelings shatter the family rather than the three points shatter the cube. Show this is the frontier of the dual view: the one-inclusion and dual-shattering reading swaps inputs for hypotheses, and the kernel types the dual class with a dual-to-primal shattering transfer (\cref{op:dual-vc-attention}, \leanname{FLT_Proofs.Complexity.DualVC.dual_shatters_imp_original_shatters}), but the self-dual value $\VC = d+1$ under this swap is not drawn and not formalized, so the dual reading of the grid is a dashed, literature-and-open edge.
+
+\item \textbf{Is the grid the rank of a functor?} Read ``the largest finite set on which $\mathcal{H}$ realizes every labeling'' as a universal property. Show this is the figure's deepest frontier: $\VC$ would be the rank of a representable functor on finite sets, the largest free object (full cube) the class can hit, and the chapter's other dimensions (Littlestone, Natarajan \leanname{NatarajanDim}, fat-shattering) would be the same functor specialized by a data-model and a scale; whether a single such dimension functor exists, recovering all of them, or whether the dimensions are provably non-unifiable, is open (\cref{op:dimension-functor}), so this reading of the grid is drawn dashed.
+\end{enumerate}
