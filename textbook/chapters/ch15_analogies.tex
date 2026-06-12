@@ -550,17 +550,19 @@ answer different questions about the same sequential data.
 \label{sec:obstruction-map}
 
 \Cref{fig:obstruction-map} displays all 32 analogy edges, colored by
-obstruction type. The visual pattern reveals the structure of the field's
-unresolved connections.
+obstruction type, with a filled dot marking the five edges that carry a
+verified kernel handle. The visual pattern reveals the structure of the
+field's unresolved connections: a taxonomy of why analogies fail, and the
+short list of places where formalization has bridged one anyway.
 
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-  node distance=1.2cm and 1.6cm,
+  x=1.5cm, y=1.2cm,
   concept/.style={
     rectangle, rounded corners=2pt, draw, thick,
     fill=layergray, font=\scriptsize\sffamily,
-    minimum width=1.6cm, minimum height=0.5cm,
+    minimum width=1.3cm, minimum height=0.5cm,
     align=center, inner sep=2pt
   },
   tm/.style={-, edgeorange, thick},        % type mismatch
@@ -569,54 +571,61 @@ unresolved connections.
   dm/.style={-, thmred, thick, dashdotted}, % data model mismatch
   pm/.style={-, analogypurple, thick, densely dashed}, % proof method
   sc/.style={-, boundbrown, thick, densely dotted},    % success criterion
+  ev/.style={circle, fill=black, draw=white, line width=0.25pt,
+             inner sep=0pt, minimum size=3.6pt}, % verified-handle dot
 ]
 
-% --- Complexity measures cluster ---
-\node[concept] (vc) {VC dim};
-\node[concept, right=1.4cm of vc] (rad) {Rademacher};
-\node[concept, right=1.4cm of rad] (cov) {Covering\\number};
-\node[concept, below=1.0cm of vc] (sq) {SQ dim};
-\node[concept, below=1.0cm of rad] (comp) {Compression};
-\node[concept, above=1.0cm of vc] (ldim) {Littlestone\\dim};
-\node[concept, above=1.0cm of rad] (mb) {Mistake\\bound};
-\node[concept, right=1.4cm of cov] (sc_node) {Sample\\complexity};
-\node[concept, below=1.0cm of sc_node] (lc) {Label\\complexity};
+% Layout by connected component: the analogy graph is disconnected, so each
+% component sits in its own region (zero inter-region crossings) and is drawn
+% planar. Color/style = obstruction type; a filled dot = a verified sorry-free
+% kernel handle backs that edge.
 
-% --- Paradigm cluster ---
-\node[concept, below=2.8cm of vc] (pac) {PAC};
-\node[concept, right=1.4cm of pac] (stab) {Stability};
-\node[concept, right=1.4cm of stab] (pb) {PAC-Bayes};
-\node[concept, right=1.4cm of pb] (itb) {Info-theoretic};
-\node[concept, below=1.0cm of pac] (post) {Posterior\\consistency};
-\node[concept, left=1.4cm of pac] (ft) {Fund.\\Theorem};
+% --- Complexity core (VC-hub component) ---
+\node[concept] (vc)      at (1.5,3.5)  {VC dim};
+\node[concept] (sq)      at (0.4,3.5)  {SQ dim};
+\node[concept] (rad)     at (1.5,4.5)  {Rademacher};
+\node[concept] (cov)     at (2.7,4.5)  {Covering\\number};
+\node[concept] (comp)    at (1.5,2.5)  {Compression};
+\node[concept] (sc_node) at (2.85,3.0) {Sample\\complexity};
+\node[concept] (lc)      at (4.1,3.4)  {Label\\complexity};
+\node[concept] (ar)      at (4.1,2.4)  {Advice\\reduction};
 
-% --- Characterization cluster ---
-\node[concept, above left=1.0cm and 0.0cm of ldim] (vcc) {VC charac.};
-\node[concept, above right=1.0cm and 0.0cm of ldim] (lc_char) {Ldim charac.};
+% --- Model-selection tail (hangs off compression via Occam) ---
+\node[concept] (occam)   at (1.5,1.5)  {Occam};
+\node[concept] (mdl)     at (2.7,1.5)  {MDL};
+\node[concept] (kolm)    at (2.7,0.6)  {Kolmogorov};
+\node[concept] (mml)     at (3.9,1.5)  {MML};
+\node[concept] (bayes)   at (3.9,0.6)  {Bayesian};
+\node[concept] (ib)      at (5.1,1.05) {Inductive\\bias};
+\node[concept] (srm)     at (5.1,2.0)  {SRM};
 
-% --- Model selection cluster ---
-\node[concept, below=2.8cm of stab] (mdl) {MDL};
-\node[concept, left=1.4cm of mdl] (mml) {MML};
-\node[concept, right=1.4cm of mdl] (bayes) {Bayesian};
-\node[concept, left=1.4cm of mml] (kolm) {Kolmogorov};
-\node[concept, below=1.0cm of mdl] (occam) {Occam};
-\node[concept, right=1.4cm of bayes] (srm) {SRM};
-\node[concept, below=1.0cm of bayes] (ib) {Inductive\\bias};
+% --- Verified dimension-equivalence pairs (isolated edges, both dotted) ---
+\node[concept] (ldim)    at (3.9,4.6)  {Littlestone\\dim};
+\node[concept] (mb)      at (5.1,4.6)  {Mistake\\bound};
+\node[concept] (vcc)     at (3.5,5.5)  {VC charac.};
+\node[concept] (lc_char) at (4.9,5.5)  {Ldim charac.};
 
-% --- Sequential cluster ---
-\node[concept, below=2.8cm of pb] (ol) {Online};
-\node[concept, right=1.4cm of ol] (drift) {Concept\\drift};
-\node[concept, right=1.4cm of drift] (gc) {Granger};
-\node[concept, below=1.0cm of drift] (exd) {Ex under\\drift};
-\node[concept, below=1.0cm of ol] (ll) {Lifelong};
-\node[concept, below left=1.0cm and 0.0cm of ll] (ml) {Meta-\\learner};
+% --- Sequential component (drift-hub) ---
+\node[concept] (drift)   at (7.0,3.4)  {Concept\\drift};
+\node[concept] (ol)      at (6.3,2.6)  {Online};
+\node[concept] (gc)      at (7.7,2.6)  {Granger};
+\node[concept] (exd)     at (7.7,4.2)  {Ex under\\drift};
+\node[concept] (ll)      at (6.3,4.2)  {Lifelong};
+\node[concept] (ml)      at (6.3,5.1)  {Meta-\\learner};
 
-% --- Data cluster ---
-\node[concept, left=1.4cm of kolm] (bk) {Background\\knowledge};
-\node[concept, below=1.0cm of kolm] (adv) {Advice};
-\node[concept, below=1.0cm of bk] (gi) {Grammar\\induction};
-\node[concept, below=1.0cm of gi] (gt) {Gold's\\theorem};
-\node[concept, below=1.0cm of adv] (ar) {Advice\\reduction};
+% --- Paradigm component (stability-hub) ---
+\node[concept] (stab)    at (3.1,-0.4) {Stability};
+\node[concept] (pb)      at (4.1,0.1)  {PAC-Bayes};
+\node[concept] (itb)     at (4.1,-0.9) {Info-theoretic};
+\node[concept] (ft)      at (2.0,-0.4) {Fund.\\Theorem};
+
+% --- Remaining isolated edges ---
+\node[concept] (pac)     at (0.4,1.5)  {PAC};
+\node[concept] (post)    at (0.4,0.6)  {Posterior\\consistency};
+\node[concept] (gi)      at (1.1,-1.7) {Grammar\\induction};
+\node[concept] (gt)      at (2.3,-1.7) {Gold's\\theorem};
+\node[concept] (bk)      at (3.7,-1.7) {Background\\knowledge};
+\node[concept] (adv)     at (4.9,-1.7) {Advice};
 
 % --- Type mismatch edges (orange, 12) ---
 \draw[tm] (stab) -- (pb);
@@ -632,22 +641,22 @@ unresolved connections.
 \draw[tm] (bayes) -- (ib);
 \draw[tm] (occam) -- (comp);
 
-% --- Missing equivalence witness edges (blue dashed, 9) ---
-\draw[mew] (comp) -- (vc);
+% --- Missing equivalence witness edges (blue dashed, 9); 3 verified-backed ---
+\draw[mew] (comp) -- (vc)      node[ev,pos=0.5]{}; % fundamental_vc_compression
 \draw[mew] (rad) -- (vc);
-\draw[mew] (vcc) -- (lc_char);
+\draw[mew] (vcc) -- (lc_char)  node[ev,pos=0.5]{}; % vcdim_le_of_mistake_bounded
 \draw[mew] (mml) -- (mdl);
 \draw[mew] (mml) -- (bayes);
 \draw[mew] (pac) -- (post);
-\draw[mew] (mb) -- (ldim);
+\draw[mew] (mb) -- (ldim)      node[ev,pos=0.5]{}; % optimal_mistake_bound_eq_ldim
 \draw[mew] (lc) -- (sc_node);
 \draw[mew] (ll) -- (drift);
 
-% --- One-way theorem edges (green dotted, 4) ---
-\draw[owt] (sc_node) -- (vc);
+% --- One-way theorem edges (green dotted, 4); 2 verified-backed ---
+\draw[owt] (sc_node) -- (vc)  node[ev,pos=0.5]{}; % fundamental_theorem
 \draw[owt] (comp) -- (sc_node);
-\draw[owt] (cov) -- (vc);
-\draw[owt] (cov) -- (rad);
+\draw[owt] (cov) -- (vc)      node[ev,pos=0.5]{}; % sauer_shelah_exp_bound
+\draw[owt] (cov) -- (rad);                        % Dudley: no kernel handle, undotted
 
 % --- Data model mismatch edges (red dashdotted, 3) ---
 \draw[dm] (drift) -- (ol);
@@ -664,16 +673,31 @@ unresolved connections.
 
 \end{tikzpicture}
 
-\caption{The obstruction map: all 32 analogy edges colored by
-obstruction type.
+\caption[The obstruction map: thirty-two analogies, six failure types, five
+verified bridges]{The obstruction map. The field is connected by thirty-two
+cross-paradigm analogies, none of them a theorem; they fail for six
+classifiable reasons, shown by color and line style (the key below). Most
+obstructions are the book's conceptual analysis of why the analogy breaks; a
+filled dot marks the five edges where the kernel has proved a one-way bridge
+or an equivalence: the mistake bound equals the Littlestone dimension
+(\leanname{optimal_mistake_bound_eq_ldim}), the VC dimension lies below it
+with no reverse (\leanname{vcdim_le_of_mistake_bounded}), finite VC dimension
+yields some finite compression (\leanname{fundamental_vc_compression}, the
+size $O(d)$ still open), sample complexity is characterized by VC dimension
+(\leanname{fundamental_theorem}), and covering numbers follow from VC
+dimension (\leanname{sauer_shelah_exp_bound}). The distribution of colors is
+the lesson, that analogy-failure is taxonomic; the marked edges are where
+formalization currently reaches. The graph is disconnected, so each cluster
+is drawn in its own region. Key:
 \textcolor{edgeorange}{\rule[0.4ex]{1.1em}{0.9pt}} type mismatch (12);
 \textcolor{defblue}{\textbf{-\,-\,-}} missing equivalence witness (9);
 \textcolor{sepgreen}{\textbf{$\cdots$}} one-way theorem (4);
-\textcolor{thmred}{\textbf{-$\cdot$-}} data model mismatch (3);
-\textcolor{analogypurple}{\textbf{-\,-}} proof method mismatch (3);
-\textcolor{boundbrown}{\textbf{$\cdots$}} success criterion mismatch (1).
-One edge (ordinal VC dim $\leftrightarrow$ mind-change ordinal,
-proof method mismatch) is omitted from the diagram for clarity.}
+\textcolor{thmred}{\textbf{-$\cdot$-}} data-model mismatch (3);
+\textcolor{analogypurple}{\textbf{-\,-}} proof-method mismatch (3);
+\textcolor{boundbrown}{\textbf{$\cdots$}} success-criterion mismatch (1);
+$\bullet$~verified one-way handle (5).
+One proof-method edge (ordinal VC dimension $\leftrightarrow$ mind-change
+ordinal) is omitted for clarity.}
 \label{fig:obstruction-map}
 \end{figure}
 
@@ -879,3 +903,150 @@ unbounded key set, giving a verified value for attention as an adversarial
 prediction game?  An unknown known on the transformer side
 (\leanname{softAttention_wellBehaved}).
 \end{openprob}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:obstruction-map}}
+
+Each exercise perturbs the obstruction map.  Read the figure as a concept
+graph whose every edge is an \rel{analogy} that fails, carrying two
+independent codes: a \emph{color and line style} for the obstruction type
+(the book's classification of \emph{why} the analogy is not a theorem, in six
+values, namely type mismatch, missing equivalence witness, one-way theorem
+only, data-model mismatch, proof-method mismatch, and success-criterion
+mismatch), and a \emph{filled dot} for the evidence, present on exactly the
+five edges where the kernel certifies a one-way bridge or an equivalence
+sorry-free.  Argue, in this grammar, that each perturbed picture subsumes the
+concrete one as an \emph{instance} (an edge, color class, or dotted handle the
+map already exhibits), a \emph{boundary} (one code, direction, or evidence
+grade toggled, so an edge changes color, gains or loses its dot, or is
+revealed as settled rather than open), or a \emph{frontier} (an undotted,
+open or literature-only edge whose formalization, or whose meta-level
+definition, is the next move).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The distribution of colors is the lesson, not any single edge.}
+Read the figure by counting colors and ignoring node identities.  Show this is
+the map's defining instance: thirty-two analogies fail across only six
+obstruction types, with type mismatch the plurality (twelve), so ``why does
+this analogy fail?'' has a finite-codomain answer rather than a case-by-case
+story.  The figure is the abstract witness that analogy-failure in learning
+theory is taxonomic, and the colour histogram, twelve type mismatches
+dominating, is the chapter's central claim that the field's most common
+bridges break for the most basic reason, that the objects compared are not the
+same kind of thing.
+
+\item \textbf{The five dotted edges are the formalization frontier, and they
+are a minority.}  Read only the edges carrying a filled dot.  Show this is the
+instance that exposes where the kernel reaches into the analogy web: exactly
+five of the thirty-two edges carry a verified one-way handle
+(\leanname{optimal_mistake_bound_eq_ldim}, \leanname{vcdim_le_of_mistake_bounded},
+\leanname{fundamental_vc_compression}, \leanname{fundamental_theorem},
+\leanname{sauer_shelah_exp_bound}), and they cluster on the complexity-measure
+side of the graph, so the dotted subgraph is the machine-checked fragment of
+the analogy structure while the roughly two dozen undotted edges are the
+book's conceptual analysis or open conjecture.  The dot count is small
+precisely because formalization has so far bridged only a few of the field's
+analogies.
+
+\item \textbf{The twelve type-mismatch edges are the conceptual majority, and
+none is a theorem.}  Read only the orange strokes.  Show this is the instance
+that anchors the honesty of the two-code scheme: every type-mismatch edge
+(\Cref{sec:type-mismatch}) is an argument that source and target live in
+different formal categories, not a proved impossibility and not a verified
+bridge, so not one orange edge carries a dot.  Drawing color (a conceptual
+classification) and the dot (a verified handle) as separate axes is exactly
+what stops the reader from mistaking the book's analysis of \emph{why} an
+analogy fails for a kernel theorem that it fails.
+
+\item \textbf{The mistake bound and Littlestone dimension are equal, yet the
+edge is blue.}  Read the dotted blue edge between \nde{mistake\_bound} and
+\nde{littlestone\_dimension}.  Show this is the boundary that separates the
+obstruction type from the evidence: the pair \emph{is} a verified equivalence
+(\leanname{optimal_mistake_bound_eq_ldim}, hence the dot), so the ``missing
+witness'' is not a missing proof of equivalence but the stand-alone-measures
+distinction, that as complexity measures in their own right the two diverge
+when extended to bandit or partial-monitoring feedback
+(\Cref{sec:missing-equiv}).  The edge is blue because the naive ``these are
+the same object'' reading fails even though the equivalence theorem holds,
+which is why the color and the dot genuinely disagree on this edge and the
+diagram needs both.
+
+\item \textbf{Finite VC gives some compression, but the dot does not certify
+$O(d)$.}  Read the dotted blue edge between \nde{compression\_scheme} and
+\nde{vc\_dimension}.  Show this is the boundary between a verified
+\emph{direction} and an open \emph{equivalence}: the dot marks
+\leanname{fundamental_vc_compression}, finite VC dimension implies \emph{some}
+finite compression scheme (of size exponential in $d$), but the sample
+compression conjecture, that the size is $O(d)$, is the prominent missing
+witness (\Cref{op:compression-vc-analogy}).  The dot certifies one half of the
+analogy while the edge stays blue dashed because the equivalence that would
+discharge it is unproved, and promoting the edge to a solid theorem edge is
+exactly the content of the open problem.
+
+\item \textbf{Rademacher versus VC and label versus sample are settled
+non-equivalences, not conjectures.}  Read the two blue edges
+\nde{rademacher\_complexity}--\nde{vc\_dimension} and
+\nde{label\_complexity}--\nde{sample\_complexity}, which carry no dot.  Show
+this is the boundary the chapter's caveat draws inside the blue class: these
+are not open problems awaiting a proof of equivalence but \emph{established}
+non-equivalences (Rademacher complexity is data-dependent and can fall far
+below the VC bound; label complexity can be exponentially smaller than sample
+complexity, the content of active learning, \Cref{op:active-passive}), so the
+``missing witness'' is the recognition that the naive equivalence is false,
+not a gap to be closed.  The blue color groups them with the genuinely open
+MML edges, but the absence of a dot together with the prose distinguishes a
+known separation from a live conjecture.
+
+\item \textbf{One green edge is verified and one is only classical, and the
+dot tells them apart.}  Read the two green dotted edges
+\nde{covering\_number}--\nde{vc\_dimension} and
+\nde{covering\_number}--\nde{rademacher\_complexity}.  Show this is the
+boundary where same color does not mean same evidence: covering numbers are
+bounded by VC dimension via Sauer--Shelah, which is machine-checked
+(\leanname{sauer_shelah_exp_bound}, hence the dot), whereas covering numbers
+bound Rademacher complexity via Dudley's entropy integral, a classical result
+the chapter states with no kernel handle (\Cref{sec:one-way}), so the second
+edge is the same green ``one-way theorem only'' color but carries no dot.  The
+evidence axis splits a single obstruction type into a verified bridge and a
+literature bridge, which a one-code figure could not express.
+
+\item \textbf{The fundamental theorem is two-directional, and the dot warns
+against collapsing it.}  Read the dotted green edge between
+\nde{sample\_complexity} and \nde{vc\_dimension}.  Show this is the boundary
+between a theorem and a definition: the dot marks \leanname{fundamental_theorem},
+the equivalence between finite VC dimension and finite sample complexity, but
+the analogy is usually stated as an identity (``sample complexity just
+\emph{is} VC dimension''), which erases the content of the theorem, an
+explicit upper bound one way and a matching lower bound the other, proved by
+different arguments (\Cref{sec:one-way}).  The dot says the bridge is verified
+\emph{as a theorem}, not assumable as a definition, so the marker here guards a
+two-directional result against being read as a tautology.
+
+\item \textbf{Close the compression conjecture, or formalize the taxonomy, and
+the figure gains structure.}  Pick either the $O(d)$ compression direction or
+the meta-level classification.  Show this is the frontier the figure marks but
+cannot yet draw: proving compression size $O(d)$ would upgrade the
+\nde{compression\_scheme}--\nde{vc\_dimension} edge from a half-verified blue
+dash to a full equivalence (\Cref{op:compression-vc-analogy}), and separately,
+making ``type mismatch,'' ``one-way theorem,'' and the other obstruction types
+precise would turn the assignment of a color to each of the thirty-two edges
+from an expert judgment into a theorem (\Cref{op:formalize-taxonomy}).  The
+first frontier adds a dot; the second would make the entire color code itself
+a proved classification rather than a census, and likewise the MML--MDL
+relationship still awaits any witness in either direction
+(\Cref{op:mml-mdl}).
+
+\item \textbf{Is analogy-failure provably six-typed, a completeness theorem for
+the obstruction map?}  Ask whether the six colors are exhaustive, that every
+cross-paradigm analogy must fail for one of exactly these reasons and no
+seventh is possible.  Show this is the figure's deepest frontier: the diagram
+exhibits six obstruction types as an expert classification, but whether six is
+a proved invariant of the analogy graph, a completeness theorem stating that
+the failure modes are exactly these and that, for instance, a specific type
+mismatch is \emph{permanently} un-bridgeable rather than merely currently
+un-bridged, is open and couples two problems, defining the types formally
+(\Cref{op:formalize-taxonomy}) and proving the permanence of a single mismatch
+(\Cref{op:type-mismatch-impossibility}).  Until both land, the color count six
+and the dot count five are a census of the present state of knowledge, not
+invariants of the field, so this reading of the map, that analogy-failure is a
+small finite invariant, is itself drawn dashed.
+\end{enumerate}
