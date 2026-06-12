@@ -1115,22 +1115,29 @@ binary theory loses information.
     fill=defblue!5, minimum width=2.8cm, minimum height=0.8cm,
     font=\small, align=center
   },
+  hubbox/.style={
+    rectangle, rounded corners=3pt, draw=defblue, very thick,
+    fill=defblue!12, minimum width=2.8cm, minimum height=0.8cm,
+    font=\small, align=center
+  },
   extarr/.style={-{Stealth[length=5pt]}, edgeorange, thick,
     decorate, decoration={snake, amplitude=1pt, segment length=6pt}}
 ]
 
-% Binary core
-\node[box] (bin) at (0,0) {Binary PAC\\$\VC(\mathcal{H}) < \infty$};
+% Binary core (the one machine-checked rung: fundamental_theorem, sc=0)
+\node[hubbox] (bin) at (0,0) {Binary PAC\\$\VC(\mathcal{H}) < \infty$};
+\node[font=\tiny\sffamily, text=defblue, anchor=north]
+  at ([yshift=-2pt]bin.south) {\checkmark\,machine-checked};
 
-% Extensions
+% Extensions (literature characterizations; dimensions formalized as kernel defs)
 \node[box] (mc) at (-4, 2.5) {Multiclass\\$\DSdim(\mathcal{H}) < \infty$};
 \node[box] (rv) at (4, 2.5) {Real-valued\\$\fatshat_\gamma < \infty\;\forall\gamma$};
 \node[box] (ag) at (-4, -2.5) {Agnostic\\$\VC(\mathcal{H}) < \infty$\\(same condition)};
 \node[box] (no) at (4, -2.5) {Noise-tolerant\\$\VC(\mathcal{H}) < \infty$\\$+ \eta < 1/2$};
 
-% Grammar growth arrows
+% Grammar growth arrows (each adds an irreducible primitive)
 \draw[extarr] (bin) -- node[left, font=\tiny\itshape, text=edgeorange, align=center]
-  {$+$ two-function\\shattering} (mc);
+  {$+$ one-inclusion\\witness} (mc);
 \draw[extarr] (bin) -- node[right, font=\tiny\itshape, text=edgeorange, align=center]
   {$+$ thresholds\\$+$ margins} (rv);
 \draw[extarr] (bin) -- node[left, font=\tiny\itshape, text=edgeorange, align=center]
@@ -1139,9 +1146,26 @@ binary theory loses information.
   {$+$ noise rate\\$\eta$} (no);
 
 \end{tikzpicture}
-\caption{Grammar growth from binary PAC learning.  Each wavy arrow represents
-an \rel{extends\_grammar} edge: the extension requires new primitives
-(labeled) that have no analogue in the binary theory.}
+\caption[Grammar growth from binary PAC learning]{Grammar growth from binary PAC
+learning.  Binary PAC learning sits at the hub, characterized by finite VC
+dimension; this is the chapter's one machine-checked rung, the fundamental
+theorem \leanname{fundamental_theorem}, drawn with the heavier border.  Each
+wavy arrow is an \rel{extends\_grammar} edge that grows the binary theory into a
+richer setting by adding a primitive with no binary analogue: a one-inclusion
+witness for multiclass learning, where the DS dimension governs the global
+hypergraph structure; thresholds and then a margin for real-valued learning,
+giving the pseudodimension and the fat-shattering dimension; a relative
+benchmark for agnostic learning, where the finiteness condition stays VC yet the
+vocabulary is new; and a noise rate $\eta$ for noise-tolerant learning.  The
+extension is irreducible because reducing to the binary theory loses information
+(the non-reduction principle, \Cref{rmk:non-reduction}).  This irreducibility is
+proved only in the multiclass case, where a class can have Natarajan dimension
+one and infinite DS dimension (\Cref{prop:ds-vs-nat}); for the real-valued,
+agnostic, and noisy settings it is the working understanding rather than a
+theorem.  The extension dimensions are formalized as kernel structures
+(\leanname{FatShatteringDim}, \leanname{Pseudodimension},
+\leanname{StrongShatteringDim}, the last running below \leanname{NatarajanDim}),
+while their characterizations are literature.}
 \label{fig:grammar-growth}
 \end{figure}
 
@@ -1718,6 +1742,137 @@ verified facts (\leanname{fundamental_theorem} on the improper side,
 \leanname{vcdim_finite_imp_proper_finite_support_learner} on the proper side) that would be the
 base case of such a theorem, and argue that no static frame can certify the universal claim,
 so this reading of the table is itself drawn dashed.
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:grammar-growth}}
+
+Read Figure~\ref{fig:grammar-growth} as a reasoner about generalization.  The hub
+is binary PAC learning, the single claim the kernel certifies sorry-free (finite
+VC characterizes realizable binary PAC, \leanname{fundamental_theorem}); each
+wavy orange arrow is an \rel{extends\_grammar} edge (\Cref{sec:extends-grammar})
+that grows the binary theory by adding one primitive with no binary analogue, and
+each corner box names the extended setting and its characterizing dimension.  The
+figure's whole content is that five different extensions are instances of one
+move, adding irreducible vocabulary, rather than five unrelated facts.  Argue, in
+this grammar, that each perturbed picture subsumes the concrete hub-and-spoke as
+an \emph{instance} (a box, an arrow, or a primitive the figure already exhibits),
+a \emph{boundary} (one label, direction, or evidence grade toggled so an edge
+changes meaning, kind, or status), or a \emph{frontier} (a structure or
+formalization the figure points to but does not contain).  Honesty rule: the hub
+is verified, the extension dimensions are formalized definitions, and the
+characterizations and the irreducibility claim are literature, with the
+multiclass case the one proven instance.
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The hub is the chapter's one verified rung.} Read only the center
+box and ignore the four spokes.  Show this is the figure's defining verified
+instance: of every claim in the diagram, exactly one is machine-checked, the
+biconditional that finite VC dimension characterizes realizable binary PAC
+learnability (\leanname{fundamental_theorem}, over $\mathcal{H} \subseteq
+\{0,1\}^X$); the four corner characterizations are borrowed from the literature,
+so the verified part of the figure is the hub alone and every spoke grows outward
+from it, which is why the heavier border marks the hub as the lower bound on what
+the kernel currently proves.
+
+\item \textbf{Five extensions are instances of one move.} Read the four orange
+arrows as a single class and ignore which box each one reaches.  Show this is the
+instance that names the chapter's thesis (\Cref{sec:extends-grammar}): each arrow
+is one \rel{extends\_grammar} edge that adds a primitive absent from the binary
+language, so the question ``how does binary PAC generalize?'' has the structural
+answer ``by adding irreducible vocabulary,'' and the hub-and-spoke is the witness
+that the multiclass, real-valued, agnostic, and noisy extensions are instances of
+the same relation, not four separate constructions.
+
+\item \textbf{Each spoke carries exactly one new primitive.} Pick any single arrow
+and read its label against its box.  Show this is the instance that exhibits the
+per-extension primitive: the multiclass arrow adds the one-inclusion witness for
+the DS dimension (\Cref{def:ds-dim-ext}), the real-valued arrow adds a threshold
+vector and then the scale $\gamma$ for the pseudo- and fat-shattering dimensions
+(\Cref{def:pseudodim-ext}, \Cref{def:fat-shattering-ext}), the agnostic arrow adds
+the relative benchmark, and the noise arrow adds the rate $\eta$
+(\Cref{thm:noise-tolerant}); each is one expansion of the binary grammar, and the
+figure asserts these expansions are the same kind of move.
+
+\item \textbf{The corrected multiclass spoke is isomorphic to the DS witness
+picture.} Read the multiclass arrow's primitive, the one-inclusion witness, and
+compare it to Figure~\ref{fig:ds-shattering}.  Show this is the instance where the
+spoke and the dimension it produces speak the same language: the one-inclusion
+witness is precisely the single-coordinate-deviation structure of the DS dimension
+(\Cref{def:ds-dim-ext}), the star in the one-inclusion hypergraph
+$\mathrm{OIG}(\mathcal{H}, S)$ (\Cref{def:oig}); so the arrow that yields the
+$\DSdim$ box is labeled with the very object that defines $\DSdim$, and the
+multiclass spoke is a compressed pointer to the witness figure.
+
+\item \textbf{An \rel{extends\_grammar} edge is not a \rel{restricts} edge.} Read
+any orange arrow and ask whether it could be drawn as a special-case inclusion
+instead.  Show this is the figure's defining boundary: a \rel{restricts} edge
+would mean the extension is a special case of binary PAC needing no new
+vocabulary, whereas every arrow here marks a place where reduction to the binary
+theory loses information (the non-reduction principle, \Cref{rmk:non-reduction}),
+so toggling any arrow from \rel{extends\_grammar} to \rel{restricts} would falsely
+claim the new primitive is dispensable, and the figure's wavy style is exactly the
+refusal to make that claim.
+
+\item \textbf{The multiclass box is $\DSdim$, so its primitive is one-inclusion,
+not two-function.} Read the top-left box and its arrow together and ask whether the
+primitive matches the dimension.  Show this is the boundary the corrected label
+protects: the box is characterized by the DS dimension, whose primitive is the
+one-inclusion witness, while two-function shattering is the Natarajan primitive
+(\Cref{def:natarajan-dim}, \cite{Natarajan1989}), and the two are not
+interchangeable because a class can have Natarajan dimension one and infinite DS
+dimension (\Cref{prop:ds-vs-nat}); so labeling this arrow ``two-function
+shattering'' would contradict its own box and the chapter's resolution that DS, not
+Natarajan, characterizes multiclass learnability (\Cref{thm:multiclass-char},
+\cite{BrukhimCarmonDinurMoranYehudayoff2022}).
+
+\item \textbf{Agnostic keeps the same condition yet is still a grammar extension.}
+Read the bottom-left box, whose condition is finite VC, the same as the hub.  Show
+this is the boundary where the finiteness condition is unchanged but the edge is
+still \rel{extends\_grammar}: agnostic PAC drops realizability and measures success
+relative to the best in class (\Cref{thm:agnostic-ft}, \cite{Haussler1992}), so the
+new vocabulary is the relative benchmark $\inf_{h \in \mathcal{H}} \risk(h)$, not a
+new dimension; the arrow therefore adds vocabulary without changing the finiteness
+condition, which shows generalization here is about language, not about the
+characterizing quantity.
+
+\item \textbf{The dimensions are formalized, but their characterizations are not.}
+Read the corner boxes as naming dimensions and ask which parts the kernel
+certifies.  Show this is the figure's principal evidence boundary: the
+pseudodimension, the fat-shattering dimension, and the all-labelings strong
+shattering dimension are machine-checked structures (\leanname{Pseudodimension},
+\leanname{FatShatteringDim}, \leanname{StrongShatteringDim}, with the verified
+inequality \leanname{strongShatteringDim_le_NatarajanDim}), yet the theorems that
+make a dimension \emph{characterize} a setting, in the corner boxes, are literature
+(\Cref{thm:real-valued-char}, \cite{AlonBenDavidCesaBianchiHaussler1997}); so a
+dimension can be a verified definition while its characterizing claim stays
+borrowed, and drawing the boxes as verified because the dimensions are formalized
+would overstate what the kernel proves.
+
+\item \textbf{Formalizing one spoke's dimension is the next move.} Pick the
+multiclass spoke and ask what machine-checking it would change.  Show this is the
+frontier the figure marks but cannot yet draw verified: the $\DSdim$ box names a
+literature dimension, because the kernel's \leanname{StrongShatteringDim} is the
+all-labelings dimension and runs below \leanname{NatarajanDim}, the \emph{opposite}
+of the true $\Ndim \le \DSdim$, so formalizing the genuine DS dimension and
+\Cref{thm:multiclass-char} would turn the multiclass spoke from literature into
+kernel-anchored (\Cref{open:formalize-ds}); the same move for the real-valued,
+agnostic, and noise spokes is open, and the spokes are the inventory of which
+characterization to climb next.
+
+\item \textbf{Is grammar growth itself a provable no-single-dimension invariant?}
+Read the entire orange backbone as one claim about the impossibility of a single
+universal measure.  Show this is the figure's deepest frontier and the chapter's
+synthesis: grammar growth is proved \emph{necessary} only for multiclass, where the
+$\Ndim = 1$, $\DSdim = \infty$ class shows no two-function dimension can
+characterize learnability when the label set is infinite (\Cref{prop:ds-vs-nat}),
+while for the real-valued, agnostic, and noisy spokes the necessity is the working
+understanding rather than a theorem; so the conjecture that \emph{no single
+combinatorial dimension characterizes all four extensions at once}, a
+no-free-lunch for shattering primitives of which the Natarajan--DS gap is the one
+proven instance, is the meta-question the whole hub-and-spoke raises, the same
+no-single-dimension reading that the concept map leaves dotted
+(\Cref{fig:ch17-concept-map}), and because no verifier yet certifies it, this
+reading of the figure is the open invariant the chapter closes on.
 \end{enumerate}
 
 \bigskip
