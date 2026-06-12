@@ -54,66 +54,82 @@ The chapter has six sections.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-  node distance=1.6cm and 2.8cm,
+  >={Stealth[length=5pt]},
   concept/.style={
     rectangle, rounded corners=3pt, draw, thick,
     fill=layergray, font=\small\sffamily,
-    minimum width=2.4cm, minimum height=0.7cm,
+    minimum width=2.3cm, minimum height=0.7cm,
     align=center
   },
-  ext/.style={-{Stealth[length=5pt]}, edgeorange, thick},
-  chr/.style={-{Stealth[length=5pt]}, defblue, thick},
-  ss/.style={-{Stealth[length=5pt]}, thmred, thick, dashed},
-  lbl/.style={font=\tiny\itshape, text=notegray, align=center}
+  % COLOR = relationship type ; LINE = evidence grade (the second axis)
+  chr_solid/.style  ={->, defblue,    thick},            % characterizes, kernel-verified
+  chr_lit/.style    ={->, defblue,    thick, dashed},    % characterizes, literature
+  ext_concept/.style={->, edgeorange, thick, dotted},    % extends_grammar, conceptual
+  ss_lit/.style     ={->, thmred,     thick, dashed},    % strictly_stronger, literature
+  res_concept/.style={->, sepgreen,   thick, dotted},    % restricts, conceptual
+  lb_lit/.style     ={->, boundbrown, thick, dashed},    % lower_bounds, literature
 ]
 
-% --- Binary core ---
-\node[concept] (vc) {VC\\Dimension};
-\node[concept, right=3.2cm of vc] (pac) {PAC\\Learning};
+% Layout by structure: two hubs (vc, pac) on a horizontal spine; the multiclass
+% cycle (nat, ds) fans UP, the real-valued branch (pdim, fat) fans DOWN, the
+% settings (agn, pi, noise) sit on the right. Planar straight-line drawing =
+% ZERO crossings. Two codes: color = relationship type, line = evidence grade.
 
-% --- Multiclass branch ---
-\node[concept, above right=1.8cm and 0.8cm of vc] (nat) {Natarajan\\Dimension};
-\node[concept, above=1.4cm of nat] (ds) {DS\\Dimension};
+% --- hubs ---
+\node[concept] (vc)    at (0,0)      {VC\\Dimension};
+\node[concept] (pac)   at (6.5,0)    {PAC\\Learning};
+% --- multiclass branch (fans up) ---
+\node[concept] (nat)   at (2.2,1.9)  {Natarajan\\Dimension};
+\node[concept] (ds)    at (4.3,3.1)  {DS\\Dimension};
+% --- real-valued branch (fans down-left) ---
+\node[concept] (pdim)  at (1.8,-1.9) {Pseudo-\\dimension};
+\node[concept] (fat)   at (2.8,-3.1) {Fat-Shattering\\Dimension};
+% --- agnostic: small triangle just under the verified spine (clears fat->pac) ---
+\node[concept] (agn)   at (3.5,-0.8) {Agnostic\\PAC};
+% --- settings (right) ---
+\node[concept] (noise) at (8.7,1.4)  {Noise-Tolerant\\Learning};
+\node[concept] (pi)    at (8.7,-1.5) {Proper vs\\Improper};
 
-% --- Real-valued branch ---
-\node[concept, below right=1.8cm and 0.8cm of vc] (pdim) {Pseudo-\\dimension};
-\node[concept, below=1.4cm of pdim] (fat) {Fat-Shattering\\Dimension};
-
-% --- Agnostic ---
-\node[concept, right=3.2cm of pac] (agn) {Agnostic\\PAC};
-
-% --- Proper/Improper ---
-\node[concept, below=2.0cm of pac] (pi) {Proper vs\\Improper};
-
-% --- Noise ---
-\node[concept, above=2.0cm of pac] (noise) {Noise-Tolerant\\Learning};
-
-% --- Edges ---
-\draw[ext] (nat) -- node[lbl, left] {\rel{extends\_grammar}} (vc);
-\draw[ext] (pdim) -- node[lbl, left] {\rel{extends\_grammar}} (vc);
-\draw[ss] (ds) -- node[lbl, left] {\rel{strictly\_stronger}} (nat);
-\draw[chr] (vc) -- node[lbl, above] {\rel{characterizes}} (pac);
-\draw[chr] (ds) to[bend left=20] node[lbl, above right] {\rel{characterizes}} (pac);
-\draw[chr] (fat) to[bend right=20] node[lbl, below right] {\rel{characterizes}} (pac);
-\draw[chr] (vc) to[bend right=15] node[lbl, below] {\rel{characterizes}} (agn);
-
-\draw[-{Stealth[length=5pt]}, sepgreen, thick]
-  (agn) -- node[lbl, above] {\rel{restricts}} (pac);
-\draw[-{Stealth[length=5pt]}, boundbrown, thick]
-  (pi) -- node[lbl, right] {\rel{lower\_bounds}} (pac);
+% --- edges: color = relationship type, line = evidence grade ---
+\draw[chr_solid]   (vc)    -- (pac);   % VERIFIED rung: fundamental_theorem (sc=0)
+\draw[ext_concept] (nat)   -- (vc);
+\draw[ext_concept] (pdim)  -- (vc);
+\draw[ext_concept] (noise) -- (pac);   % NEW edge: connects the formerly floating noise node
+\draw[ss_lit]      (ds)    -- (nat);
+\draw[chr_lit]     (ds)    -- (pac);
+\draw[chr_lit]     (fat)   -- (pac);
+\draw[chr_lit]     (vc)    -- (agn);
+\draw[res_concept] (agn)   -- (pac);
+\draw[lb_lit]      (pi)    -- (pac);
 
 \end{tikzpicture}
 
-\caption{Concept map for this chapter.  Orange:~\rel{extends\_grammar}.
-Dashed red:~\rel{strictly\_stronger}.  Blue:~\rel{characterizes}.
-Green:~\rel{restricts}.  Brown:~\rel{lower\_bounds}.  Each arrow represents an
-edge in the concept graph.  The \rel{characterizes} edges target the
-appropriate variant of PAC learning for each source: VC dimension for binary
-(and agnostic binary) PAC, the DS dimension for \emph{multiclass} PAC, the
-fat-shattering dimension for \emph{agnostic real-valued} PAC.  The Natarajan
-dimension does \emph{not} characterize multiclass PAC; it only extends the
-grammar and is dominated by DS (\Cref{prop:ds-vs-nat}, with the $\Ndim=1$,
-$\DSdim=\infty$ obstruction).}
+\caption[Concept map: binary PAC generalizes by grammar growth, with one
+verified rung]{Concept map for this chapter, drawn with two codes.  Color marks
+the relationship type: blue for \rel{characterizes}, orange for
+\rel{extends\_grammar}, red for \rel{strictly\_stronger}, green for
+\rel{restricts}, brown for \rel{lower\_bounds}.  Line style marks the evidence
+grade: solid for a machine-checked kernel theorem, dashed for an established
+literature result, dotted for a conceptual grammar-extension or restriction.
+The chapter's thesis is that binary PAC theory does not generalize by
+substitution but by grammar growth, each extension adding a shattering primitive
+with no binary analogue.  Exactly one edge is solid: VC dimension characterizes
+binary PAC learning (\leanname{fundamental_theorem}), the single rung the kernel
+has climbed.  The multiclass (DS), agnostic real-valued (fat-shattering),
+agnostic, and proper-versus-improper characterizations are established in the
+literature but not yet machine-checked, so they are dashed; the
+grammar-extension and restriction edges are structural, so they are dotted.  The
+dimension nodes themselves are formalized as kernel structures
+(\leanname{NatarajanDim}, \leanname{Pseudodimension}, \leanname{FatShatteringDim},
+\leanname{StrongShatteringDim}), and the kernel verifies the inequality
+\leanname{strongShatteringDim_le_NatarajanDim}, though the map uses DS
+terminology while that verified inequality runs the other way, from strong
+shattering to Natarajan (\Cref{open:formalize-ds}).  The Natarajan dimension does
+\emph{not} characterize multiclass PAC; it only extends the grammar and is
+dominated by DS (\Cref{prop:ds-vs-nat}, with the $\Ndim=1$, $\DSdim=\infty$
+obstruction).  Noise-tolerant learning extends the setting with the noise-rate
+primitive $\eta$ (\Cref{thm:noise-tolerant}), shown as a dotted
+\rel{extends\_grammar} edge.}
 \label{fig:ch17-concept-map}
 \end{figure}
 
@@ -1139,6 +1155,141 @@ Classification noise tolerance is understood for binary VC classes
 label noise on real-valued targets degrade the scale-sensitive sample
 complexity?  A known unknown.
 \end{openprob}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:ch17-concept-map}}
+
+Each exercise perturbs the concept map.  Read the figure as a concept graph
+carrying two independent codes: a \emph{color} for the relationship type
+(\rel{extends\_grammar} in orange, \rel{strictly\_stronger} in red,
+\rel{characterizes} in blue, \rel{restricts} in green, \rel{lower\_bounds} in
+brown), and a \emph{line style} for the evidence (solid where the kernel
+certifies a theorem sorry-free, dashed where the result is established in the
+literature, dotted where the edge is a conceptual grammar-extension or
+restriction).  Exactly one edge is solid, VC dimension characterizes binary PAC
+learning (\leanname{fundamental_theorem}); the three literature characterizations,
+the strictly-stronger edge, and the proper-improper lower bound are dashed; the
+four grammar-extension and restriction edges are dotted.  Argue, in this grammar,
+that each perturbed picture subsumes the concrete one as an \emph{instance} (an
+edge, node, or sub-map the figure already exhibits), a \emph{boundary} (one code,
+direction, or evidence grade toggled so an edge changes color, style, or
+orientation), or a \emph{frontier} (a dashed or dotted edge whose formalization
+is the next move).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The one solid edge is the only rung the kernel has climbed.} Read
+only the solid stroke and ignore the dashed and dotted ones. Show this is the
+figure's defining verified instance: of the ten edges, exactly one is
+machine-checked, the biconditional that VC dimension characterizes realizable
+binary PAC learnability (\leanname{fundamental_theorem}, over $\mathcal{H}
+\subseteq \{0,1\}^X$; the agnostic-binary characterization \Cref{thm:agnostic-ft}
+is a separate literature result, drawn dashed at $vc \to agn$), so the solid
+subgraph is the single edge $vc \to pac$ and everything above it in the grammar
+is borrowed; the all-dashed-and-dotted periphery is precisely the reach the
+kernel has not yet attained, which is why the figure is the abstract witness that
+the extensions form a frontier with one verified rung, not a settled tower.
+
+\item \textbf{Grammar growth, not substitution, is the lesson the orange backbone
+encodes.} Read the orange \rel{extends\_grammar} edges as a class and ignore node
+identities. Show this is the instance that names the chapter's thesis
+(\Cref{sec:extends-grammar}): each orange edge marks a place where the binary
+language provably loses information and a new primitive must be added, the pair
+$(f_0, f_1)$ for Natarajan, the threshold vector then the margin $\gamma$ for the
+real-valued branch, the noise rate $\eta$ for the noise branch, so ``how does
+binary PAC generalize?'' has the structural answer ``by adding irreducible
+vocabulary,'' and the map is the witness that no reduction to the binary theory
+(\Cref{rmk:non-reduction}) collapses these edges.
+
+\item \textbf{Each extension's new primitive is an instance of one move.} Pick any
+single orange edge and read its source. Show this is the instance that exhibits
+the per-extension primitive: $nat \to vc$ adds two-function shattering
+(\Cref{def:natarajan-dim}), $pdim \to vc$ adds the threshold vector
+(\Cref{def:pseudodim-ext}), the fat-shattering refinement adds the scale $\gamma$
+(\Cref{def:fat-shattering-ext}), and the new $noise \to pac$ edge adds $\eta$
+(\Cref{thm:noise-tolerant}); each is one expansion of the binary grammar, and the
+figure asserts that the expansions are instances of the same \rel{extends\_grammar}
+relation rather than unrelated facts.
+
+\item \textbf{A node can be formalized as a structure while its characterizing edge
+stays literature.} Read the Natarajan, pseudodimension, and fat-shattering nodes
+together with the edges leaving them. Show this is the figure's principal evidence
+boundary: the three dimension nodes are machine-checked as kernel structures
+(\leanname{NatarajanDim}, \leanname{Pseudodimension}, \leanname{FatShatteringDim},
+each a sorry-free definition), yet the edges that would make them
+\emph{characterize} a learning setting, $ds \to pac$ and $fat \to pac$, are dashed
+because the characterization theorems are literature
+(\cite{BrukhimCarmonDinurMoranYehudayoff2022},
+\cite{AlonBenDavidCesaBianchiHaussler1997}); so a node solid as a structure and
+dashed as an edge is exactly the distinction the two-code scheme protects, and
+drawing the edge solid because the node is formalized would overstate what the
+kernel proves.
+
+\item \textbf{DS dominates Natarajan, yet the kernel verifies only the other rung.}
+Read the dashed red $ds \to nat$ edge and ask which inequality the kernel actually
+holds. Show this is the subtler evidence boundary: the strict domination $\Ndim
+\le \DSdim$ with the $\Ndim = 1$, $\DSdim = \infty$ obstruction
+(\Cref{prop:ds-vs-nat}, \cite{BrukhimCarmonDinurMoranYehudayoff2022}) is the
+literature content of the edge, but the kernel proves the \emph{reverse}
+inequality, strong-shattering dimension below Natarajan
+(\leanname{strongShatteringDim_le_NatarajanDim}, sorry-free), because its
+\leanname{StrongShatteringDim} is the all-labelings dimension, not the genuine
+Daniely--Shalev-Shwartz DS dimension (\Cref{open:formalize-ds}); so the edge is red
+and dashed, and the toggle to solid would require formalizing the true DS
+dimension and its domination, not the inequality the kernel currently certifies.
+
+\item \textbf{Agnostic drops realizability, yet VC still characterizes it in the
+literature.} Read the green $agn \to pac$ restriction edge together with the blue
+$vc \to agn$ edge. Show this is the boundary where the relationship type and the
+evidence diverge: agnostic PAC generalizes standard PAC by removing the
+realizability constraint (the green \rel{restricts} edge,
+\Cref{def:agnostic-pac-ext}), and the characterizing condition is still finite VC
+dimension (\Cref{thm:agnostic-ft}); but the kernel has only the \emph{definition}
+\leanname{AgnosticPACLearnable}, not an agnostic characterization theorem, so $vc
+\to agn$ is dashed while $agn \to pac$ is dotted, and the two edges out of the
+agnostic node carry different evidence grades for the same setting.
+
+\item \textbf{Noise adds $\eta$, yet finite VC still suffices.} Read the new $noise
+\to pac$ edge that connects the previously floating node. Show this is the boundary
+that justifies its color and style: noise tolerance extends the grammar with the
+noise rate $\eta$ (the orange \rel{extends\_grammar} edge), yet finite VC dimension
+plus a \emph{known} $\eta < 1/2$ already suffices for PAC learnability under
+classification noise (\Cref{thm:noise-tolerant},
+\cite{AngluinLaird1988}); because that theorem carries no kernel handle, the edge
+is dotted, not solid, and statistical-query learnability is the bridge
+(\Cref{rmk:sq-noise}).
+
+\item \textbf{Formalizing one characterization turns a dashed edge solid.} Pick the
+multiclass or the agnostic characterization and ask what machine-checking it would
+change. Show this is the frontier the figure marks but cannot yet draw solid:
+formalizing the genuine DS dimension and \Cref{thm:multiclass-char} would promote
+$ds \to pac$ from dashed to solid (\Cref{open:formalize-ds}), and formalizing the
+agnostic fundamental theorem would promote $vc \to agn$; each such move grows the
+verified subgraph outward from the single $vc \to pac$ rung into the extension
+periphery, and the figure's dashed edges are exactly the inventory of which
+characterization to climb next.
+
+\item \textbf{The open problems are the dashed and dotted edges read forward.} Read
+the periphery edges as a to-do list. Show this is the frontier that the map and the
+open-problems section share a vocabulary for: closing the multiclass $\Theta(\log
+k)$ gap (\Cref{open:multiclass-tight}), proving pseudodimension characterizes
+realizable real-valued learning (\Cref{open:pdim-realizable}), and finding the
+fat-shattering analogue of noise tolerance (\Cref{open:noise-fat}) are each a
+specific dashed or dotted edge whose evidence grade the corresponding theorem would
+raise; so the white space between solid and dashed in the figure is the chapter's
+research frontier, and the lone solid edge is a lower bound on what is provable.
+
+\item \textbf{Is grammar growth itself a provable no-single-dimension invariant?}
+Read the entire orange backbone as a single claim about the impossibility of one
+universal measure. Show this is the figure's deepest frontier: the chapter proves
+grammar growth is \emph{necessary} only in the multiclass case, where the $\Ndim =
+1$, $\DSdim = \infty$ class shows no two-function dimension can characterize
+learnability when the label set is infinite (\Cref{prop:ds-vs-nat}), while for the
+real-valued, agnostic, and noisy settings the necessity is a working understanding,
+not a theorem; so the conjecture that \emph{no single combinatorial dimension
+characterizes all extensions at once}, a no-free-lunch for shattering primitives of
+which the Natarajan--DS gap is the one proven instance, is the meta-question about
+the whole backbone, and because no verifier yet certifies it, this reading of the
+map is drawn dotted.
+\end{enumerate}
 
 \bigskip
 
