@@ -136,6 +136,26 @@
 \newtheorem{warning}[defn]{Warning}
 
 % ============================================================
+% CLEVEREF NAMES (all envs above share the `defn' counter via the
+% \newtheorem optional arg, which defeats cleveref's auto-naming;
+% declare names explicitly, else \cref emits "reference format for
+% label type ... undefined" warnings + a spurious "undefined
+% references" summary line, even though refs render correctly).
+% ============================================================
+\crefname{defn}{Definition}{Definitions}            \Crefname{defn}{Definition}{Definitions}
+\crefname{example}{Example}{Examples}               \Crefname{example}{Example}{Examples}
+\crefname{notation}{Notation}{Notations}            \Crefname{notation}{Notation}{Notations}
+\crefname{convention}{Convention}{Conventions}      \Crefname{convention}{Convention}{Conventions}
+\crefname{thm}{Theorem}{Theorems}                   \Crefname{thm}{Theorem}{Theorems}
+\crefname{prop}{Proposition}{Propositions}          \Crefname{prop}{Proposition}{Propositions}
+\crefname{cor}{Corollary}{Corollaries}              \Crefname{cor}{Corollary}{Corollaries}
+\crefname{lemma}{Lemma}{Lemmas}                     \Crefname{lemma}{Lemma}{Lemmas}
+\crefname{claim}{Claim}{Claims}                     \Crefname{claim}{Claim}{Claims}
+\crefname{remark}{Remark}{Remarks}                  \Crefname{remark}{Remark}{Remarks}
+\crefname{openprob}{Open Problem}{Open Problems}    \Crefname{openprob}{Open Problem}{Open Problems}
+\crefname{warning}{Warning}{Warnings}               \Crefname{warning}{Warning}{Warnings}
+
+% ============================================================
 % PAGE STYLE
 % ============================================================
 \pagestyle{fancy}
