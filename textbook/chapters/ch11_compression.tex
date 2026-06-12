@@ -750,37 +750,74 @@ The landscape of this chapter is dominated by the compression conjecture.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    node distance=1.5cm and 2.5cm,
-    box/.style={draw, thick, rounded corners, minimum width=3cm,
-      minimum height=0.8cm, font=\small, align=center},
-    open/.style={box, dashed, fill=edgeorange!10, text=edgeorange!80!black},
-    known/.style={box, fill=defblue!10},
-    negative/.style={box, fill=thmred!10},
-    arr/.style={-{Stealth[length=2.5mm]}, thick},
-    lbl/.style={font=\scriptsize, midway, fill=white, inner sep=1pt}
+    box/.style={draw, thick, rounded corners, minimum width=2.5cm,
+      minimum height=0.85cm, font=\small, align=center},
+    verified/.style={box, fill=defblue!12},
+    literature/.style={box, fill=defblue!4, draw=gray!55},
+    openq/.style={box, dashed, fill=edgeorange!10, text=edgeorange!85!black},
+    refuted/.style={box, fill=thmred!10, draw=thmred!70},
+    veq/.style={{Stealth[length=2.5mm]}-{Stealth[length=2.5mm]}, thick, defblue!75},
+    vedge/.style={-{Stealth[length=2.5mm]}, thick, defblue!75},
+    litedge/.style={-{Stealth[length=2.5mm]}, semithick, gray!60},
+    openedge/.style={-{Stealth[length=2.5mm]}, thick, dashed, edgeorange},
+    rededge/.style={-{Stealth[length=2.5mm]}, thick, dashed, thmred},
+    lbl/.style={font=\scriptsize, midway, fill=white, inner sep=1pt},
 ]
-% Nodes
-\node[known] (vc) {$\VC(\mathcal{H}) = d < \infty$};
-\node[known, below left=1.5cm and 0.5cm of vc] (pac) {PAC learnable};
-\node[known, below right=1.5cm and 0.5cm of vc] (uc) {Uniform convergence};
-\node[known, below=3cm of vc] (compress-exp) {Compression\\size $2^{O(d)}$};
-\node[open, below=1.5cm of compress-exp] (compress-d) {Compression\\size $O(d)$\;?};
-\node[known, right=2.5cm of compress-exp] (occam) {Occam algorithm};
-\node[negative, left=2.5cm of compress-d] (unlabeled) {Unlabeled comp.\\size $f(d)$: \textbf{FALSE}};
+% --- verified equivalence core: THAT a short summary exists (kernel sc=0) ---
+\node[verified] (pac) at (0,0) {PAC learnable};
+\node[verified] (vc) at (3.5,0) {$\VC<\infty$};
+\node[verified] (comp) at (7.0,0) {Finite\\compression\\{\scriptsize with side info}};
+\draw[veq] (pac) -- (vc);
+\draw[veq] (vc) -- (comp);
 
-% Edges
-\draw[arr] (vc) -- node[lbl, left] {\Cref{ch:pac}} (pac);
-\draw[arr] (vc) -- node[lbl, right] {\Cref{ch:pac}} (uc);
-\draw[arr] (vc) -- node[lbl, right] {\cite{MoranYehudayoff2016}} (compress-exp);
-\draw[arr, dashed, edgeorange] (compress-exp) -- node[lbl] {Open!} (compress-d);
-\draw[arr] (compress-exp) -- node[lbl, above] {implies} (occam);
-\draw[arr] (occam) -- node[lbl, right] {\Cref{thm:occam}} (pac);
-\draw[arr, thmred, dashed] (compress-d) -- node[lbl, above] {fails} (unlabeled);
+% --- Occam: a literature alternative route to the same qualitative conclusion ---
+\node[literature] (occam) at (3.5,-2.0) {Occam algorithm};
+\draw[litedge] (comp) -- node[lbl, above right] {implies} (occam);
+\draw[litedge] (occam) -- node[lbl, below left] {\cref{thm:occam}} (pac);
+
+% --- the size ladder: HOW short? descent = a strictly stronger claim ---
+\node[literature] (sexp) at (7.0,-2.0) {Size $2^{O(d)}$};
+\node[openq] (spoly) at (7.0,-3.4) {Size $\mathrm{poly}(d)$?};
+\node[openq] (slin) at (7.0,-4.8) {Size $O(d)$?};
+\draw[litedge] (comp) -- node[lbl, right] {\cite{MoranYehudayoff2016}} (sexp);
+\draw[openedge] (sexp) -- node[lbl, right] {\cref{op:poly-compression}} (spoly);
+\draw[openedge] (spoly) -- node[lbl, right] {\cref{op:compression}} (slin);
+
+% --- side-info axis: an open strengthening of the verified core ---
+\node[openq] (noinfo) at (10.1,-2.0) {Drop side info?};
+\draw[openedge] (comp) -- node[lbl, pos=0.72] {\cref{op:side-info}} (noinfo);
+
+% --- the one refuted edge: unlabeled compression has no f(d) bound ---
+\node[refuted] (unlab) at (7.0,-6.2) {Unlabeled: no $f(d)$\\{\scriptsize\textbf{FALSE}}};
+\draw[rededge] (slin) -- node[lbl, right] {\cref{thm:unlabeled-fails}} (unlab);
+
+% --- line-style legend: the evidence grade ---
+\begin{scope}[shift={(0,-3.7)}]
+  \draw[vedge] (0,0) -- (0.6,0);
+  \node[font=\scriptsize, anchor=west] at (0.72,0) {kernel-verified ($sc{=}0$)};
+  \draw[litedge] (0,-0.5) -- (0.6,-0.5);
+  \node[font=\scriptsize, anchor=west] at (0.72,-0.5) {literature (cited)};
+  \draw[openedge] (0,-1.0) -- (0.6,-1.0);
+  \node[font=\scriptsize, anchor=west] at (0.72,-1.0) {open};
+  \draw[rededge] (0,-1.5) -- (0.6,-1.5);
+  \node[font=\scriptsize, anchor=west] at (0.72,-1.5) {refuted};
+\end{scope}
 \end{tikzpicture}
-\caption{Logical landscape of compression and learnability.  Solid arrows
-  denote known implications; dashed arrows denote open or negative results.
-  The central open question is whether compression of size $O(d)$ is
-  achievable.}
+\caption[Compression and learnability: line style is evidence grade.]{Compression and
+  learnability, with each arrow drawn by the strength of its evidence.  The unifying claim
+  is that learnability is the existence of a short summary of the data.  The machine-checked
+  core is purely qualitative: a class is PAC learnable if and only if its VC dimension is
+  finite if and only if it admits a finite compression scheme with side information
+  (\leanname{fundamental_vc_compression}, \leanname{compression_imp_vcdim_finite}), drawn
+  solid.  How short that summary can be is the open frontier: an exponential bound of size
+  $2^{O(d)}$ is known (Moran--Yehudayoff 2016, the lighter literature style), while the
+  conjectured $O(d)$ and even $\mathrm{poly}(d)$ remain open, and removing the side
+  information is a further open strengthening, stated but not proved
+  (\leanname{Open_NoInfoCompressionStrengthening} is a conjecture, not a theorem).  Occam's
+  razor reaches the same qualitative conclusion by another route, and unlabeled compression
+  of bounded size is impossible in general, the one refuted edge in red.  Solid marks what
+  is machine-checked, the lighter style what is proved in the literature, dashed what is
+  open; descending the ladder strengthens the claim.}
 \label{fig:compression-landscape}
 \end{figure}
 
@@ -995,4 +1032,30 @@ operator on compression schemes has not been formulated~\cite{MoranYehudayoff201
     distinct (and incomparable) questions.
   \end{enumerate}
 
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:compression-landscape}}
+
+Each exercise perturbs the compression landscape.  Argue, in the figure's grammar (a verified qualitative core in which PAC learnability, finite VC dimension, and the existence of a finite compression scheme \emph{with side information} are one three-way equivalence, drawn solid where the kernel certifies it (the equivalence \leanname{fundamental_vc_compression} and the easy direction \leanname{compression_imp_vcdim_finite}, with \leanname{vc_characterization} carrying the learnability leg), beneath it a vertical size ladder finite $\to 2^{O(d)} \to \mathrm{poly}(d) \to O(d)$ on which descent means a strictly stronger claim, and beside it a side-information axis, drawn in the lighter literature style where a result is proved but not machine-checked and dashed where it is open, with the one refuted edge in red), that the perturbed picture subsumes the concrete one as an \emph{instance} (a class or claim that the verified core or a single rung exhibits), a \emph{boundary} (one axis, qualifier, or sign toggled so a rung's evidence grade or direction changes), or a \emph{frontier} (a dashed, open or literature-only edge).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The solid core is the qualitative equivalence, and only the qualitative one.} Read the top row not as three separate facts but as a single machine-checked biconditional. Show this is the figure's defining verified instance: PAC learnability, finite VC dimension, and the existence of \emph{some} finite compression scheme with side information are one three-way equivalence (\cref{thm:fundamental}, \leanname{fundamental_vc_compression}, \leanname{vc_characterization}), so the solid spine asserts exactly \emph{that} a short summary exists and asserts nothing about its length; the kernel's witness is a finite $k$ with no rate attached, which is why every numbered rung below the core is drawn in a weaker style.
+
+\item \textbf{Compression implies finite VC is the easy half, and it is verified.} Read the upward arrow from the compression node to the VC node alone. Show this is the instance that names the settled direction: any finite compression scheme forces finite VC dimension (\cref{thm:compression-pac}, \leanname{compression_imp_vcdim_finite}), with the explicit bound $\VC(\mathcal{H}) \le 2(k+1)^2-1$, so this half of the equivalence is a genuine kernel theorem and is drawn solid; it is the converse direction, finite VC implying \emph{small} compression, that splinters into the literature bound and the open conjectures.
+
+\item \textbf{Halfspaces realize the bottom rung with equality.} Replace the abstract class by halfspaces in $\R^d$. Show this is the instance that attains the conjectured rung: the maximum-margin hyperplane is determined by at most $d+1$ support vectors (\cref{ex:svm-compression}), so halfspaces compress to size $d+1$ and sit at $\VC=d+1$ (row ``Halfspaces in $\R^d$'' of \cref{tab:compression-bounds}), realizing the $O(d)$ target exactly for this family; the conjecture's difficulty is that this support-vector picture has no known analogue for an arbitrary VC class, so the bottom rung is open in general yet solid-by-example here.
+
+\item \textbf{Maximum classes collapse the ladder to a single point.} Restrict to maximum classes, where the growth function meets the Sauer--Shelah bound with equality. Show this is the instance on which the whole size ladder degenerates: a maximum class of VC dimension $d$ compresses to exactly $d$ points (rows ``Maximum classes'' and ``Intersection-closed'' of \cref{tab:compression-bounds}), so for this family the literature rung $2^{O(d)}$, the open rung $\mathrm{poly}(d)$, and the open rung $O(d)$ all coincide at $d$; the figure's vertical separation between rungs is therefore a statement about \emph{arbitrary} classes, and vanishes on the maximum case.
+
+\item \textbf{Side information is a real axis, verified on one side and open on the other.} Read the qualifier ``with side information'' on the solid core, then read the branch that drops it. Show this is the figure's principal boundary: what is machine-checked is the existence of a scheme \emph{with} side information (\leanname{fundamental_vc_compression}, whose witness carries extra bits beyond the subsample), whereas whether the side bits can be removed at the same size is open (\cref{op:side-info}, \leanname{Open_NoInfoCompressionStrengthening}); the two differ by a structural qualifier, not a size, so toggling ``with'' to ``without'' moves the edge from solid to dashed without touching any number on the ladder.
+
+\item \textbf{The exponential gap is the distance between two rungs.} Read the vertical span from the literature rung to the bottom rung. Show this is the boundary that measures the conjecture: the best known bound is $2^{O(d)}$ while the conjecture demands $O(d)$ (\cref{rmk:compression-gap}), a gap from roughly $10^6$ to roughly $20$ at $d=20$, so the figure's two rungs are not adjacent refinements but an exponential apart; the lighter stroke on $2^{O(d)}$ records that even this enormous bound (\cref{thm:moran-yehudayoff}, \cite{MoranYehudayoff2016}) was unknown before 2016 and is literature, not kernel.
+
+\item \textbf{The unlabeled node is the one refuted edge.} Read the red node where size $f(d)$ is crossed out. Show this is the figure's lone negative boundary: dropping the labels from the compressed subsample makes bounded-size compression provably impossible in general (\cref{def:unlabeled-compression}, \cref{thm:unlabeled-fails}, \cite{MoranYehudayoff2016}, \cite{CheriayanMoranShpilka2022}), so this is the one edge whose answer is settled in the negative rather than open; it marks precisely where compressibility ends, a boundary the positive rungs cannot reach.
+
+\item \textbf{Occam reaches the same qualitative conclusion by another route.} Read the side branch through the Occam node. Show this is the boundary between two roads to one destination: an Occam algorithm (one that returns a short, consistent hypothesis) implies PAC learnability (\cref{thm:occam}, \cite{BlumerEhrenfeuchtHausslerWarmuth1987}), so the figure reaches the learnable vertex both through the compression core and through Occam, yet both deliver only the \emph{qualitative} conclusion; the Occam branch is drawn in the literature style because the kernel certifies the VC--compression equivalence, not the Occam implication, even though the two meet at the same node.
+
+\item \textbf{Closing the ladder is the forty-year frontier.} Ask what it would take to draw the bottom rungs solid. Show this is the figure's central open frontier: proving that every VC-$d$ class compresses to $\mathrm{poly}(d)$ (\cref{op:poly-compression}) or to $O(d)$ (\cref{op:compression}) would promote those rungs from dashed to verified and collapse the exponential gap; one concrete route runs through orienting the one-inclusion graph of a non-maximum class with small in-degree (\cref{thm:one-inclusion-orientation}, \cref{op:oig-orientation}), since an in-degree-$\mathrm{poly}(d)$ orientation would yield polynomial compression, but no orientation theorem is known off the maximum case.
+
+\item \textbf{Is compression a section of an evidence functor whose rank is VC?} Read ``the smallest summary that reconstructs the data'' as a universal property. Show this is the figure's deepest frontier: the optimal compression size would be the minimal size of a generating section of a representable evidence-functor on finite samples whose \emph{rank} is the VC dimension, so the verified core would read ``the functor's rank is finite'' and the conjecture would read ``its minimal generating set has size $O(\mathrm{rank})$'', unifying the size ladder, the side-information qualifier, and the alternative dimensions (recursive teaching, the DS dimension) as one object specialized by a data-model; whether such a single dimension functor exists, with compression size as its generating rank, or the notions are provably non-unifiable, is open (\cref{op:dimension-functor}, \cref{op:rtd}), so this reading of the landscape is drawn dashed.
 \end{enumerate}
