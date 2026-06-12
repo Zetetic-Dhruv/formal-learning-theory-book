@@ -533,52 +533,71 @@ equivalence web: this is where the PAC--online separation begins.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    node/.style={draw, thick, rounded corners, minimum width=2.4cm,
-      minimum height=0.8cm, font=\small, align=center, fill=defblue!8},
-    edge/.style={-{Stealth[length=2mm]}, thick},
-    bidir/.style={{Stealth[length=2mm]}-{Stealth[length=2mm]}, thick},
-    note/.style={font=\tiny, text=notegray, align=center, fill=white,
-      inner sep=1pt},
-    node distance=1.8cm and 2.2cm
+    >={Stealth[length=2mm]},
+    sat/.style={draw, semithick, rounded corners, minimum width=2.2cm, align=center,
+      inner sep=2.5pt, font=\scriptsize, fill=defblue!8},
+    hub/.style={draw, very thick, rounded corners, minimum width=2.4cm, align=center,
+      inner sep=3pt, font=\small, fill=thmred!12},
+    classical/.style={draw, semithick, densely dashed, rounded corners, minimum width=2.2cm,
+      align=center, inner sep=2.5pt, font=\scriptsize, fill=white},
+    strict/.style={draw=edgeorange!80!black, semithick, rounded corners, minimum width=2.2cm,
+      align=center, inner sep=2.5pt, font=\scriptsize, fill=edgeorange!8},
+    sp/.style={defblue, semithick},
+    spcore/.style={thmred, very thick},
+    spcomp/.style={sepgreen!55!black, semithick},
+    spcl/.style={defblue!65, semithick, densely dashed},
+    spstrict/.style={edgeorange!80!black, semithick, densely dashed},
 ]
-% Core nodes
-\node[node, fill=thmred!12] (vc) {$\VC(\mathcal{H}) < \infty$\\\ref{F:finvc}};
-\node[node, right=2.5cm of vc] (uc) {Uniform\\convergence\\\ref{F:uc}};
-\node[node, right=2.5cm of uc] (erm) {ERM is PAC\\\ref{F:erm}};
-
-\node[node, below=2cm of vc] (growth) {$\growth(m) < 2^m$\\\ref{F:fingrowth}};
-\node[node, below=2cm of uc, fill=thmred!12] (pac) {PAC\\learnable\\\ref{F:pac}};
-\node[node, below=2cm of erm] (agpac) {Agnostic\\PAC\\\ref{F:agpac}};
-
-\node[node, below=2cm of growth] (comp) {Finite\\compression\\\ref{F:compression}};
-\node[node, below=2cm of pac] (finite) {Finiteness\\property\\\ref{F:finiteness}};
-\node[node, right=2.5cm of finite, draw=edgeorange, thick, fill=edgeorange!8]
-  (ldim) {$\Ldim < \infty$\\\ref{F:online}\\(strict)};
-
-% Equivalence edges (bidirectional)
-\draw[bidir, defblue] (vc) -- node[note, above] {Sauer--Shelah\\$+$ converse} (uc);
-\draw[bidir, defblue] (uc) -- node[note, above] {Prop.~\ref{prop:erm-pac}} (erm);
-\draw[bidir, defblue] (vc) -- node[note, left] {Sauer} (growth);
-\draw[bidir, defblue] (uc) -- node[note, right] {} (pac);
-\draw[bidir, defblue] (pac) -- node[note, above] {} (erm);
-\draw[bidir, defblue] (pac) -- node[note, right] {} (agpac);
-\draw[bidir, defblue] (growth) -- node[note, left] {} (comp);
-\draw[bidir, defblue] (pac) -- node[note, right] {} (finite);
-
-% The strict implication
-\draw[edge, edgeorange, dashed] (ldim) -- node[note, below=3pt, text=edgeorange]
-  {strict: $\Ldim < \infty \Rightarrow \VC < \infty$\\but not conversely} (finite);
-
-% Main diagonal
-\draw[bidir, thmred, very thick] (vc) -- node[note, right, text=thmred]
-  {\textbf{Core}} (pac);
+% --- hub: the representing object ---
+\node[hub] (vc) at (0,0) {$\VC(\mathcal{H})<\infty$~\ref{F:finvc}\\[-2pt]{\scriptsize the hub}};
+% --- verified faces (solid spokes) ---
+\node[sat] (pac) at (0,3.6) {PAC learnable~\ref{F:pac}\\{\tiny\leanname{vc_characterization}}};
+\node[sat] (uc) at (2.55,2.55) {Uniform conv.~\ref{F:uc}\\{\tiny\leanname{uc_imp_pac}}};
+\node[sat] (rad) at (3.6,0) {Rademacher\\{\tiny\leanname{fundamental_rademacher}}};
+\node[sat, fill=sepgreen!10] (comp) at (2.55,-2.55) {Compression~\ref{F:compression}\\{\tiny\leanname{fundamental_vc_compression}}};
+\node[sat] (growth) at (0,-3.6) {Growth $\growth(m)<2^m$~\ref{F:fingrowth}\\{\tiny in \leanname{fundamental_theorem}}};
+% --- classical faces (dashed spokes, not kernel conjuncts) ---
+\node[classical] (erm) at (-2.55,-2.55) {ERM is PAC~\ref{F:erm}\\{\tiny classical \cite{ShalevShwartzBenDavid2014}}};
+\node[classical] (agpac) at (-3.6,0) {Agnostic PAC~\ref{F:agpac}\\{\tiny classical \cite{ShalevShwartzBenDavid2014}}};
+\node[classical] (fin) at (-2.55,2.55) {Finiteness~\ref{F:finiteness}\\{\tiny classical \cite{BlumerEhrenfeuchtHausslerWarmuth1989}}};
+% --- strict outside node ---
+\node[strict] (ldim) at (5.5,-2.9) {$\Ldim<\infty$~\ref{F:online}\\{\scriptsize\itshape strict}\\{\tiny\leanname{online_strictly_stronger_pac}}};
+% --- spokes ---
+\draw[spcore] (vc) -- (pac);
+\draw[sp] (vc) -- (uc);
+\draw[sp] (vc) -- (rad);
+\draw[spcomp] (vc) -- (comp);
+\draw[sp] (vc) -- (growth);
+\draw[spcl] (vc) -- (erm);
+\draw[spcl] (vc) -- (agpac);
+\draw[spcl] (vc) -- (fin);
+\draw[spstrict, ->] (ldim) -- node[font=\tiny, text=edgeorange!80!black, fill=white, inner sep=1pt, pos=0.58]{converse fails} (vc);
+% --- the core spoke carries the quantitative two-sided bound ---
+\node[font=\tiny, text=thmred!75!black, fill=white, inner sep=1pt] at (0,1.65) {\leanname{pac_sample_complexity_sandwich}};
+% --- legend ---
+\begin{scope}[shift={(-4.9,-4.35)}, font=\tiny]
+  \draw[spcore] (0,0) -- (0.4,0); \node[anchor=west, inner sep=1pt] at (0.45,0) {core VC$\Leftrightarrow$PAC};
+  \draw[sp] (2.7,0) -- (3.1,0); \node[anchor=west, inner sep=1pt] at (3.15,0) {verified equivalence};
+  \draw[spcomp] (5.5,0) -- (5.9,0); \node[anchor=west, inner sep=1pt] at (5.95,0) {compression};
+  \draw[spcl] (0,-0.34) -- (0.4,-0.34); \node[anchor=west, inner sep=1pt] at (0.45,-0.34) {classical, cited (not in kernel)};
+  \draw[spstrict] (4.0,-0.34) -- (4.4,-0.34); \node[anchor=west, inner sep=1pt] at (4.45,-0.34) {strict, one-way};
+\end{scope}
 \end{tikzpicture}
-\caption{The equivalence web of the Fundamental Theorem.  All solid
-bidirectional arrows are full equivalences.  The dashed arrow from
-$\Ldim < \infty$ is strict: finite Littlestone dimension implies PAC
-learnability, but not conversely.  The thick red diagonal marks the VC
-characterization, the core equivalence proved in
-\Cref{sec:vc-char}.}
+\caption[The equivalence web of the Fundamental Theorem: VC dimension as the hub]{The Fundamental
+Theorem as a confluence: several a priori unrelated descriptions of ``learnable'' collapse into one
+equivalence class, with finite VC dimension as the central hub that represents the class. Each solid
+spoke is an equivalence the verified kernel certifies: PAC learnability (\leanname{vc_characterization}),
+the uniform convergence property, finite Rademacher complexity (\leanname{fundamental_rademacher}), the
+polynomial growth bound, and finite sample compression with side information
+(\leanname{fundamental_vc_compression}, Moran--Yehudayoff); the two-sided sample complexity bound on the
+core spoke is \leanname{pac_sample_complexity_sandwich}, and the whole bundle is
+\leanname{fundamental_theorem}. Dashed spokes are classical but outside the present kernel: agnostic PAC
+learnability, ERM as a PAC learner, and the finiteness lifting
+(\cite{BlumerEhrenfeuchtHausslerWarmuth1989,ShalevShwartzBenDavid2014}). The single outside node, finite
+Littlestone dimension, is joined by one dashed strict edge: it implies finite VC dimension, hence PAC
+learnability, but the converse fails (thresholds on $\R$ have $\VC=1$ and $\Ldim=\infty$;
+\leanname{online_strictly_stronger_pac}), the one place where the equivalence breaks into the online
+separation of \Cref{ch:separations}.}
 \label{fig:equivalence-web}
 \end{figure}
 
@@ -1114,3 +1133,29 @@ Combine \cref{thm:agnostic-gap,prop:attention-pac}: does the $\varepsilon$-vs-$\
 The optimal expected-error predictor in the realizable case is the one-inclusion graph algorithm, and its analysis underlies both the Hanneke bound and the compression direction.  Formalize the one-inclusion graph predictor and prove its $\le d/(m+1)$ leave-one-out error bound, connecting it to the compression scheme of \cref{def:compression} and the open $O(d)$ conjecture (\cref{op:compression-od}).
 \end{openprob}
 
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:equivalence-web}}
+
+Each exercise perturbs the web. Show, in the figure's grammar (one central hub that represents the class, solid spokes for equivalences the verified kernel certifies and dashed spokes for what is borrowed from the literature or genuinely one-way), that the generalized figure subsumes it as an \emph{instance} (another face that joins the equivalence class), a \emph{boundary} (where the equivalence becomes strict or a constant is fixed), or a \emph{frontier} (a dashed, open edge).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The Rademacher face.} Add finite Rademacher complexity as a satellite of the hub. Show this is an instance: it is a fully verified spoke, since PAC learnability and the uniform vanishing of Rademacher complexity are equivalent in the kernel (\leanname{fundamental_rademacher}), so the face enters solid, not dashed.
+
+\item \textbf{The compression face.} Add finite sample compression with side information as a satellite. Show this is an instance: the deep direction, finite VC dimension yields a compression scheme, is the Moran--Yehudayoff theorem and is verified (\leanname{fundamental_vc_compression}), so the whole spoke is solid even though its proof is the hardest in the web.
+
+\item \textbf{The quantitative ring.} Replace the qualitative hub edge by the two-sided sample complexity bound. Show this is a boundary that sharpens the hub: the kernel pins both an upper bound from any PAC witness and a lower bound from VC dimension (\leanname{pac_sample_complexity_sandwich}), so the spoke carries a rate, not just an equivalence.
+
+\item \textbf{The agnostic price.} Move from realizable to agnostic PAC and ask for the sample complexity. Show this is a boundary on a dashed face: the equivalence to realizable PAC is classical and drawn dashed (\cite{ShalevShwartzBenDavid2014}, not in the kernel), and the boundary it draws is the $\varepsilon^{2}$ price, whose exact constant is open (\cref{op:sample-constant}).
+
+\item \textbf{The Littlestone strict edge.} Replace the outside node's dashed edge by an attempted equivalence. Show this is the web's principal boundary: finite Littlestone dimension implies PAC learnability but the converse fails, witnessed by thresholds on $\R$ with $\VC=1$ and $\Ldim=\infty$ (\leanname{online_strictly_stronger_pac}, \leanname{pac_not_implies_online}), so the edge must stay dashed and one-way.
+
+\item \textbf{The growth-function rung.} Insert ``$\growth_{\mathcal H}(m)<2^{m}$ for some $m$'' as a satellite. Show this is an instance with a dashed inner curve: the equivalence to finite VC dimension is a verified conjunct of the bundle (\leanname{fundamental_theorem}), but the quantitative Sauer--Shelah envelope $(em/d)^{d}$ it rides on is classical (\cite{Sauer1972,Shelah1972,VapnikChervonenkis1971}), so the spoke is solid while its shape annotation is dashed.
+
+\item \textbf{The compression size gap.} Refine the compression face from $2^{O(d)}$ to $O(d)$. Show this is a frontier: the kernel proves only the finiteness direction and a quadratic reverse bound, $\VC \le 2(k+1)^{2}-1$ (\leanname{compression_bounds_vcdim}), so the Littlestone--Warmuth $O(d)$ conjecture and the removal of side information remain a dashed open spoke (\cref{op:compression-od}).
+
+\item \textbf{The ERM face.} Add ``empirical risk minimization is a PAC learner'' as a satellite. Show this is a frontier on the algorithmic side: the kernel types and proves the realizable-ERM machinery (\leanname{ermLearn_in_H}, \leanname{erm_consistent_realizable}), but there is no named ERM-is-PAC equivalence theorem, so the spoke is drawn dashed and cited (\cite{ShalevShwartzBenDavid2014}) pending promotion to a bundle conjunct.
+
+\item \textbf{The multiclass web.} Redraw the whole figure for multiclass or real-valued hypotheses with the DS dimension as hub. Show this is a frontier that re-types every spoke: no multiclass fundamental theorem is in the kernel (\cref{op:multiclass-fundamental}), so the entire generalized star would be dashed, an open analogue of the binary confluence.
+
+\item \textbf{One representing object.} Replace the several solid spokes by a single claim that the conditions are evaluations of one representable predicate with VC dimension as its representing object. Show this is the web's most general open frontier: the kernel has assembled the faces as one bundle (\leanname{fundamental_theorem}) but proves no universal property unifying them, so the meta-edge that all spokes are one functor is the figure's single dashed frontier over an otherwise solid hub.
+\end{enumerate}
