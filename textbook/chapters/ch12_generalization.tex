@@ -1072,41 +1072,61 @@ and obstruction relationships connect them:
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-  every node/.style={font=\small},
-  axis/.style={thick, -{Stealth[length=3mm]}},
-  dot/.style={circle, fill, inner sep=2pt},
-  lbl/.style={font=\footnotesize, text width=2.5cm, align=center}
+    vfbox/.style={draw=defblue, line width=1pt, rounded corners=3pt,
+      minimum width=1.7cm, minimum height=0.58cm, font=\small\bfseries,
+      align=center, fill=defblue!10, inner sep=2pt},
+    litbox/.style={draw=black!45, thin, dashed, rounded corners=3pt,
+      minimum width=1.7cm, minimum height=0.58cm, font=\small, align=center,
+      fill=black!3, inner sep=2pt},
+    cdot/.style={circle, fill, inner sep=2.4pt},
+    clbl/.style={font=\footnotesize\bfseries},
+    note/.style={font=\scriptsize, text=black!55},
 ]
-% Triangle of information
+% --- the three information sources (corners of the triangle) ---
 \coordinate (D) at (0,0);
-\coordinate (H) at (6,0);
-\coordinate (A) at (3,4.5);
-
+\coordinate (H) at (7,0);
+\coordinate (A) at (3.5,5);
 \draw[thick, fill=layergray] (D) -- (H) -- (A) -- cycle;
-
-\node[dot, defblue] at (D) {};
-\node[dot, thmred] at (H) {};
-\node[dot, sepgreen] at (A) {};
-
-\node[below left] at (D) {Data $D$};
-\node[below right] at (H) {Class $\mathcal{H}$};
-\node[above] at (A) {Algorithm $A$};
-
-% Framework labels along edges/vertices
-\node[lbl, defblue, below] at (3,0)
-  {Rademacher\\Margin\\(class axis)};
-\node[lbl, sepgreen, rotate=55, anchor=south] at (1.2,2.6)
-  {Stability\\(algo + data)};
-\node[lbl, thmred, rotate=-55, anchor=south] at (4.8,2.6)
-  {PAC-Bayes\\(algo + class)};
-\node[lbl, edgeorange] at (3,1.8)
-  {Information\\$I(S;W)$\\(channel)};
+\node[cdot, defblue] at (D) {};
+\node[cdot, thmred] at (H) {};
+\node[cdot, sepgreen] at (A) {};
+\node[clbl, defblue, below left=0pt and -3pt] at (D) {Data $D$};
+\node[clbl, thmred, below right=0pt and -3pt] at (H) {Class $\mathcal{H}$};
+\node[clbl, sepgreen, above=2pt] at (A) {Algorithm $A$};
+% --- each framework placed at the source it reads; solid = verified bound, dashed = literature ---
+% interior channel: Information reads the data-to-output channel I(S;W)
+\node[litbox] (info) at (3.5,1.65) {Information};
+\node[note, below=1pt of info] {$I(S;W)$ channel};
+% class corner (right): VC and Rademacher (verified), Margin (literature, class geometry)
+\node[vfbox] (vc) at (7.8,0.55) {VC};
+\node[vfbox] (rad) at (7.8,1.4) {Rademacher};
+\node[litbox] (margin) at (7.8,2.25) {Margin};
+% algorithm-class edge (upper right): PAC-Bayes (verified, posterior over the class)
+\node[vfbox] (pb) at (5.5,3.4) {PAC-Bayes};
+% algorithm-data edge (upper left): Stability (literature)
+\node[litbox] (stab) at (0.5,3.3) {Stability};
+% --- evidence-grade legend (same convention as Fig 12.1) ---
+\begin{scope}[shift={(-0.3,-1.35)}]
+  \node[vfbox, minimum width=0.85cm, minimum height=0.3cm] at (0,0) {};
+  \node[font=\scriptsize, anchor=west] at (0.55,0) {verified-bound};
+  \node[litbox, minimum width=0.85cm, minimum height=0.3cm] at (3.6,0) {};
+  \node[font=\scriptsize, anchor=west] at (4.15,0) {literature-only};
+\end{scope}
 \end{tikzpicture}
-\caption{Each framework projects the data--class--algorithm triangle
-onto a different axis.  Rademacher and margin bounds project onto the
-class axis; stability onto the algorithm--data edge; PAC-Bayes onto
-the algorithm--class edge; information-theoretic bounds onto the
-``channel'' in the interior.}
+\caption[Generalization is read from three sources: data, class, or algorithm.]{Every
+generalization bound reads one of three sources of information, the data, the hypothesis
+class, or the algorithm, drawn here as the three corners of a triangle, so the choice of
+framework is the choice of which source one can measure.  The class-based bounds sit at the
+class corner and are machine-checked: VC uniform convergence (\leanname{finite_massart_lemma})
+and Rademacher complexity (\leanname{EmpiricalRademacherComplexity}), drawn solid.  PAC-Bayes
+(\leanname{pac_bayes_finite}) reads the posterior over the class induced by the algorithm and
+is also machine-checked, so it sits on the algorithm--class edge and is drawn solid as well.
+Stability reads the algorithm--data edge, information reads the data-to-output channel in the
+interior, and margin reads the class geometry; these three are proved in the literature but
+not verified, and are drawn lighter and dashed.  The obstructions of the companion
+\Cref{fig:five-frameworks} are exactly these projections landing on different corners:
+information and Rademacher read opposite sources, and stability and PAC-Bayes read different
+edges, so the two figures are spatial complements of one another.}
 \label{fig:triangle}
 \end{figure}
 
@@ -1471,4 +1491,30 @@ Each exercise perturbs the parallax.  Argue, in the figure's grammar (six framew
 \item \textbf{Formalizing stability and information would flip two lighter nodes to solid.} Ask which perturbation promotes the algorithm-based frameworks. Show this is the frontier that the conceptual obstructions hide: the stability bound (\cref{thm:stability-bound}) and the Xu--Raginsky information bound (\cref{thm:xu-raginsky}, \cite{XuRaginsky2017}) have no verified handle, and a single conditional-mutual-information master inequality is conjectured to recover VC, PAC-Bayes, and stability at once (\cref{op:cmi-unification}, \cite{SteinkeZakynthinou2020}); proving and formalizing it would recolor the stability and information nodes solid and replace the stability-to-information literature edge by a verified one, leaving only the genuinely orthogonal algorithm-versus-class edge conceptual.
 
 \item \textbf{Is every framework a section of one risk-gap functor over its own fibration?} Read ``one quantity, many certificates'' as a universal property. Show this is the figure's deepest frontier: each framework would be a section of a single risk-gap functor over a different fibration of the learning problem, the class for VC and Rademacher, the algorithm for stability and information, the posterior for PAC-Bayes, the operator norms for margin, so the verified core would read ``the functor admits a section over the class fibration'' (the three solid nodes) and the conceptual obstructions would read ``the class and algorithm fibrations do not refine one another,'' explaining the orthogonality as a fact about base categories rather than a separation; whether such a single generalization-certificate object exists, of which the certified attention bound (\cref{prop:certified-attention}, \leanname{CertifiedGeneralization}) is a sixth, algorithm-specific section, or the fibrations are provably non-unifiable, is open (\cref{op:cmi-unification}, \cref{op:tighten-certified-attention}), so this reading is drawn dashed.
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:triangle}}
+
+Each exercise perturbs the projection.  Argue, in the figure's grammar (generalization information has three sources, the data, the hypothesis class, and the algorithm, drawn as the three corners of a triangle; every bound is a projection reading one corner or edge; three framework nodes are drawn solid because their bounds are machine-checked, VC and Rademacher at the class corner, \leanname{finite_massart_lemma} and \leanname{EmpiricalRademacherComplexity}, and PAC-Bayes on the algorithm--class edge, \leanname{pac_bayes_finite}; and three are drawn lighter and dashed because their bounds are literature, stability on the algorithm--data edge, information in the interior channel, and margin on the class geometry; no edge is a theorem, the figure is a projection and its only verified content is the node grade; and the obstructions of \cref{fig:five-frameworks} are exactly these projections landing on different corners), that the perturbed picture subsumes the concrete one as an \emph{instance} (a framework whose corner placement the verified core or the literature exhibits), a \emph{boundary} (one node grade or information source toggled so the evidence grade or the source read changes), or a \emph{frontier} (a literature reading whose promotion to a verified source is open).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The class corner carries both verified bounds.} Read the two solid nodes at the class corner together. Show this is the figure's defining verified instance: VC uniform convergence and Rademacher complexity both read the hypothesis class and nothing else, and both have machine-checked bounds (\cref{thm:vc-uniform}, \leanname{finite_massart_lemma} and \leanname{sauer_shelah_exp_bound}; \cref{def:rademacher}, \leanname{EmpiricalRademacherComplexity} and \leanname{vcdim_bounds_rademacher_quantitative}), so the class corner is the most fully certified source in the diagram, and the solid border at that corner asserts exactly that the class-source reading is a kernel theorem.
+
+\item \textbf{PAC-Bayes is the verified reading on the algorithm--class edge.} Read the PAC-Bayes node and ask why it is solid yet off the class corner. Show this is the instance that anchors the posterior reading: the McAllester finite bound on the Gibbs risk is machine-checked (\cref{thm:pac-bayes}, \leanname{pac_bayes_finite}, with \leanname{gibbsError} the verified mean error of the posterior-sampled predictor), and PAC-Bayes reads the posterior over the class \emph{induced by the algorithm}, so its node sits on the edge joining the algorithm and class corners, solid like VC and Rademacher but reading two sources rather than one.
+
+\item \textbf{One problem read from three corners is the three-bounds example.} Read \cref{ex:three-bounds} as a tour of the triangle. Show this is the figure's organizing instance: linear classification with bounded norm admits a VC bound (class corner, $\VC=d+1$), a Rademacher bound (class corner, $\Rad_S\le 1/\sqrt{m}$), and a margin bound (class geometry), all on the \emph{same} problem, so the diagram is the abstract witness that a single learning problem is bounded by reading whichever corner one can measure, and the three numbers in the example differ only because they project different sources.
+
+\item \textbf{Which framework when is a corner-selection rule.} Read the ``Which Framework When?'' guide as a map back onto the triangle. Show this is the instance that names the figure's use: knowing the class but not the algorithm selects the class corner (Rademacher or margin), knowing the algorithm but not the class selects the algorithm readings (stability or information), and being able to choose a prior selects the algorithm--class edge (PAC-Bayes), so the choice of framework is literally the choice of which corner of \cref{fig:triangle} one can measure.
+
+\item \textbf{The obstructions are different-corner projections, not separations.} Toggle the companion figure's two conceptual edges onto this triangle. Show this is the figure's principal boundary: information reads the data-to-output channel in the interior while Rademacher reads the class corner, so the \cref{fig:five-frameworks} ``orthogonal'' edge is just these two nodes sitting at different places (\cref{sec:comparison}), and stability reads the algorithm--data edge while PAC-Bayes reads the algorithm--class edge, so the ``type mismatch'' edge is two nodes on different edges sharing only the algorithm corner; neither is a separation theorem, which is why both figures draw them without a verified arrow.
+
+\item \textbf{Stability and information read the algorithm, not the class.} Read the two interior or algorithm-edge nodes and ask why they are dashed. Show this is the boundary that fixes their grade: stability measures the algorithm's sensitivity to one data point (\cref{thm:stability-bound}) and information measures the mutual information $I(S;W)$ between the sample and the algorithm's output (\cref{thm:xu-raginsky}, \cite{XuRaginsky2017}), so both read the algorithm rather than the class and neither has a verified handle, hence both nodes are drawn lighter; a deterministic ERM can carry $I(S;W)=H(W)$ on a class of small Rademacher complexity, confirming the interior reading is genuinely a different source from the class corner.
+
+\item \textbf{Margin reads class geometry, and that reading is literature.} Read the margin node near the class--algorithm side. Show this is the boundary between a class-adjacent reading and a verified one: the margin bound is derived from Rademacher complexity applied to the ramp loss (\cref{thm:margin-bound}), so it reads the class geometry together with the predictor's margin, yet because thm:margin-bound is not machine-checked the node is drawn dashed even though it sits beside the solid class corner; promoting it would require a verified ramp-loss contraction, the same step missing for the assembled Rademacher bound.
+
+\item \textbf{Formalizing the algorithm readings would recolor the interior.} Ask which perturbation turns the dashed interior and algorithm-edge nodes solid. Show this is the frontier the dashed nodes mark: the stability bound (\cref{thm:stability-bound}) and the Xu--Raginsky information bound (\cref{thm:xu-raginsky}, \cite{XuRaginsky2017}) have no verified handle, and the Rademacher node is solid for its complexity measure but its assembled high-probability \emph{guarantee} (\cref{thm:rademacher-bound}) is still a placeholder (\cref{op:formalize-rademacher}, \cite{BartlettMendelson2002}), so formalizing these would recolor the algorithm-reading and interior nodes solid and certify sources beyond the class corner.
+
+\item \textbf{Is there a single bound that reads all three corners at once?} Ask whether one certificate could project the whole triangle rather than one corner or edge. Show this is the figure's unifying frontier: a single conditional-mutual-information master inequality is conjectured to recover VC, PAC-Bayes, and stability simultaneously (\cref{op:cmi-unification}, \cite{SteinkeZakynthinou2020}), which would be one bound reading the class, the algorithm, and the posterior together, collapsing the three solid-and-dashed readings into a single source-spanning certificate; until it is proved and formalized the corners remain separate projections.
+
+\item \textbf{Is the triangle the base of a fibration with each framework a section?} Read ``three sources, many projections'' as a universal property. Show this is the figure's deepest frontier: each framework would be a section of one risk-gap functor over a different face of the learning problem, the class face for VC and Rademacher, the algorithm face for stability and information, the posterior for PAC-Bayes, the operator norms for margin, so the verified core would read ``a section exists over the class face'' (the solid corner) and the obstructions would read ``the class and algorithm faces do not refine one another,'' explaining the orthogonality as a fact about base faces rather than a separation; whether such a single generalization-certificate object exists, of which the certified attention bound (\cref{prop:certified-attention}, \leanname{CertifiedGeneralization}) is an algorithm-face section, or the faces are provably non-unifiable, is open (\cref{op:cmi-unification}, \cref{op:tighten-certified-attention}), so this reading is drawn dashed.
 \end{enumerate}
