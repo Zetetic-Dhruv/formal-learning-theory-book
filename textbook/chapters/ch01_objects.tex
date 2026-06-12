@@ -56,55 +56,67 @@ These definitions are unremarkable individually. The mathematical content begins
 A \emph{concept class} $\mathcal{C} \subseteq Y^X$ is a collection of concepts over a common domain; as a type, $\leanname{ConceptClass X Y} := \mathrm{Set}\,(\leanname{Concept X Y})$.\formal{FLT_Proofs.Basic.ConceptClass} The class is the primary object of study: every major question in learning theory is a question about concept classes.
 \end{defn}
 
-This definition is simple. Its importance is not. In the companion knowledge graph, \nde{concept\_class} is the single most connected node: 21 edges point into it, including \emph{every} complexity measure in the graph (Figure~\ref{fig:concept-class-hub}).
+This definition is simple. Its importance is not. The concept class is the single object on which the chapter's deepest theorem turns: a family of apparently different demands one might place on it (learnability from few examples, finite shattering, bounded compression, vanishing correlation with noise, sub-exponential growth, finite sample size) are secretly one condition, and the class is the vertex at which they coincide (Figure~\ref{fig:concept-class-hub}).\formal{FLT_Proofs.Theorem.PAC.fundamental_theorem}
 
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    hub/.style={draw, very thick, rounded corners, fill=defblue!15, font=\small\bfseries, minimum width=2.8cm, minimum height=0.9cm},
-    measure/.style={draw, rounded corners, fill=layergray, font=\scriptsize, minimum width=1.6cm, minimum height=0.55cm, align=center},
-    paradigm/.style={draw, rounded corners, fill=edgeorange!10, font=\scriptsize, minimum width=1.8cm, minimum height=0.55cm, align=center},
-    arr/.style={-{Stealth[length=1.5mm]}, thin, notegray},
-    node distance=0.5cm
+    pivot/.style={draw, very thick, rounded corners, fill=defblue!20, font=\footnotesize\bfseries, minimum width=2.1cm, minimum height=0.95cm, align=center},
+    face/.style={draw, thick, rounded corners, fill=defblue!8, font=\scriptsize, minimum width=1.85cm, minimum height=0.74cm, align=center},
+    onlinenode/.style={draw, thick, rounded corners, fill=onlineblue!15, font=\scriptsize, minimum width=1.45cm, minimum height=0.62cm, align=center},
+    frontier/.style={draw, dashed, rounded corners, fill=edgeorange!7, font=\scriptsize, minimum width=1.6cm, minimum height=0.58cm, align=center},
+    chipgood/.style={draw, circle, thick, fill=sepgreen!25, font=\tiny, inner sep=0.4pt, minimum size=0.56cm},
+    chipbad/.style={draw, circle, thick, fill=thmred!18, font=\tiny, inner sep=0.4pt, minimum size=0.56cm},
+    equiv/.style={{Stealth[length=1.5mm]}-{Stealth[length=1.5mm]}, semithick, defblue},
+    strictbridge/.style={-{Stealth[length=1.8mm]}, thick, onlineblue!75!black},
+    fedge/.style={-{Stealth[length=1.3mm]}, dashed, edgeorange!85!black},
+    elab/.style={font=\tiny, text=notegray, inner sep=1.1pt, fill=white},
+    flab/.style={font=\tiny\itshape, text=edgeorange!65!black, inner sep=1pt}
 ]
-\node[hub] (cc) {Concept Class $\mathcal{C}$};
-
-% Complexity measures - left arc
-\node[measure, above left=1.2cm and 2.5cm of cc] (vc) {VCdim};
-\node[measure, left=2.8cm of cc] (ldim) {Ldim};
-\node[measure, below left=1.2cm and 2.5cm of cc] (ds) {DSdim};
-\node[measure, above left=0.4cm and 2.8cm of cc] (star) {$\star$-number};
-\node[measure, below left=0.4cm and 2.8cm of cc] (nat) {$d_N$};
-
-% More measures - right arc
-\node[measure, above right=1.2cm and 2.5cm of cc] (rad) {Rademacher};
-\node[measure, right=2.8cm of cc] (comp) {Compression};
-\node[measure, below right=1.2cm and 2.5cm of cc] (sq) {SQ-dim};
-\node[measure, above right=0.4cm and 2.8cm of cc] (cover) {Covering \#};
-\node[measure, below right=0.4cm and 2.8cm of cc] (fat) {Fat-shattering};
-
-% Top measures
-\node[measure, above=1.5cm of cc] (growth) {Growth fn};
-\node[measure, above left=1.5cm and 0.8cm of cc] (samp) {Sample cplx};
-\node[measure, above right=1.5cm and 0.8cm of cc] (teach) {Teaching dim};
-
-% Paradigms below
-\node[paradigm, below left=1.8cm and 1cm of cc] (pac) {PAC};
-\node[paradigm, below=1.8cm of cc] (gold) {Gold};
-\node[paradigm, below right=1.8cm and 1cm of cc] (online) {Online};
-
-\foreach \n in {vc,ldim,ds,star,nat,rad,comp,sq,cover,fat,growth,samp,teach}
-  \draw[arr] (\n) -- (cc);
-
-\foreach \n in {pac,gold,online}
-  \draw[arr, dashed, defblue] (\n) -- (cc);
-
-% Legend
-\node[font=\tiny, below=2.5cm of cc, anchor=north] (leg) {%
-  \textcolor{notegray}{\rule{0.8cm}{0.4pt}}\;\rel{measures} \qquad
-  \textcolor{defblue}{\rule[0.2ex]{0.3cm}{0.4pt}\,\rule[0.2ex]{0.3cm}{0.4pt}}\;\textcolor{defblue}{\rel{defined\_using}}};
+% measurability gate
+\draw[dashed, thick, notegray] (0,-0.1) ellipse (3.15cm and 2.75cm);
+\node[notegray, font=\tiny] at (0,-2.35) {measurability gate};
+% pivot: the loop-closing measure on the carrier
+\node[pivot] (vc) at (0,0) {$\mathcal{C}$\\$\VC(\mathcal{C})<\infty$};
+% verified equivalence faces (conjuncts of the Fundamental Theorem)
+\node[face] (pac)  at (-2.05,-1.5) {PAC\\learnable};
+\node[face] (rad)  at (-2.5, 0.95) {Rademacher\\$\to 0$};
+\node[face] (grow) at (0, 2.2)     {sub-exp.\\growth};
+\node[face] (comp) at (2.5, 0.95)  {compression\\(with info)};
+\node[face] (samp) at (2.05,-1.5)  {finite sample\\complexity};
+% two-way machine-checked equivalences
+\draw[equiv] (vc) -- node[elab]{Fund.\ Thm} (pac);
+\draw[equiv] (vc) -- (rad);
+\draw[equiv] (vc) -- node[elab]{Sauer--Shelah} (grow);
+\draw[equiv] (vc) -- node[elab]{Moran--Yehud.} (comp);
+\draw[equiv] (vc) -- node[elab]{$\Theta(\VC)$} (samp);
+\draw[equiv] (pac) -- (rad);
+% nested verified loop: online learning
+\node[onlinenode] (onl) at (-2.55,-3.05) {online\\learnable};
+\node[onlinenode] (ld)  at (-0.65,-3.05) {Littlestone\\dim};
+\draw[equiv, onlineblue!70!black] (onl) -- (ld);
+\draw[strictbridge] (onl) to[bend left=14] node[elab, pos=0.58]{strict $\not\Leftarrow$} (pac);
+% attention chips straddling the gate
+\node[chipgood] (soft) at (1.95,1.6) {soft};
+\node[chipbad]  (hard) at (3.0,2.45) {hard};
+\node[font=\tiny, text=sepgreen!55!black, anchor=east] at (1.58,1.6) {softmax};
+\node[font=\tiny, text=thmred!70!black, anchor=west] at (3.34,2.45) {argmax};
+% generality frontier: literature / open / known-to-break
+\node[frontier] (ds)    at (0, 3.35)    {multiclass / DS};
+\node[frontier] (noinf) at (4.05, 0.95) {compression,\\no side info};
+\node[frontier] (agn)   at (-4.5,-1.5)  {agnostic PAC};
+\node[frontier, draw=thmred!70!black, fill=thmred!5] (part) at (-4.5, 0.5) {partial\\concepts};
+\draw[fedge] (ds)    -- node[flab,right]{lit.\ '22} (grow);
+\draw[fedge] (noinf) -- node[flab,above]{open} (comp);
+\draw[fedge] (agn)   -- node[flab,below]{lit.} (pac);
+\draw[fedge, thmred!70!black] (part) -- node[flab,above,text=thmred!75!black]{VC$\,\not\Leftrightarrow\,$PAC} (pac);
+% legend
+\node[font=\tiny, anchor=west, text=notegray] at (-4.5,-3.7) {%
+  \textcolor{defblue}{\rule[0.45ex]{0.5cm}{0.8pt}}~verified equivalence \quad
+  \textcolor{edgeorange!85!black}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~literature / open \quad
+  \textcolor{onlineblue!75!black}{\rule[0.45ex]{0.5cm}{0.8pt}}~strict one-way};
 \end{tikzpicture}
-\caption{The concept class as hub node. All 13 complexity measures in the graph target $\mathcal{C}$; each paradigm defines its success criterion in terms of $\mathcal{C}$. The same mathematical object is measured by 13 different instruments, each revealing a different aspect of learnability.}
+\caption[The concept class as the vertex of an equivalence]{\textbf{The concept class as the vertex of an equivalence.} Several apparently different demands one might place on a class of concepts (learnability from few examples; finite shattering; reconstructibility of every consistent labelling from a bounded subsample with a little side information; vanishing correlation with random noise; sub-exponential growth of its labellings; a finite sufficient sample) are not separate properties but a single property wearing several faces, and the class is the one object on which they coincide. The figure draws that coincidence as a wheel whose hub is the dimension counting shatterable points and whose spokes are two-way bridges, each checked in full by a proof assistant; the wheel as a whole is one assembled theorem, so the picture is the abstract shape those machine-checked equivalences instantiate. A tighter wheel sits inside, online learning with mistakes counted as they occur, joined by a single one-way bridge, since the online demand implies the statistical one but not conversely. The wheel rests on a measurability gate that a smoothed attention head passes but a hard, argmax-routed one does not; and a dashed frontier marks the same coincidence expected but not yet verified here (many-valued labels, agnostic learning, compression without side information), with one edge known to break for partial concepts, where finite dimension and learnability come apart.}
 \label{fig:concept-class-hub}
 \end{figure}
 
@@ -598,3 +610,20 @@ The coding theorem $K(x) = -\log M(x) + O(1)$ (\cref{def:alg-prob}) hides an add
 \label{op:attention-hub}
 \Cref{fig:concept-class-hub} measures the concept class with thirteen instruments.  Compute, for the softmax-attention class, the values of as many of them as possible (VC dimension, Littlestone dimension, Rademacher complexity, compression size) and determine which instruments agree and which diverge on this single modern object.  The well-behavedness of \cref{prop:attention-wellbehaved} guarantees the measures are defined; whether attention is a place where they coincide or a place where they pull apart is open.
 \end{openprob}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:concept-class-hub}}
+
+Each exercise perturbs the claim of \Cref{fig:concept-class-hub} that the listed conditions coincide. Show, in the figure's own grammar, that the generalized wheel subsumes the perturbation as an \emph{instance} (it lands on a verified face or spoke), a \emph{boundary} (it lands on the measurability gate), or a \emph{frontier} (it lands on a dashed, unverified edge), naming the relevant verified handle or the literature result.
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Infinite label space.} Let the labels range over many classes, so the hub measure becomes the DS dimension and the criterion becomes multiclass PAC learnability. Show this is a frontier item: the kernel carries the Natarajan and strong-shattering definitions and the inequality \leanname{strongShatteringDim_le_NatarajanDim}, but not the Brukhim et al.\ (2022) equivalence, so the edge is dashed rather than solid.
+\item \textbf{Real-valued labels.} Replace shattering by $\gamma$-shattering at a scale. Show the wheel's shape survives with the shattering relation re-parametrized by scale while its proof status does not: pseudodimension and fat-shattering are defined in the kernel yet carry no equivalence theorem, so they sit on the dashed frontier (Alon--Ben-David--Cesa-Bianchi--Haussler 1997).
+\item \textbf{Improper learner.} Let the learner output hypotheses outside the class. Show the wheel is invariant: the hub is the VC dimension of the \emph{target} class, not of the learner's hypothesis space, so the perturbation moves a quantity the loop does not depend on (it only shifts cost, a satellite).
+\item \textbf{Learnable without uniform convergence.} Show that inside the verified wheel this is impossible, since uniform convergence and learnability are one face (\leanname{uc_imp_pac}, \leanname{vcdim_finite_imp_uc'}); the counterfactual is therefore the act of stepping off the loop, into the partial-concept or improper-agnostic region.
+\item \textbf{Online learnability.} Show this is the nested inner wheel (\leanname{littlestone_characterization}), joined to the outer one by the single one-way bridge \leanname{online_strictly_stronger_pac}: the online demand implies the statistical one but not conversely, with threshold rules standing at the gap.
+\item \textbf{Label noise.} Drop realizability and measure success against the best rule in the class. Show this is a frontier face: \leanname{AgnosticPACLearnable} is defined in the kernel but carries no equivalence theorem, so the classical agnostic characterization (Vapnik 1998) is cited, not verified.
+\item \textbf{Partial concepts.} Allow partially-defined concepts. Show this is the one frontier edge that \emph{breaks}: there are partial classes learnable with infinite VC dimension (Alon--Hanneke--Holzman--Moran 2021), so the VC-to-learnability face fails and the figure must mark its own central edge as false here.
+\item \textbf{Drop measurability.} Remove the well-behavedness side-condition. Show this opens the gate: there is a class, a hard argmax-routed attention head, whose failure event is not measurable (\leanname{soft_vs_hard_attention_measurabilitySeparation}), so uniform convergence cannot even be stated and the wheel dissolves.
+\item \textbf{Compression without side information.} Demand a scheme of size linear in the dimension with no side bits. Show this is the open dashed edge parallel to the verified with-information compression face: the Littlestone--Warmuth conjecture, isolated as \leanname{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening} but unproven.
+\item \textbf{Constructive necessity.} Ask the necessity direction to exhibit an explicit hard distribution. Show this perturbs an edge's \emph{character}, not the node set: the sufficiency spokes are constructive (they build an empirical risk minimizer), the necessity spoke is existential, and whether it can be made constructive is open.
+\end{enumerate}
