@@ -305,13 +305,14 @@ are \emph{not} machine-checked and are flagged as open formalization problems
 where they appear---among them the exact $2^{O(d)}$ Moran--Yehudayoff
 compression bound, the Brukhim et al.\ DS characterization of multiclass
 learnability, the Kearns--Valiant cryptographic hardness, and the Bousquet et
-al.\ universal-learning trichotomy.  Two suggestively named kernel declarations
-are deliberately \emph{not} cited as companions, because their statements do
-not prove what their names suggest: \leanname{rademacher_gen_bound}, which only
-asserts the existence of a non-negative real rather than the Rademacher
-generalization bound; and the kernel's \leanname{DSDim}, which is the
-``all labelings realizable'' dimension (satisfying $\DSdim \le \Ndim$) rather
-than the Daniely--Shalev-Shwartz DS dimension (which satisfies
-$\Ndim \le \DSdim$).  Both are recorded as formalization gaps in
-\Cref{ch:generalization} and \Cref{ch:extensions}.
+al.\ universal-learning trichotomy.  The kernel declaration \leanname{rademacher_gen_bound} is deliberately
+\emph{not} cited as a companion, because its statement does not prove what its
+name suggests: it only asserts the existence of a non-negative real rather than
+the Rademacher generalization bound.  A second gap is one of coverage rather
+than naming: the kernel types the all-labelings shattering dimension
+\leanname{FLT_Proofs.Complexity.Structures.StrongShatteringDim}---bounded above
+by $\Ndim$---but not the Daniely--Shalev-Shwartz DS dimension, whose pseudo-cube
+definition gives the reverse bound $\Ndim \le \DSdim$, so the multiclass
+characterization is cited rather than verified.  Both are recorded as
+formalization gaps in \Cref{ch:generalization} and \Cref{ch:extensions}.
 \par\endgroup

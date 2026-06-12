@@ -575,7 +575,7 @@ A \emph{pseudo-cube of dimension $d$} in $G_\mathcal{H}$ is a subhypergraph
 isomorphic to the complete $d$-dimensional hypercube graph $\{0,1\}^d$.
 
 The DS dimension $\DSdim(\mathcal{H})$ is the supremum over all finite
-$S \subseteq X$ of the maximum dimension of a pseudo-cube in $G_\mathcal{H}$.\formal{FLT_Proofs.Complexity.Structures.DSDim}
+$S \subseteq X$ of the maximum dimension of a pseudo-cube in $G_\mathcal{H}$.\footnote{The genuine DS dimension is not machine-checked. The kernel types a related but distinct notion---the \emph{all-labelings} (strong shattering) dimension \leanname{FLT_Proofs.Complexity.Structures.StrongShatteringDim}, the largest $S$ on which every $f \colon S \to Y$ is realizable---whose value is at most $\Ndim$, the reverse of the genuine DS relationship $\Ndim \le \DSdim$. Formalizing the pseudo-cube DS dimension is \cref{op:ds-formal}.}
 \end{defn}
 
 \begin{thm}[Multiclass Characterization
@@ -785,7 +785,7 @@ The Sauer--Shelah lemma (\cref{lem:sauer-shelah}) converts finite VC dimension i
 
 \begin{openprob}[A combinatorial proof that DS characterizes multiclass learning, \textsc{uk}]
 \label{op:ds-formal}
-The DS characterization (\cref{thm:ds-char}) is cited, not verified; the development types the DS dimension (\leanname{FLT_Proofs.Complexity.Structures.DSDim}) and the Natarajan dimension but not the characterization theorem.  Formalize the Brukhim et al.\ proof that $\DSdim(\mathcal{H}) < \infty$ iff $\mathcal{H}$ is multiclass PAC learnable, and verify the exact relationship between the DS and Natarajan dimensions.
+The DS characterization (\cref{thm:ds-char}) is cited, not verified.  The development types the Natarajan dimension and an \emph{all-labelings} shattering dimension (\leanname{StrongShatteringDim}, whose value is at most $\Ndim$) but \emph{not} the genuine Daniely--Shalev-Shwartz DS dimension, whose pseudo-cube definition gives the reverse bound $\Ndim \le \DSdim$.  Formalize the true DS dimension and the Brukhim et al.\ proof that $\DSdim(\mathcal{H}) < \infty$ iff $\mathcal{H}$ is multiclass PAC learnable.
 \end{openprob}
 
 \begin{openprob}[Closing the Natarajan--DS gap quantitatively, \textsc{ku}]
