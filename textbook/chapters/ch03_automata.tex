@@ -22,34 +22,63 @@ Two things here are not standard vocabulary. First, the distinction between \emp
 \section{The Chomsky Hierarchy}
 \label{sec:chomsky}
 
-The Chomsky hierarchy classifies formal languages by the computational resources needed to recognize them. Figure~\ref{fig:chomsky} displays the containment structure; the definitions follow. A \emph{formal language} over an alphabet $\Sigma$ is a set of finite words, $L \subseteq \Sigma^\ast$.\formal{FLT_Proofs.Computation.FormalLanguage}
+The Chomsky hierarchy classifies formal languages by the computational resources needed to recognize them. Figure~\ref{fig:chomsky} displays the containment structure together with the bridge, made precise later in this chapter, that places identification in the limit at a definite level of the computability hierarchy;\formal{FLT_Proofs.Theorem.Gold.mind_change_characterization} the definitions follow. A \emph{formal language} over an alphabet $\Sigma$ is a set of finite words, $L \subseteq \Sigma^\ast$.\formal{FLT_Proofs.Computation.FormalLanguage}
 
 \begin{figure}[ht]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-    every node/.style={font=\small},
-    level/.style={draw, thick, ellipse, minimum height=1.2cm, align=center}
+    lvl/.style={draw, thick, ellipse, align=center, font=\scriptsize},
+    reclbl/.style={font=\tiny\itshape, text=notegray, anchor=west},
+    rung/.style={draw, thick, rounded corners, fill=defblue!8, font=\scriptsize, minimum width=2.5cm, minimum height=0.6cm, align=center},
+    goldnode/.style={draw, very thick, rounded corners, fill=sepgreen!14, font=\scriptsize, minimum width=2.5cm, minimum height=0.82cm, align=center},
+    contnode/.style={draw, dashed, rounded corners, fill=edgeorange!8, font=\scriptsize, minimum width=2.5cm, minimum height=0.78cm, align=center},
+    proj/.style={-{Stealth[length=1.6mm]}, semithick, defblue},
+    goldedge/.style={-{Stealth[length=2.2mm]}, line width=1.3pt, sepgreen!60!black},
+    spine/.style={-{Stealth[length=1.8mm]}, thick, notegray},
+    mirror/.style={-{Stealth[length=1.6mm]}, dashed, edgeorange!80!black},
+    elab/.style={font=\tiny, text=notegray, inner sep=1.2pt, fill=white, align=center}
 ]
-% Nested ovals, outermost first
-\node[level, minimum width=10cm, minimum height=5.8cm, fill=layergray!60] (re) at (0,0) {};
-\node[font=\scriptsize, anchor=north] at (re.north) {Recursively enumerable (Type 0)};
-
-\node[level, minimum width=7.8cm, minimum height=4.2cm, fill=defblue!6] (rec) at (0,-0.3) {};
-\node[font=\scriptsize, anchor=north] at (rec.north) {Recursive (decidable)};
-
-\node[level, minimum width=5.6cm, minimum height=2.8cm, fill=edgeorange!8] (cfl) at (0,-0.5) {};
-\node[font=\scriptsize, anchor=north] at (cfl.north) {Context-free (Type 2)};
-
-\node[level, minimum width=3.2cm, minimum height=1.4cm, fill=sepgreen!10] (reg) at (0,-0.6) {};
-\node[font=\scriptsize] at (reg.center) {Regular (Type 3)};
-
-% Recognizer labels on the right
-\node[font=\scriptsize\itshape, notegray, anchor=west] at (4.2,2.2) {Turing machine};
-\node[font=\scriptsize\itshape, notegray, anchor=west] at (3.2,0.8) {TM (halting)};
-\node[font=\scriptsize\itshape, notegray, anchor=west] at (2.2,-0.1) {Pushdown automaton};
-\node[font=\scriptsize\itshape, notegray, anchor=west] at (1.2,-0.6) {DFA / NFA};
-\end{tikzpicture}
-\caption{The Chomsky hierarchy. Each level is strictly contained in the next. The recognizer type is indicated at right. All containments are proper.}
+% === LEFT: language ladder, nested ovals (CSL/Type-1 restored; dashed border = no Lean witness) ===
+\node[lvl, minimum width=5.6cm, minimum height=5.2cm, fill=layergray!50] (re) at (-3.4,0) {};
+\node[font=\scriptsize, anchor=north] at (re.north) {recursively enumerable (Type 0)};
+\node[lvl, dashed, minimum width=4.55cm, minimum height=3.95cm, fill=defblue!4] (rec) at (-3.4,-0.3) {};
+\node[font=\scriptsize, anchor=north] at (rec.north) {recursive (decidable)};
+\node[lvl, dashed, minimum width=3.6cm, minimum height=2.9cm, fill=edgeorange!5] (csl) at (-3.4,-0.53) {};
+\node[font=\scriptsize, anchor=north] at (csl.north) {context-sensitive (Type 1)};
+\node[lvl, minimum width=2.6cm, minimum height=1.85cm, fill=edgeorange!9] (cfl) at (-3.4,-0.76) {};
+\node[font=\scriptsize, anchor=north] at (cfl.north) {context-free (Type 2)};
+\node[lvl, minimum width=1.5cm, minimum height=0.85cm, fill=sepgreen!12] (reg) at (-3.4,-0.98) {};
+\node[font=\scriptsize] at (reg.center) {regular (T3)};
+% recognizer labels (right diagonal of the bands)
+\node[reclbl] at (-0.75,1.95) {Turing machine};
+\node[reclbl] at (-1.3,1.18) {halting TM};
+\node[reclbl] at (-1.95,0.43) {LBA};
+\node[reclbl] at (-2.6,-0.32) {PDA};
+\node[reclbl] at (-3.9,-0.98) {DFA/NFA};
+% === arithmetical ladder over N ===
+\node[rung] (d1) at (3.5,-1.4) {decidable $\Delta^0_1$};
+\node[rung] (s1) at (3.5,-0.3) {r.e.\ $\Sigma^0_1$};
+\node[rung, very thick, fill=defblue!16] (d2) at (3.5,0.85) {limit-comp.\ $\Delta^0_2$};
+\draw[proj] (d1) -- node[elab,right]{$\exists$} (s1);
+\draw[proj] (s1) -- node[elab,right]{$\exists\forall$} (d2);
+% === Godel spine: language ladder -> arithmetical ladder ===
+\draw[spine] (re.east) -- node[elab,above]{G\"odel\\numbering} (s1.west);
+% === Gold bridge (headline, machine-checked) ===
+\node[goldnode] (gold) at (6.4,0.85) {Gold identification\\in the limit};
+\draw[goldedge] (gold) -- node[elab,above]{finite mind changes\\$\Leftrightarrow$ converges} (d2);
+% === continuum next rung (the descriptive analogue) ===
+\node[contnode] (cont) at (6.4,2.55) {analytic $\Sigma^1_1$\\soft vs.\ hard attention};
+\draw[mirror] (d2) to[bend left=14] node[elab,left]{continuum\\analogue} (cont);
+% legend
+\node[font=\tiny, anchor=west, text=notegray] at (-6.3,-3.05) {%
+  \textcolor{sepgreen!60!black}{\rule[0.45ex]{0.5cm}{1.2pt}}~machine-checked bridge \quad
+  \textcolor{defblue}{\rule[0.45ex]{0.5cm}{0.8pt}}~verified \quad
+  solid border $=$ Lean def \quad
+  \textcolor{notegray}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~dashed $=$ literature / open};
+\end{tikzpicture}%
+}
+\caption[The language hierarchy lifted to the computability hierarchy, with learning inside it]{\textbf{The hierarchy of formal languages, lifted to the hierarchy of computation, with learning placed inside it.} Reading inward, each region of languages is recognized by a strictly weaker machine: unrestricted machines for the merely enumerable, always-halting machines for the decidable, linearly space-bounded machines for the context-sensitive, a single-stack machine for the context-free, and finite automata for the regular. The finite-state, stack, grammar, and unrestricted recognizers are defined in the companion development; the context-sensitive region and the proper-containment claims rest on the classical literature rather than a machine-checked separation, and are drawn lightly. The same act of looking one step beyond what a base description can decide, applied to questions about the numbers rather than to languages, builds a second ladder, the hierarchy of computability, joined to the first by the effective coding of finite objects as numbers. On that ladder the chapter locates learning: a class is identifiable in the limit exactly when a learner converges after finitely many changes of mind, an equivalence the development proves in full, which places identification at one definite height, the first reachable by computation in the limit and no higher. Climbing the same ladder over a continuum rather than over the numbers reproduces the pattern one rung up, where smooth attention stays inside the well-behaved world and hard attention can step just outside it. Solid regions and arrows are those the verified development establishes; the lightly drawn ones mark what is borrowed or left open. The figure is the single shape all of these machine-checked results share.}
 \label{fig:chomsky}
 \end{figure}
 
@@ -440,3 +469,20 @@ The mind-change count is typed as an ordinal (\leanname{FLT_Proofs.Complexity.Mi
 \label{op:attention-restricts-descriptive}
 The soft/hard boundary reads as a \rel{restricts} versus \rel{extends\_grammar} edge (\cref{rmk:attention-descriptive}). Classify the standard architectural relaxations (softmax to $\arg\max$, finitely to countably many heads, bounded to unbounded context) by whether each keeps the bad event Borel (\leanname{TLT.transformerAttentionBadEvent_borel}) or can push it to analytic non-Borel (\leanname{TLT.Strictness.attention_nonBorel_badEvent}), turning the two-point separation of \cref{prop:soft-hard-descriptive} into a map of the attention design space against the Borel/analytic boundary.
 \end{openprob}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:chomsky}}
+
+Each exercise perturbs the picture. Show, in the figure's grammar (one projection operation building parallel ladders, solid for what the verified development establishes and dashed for what is borrowed or open), that the generalized figure subsumes it as an \emph{instance} (a rung or edge already present), a \emph{boundary} (a hard line the figure draws), or a \emph{frontier} (a dashed, open edge).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The context-sensitive level.} Insert context-sensitive languages, recognized by a linear-bounded automaton, between context-free and recursive. Show this is a frontier instance: it is a resource rung of the language ladder, but the verified development has no context-sensitive or linear-bounded declaration, so the level and its containments are drawn dashed rather than solid.
+\item \textbf{Relativization to an oracle.} Rebuild the ladder over an oracle base. Show this is a boundary: the figure's spine is one projection above a base, so swapping the computable floor for a halting-problem oracle slides the whole picture up one Turing degree, with Gold's level appearing as the instance at the halting-oracle base (\cref{thm:shoenfield}).
+\item \textbf{Climbing the arithmetical hierarchy.} Iterate projection past the second level. Show this is an instance: the figure's central ladder is exactly this hierarchy, of which the recognizer labels show only the bottom, and the figure marks that nothing above the limit-computable level is identifiable in the limit.
+\item \textbf{Behaviorally-correct identification.} Relax explanatory convergence to behaviorally correct. Show this is a frontier: the criterion is typed in the development (\leanname{BCLearnable}) but its arithmetical height is open, so it enters as a dashed rung stacked above the verified limit-computable one, a conservative relaxation of the explanatory edge.
+\item \textbf{The descriptive analogue.} Replace the numbers by a continuum. Show this is an instance, the figure's right rung: the same projection sends Borel to analytic, soft attention staying inside the well-behaved world and hard attention stepping outside (\leanname{borel_param_badEvent_analytic}, \leanname{soft_vs_hard_attention_measurabilitySeparation}).
+\item \textbf{Transfinite mind changes.} Index identification by a countable ordinal bound on mind changes. Show this is a frontier on a verified floor: the mind-change count is already an ordinal in the development (\leanname{FLT_Proofs.Complexity.MindChange.MindChangeOrdinal}), finite exactly when the learner converges, and the transfinite refinement is that label's range, a dashed sub-ladder inside the Gold rung.
+\item \textbf{Myhill--Nerode.} Replace the pumping necessary condition by the exact regularity criterion. Show this is a boundary: it makes the figure's lowest containment line exact (finite right-congruence index), supplying the canonical minimal automaton the regular node is defined by (\leanname{FLT_Proofs.Computation.IsRegularLang}).
+\item \textbf{Effective refinement.} Present the descriptive ladder lightface, aligned rung for rung with the arithmetical one. Show this is the figure's principal open frontier: the dashed cross-ladder edge asking whether the soft-to-hard smoothing is the descriptive image of the computable-approximation step that pulls a definition down to the limit-computable level.
+\item \textbf{The coding theorem.} Add Kolmogorov complexity and algorithmic probability as a gauge on the enumerable rung. Show this is a frontier annotation: both are typed in the same substrate (\leanname{FLT_Proofs.Computation.KolmogorovComplexity}, \leanname{FLT_Proofs.Computation.AlgorithmicProbability}) but no theorem links them, so the metric attaches to the top rung dashed.
+\item \textbf{One witness for the whole chain.} Replace the four independent separations by a single procedure that, given two adjacent levels, outputs a separating language with its non-membership proof. Show this is a frontier that re-types every containment edge at once: only the regular-versus-context-free separation has even a prose witness, so the meta-edge that all containment lines share one witness-generator is the figure's most general open problem.
+\end{enumerate}
