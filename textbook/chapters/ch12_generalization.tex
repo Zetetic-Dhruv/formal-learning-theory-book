@@ -952,48 +952,68 @@ algorithm onto a different axis.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    fbox/.style={draw, thick, rounded corners=4pt, minimum width=2.8cm,
-      minimum height=0.9cm, font=\small\bfseries, align=center},
-    arr/.style={-{Stealth[length=2.5mm]}, thick},
-    darr/.style={arr, defblue},
-    oarr/.style={{Stealth[length=2.5mm]}-{Stealth[length=2.5mm]}, thick,
-      analogypurple, dashed},
-    xarr/.style={arr, thmred, dashed},
-    lbl/.style={font=\scriptsize, midway, fill=white, inner sep=1pt}
+    vfbox/.style={draw=defblue, line width=1pt, rounded corners=4pt,
+      minimum width=2.5cm, minimum height=0.9cm, font=\small\bfseries,
+      align=center, fill=defblue!10},
+    litbox/.style={draw=black!45, thin, dashed, rounded corners=4pt,
+      minimum width=2.5cm, minimum height=0.9cm, font=\small, align=center,
+      fill=black!3},
+    vedge/.style={-{Stealth[length=2.5mm]}, line width=1pt, defblue},
+    ledge/.style={-{Stealth[length=2.5mm]}, semithick, black!55, densely dashed},
+    cedge/.style={{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, thick,
+      black!45, dotted},
+    elbl/.style={font=\scriptsize, midway, fill=white, inner sep=1.5pt},
 ]
-% Nodes
-\node[fbox, fill=defblue!10] (vc) at (-3.5,0) {VC / Uniform\\Convergence};
-\node[fbox, fill=defblue!15] (rad) at (0,0) {Rademacher};
-\node[fbox, fill=sepgreen!10] (pb) at (4.5,0) {PAC-Bayes};
-\node[fbox, fill=goldcolor!10] (stab) at (-1.5,-2.8) {Stability};
-\node[fbox, fill=edgeorange!10] (info) at (3,-2.8) {Information-\\Theoretic};
-\node[fbox, fill=boundbrown!10] (margin) at (0,2.5) {Margin};
+% --- frameworks: verified-bound (thick blue border) vs literature-only (thin dashed) ---
+\node[vfbox] (vc) at (-4.2,2.3) {VC / Uniform\\Convergence};
+\node[vfbox] (rad) at (0,2.3) {Rademacher};
+\node[litbox] (margin) at (4.2,2.3) {Margin};
+\node[litbox] (info) at (0,0) {Information-\\Theoretic};
+\node[litbox] (stab) at (-2.7,-2.5) {Stability};
+\node[vfbox] (pb) at (2.7,-2.5) {PAC-Bayes};
 
-% Implications (solid blue arrows)
-\draw[darr] (margin) -- node[lbl, left] {specializes} (rad);
-\draw[darr] (rad) -- node[lbl, above] {refines} (vc);
-\draw[darr] (stab) -- node[lbl, below] {implies} (info);
+% --- the one kernel-verified bridge: Rademacher controlled by VC via Sauer-Shelah ---
+\draw[vedge] (vc) -- node[elbl] {Sauer--Shelah} (rad);
 
-% Dual relationship (dashed purple double arrow)
-\draw[oarr] (pb) -- node[lbl, right, xshift=2pt]
-  {\textcolor{analogypurple}{dual views}} (info);
+% --- literature implications / analogies ---
+\draw[ledge] (margin) -- node[elbl] {specializes} (rad);
+\draw[ledge] (stab) -- node[elbl] {implies} (info);
+\draw[ledge, {Stealth[length=2.5mm]}-{Stealth[length=2.5mm]}]
+  (info) -- node[elbl] {dual} (pb);
 
-% Obstructions (dashed red)
-\draw[xarr] (info) -- node[lbl, left, xshift=-2pt, rotate=30]
-  {\textcolor{thmred}{orthogonal}} (rad);
-\draw[xarr] (stab) -- node[lbl, below, yshift=-2pt]
-  {\textcolor{thmred}{type mismatch}} (pb);
+% --- conceptual orthogonalities (argued, not proved) ---
+\draw[cedge] (rad) -- node[elbl] {orthogonal} (info);
+\draw[cedge] (stab) -- node[elbl] {type mismatch} (pb);
 
-% Dotted connection: VC to Rademacher via Sauer-Shelah
-\draw[darr, densely dotted] (vc) to[bend right=20]
-  node[lbl, below] {\scriptsize Sauer--Shelah} (rad);
+% --- evidence-grade legend ---
+\begin{scope}[shift={(-4.4,-4.0)}]
+  \draw[vedge] (0,0) -- (0.7,0);
+  \node[font=\scriptsize, anchor=west] at (0.82,0) {kernel-verified bound / bridge};
+  \draw[ledge] (5.0,0) -- (5.7,0);
+  \node[font=\scriptsize, anchor=west] at (5.82,0) {literature (cited)};
+  \draw[cedge] (0,-0.52) -- (0.7,-0.52);
+  \node[font=\scriptsize, anchor=west] at (0.82,-0.52) {conceptual orthogonality (argued)};
+  \node[vfbox, minimum width=0.55cm, minimum height=0.3cm] at (5.27,-0.52) {};
+  \node[font=\scriptsize, anchor=west] at (5.62,-0.52) {verified-bound};
+  \node[litbox, minimum width=0.55cm, minimum height=0.3cm] at (8.5,-0.52) {};
+  \node[font=\scriptsize, anchor=west] at (8.85,-0.52) {literature-only};
+\end{scope}
 \end{tikzpicture}
-\caption{Implication and obstruction relationships among the five
-generalization frameworks.  Solid arrows: one framework implies or
-refines the other.  Dashed purple: dual or analogous frameworks.  Dashed
-red: obstruction (the frameworks measure orthogonal aspects or have a
-type mismatch).  Dotted: the Sauer--Shelah lemma mediates the
-VC-to-Rademacher connection.}
+\caption[Six generalization frameworks graded by evidence: one risk gap, many certificates.]{The
+six frameworks all bound the \emph{same} quantity, the gap between true and empirical risk, but
+each reads a different slice of the data--class--algorithm interaction.  The kernel machine-checks
+the bounds for the class-based frameworks: VC uniform convergence (\leanname{finite_massart_lemma}),
+Rademacher complexity (\leanname{EmpiricalRademacherComplexity}), and PAC-Bayes
+(\leanname{pac_bayes_finite}); these three nodes are drawn solid.  The one machine-checked
+cross-framework bridge is that Rademacher complexity is controlled by VC dimension through
+Sauer--Shelah (\leanname{vcdim_bounds_rademacher_quantitative}), the single solid edge.  The
+remaining links are literature, proved on paper but not verified (margin specializes Rademacher,
+stability implies an information bound, PAC-Bayes and the information bound are dual views), or
+conceptual, argued rather than proved (information and Rademacher are orthogonal because one reads
+the algorithm and the other the class; stability and PAC-Bayes are a type mismatch between
+algorithm space and distribution space).  Solid marks a kernel-verified bound or bridge, a lighter
+dashed style a cited literature result, and a dotted style a conceptual orthogonality that is
+argued rather than proved.}
 \label{fig:five-frameworks}
 \end{figure}
 
@@ -1426,3 +1446,29 @@ information one chooses to measure.  No single framework captures the
 full picture, and the obstructions between frameworks (\Cref{fig:five-frameworks})
 are as informative as the implications.
 \end{remark}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:five-frameworks}}
+
+Each exercise perturbs the parallax.  Argue, in the figure's grammar (six frameworks that bound one quantity, the gap between true and empirical risk, each reading a different slice of the data--class--algorithm interaction; three framework nodes drawn solid because their bounds are machine-checked, VC uniform convergence \leanname{finite_massart_lemma}, Rademacher complexity \leanname{EmpiricalRademacherComplexity}, and PAC-Bayes \leanname{pac_bayes_finite}, and three drawn in the lighter literature style because their bounds are proved but not verified, stability, information, and margin; one solid edge, the kernel-checked bridge that Rademacher complexity is controlled by VC dimension through Sauer--Shelah \leanname{vcdim_bounds_rademacher_quantitative}; three literature edges, margin specializing Rademacher, stability implying an information bound, and the PAC-Bayes and information duality; and two conceptual edges, drawn in a third style because they are argued rather than proved, the algorithm-versus-class orthogonality and the stability-versus-PAC-Bayes type mismatch), that the perturbed picture subsumes the concrete one as an \emph{instance} (a framework, bound, or bridge that the verified core or a single graded edge exhibits), a \emph{boundary} (one node sort, edge grade, or information axis toggled so the evidence grade or the direction changes), or a \emph{frontier} (a literature or conceptual edge whose promotion to verified is open).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The three solid nodes are exactly the class-based bounds the kernel checks.} Read the figure's three solid-bordered frameworks not as a stylistic choice but as a claim about evidence. Show this is the figure's defining verified instance: VC uniform convergence, Rademacher complexity, and PAC-Bayes are the frameworks whose bounds are machine-checked (\cref{thm:vc-uniform}, \leanname{finite_massart_lemma}; \cref{def:rademacher}, \leanname{EmpiricalRademacherComplexity}; \cref{thm:pac-bayes}, \leanname{pac_bayes_finite}), so the solid border asserts exactly \emph{that the bound is a kernel theorem}, and the three lighter-bordered nodes, stability, information, and margin, are drawn weaker precisely because their bounds (\cref{thm:stability-bound}, \cref{thm:xu-raginsky}, \cref{thm:margin-bound}) are literature with no verified handle.
+
+\item \textbf{The one solid edge is the only machine-checked cross-framework bridge.} Read the single solid arrow between Rademacher and VC alone. Show this is the instance that names the settled link: Rademacher complexity is bounded by VC dimension through Sauer--Shelah, $\mathcal{R}_m(\mathcal{H}) \le \sqrt{2\VC(\mathcal{H})\log(em/\VC(\mathcal{H}))/m}$ (\cref{prop:rad-vc}, \leanname{vcdim_bounds_rademacher_quantitative}), so this is the lone cross-framework relationship the kernel certifies; the old figure's separate ``refines'' arrow and dotted ``Sauer--Shelah'' arrow named the \emph{same} fact, which is why the re-graded figure draws them as one solid edge and nothing else solid between frameworks.
+
+\item \textbf{The parallax is one risk-gap quantity seen from six sides.} Read the whole figure as six projections rather than six theories. Show this is the figure's organizing instance: every framework bounds the single quantity $|\risk - \emprisk|$ (or its expectation), and the rows of \cref{tab:five-frameworks} differ only in the \emph{key quantity} each reads (noise correlation, posterior--prior divergence, one-sample sensitivity, mutual information, margin), so the diagram is the abstract witness that generalization is one quantity admitting many certificates, three of them, the class-based ones, machine-checked, and the rest borrowed from the literature.
+
+\item \textbf{PAC-Bayes is the verified bound that lives in distribution space.} Read the PAC-Bayes node and its kernel handle. Show this is the instance that anchors the posterior axis: the McAllester finite bound on the Gibbs risk is machine-checked (\cref{thm:pac-bayes}, \leanname{pac_bayes_finite}, with \leanname{gibbsError} the verified mean error of the posterior-sampled predictor), so PAC-Bayes joins VC and Rademacher among the solid nodes even though it reads the \emph{posterior} rather than the class; the same handle is what makes the conceptual stability-to-PAC-Bayes edge a type relation and not a theorem, since stability reads the algorithm and PAC-Bayes the distribution it induces.
+
+\item \textbf{The two obstructions are orthogonal information sources, not separations.} Toggle the figure's reading of the conceptual obstructions from ``proved gap'' to ``different information axis.'' Show this is the figure's principal boundary: information-theoretic bounds depend on the \emph{algorithm} and Rademacher bounds on the \emph{class}, so a deterministic ERM can carry $I(S;W)=H(W)$ on a class of small Rademacher complexity (\cref{sec:comparison}), and stability lives in algorithm space while PAC-Bayes lives in distribution space; neither is a separation theorem nor even a formal literature separation, so both are drawn in the conceptual style, argued not proved, and reversing either direction does not turn it into a verified edge.
+
+\item \textbf{Margin is a Rademacher specialization, and that specialization is literature.} Read the margin-to-Rademacher edge. Show this is the boundary that fixes the edge's grade: the margin bound is \emph{derived from} Rademacher complexity applied to the ramp loss (\cref{thm:margin-bound}), so the arrow points from margin into Rademacher as a specialization, yet because thm:margin-bound is not machine-checked the edge is drawn lighter than the solid rad--vc bridge; promoting it would require a verified ramp-loss contraction, which is exactly the kind of step still missing for the assembled bounds.
+
+\item \textbf{The stability-to-information edge is one direction only, and unverified.} Read the stability-to-information arrow and ask whether the reverse is drawn. Show this is the boundary between a literature implication and an absent one: a $\beta$-uniformly stable randomized algorithm satisfies $I(S;W)=O(m\beta^2)$ (\cref{sec:comparison}, \cref{thm:stability-bound}), a one-way implication with no kernel handle, so the figure draws stability into information in the literature style and does not draw the converse; both endpoints are lighter-bordered nodes, confirming that an edge between two unverified frameworks cannot be solid even when the implication is classical.
+
+\item \textbf{The Rademacher generalization bound is the figure's nearest open frontier.} Ask what it would take to draw a \emph{second} solid edge out of the Rademacher node, the full generalization bound rather than the VC bridge. Show this is the figure's nearest verification frontier: the empirical Rademacher complexity, the Massart lemma, and the VC bound are machine-checked, but the assembled high-probability bound of \cref{thm:rademacher-bound} (symmetrization plus the two McDiarmid steps) is still a placeholder (\cref{op:formalize-rademacher}, \cite{BartlettMendelson2002}), so the Rademacher node is solid for its \emph{complexity measure} but its generalization \emph{guarantee} is literature; closing this would let the figure draw Rademacher's own bound solid, not merely its bridge to VC.
+
+\item \textbf{Formalizing stability and information would flip two lighter nodes to solid.} Ask which perturbation promotes the algorithm-based frameworks. Show this is the frontier that the conceptual obstructions hide: the stability bound (\cref{thm:stability-bound}) and the Xu--Raginsky information bound (\cref{thm:xu-raginsky}, \cite{XuRaginsky2017}) have no verified handle, and a single conditional-mutual-information master inequality is conjectured to recover VC, PAC-Bayes, and stability at once (\cref{op:cmi-unification}, \cite{SteinkeZakynthinou2020}); proving and formalizing it would recolor the stability and information nodes solid and replace the stability-to-information literature edge by a verified one, leaving only the genuinely orthogonal algorithm-versus-class edge conceptual.
+
+\item \textbf{Is every framework a section of one risk-gap functor over its own fibration?} Read ``one quantity, many certificates'' as a universal property. Show this is the figure's deepest frontier: each framework would be a section of a single risk-gap functor over a different fibration of the learning problem, the class for VC and Rademacher, the algorithm for stability and information, the posterior for PAC-Bayes, the operator norms for margin, so the verified core would read ``the functor admits a section over the class fibration'' (the three solid nodes) and the conceptual obstructions would read ``the class and algorithm fibrations do not refine one another,'' explaining the orthogonality as a fact about base categories rather than a separation; whether such a single generalization-certificate object exists, of which the certified attention bound (\cref{prop:certified-attention}, \leanname{CertifiedGeneralization}) is a sixth, algorithm-specific section, or the fibrations are provably non-unifiable, is open (\cref{op:cmi-unification}, \cref{op:tighten-certified-attention}), so this reading is drawn dashed.
+\end{enumerate}
