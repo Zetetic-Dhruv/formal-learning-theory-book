@@ -630,84 +630,96 @@ mind-change-bounded and anomaly-bounded learning criteria.
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-  node distance=0.8cm and 1.2cm,
+  node distance=0.6cm and 1.2cm,
   every node/.style={font=\small},
-  class/.style={draw, rounded corners, minimum width=1.8cm,
-    minimum height=0.6cm, align=center},
-  strict/.style={-{Stealth[length=5pt]}, thick, color=thmred},
-  contains/.style={-{Stealth[length=5pt]}, thick, color=defblue},
-  label/.style={font=\scriptsize, color=notegray, midway},
+  basecrit/.style={draw, very thick, rounded corners, minimum width=1.9cm,
+    minimum height=0.58cm, align=center},
+  litlevel/.style={draw, thin, dashed, rounded corners, minimum width=1.8cm,
+    minimum height=0.54cm, align=center},
+  litincl/.style={-{Stealth[length=5pt]}, thick, dashed, color=thmred},
+  citetag/.style={font=\scriptsize\itshape, color=notegray},
 ]
-
-% Mind-change hierarchy (left column)
-\node[class, fill=defblue!10] (fin) {$\FIN = \Ex_0$};
-\node[class, fill=defblue!10, above=of fin] (ex1) {$\Ex_1$};
-\node[class, fill=defblue!10, above=of ex1] (ex2) {$\Ex_2$};
-\node[above=0.4cm of ex2] (dots1) {$\vdots$};
-\node[class, fill=defblue!10, above=0.4cm of dots1] (exn) {$\Ex_n$};
-\node[above=0.4cm of exn] (dots2) {$\vdots$};
-\node[class, fill=edgeorange!15, above=0.4cm of dots2] (exomega)
-  {$\Ex_\omega$};
-\node[class, fill=edgeorange!15, above=of exomega] (exomega2)
-  {$\Ex_{\omega \cdot 2}$};
-\node[above=0.4cm of exomega2] (dots3) {$\vdots$};
-\node[class, fill=edgeorange!15, above=0.4cm of dots3] (exomega2a)
-  {$\Ex_{\omega^2}$};
-\node[above=0.4cm of exomega2a] (dots4) {$\vdots$};
-\node[class, fill=thmred!10, above=0.4cm of dots4] (exall)
-  {$\bigcup_\alpha \Ex_\alpha$};
-\node[class, fill=thmred!15, above=of exall] (ex) {$\Ex$};
-
-% Anomaly hierarchy (right column)
-\node[class, fill=sepgreen!10, right=2.5cm of ex] (exa1) {$\Ex_1^*$};
-\node[class, fill=sepgreen!10, above=of exa1] (exa2) {$\Ex_2^*$};
-\node[above=0.4cm of exa2] (dots5) {$\vdots$};
-\node[class, fill=sepgreen!10, above=0.4cm of dots5] (exastar)
-  {$\Ex^*$};
-\node[class, fill=analogypurple!10, above=of exastar] (bc0)
-  {$\BC_0$};
-\node[class, fill=analogypurple!15, above=of bc0] (bc) {$\BC$};
-
-% Strict inclusion arrows (mind-change column)
-\draw[strict] (fin) -- (ex1) node[label, left] {$\subsetneq$};
-\draw[strict] (ex1) -- (ex2) node[label, left] {$\subsetneq$};
-\draw[strict] (exn.north) -- (dots2.south);
-\draw[strict] (dots2.north) -- (exomega.south);
-\draw[strict] (exomega) -- (exomega2) node[label, left] {$\subsetneq$};
-\draw[strict] (exomega2a.north) -- (dots4.south);
-\draw[strict] (dots4.north) -- (exall.south);
-\draw[strict] (exall) -- (ex) node[label, left] {$\subsetneq$};
-
-% Anomaly column arrows
-\draw[strict] (ex) -- (exa1) node[label, above] {$\subsetneq$};
-\draw[strict] (exa1) -- (exa2) node[label, right] {$\subsetneq$};
-\draw[strict] (exastar) -- (bc0) node[label, right] {$\subsetneq$};
-\draw[strict] (bc0) -- (bc) node[label, right] {$\subsetneq$};
-
-% Brace label for mind-change hierarchy
-\draw[decorate, decoration={brace, amplitude=6pt, mirror},
-  color=defblue!70] ([xshift=-1.6cm]fin.south west)
-  -- ([xshift=-1.6cm]ex.north west)
-  node[midway, left=8pt, align=center, font=\scriptsize,
-    color=defblue!70] {mind-change\\hierarchy};
-
-% Brace label for anomaly hierarchy
-\draw[decorate, decoration={brace, amplitude=6pt},
-  color=sepgreen!70] ([xshift=1.6cm]exa1.south east)
-  -- ([xshift=1.6cm]bc.north east)
-  node[midway, right=8pt, align=center, font=\scriptsize,
-    color=sepgreen!70] {anomaly\\hierarchy};
-
-% Annotation: limit ordinal jump
-\node[font=\scriptsize, color=edgeorange, right=0.1cm of exomega,
-  anchor=west] {$\supsetneq \bigcup_n \Ex_n$};
-
+% --- mind-change column (left, bottom to top): SOLID base FIN/Ex, DASHED ordinal levels ---
+\node[basecrit, fill=defblue!10] (fin) {$\FIN = \Ex_0$};
+\node[litlevel, fill=defblue!8, above=of fin] (ex1) {$\Ex_1$};
+\node[litlevel, fill=defblue!8, above=of ex1] (ex2) {$\Ex_2$};
+\node[above=0.26cm of ex2] (dots1) {$\vdots$};
+\node[litlevel, fill=defblue!8, above=0.26cm of dots1] (exn) {$\Ex_n$};
+\node[above=0.26cm of exn] (dots2) {$\vdots$};
+\node[litlevel, fill=edgeorange!14, above=0.26cm of dots2] (exomega) {$\Ex_\omega$};
+\node[litlevel, fill=edgeorange!14, above=of exomega] (exomega2) {$\Ex_{\omega \cdot 2}$};
+\node[above=0.26cm of exomega2] (dots3) {$\vdots$};
+\node[litlevel, fill=edgeorange!14, above=0.26cm of dots3] (exomega2a) {$\Ex_{\omega^2}$};
+\node[above=0.26cm of exomega2a] (dots4) {$\vdots$};
+\node[litlevel, fill=thmred!9, above=0.26cm of dots4] (exall) {$\bigcup_\alpha \Ex_\alpha$};
+\node[basecrit, fill=thmred!14, above=of exall] (ex) {$\Ex$};
+% --- anomaly arm (up-right from Ex): DASHED levels, SOLID BC ---
+\node[litlevel, fill=sepgreen!10, right=2.4cm of ex] (exa1) {$\Ex_1^*$};
+\node[litlevel, fill=sepgreen!10, above=of exa1] (exa2) {$\Ex_2^*$};
+\node[above=0.26cm of exa2] (dots5) {$\vdots$};
+\node[litlevel, fill=sepgreen!10, above=0.26cm of dots5] (exastar) {$\Ex^*$};
+\node[litlevel, fill=analogypurple!10, above=of exastar] (bc0) {$\BC_0$};
+\node[basecrit, fill=analogypurple!14, above=of bc0] (bc) {$\BC$};
+% --- inclusion arrows: ALL dashed-literature (every rung is classical, none kernel-verified) ---
+\draw[litincl] (fin) -- (ex1);
+\draw[litincl] (ex1) -- (ex2);
+\draw[litincl] (exn.north) -- (dots2.south);
+\draw[litincl] (dots2.north) -- (exomega.south);
+\draw[litincl] (exomega) -- (exomega2);
+\draw[litincl] (exomega2a.north) -- (dots4.south);
+\draw[litincl] (dots4.north) -- (exall.south);
+\draw[litincl] (exall) -- (ex);
+\draw[litincl] (ex) -- (exa1);
+\draw[litincl] (exa1) -- (exa2);
+\draw[litincl] (exastar) -- (bc0);
+\draw[litincl] (bc0) -- (bc);
+% --- one cite tag per author-result, at the regime boundary ---
+\node[citetag, right=2pt of ex1] {Velauthapillai};
+\node[citetag, left=2pt of exomega] {Freivalds--Smith};
+\node[citetag, left=2pt of exall] {Ambainis--Jain--Sharma};
+\node[citetag, right=2pt of exa2] {Case--Smith};
+\node[font=\scriptsize, color=edgeorange, right=2pt of exomega2] {$\supsetneq \bigcup_n \Ex_n$};
+% --- braces ---
+\draw[decorate, decoration={brace, amplitude=6pt, mirror}, color=defblue!70]
+  ([xshift=-1.7cm]fin.south west) -- ([xshift=-1.7cm]ex.north west)
+  node[midway, left=8pt, align=center, font=\scriptsize, color=defblue!70] {mind-change\\hierarchy};
+\draw[decorate, decoration={brace, amplitude=6pt}, color=sepgreen!70]
+  ([xshift=1.6cm]exa1.south east) -- ([xshift=1.6cm]bc.north east)
+  node[midway, right=8pt, align=center, font=\scriptsize, color=sepgreen!70] {anomaly\\hierarchy};
+% --- VERIFIED ordinal-rank inset: the kernel's actual transfinite contribution, a SEPARATE measure ---
+\node[draw, very thick, rounded corners, fill=defblue!5, align=left, font=\scriptsize,
+  text width=6.1cm, below=1.4cm of fin.south west, anchor=north west] (rankbox) {%
+  \textbf{Verified ordinal rank} (dimension side, a separate measure)\\
+  \leanname{withTopNatToOrdinal} embeds $\N\cup\{\infty\}$ into the ordinals, sending $\infty$ to $\omega$\\
+  \leanname{vcdim_to_ordinal_vcdim}: finite VC gives a finite rank, $\VC{=}\infty$ gives $\omega$\\
+  finite-capacity classes (softmax attention, halfspaces) sit at the bottom, below $\omega$};
+% --- evidence-grade legend ---
+\coordinate (leg) at ([yshift=-0.42cm]rankbox.south west);
+\draw[very thick] (leg) -- ++(0.55,0);
+\node[font=\scriptsize, anchor=west] at ([xshift=0.62cm]leg) {kernel-verified ($sc{=}0$)};
+\draw[thick, dashed, color=thmred] ([xshift=4.0cm]leg) -- ++(0.55,0);
+\node[font=\scriptsize, anchor=west] at ([xshift=4.62cm]leg) {classical literature (cited)};
+\draw[thick, dashed, color=edgeorange] ([yshift=-0.42cm]leg) -- ++(0.55,0);
+\node[font=\scriptsize, anchor=west] at ([xshift=0.62cm, yshift=-0.42cm]leg)
+  {open: not yet machine-checked (\cref{op:formalize-ordinal-hierarchy}, \cref{op:formalize-bc})};
 \end{tikzpicture}
-\caption{The ordinal mind-change hierarchy (left) and the anomaly
-hierarchy (right), with all strict inclusions.  Limit ordinals such
-as $\omega$, $\omega^2$ mark strict jumps beyond the union of their
-predecessors.  The entire mind-change hierarchy is strictly contained
-in $\Ex$, which is strictly contained in $\BC$ via the anomaly axis.}
+\caption[The ordinal complexity spine of limit identification: a classical tower with a verified rank at its base.]{The
+number of mind changes a limit learner needs (left column) or the number of anomalies it
+tolerates (right column) is a constructive ordinal, and that ordinal stratifies the
+identification criteria into a strict tower: from finite identification $\FIN = \Ex_0$ up
+through the transfinite levels $\Ex_\alpha$ into explanatory learning $\Ex$, and on through the
+anomaly levels $\Ex_a^*$ into behaviorally correct learning $\BC$.  Every strict inclusion is a
+classical theorem (the finite levels by Velauthapillai, the first limit jump
+$\bigcup_n \Ex_n \subsetneq \Ex_\omega$ by Freivalds--Smith, the transfinite levels and
+$\bigcup_\alpha \Ex_\alpha \subsetneq \Ex$ by Ambainis--Jain--Sharma, the anomaly axis by
+Case--Smith), and each inclusion is drawn dashed because none is machine-checked and formalizing
+the tower is still open.  The three base criteria $\FIN$, $\Ex$, $\BC$ are formalized, so their
+nodes are drawn solid; the ordinal and anomaly levels are literature definitions and drawn
+lighter.  The kernel certifies a separate ordinal rank on the dimension side, in the lower box:
+an order-preserving embedding sends an infinite VC dimension to the first transfinite rank
+$\omega$ and fixes every finite dimension below it, so every finite-capacity class of this book,
+including softmax attention and the geometric classes, sits at a finite rank at the very bottom.
+The transfinite tower thus becomes necessary only for the exact identification of programs.}
 \label{fig:ordinal-hierarchy}
 \end{figure}
 
@@ -1021,3 +1033,30 @@ The interaction between mind changes and anomalies produces a
 two-dimensional lattice that is still not fully mapped.  Whether every
 point in this lattice has a natural characterization (analogous to
 pattern language unions for $\omega^n$) remains an open question.
+
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:ordinal-hierarchy}}
+
+Each exercise perturbs the tower.  Argue, in the figure's grammar (the number of mind changes or anomalies a limit learner needs is a constructive ordinal that stratifies the criteria into a strict tower from $\FIN = \Ex_0$ up through $\Ex$ and on into $\BC$; every strict inclusion is a classical theorem with no machine-checked counterpart, so every inclusion arrow is drawn dashed and cited to Velauthapillai, Freivalds--Smith, Ambainis--Jain--Sharma, or Case--Smith; the three base criteria $\FIN$, $\Ex$, $\BC$ are formalized and drawn solid, the ordinal and anomaly levels are literature definitions and drawn lighter; and the kernel's only verified transfinite content is a \emph{separate} ordinal rank on the dimension side, the lower box, that sends an infinite VC dimension to $\omega$ and places every finite-capacity class at a finite rank below it), that the perturbed picture subsumes the concrete one as an \emph{instance} (a criterion or rank placement the verified core or the literature exhibits), a \emph{boundary} (one inclusion or one node grade toggled so the evidence grade or the axis of relaxation changes), or a \emph{frontier} (a literature reading whose promotion to a verified rank is open).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The base criteria are the figure's solid nodes.} Read the three boxes $\FIN$, $\Ex$, $\BC$ apart from the arrows between them. Show this is the figure's defining verified instance at the node level: these three are kernel definitions (\leanname{BCLearnable} and its $\FIN$ and $\Ex$ companions in the criterion library, the same base criteria formalized in \Cref{ch:gold}), so they are drawn with solid borders, whereas the levels $\Ex_\alpha$ (\cref{def:ex-alpha}) and $\Ex_a^*$ (\cref{def:anomalous-ord}) are literature definitions drawn lighter; the node grade is independent of the edge grade, and at the nodes alone the endpoints of the tower are certified while its rungs are not.
+
+\item \textbf{The finite base levels are the integer instance of the ordinal spine.} Restrict the left column to $\FIN = \Ex_0 \subsetneq \Ex_1 \subsetneq \cdots \subsetneq \Ex_n$. Show this is the figure's most concrete instance of ``mind changes are an ordinal'': a learner bounded to $n$ revisions sits at the finite ordinal $n$, the strict inclusions hold (\cref{thm:summary}~(i), \cite{Velauthapillai1989}), and the arrows are dashed because even this integer fragment, the easiest in the tower, has no machine-checked counterpart; the whole transfinite picture is the closure of this fragment under limits.
+
+\item \textbf{Attention sits at the bottom finite rank of the verified inset.} Read the boxed dimension-side rank, not the Gold tower. Show this is the instance the inset exists to display: the softmax-attention class is machine-checked well-behaved (\cref{rem:attention-ordinal}, \leanname{softAttention_wellBehaved}) and has finite Dudley capacity once norm-bounded (\cref{prop:certified-attention}), so its ordinal rank is finite and it lives at the very bottom of the picture beside halfspaces, while the embedding \leanname{withTopNatToOrdinal} reserves the first transfinite rank $\omega$ for an infinite VC dimension; the transfinite tower is invisible to every finite-capacity class.
+
+\item \textbf{The online mistake count is the verified finite-rank shadow.} Read \cref{prop:online-ordinal-descent} as the inset's mechanism. Show this is the instance that certifies a descending rank: the optimal online mistake bound equals the Littlestone dimension (\leanname{optimal_mistake_bound_eq_ldim}), and each mistake strictly lowers the surviving version space's Littlestone dimension, a well-founded descent that stays below $\omega$; lifted through \leanname{withTopNatToOrdinal} this is a finite ordinal counted down by ordinary induction, the machine-checked finite shadow of the transfinite mind-change counter the tower draws above $\omega$.
+
+\item \textbf{The verified rank and the mind-change ordinal are two measures, drawn apart on purpose.} Ask why the inset is fenced off from the left column rather than placed on it. Show this is the figure's principal boundary: the left column is the recursion-theoretic mind-change ordinal (\cref{def:mco-class}), a literature object, while the inset is the dimension-side ordinal VC rank (\leanname{vcdim_to_ordinal_vcdim}, \leanname{OrdinalVCDim}), the verified core of Martin--Sharma--Stephan \cite{MartinSharmaStephan2006}; they are two ordinal-valued measures on overlapping domains and whether one bounds the other is open (\cref{op:mco-vs-ordinalvc}), so collapsing them onto a single axis would assert a comparison the kernel does not certify.
+
+\item \textbf{The first limit jump is the boundary between integers and ordinals.} Toggle the rung $\bigcup_{n<\omega}\Ex_n \subsetneq \Ex_\omega$. Show this is the boundary where the spine becomes genuinely transfinite: a learner may need finitely many mind changes on each input with no uniform integer bound, so the supremum is $\omega$ and no $\Ex_n$ suffices (\cref{rem:omega-to-n}, \cref{thm:summary}~(ii), \cite{FreivaldsSmith1993}); the arrow is dashed like every other, and it is exactly this jump that the integer hierarchy of Exercise~2 cannot reach, which is why the ordinal index is forced.
+
+\item \textbf{The anomaly axis is an orthogonal relaxation, not a higher rung.} Turn from the mind-change column to the right column $\Ex \subsetneq \Ex_1^* \subsetneq \cdots \subsetneq \Ex^* \subsetneq \BC_0 \subsetneq \BC$. Show this is the boundary between two axes of relaxation: the mind-change column bounds the number of hypothesis revisions, while the anomaly column tolerates errors in the final hypothesis and then drops syntactic for semantic convergence (\cref{thm:anomaly-hierarchy}, \cref{thm:bc-separation}, \cite{CaseSmith1983}); both columns are dashed literature, and the two axes are independent, so the figure draws them as separate columns rather than one chain.
+
+\item \textbf{The tower is classically complete but entirely unformalized.} Ask which arrow in the figure is solid. Show this is the dashed-versus-solid boundary the figure is built to make legible: none of the inclusion arrows is solid, because the Freivalds--Smith hierarchy, including its priority constructions, has no verified counterpart (\cref{op:formalize-ordinal-hierarchy}) and the Case--Smith separation rests on an operator recursion theorem that is sketched rather than machine-checked (\cref{op:formalize-bc}, \cite{CaseSmith1983}); the tower is a complete body of classical mathematics whose formalization is open, which is the precise content of drawing every rung dashed.
+
+\item \textbf{Formalizing the tower would recolor the whole left column.} Ask which single advance turns the dashed rungs solid. Show this is the frontier the dashed arrows mark: a proof-assistant development of constructive ordinal notations, $\alpha$-bounded learners, and the strict inclusions of \cref{thm:ordinal-hierarchy} (\cref{op:formalize-ordinal-hierarchy}), together with the operator recursion theorem behind $\BC \setminus \Ex$ (\cref{op:formalize-bc}), would promote the literature tower to a verified one and make its arrows solid; until then the contrast in the figure is exactly the contrast between the solid dimension-side inset and the dashed recursion-theoretic spine.
+
+\item \textbf{Is the mind-change ordinal the rank of a well-founded version-space descent functor whose finite shadow is the verified online descent?} Read the left column and the inset as two instances of one principle. Show this is the figure's deepest frontier: the verified online descent lowers a finite Littlestone rank on each mistake (the mechanism behind \leanname{optimal_mistake_bound_eq_ldim}, \cref{prop:online-ordinal-descent}) and stays below $\omega$, while the mind-change counter descends a constructive ordinal that may exceed every $\omega^n$; whether both are instances of a single well-founded-recursion principle, a version-space descent functor whose ordinal rank is the mind-change ordinal and whose finite-rank restriction is the certified online descent, is open (\cref{op:online-transfinite}), as is whether every point of the two-dimensional mind-change-by-anomaly lattice admits such a rank (\cref{op:two-dim-lattice}, \cite{SharmaStephanVentsov2004}); proving and formalizing it would place the dashed tower and the solid inset under one verified abstraction, which is why this reading is drawn dashed.
+\end{enumerate}
