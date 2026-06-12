@@ -125,7 +125,7 @@ A \emph{mistake tree} for $\mathcal{H}$ over $X$ is a complete binary tree $T$ i
 \item The left child of $v$ corresponds to the label $y = 0$ and the right child to $y = 1$.
 \item For every root-to-leaf path $(v_1, y_1), (v_2, y_2), \ldots, (v_d, y_d)$, there exists a hypothesis $h \in \mathcal{H}$ consistent with all labels along the path: $h(x_{v_i}) = y_i$ for all $i$.
 \end{itemize}
-The \emph{depth} of the tree is the number of internal nodes on any root-to-leaf path (all paths have the same length since the tree is complete).\formal{FLT_Proofs.Complexity.Littlestone.MistakeTree.isShattered}
+The \emph{depth} of the tree is the number of internal nodes on any root-to-leaf path (all paths have the same length since the tree is complete).\formal{FLT_Proofs.Complexity.GameInfra.LTree.isShattered}
 \end{defn}
 
 The key idea is that a mistake tree encodes an adversary strategy. Starting at the root, the adversary presents $x_{v_1}$. Whatever the learner predicts, the adversary can label $x_{v_1}$ to make the prediction wrong and descend to the corresponding child. Realizability is maintained because every root-to-leaf path is consistent with some $h \in \mathcal{H}$. Thus a mistake tree of depth $d$ represents an adversary strategy that forces \emph{any} learner to make at least $d$ mistakes.
