@@ -483,10 +483,56 @@ The base vocabulary of learning theory is small: domain, label, concept, concept
 
 These patterns---hub nodes, negative results as content, analogy obstructions, and the discipline of separating what is proved from what is merely said---recur throughout the book.
 
+% ================================================================
+% TRANSFORMER CONNECTION (retrofit): attention as a concept class,
+% well-behavedness, and the soft/hard = Borel/analytic boundary.
+% ================================================================
+
+\section{The Objects of a Transformer}
+\label{sec:ch1-transformer}
+
+The vocabulary of this chapter is not confined to the classical examples. A single softmax-attention head, read as a binary predictor, is a concept in the exact sense of \cref{def:domain-label-concept}---a function $X \to \{0,1\}$---and letting its parameters vary produces a concept class in the sense of \cref{def:concept-class}. The question the chapter has asked of every object now returns with a sharp answer for the central object of modern machine learning: \emph{is the attention class a legitimate concept class, one to which the VC characterization applies?} Answering it requires exactly the measurability that \cref{thm:vc-char} deferred to \Cref{ch:generalization}, and that is where this section earns its place: it is the first point in the book where those ``mild measurability conditions'' are made concrete---and shown to be non-vacuous.
+
+\begin{defn}[The softmax-attention concept class]
+\label{def:attention-concept-class}
+Fix an embedding dimension $d$ and a context of $n_K$ key--value pairs.  Take the domain to be the query space $X = \R^d$.  For keys $K = (k_1,\dots,k_{n_K})$ and values $V = (v_1,\dots,v_{n_K})$, the head maps a query $x$ to the readout $r_{K,V}(x) = \sum_{i=1}^{n_K} \mathrm{softmax}(\langle x, k_i\rangle)_i\, v_i$, and thresholding at zero gives a concept
+\[
+  c_{K,V}(x) \;=\; \ind[\,r_{K,V}(x) > 0\,] \;:\; \R^d \to \{0,1\}.
+\]
+The \emph{softmax-attention concept class} is $\mathcal{A}_{d,n_K} = \{\, c_{K,V} : K, V \,\}$, the range of the parametrized family.\formal{TLT.Bridge.softAttentionConcept}
+\end{defn}
+
+So far this is only a particular concept class among many.  Its first non-trivial property is that it is a \emph{well-behaved} object: the measurability hypothesis that \cref{thm:vc-char} quietly assumes is satisfied, machine-checked.
+
+\begin{prop}[Attention is a well-behaved object]
+\label{prop:attention-wellbehaved}
+For every $d$ and $n_K$, the class $\mathcal{A}_{d,n_K}$ is a well-behaved VC-measurability target: the bad events over which the uniform-convergence argument of \Cref{ch:generalization} quantifies are measurable, so $\mathcal{A}_{d,n_K}$ is a bona-fide concept class for the VC characterization.\formal{TLT.Bridge.softAttention_wellBehaved}
+\end{prop}
+
+\begin{proof}
+A parametrized concept family is a well-behaved VC-measurability target as soon as the evaluation map $(K,V,x) \mapsto c_{K,V}(x)$ is jointly measurable.  Here that map factors through the readout $(K,V,x) \mapsto r_{K,V}(x)$, which is a finite sum of products of softmax weights and values; each softmax weight is a continuous function of its arguments, so the readout is jointly continuous and therefore Borel measurable.  The concept is the indicator of the open condition $\{r_{K,V}(x) > 0\}$, whose preimage is the measurable set $\{(K,V,x) : 0 < r_{K,V}(x)\}$.  Joint measurability follows, and with it well-behavedness.  The base case is the same statement for the simplest concept class of all: the singleton-indicator class on a measurable set is well-behaved,\formal{TLT.Tame.singletonClassOn_wellBehavedVCMeasTarget} and attention's well-behavedness is the parametrized lift of that fact.
+\end{proof}
+
+The proof used continuity of the softmax in an essential way.  Removing it is not a cosmetic change: it carries the attention class across a boundary in descriptive set theory.
+
+\begin{prop}[Softmax is the boundary of measurability]
+\label{prop:soft-hard-borel}
+Assume the existence of an analytic set of reals that is not Borel---a standard fact of classical descriptive set theory.  Then softmax attention is well-behaved at every $(d,n_K)$, \emph{and} there is a hard-attention witness---a continuous score map and two measurable experts---whose argmax-routed head has a bad event that is not measurable.\formal{TLT.Bridge.soft_vs_hard_attention_measurabilitySeparation}
+\end{prop}
+
+\begin{proof}[Proof idea]
+The first conjunct is \cref{prop:attention-wellbehaved}.  For the second, replace the softmax by a hard $\arg\max$ over the scores.  The set of queries routed to a given key is then a level set of an $\arg\max$, and one can arrange---using a continuous reduction from an analytic non-Borel set---that the resulting bad event is the continuous preimage of that analytic set, hence analytic but not Borel, hence not measurable.  The two routes to attention thus sit on opposite sides of the Borel/analytic line: softmax stays measurable; $\arg\max$ can fall out of the measurable world entirely.
+\end{proof}
+
+\begin{remark}[Where the deferred conditions bite]
+\label{rmk:attention-measurability}
+\Cref{prop:soft-hard-borel} is the concrete content behind the parenthetical of \cref{thm:vc-char}.  The ``mild measurability conditions'' are not automatically met by every natural hypothesis class: hard attention violates them, and the violation is genuine---an analytic-not-Borel bad event over which no uniform-convergence statement can even be phrased.  The softmax is precisely the smoothing that restores measurability, and so the choice between soft and hard attention is, at the level of \emph{objects}, the choice of whether the learner's hypotheses form a class to which the theory of this book applies at all.
+\end{remark}
+
 \section{Exercises and Open Problems}
 \label{sec:ch1-open}
 
-The following ten problems are research-grade. Each is anchored to a concept introduced above and tagged by its epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated question awaiting an answer; an \emph{unknown known} (\textsc{uk}) is a regularity present in the verified development or the literature that the surrounding theory has not yet absorbed into a clean statement. Where a verified handle exists, it is named.
+The following thirteen problems are research-grade. Each is anchored to a concept introduced above and tagged by its epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated question awaiting an answer; an \emph{unknown known} (\textsc{uk}) is a regularity present in the verified development or the literature that the surrounding theory has not yet absorbed into a clean statement. Where a verified handle exists, it is named.
 
 \begin{openprob}[Sample compression conjecture, \textsc{ku}]
 \label{op:compression}
@@ -536,4 +582,19 @@ The coding theorem $K(x) = -\log M(x) + O(1)$ (\cref{def:alg-prob}) hides an add
 \begin{openprob}[A functorial account of the thirteen measures, \textsc{ku}]
 \label{op:dimension-multiplicity}
 \Cref{fig:concept-class-hub} shows 13 complexity measures targeting the concept class. Determine whether they organize into a single partial order---or a functor from the category of concept classes (with label-preserving maps) to $\N \cup \{\infty\}$---and classify the pairs that admit two-sided polynomial comparisons against the pairs that are provably incomparable. A clean answer would explain why no measure subsumes the others while many pairs are nonetheless linked.
+\end{openprob}
+
+\begin{openprob}[The VC dimension of attention, \textsc{ku}]
+\label{op:attention-vc}
+\Cref{prop:attention-wellbehaved} shows the softmax-attention class $\mathcal{A}_{d,n_K}$ is a well-behaved object, so \cref{thm:vc-char} applies once its VC dimension is known to be finite.  Is $\VC(\mathcal{A}_{d,n_K})$ finite for every $d, n_K$, and what is its exact growth in $d$ and $n_K$?  A Pfaffian-function argument suggests finiteness, but no machine-checked bound exists; closing it would place attention definitively on the learnable side of the hub diagram (\cref{fig:concept-class-hub}) and is the verified counterpart to the well-behavedness handle \leanname{softAttention_wellBehaved}.
+\end{openprob}
+
+\begin{openprob}[A legitimate object for hard attention, \textsc{uk}]
+\label{op:hard-attention-object}
+\Cref{prop:soft-hard-borel} shows that argmax (hard) attention can fall outside the measurable concept classes, with an analytic-not-Borel bad event (\leanname{soft_vs_hard_attention_measurabilitySeparation}).  Identify a refined class of objects---an o-minimal or otherwise tame family of hypothesis classes---that contains hard attention and to which a uniform-convergence theory still applies, recovering hard attention as a legitimate learning object rather than a measurability pathology.
+\end{openprob}
+
+\begin{openprob}[Attention among the thirteen measures, \textsc{ku}]
+\label{op:attention-hub}
+\Cref{fig:concept-class-hub} measures the concept class with thirteen instruments.  Compute, for the softmax-attention class, the values of as many of them as possible---VC dimension, Littlestone dimension, Rademacher complexity, compression size---and determine which instruments agree and which diverge on this single modern object.  The well-behavedness of \cref{prop:attention-wellbehaved} guarantees the measures are defined; whether attention is a place where they coincide or a place where they pull apart is open.
 \end{openprob}
