@@ -173,37 +173,50 @@ The essential point is that $\BC$-identification does not require the \emph{inde
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    criterion/.style={draw, thick, rounded corners, minimum width=2.4cm, minimum height=0.9cm, font=\small\bfseries, align=center},
-    branch/.style={draw, rounded corners, minimum width=2cm, minimum height=0.7cm, font=\small, align=center},
+    criterion/.style={draw, thick, rounded corners, minimum width=2.2cm, minimum height=0.85cm,
+                      font=\small\bfseries, align=center},
+    branch/.style={draw, rounded corners, minimum width=2cm, minimum height=0.7cm,
+                   font=\small, align=center},
     strict/.style={-{Stealth[length=2mm]}, thick, sepgreen!70!black},
     weak/.style={-{Stealth[length=2mm]}, thin, dashed, notegray},
     witlabel/.style={font=\tiny, text=edgeorange, fill=white, inner sep=1.5pt, align=center},
-    node distance=1.2cm
+    hdl/.style={font=\tiny, fill=white, inner sep=1pt, align=center}
 ]
-
-% Main chain
-\node[criterion, fill=defblue!15] (bc) {$\BC$};
-\node[criterion, fill=defblue!15, below=2cm of bc] (ex) {$\Ex$};
-\node[criterion, fill=defblue!15, below=2cm of ex] (fin) {$\FIN$};
-
-% Strict inclusions
-\draw[strict] (fin) -- node[witlabel, right, xshift=3pt] {all finite langs\\are $\Ex$ not $\FIN$} (ex);
-\draw[strict] (ex) -- node[witlabel, right, xshift=3pt] {Case--Smith 1983\\(Thm~\ref{thm:bc-strictly-stronger})} (bc);
-
-% Branches off Ex
-\node[branch, fill=edgeorange!8, right=2.5cm of ex] (anom) {Anomalous\\$\Ex^*$};
-\node[branch, fill=edgeorange!8, left=2.5cm of ex] (mono) {Monotonic\\$\mathrm{Mon}\Ex$};
-\node[branch, fill=goldcolor!10, below right=1cm and 2.5cm of ex] (vac) {Vacillatory\\$\mathrm{Vex}$};
-\node[branch, fill=goldcolor!10, above right=0.5cm and 2.5cm of bc] (trial) {Trial \&\\Error};
-
-% Relations
-\draw[strict] (ex) -- node[witlabel, above] {\rel{restricts}} (anom);
-\draw[weak] (mono) -- node[witlabel, above] {\rel{restricts}} (ex);
-\draw[strict] (ex) -- node[witlabel, below right, xshift=-8pt] {\rel{restricts}} (vac);
-\draw[weak] (bc) -- node[witlabel, above right, xshift=-5pt] {$\Delta^0_2$} (trial);
-
+% --- spine (layered, x=0; bottom-to-top = increasing power) ---
+\node[criterion, fill=defblue!15] (fin) at (0,0)   {$\FIN$};
+\node[criterion, fill=defblue!15] (ex)  at (0,2.7) {$\Ex$};
+\node[criterion, fill=defblue!15] (bc)  at (0,5.4) {$\BC$};
+% --- branches: restricts LEFT, extends RIGHT ---
+\node[branch, fill=edgeorange!8] (mono)  at (-3.5,2.7) {Monotonic\\$\mathrm{Mon}\Ex$};
+\node[branch, fill=edgeorange!8] (anom)  at ( 3.6,1.9) {Anomalous\\$\Ex^*$};
+\node[branch, fill=goldcolor!10] (vac)   at ( 3.6,4.0) {Vacillatory\\$\mathrm{Vex}$};
+\node[branch, fill=goldcolor!10] (trial) at ( 3.6,6.0) {Trial \&\\Error};
+% --- spine edges: FIN<Ex SOLID (verified), Ex<BC DASHED (literature) ---
+\draw[strict] (fin) -- node[hdl, left, xshift=-2pt]
+   {all finite langs\\are $\Ex$, not $\FIN$\\{\tiny\leanname{ex_strictly_stronger_finite}}} (ex);
+\draw[weak] (ex) -- node[hdl, left, xshift=-2pt]
+   {Case--Smith 1983\\(\cref{thm:bc-strictly-stronger})\\\itshape literature, not kernel} (bc);
+% --- relaxation edges: all DASHED, oriented by constraint-toggle direction ---
+\draw[weak] (anom) -- node[witlabel, above, pos=0.45]{\rel{extends}\\$-$\,zero-error} (ex);
+\draw[weak] (mono) -- node[witlabel, above]{\rel{restricts}\\$+$\,no-retraction} (ex);
+\draw[weak] (vac) -- node[witlabel, below right, xshift=-3pt]{\rel{extends}} (ex);
+\draw[weak] (vac) -- node[witlabel, above right, xshift=-3pt]{\rel{restricts}} (bc);
+\draw[weak] (bc) -- node[witlabel, above right, xshift=-3pt]{$\Delta^0_2$\\(Putnam--Gold)} (trial);
 \end{tikzpicture}
-\caption{The identification hierarchy. Solid arrows indicate strict inclusion of identifiable classes (more hypotheses identified at the target). $\FIN \subsetneq \Ex \subsetneq \BC$, with witnesses on each edge. Anomalous learning ($\Ex^*$) extends $\Ex$ by removing the zero-error constraint. Monotonic learning restricts $\Ex$ by forbidding hypothesis retraction. Vacillatory learning sits between $\Ex$ and $\BC$.}
+\caption[The identification hierarchy as a chain of separations]{The identification hierarchy, read as a
+chain of strict separations refined by a lattice of single-constraint relaxations. Each spine node
+($\FIN$, $\Ex$, $\BC$) is a success criterion; each spine edge is a separation theorem, a class one
+criterion learns and the other cannot, not a more liberal definition. The bottom rung
+$\FIN\subsetneq\Ex$ is verified in the kernel (\leanname{ex_strictly_stronger_finite}), drawn solid;
+the witness is the class of all finite languages, which is $\Ex$-identifiable but not
+$\FIN$-identifiable. The upper rung $\Ex\subsetneq\BC$ is the Case--Smith separation, where $\Ex$
+demands the index converge (syntactic) and $\BC$ demands only the language converge (semantic); it is
+established in the literature and not yet in the kernel, so it is drawn dashed and cited. The side nodes
+are single-constraint relaxations of $\Ex$: anomalous $\Ex^*$ removes the zero-error constraint and so
+extends $\Ex$; monotonic $\mathrm{Mon}\Ex$ adds a no-retraction constraint and so restricts $\Ex$;
+vacillatory $\mathrm{Vex}$ allows finitely many final hypotheses and sits strictly between $\Ex$ and
+$\BC$; trial-and-error learning pins the limit-computable predicates to the $\Delta^0_2$ level. Every
+branch and the $\Delta^0_2$ link are literature, not kernel theorems, hence dashed.}
 \label{fig:identification-hierarchy}
 \end{figure}
 
@@ -517,3 +530,29 @@ Monotonic identification (\cref{def:monotonic}, \leanname{FLT_Proofs.Criterion.G
 The three-paradigm separation produces its witnesses existentially.  Give a single parameterized family of concept classes that realizes each of the four pairwise separations of \cref{sec:three-paradigm} with explicit witnesses and explicit obstructions, turning the separation lattice into one constructive theorem rather than four independent constructions.
 \end{openprob}
 
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:identification-hierarchy}}
+
+Each exercise perturbs the hierarchy. Show, in the figure's grammar (a strict-power partial order on identification criteria whose every edge is a separation theorem, refined by a relaxation lattice of single-constraint edits to the success notion, solid where a kernel theorem certifies the separation and dashed where it is borrowed from the literature or open), that the generalized picture subsumes the concrete one as an \emph{instance} (an edge whose separation is determined), a \emph{boundary} (where one constraint is toggled and the class strictly grows or shrinks), or a \emph{frontier} (a dashed, open or literature-only edge).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The one verified rung.} Read the bottom edge $\FIN \to \Ex$ not as a containment of definitions but as a theorem with a witness class. Show this is the figure's only solid instance: the kernel proves $\FIN$-learnability implies $\Ex$-learnability by dropping the no-mind-change conjunct (\leanname{ex_strictly_stronger_finite}), and the class of all finite languages is the separating witness (\Cref{ex:finite-languages}), so this rung alone is certified rather than cited.
+
+\item \textbf{Syntactic versus semantic convergence is the whole gap.} Replace the labels $\Ex$ and $\BC$ by their quantifier skeletons. Show this is the boundary that names the upper rung: $\Ex$ requires the index to satisfy $h = c$ (\leanname{EXLearnable}) while $\BC$ requires only $\forall x,\ h\,x = c\,x$ (\leanname{BCLearnable}), one clause toggled from equality of programs to equality of extensions, and that single toggle is exactly what the Case--Smith class exploits.
+
+\item \textbf{Why the upper rung is dashed.} Ask the kernel for the $\Ex \subsetneq \BC$ separation. Show this is the figure's principal frontier: the criteria are typed (\leanname{EXLearnable}, \leanname{BCLearnable}) but no theorem separates them, so the edge is drawn dashed and cited (\cite{CaseSmith1983}, \cref{op:bc-ex-formal}); contrast this with the solid rung of Exercise~1 to see that line style is evidence grade, not decoration.
+
+\item \textbf{Anomalous learning extends, not restricts.} Toggle the exactness clause of $\Ex$ from $h = c$ to ``$h$ errs on at most $a$ strings''. Show this is a boundary on the larger side: removing a constraint can only enlarge the learnable class, so $\Ex^*$ \rel{extends} $\Ex$ (\leanname{AnomalousLearnable}), the separation is strict but literature-only (\cite{CaseSmith1983}, \cref{op:anomalous-icl}), hence the $\Ex^* \to \Ex$ edge is dashed and oriented as an extension.
+
+\item \textbf{Monotonic learning restricts.} Conjoin to $\Ex$ the no-retraction clause $h\,\mathrm{data}\,x = \mathrm{true} \Rightarrow h\,(\mathrm{data}\,{+}{+}\,[xy])\,x = \mathrm{true}$. Show this is the boundary on the smaller side: adding a constraint can only shrink the class, so $\mathrm{Mon}\Ex$ \rel{restricts} $\Ex$ (\leanname{MonotonicLearnable}); the strictness is literature (\cite{OshersonStobWeinstein1986}, \cref{op:monotonic-icl}), so the edge is dashed and oriented as a restriction, the mirror image of Exercise~4.
+
+\item \textbf{Vacillation is two toggles at once.} Replace the single final index by membership in a finite set of correct indices. Show this is the instance that sits the branch between the spine nodes: relaxing $\Ex$'s one index to finitely many extends $\Ex$, while restricting $\BC$'s arbitrarily many indices to finitely many is the dual restriction of $\BC$, so $\mathrm{Vex}$ (\leanname{VacillatoryLearnable}) lies strictly between them, with both legs dashed and cited (\cite{CaseSmith1983}, \cref{op:vex-hierarchy}).
+
+\item \textbf{The arithmetical anchor.} Read the $\Delta^0_2$ tag on the trial-and-error node as a characterization, not a containment. Show this is a frontier that re-types the value: trial-and-error learnability is pointwise convergence (\leanname{TrialAndErrorLearnable}) and equals membership in $\Delta^0_2$ (\leanname{Delta02Class}) by the Putnam--Gold theorem, but the kernel carries the class as a definition and not the iff, so the characterization edge is dashed and cited (\cite{Putnam1965}).
+
+\item \textbf{Gold's theorem is the pressure behind the chain.} Ask why the hierarchy branches at $\Ex$ at all. Show this is the instance that motivates every edge: Gold's impossibility (\leanname{gold_theorem}) proves $\neg\,\Ex$-identifiability for any class with all finite languages and one infinite language, so strengthening to $\FIN$ and weakening to $\BC$ are the two escape routes the figure draws, and the chain exists because $\Ex$ is provably bounded.
+
+\item \textbf{Mind changes turn the spine into an ordinal.} Refine the $\FIN$-to-$\Ex$ gap by counting retractions rather than forbidding them. Show this is a frontier that grades the bottom rung: $\FIN$ is zero mind changes and $\Ex$ is finitely many, and the kernel types the intermediate measure (\leanname{MindChangeOrdinal}), but the strictness of the transfinite hierarchy between them is cited, not proved (\cite{FreivaldsSmith1993}, \cref{op:fs-ordinal}), so the graded edge is dashed.
+
+\item \textbf{Is the lattice one graded criterion?} Ask whether all seven nodes are evaluations of a single success criterion parameterized by four toggles: error budget, retraction flag, index cardinality, and convergence mode (syntactic or semantic). Show this is the figure's most general open frontier: it would present the hierarchy not as a fixed chain plus branches but as one criterion space with the four constraints as a basis, yet the kernel formalizes the seven criteria separately with no graded predicate unifying them, so the meta-edge is dashed over an otherwise typed lattice.
+\end{enumerate}
