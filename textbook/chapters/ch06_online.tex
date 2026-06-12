@@ -36,27 +36,57 @@ The game continues for as many rounds as the adversary chooses. The adversary mu
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    player/.style={draw, thick, rounded corners, minimum width=2.4cm, minimum height=0.8cm, font=\small\bfseries},
-    action/.style={font=\small, align=center},
-    arr/.style={-{Stealth[length=2.5mm]}, thick},
-    node distance=1.2cm
+    >={Stealth[length=2mm]},
+    advbox/.style={draw, thick, rounded corners, fill=thmred!12, font=\small\bfseries,
+      minimum width=2.5cm, minimum height=0.65cm},
+    lrnbox/.style={draw, thick, rounded corners, fill=defblue!12, font=\small\bfseries,
+      minimum width=2.5cm, minimum height=0.65cm},
+    life/.style={semithick, densely dashed, gray!55},
+    rstep/.style={-{Stealth[length=2mm]}, semithick},
+    msg/.style={font=\scriptsize, fill=white, inner sep=1.5pt},
+    val/.style={draw, semithick, rounded corners, align=center, font=\scriptsize,
+      inner sep=3pt, minimum height=0.85cm, minimum width=1.9cm},
+    vedge/.style={-{Stealth[length=2mm]}, sepgreen!55!black, semithick},
+    sedge/.style={-{Stealth[length=2mm]}, edgeorange!80!black, semithick, densely dashed},
+    hdl/.style={font=\tiny, text=black!70, align=center}
 ]
-% Players
-\node[player, fill=thmred!10] (adv) {Adversary};
-\node[player, fill=defblue!10, right=5cm of adv] (lrn) {Learner};
-
-% Round structure
-\draw[arr, thmred!70!black] (adv.east) -- ++(1.2,0) |- node[action, above, pos=0.25] {presents $x_t$} ($(lrn.west)+(0,0.25)$);
-\draw[arr, defblue!70!black] (lrn.west) ++(-0.0,0.0) -- ++(-1.2,0) |- node[action, below, pos=0.25] {predicts $\hat{y}_t$} ($(adv.east)+(0,-0.25)$);
-
-% Reveal
-\node[action, below=1.8cm of $(adv.south east)!0.5!(lrn.south west)$, font=\small] (reveal) {Adversary reveals $y_t$. \quad Mistake if $\hat{y}_t \neq y_t$.};
-\draw[arr, notegray, dashed] ($(adv.south)!0.5!(lrn.south)+(0,-0.3)$) -- (reveal);
-
-% Constraint
-\node[below=0.6cm of reveal, font=\scriptsize\itshape, text=notegray, align=center] {Constraint: $\exists\, h^* \in \mathcal{H}$ such that $h^*(x_t) = y_t$ for all $t$.};
+% --- protocol: two lifelines, time flows down ---
+\node[advbox] (adv) at (-3.7,2.4) {Adversary};
+\node[lrnbox] (lrn) at (3.7,2.4) {Learner};
+\draw[life] (adv) -- (-3.7,-0.55);
+\draw[life] (lrn) -- (3.7,-0.55);
+\draw[rstep,thmred!70!black] (-3.7,1.45) -- node[msg]{1.~presents $x_t$} (3.7,1.45);
+\draw[rstep,defblue!70!black] (3.7,0.7) -- node[msg]{2.~predicts $\hat y_t$} (-3.7,0.7);
+\draw[rstep,thmred!70!black] (-3.7,-0.05) -- node[msg]{3.~reveals $y_t$; mistake if $\hat y_t\neq y_t$} (3.7,-0.05);
+\node[font=\scriptsize\itshape, text=black!65] at (0,-0.95) {realizability: $\exists\,h^{\ast}\!\in\mathcal{H},\ h^{\ast}(x_t)=y_t$ for all $t$};
+\node[hdl, text=gray!60, anchor=west] at (-6.4,0.7) {round\\$t=1,2,\dots$};
+% --- link: why the value is combinatorial ---
+\draw[gray!55, ->, densely dashed] (0,-1.3) -- node[hdl, right, pos=0.5]
+  {optimal adversary $=$ shattered mistake tree (\cref{fig:mistake-tree})} (0,-2.05);
+% --- value chain (what the game is worth) ---
+\node[val, fill=sepgreen!10] (opt)  at (-5.2,-2.7) {game value\\$\mathrm{Opt}(\mathcal{H})$};
+\node[val, fill=sepgreen!10] (ldim) at (-1.7,-2.7) {$\Ldim(\mathcal{H})$};
+\node[val, fill=defblue!8]  (onl)  at (1.8,-2.7) {online\\learnable};
+\node[val, fill=white, densely dashed] (pac) at (5.3,-2.7) {PAC\\learnable};
+\draw[vedge] (opt) -- node[hdl, above]{$=$} (ldim);
+\draw[vedge] (ldim) -- node[hdl, above]{finite $\Leftrightarrow$} (onl);
+\draw[sedge] (onl) -- node[hdl, above, text=edgeorange!80!black]{$\Rightarrow$ strict} (pac);
+\node[hdl] at (-3.45,-3.45) {\leanname{optimal_mistake_bound_eq_ldim}};
+\node[hdl] at (0.05,-3.45) {\leanname{littlestone_characterization}};
+\node[hdl, text=edgeorange!75!black] at (3.55,-3.45) {\leanname{online_strictly_stronger_pac}};
 \end{tikzpicture}
-\caption{The online learning game. The adversary and learner interact sequentially; the adversary is constrained only by realizability. There is no distribution, no random sampling, and no distinction between training and test phases.}
+\caption[The online learning game: an adversarial protocol whose value is the Littlestone dimension]{The
+online learning game and its value. In each round the adversary presents an instance, the learner
+predicts a label, and the adversary reveals the truth, charging a mistake on disagreement, subject only
+to realizability (some hypothesis in the class fits every revealed label). The game is sequential and
+worst-case, with an adaptive adversary, no distribution, and no train/test split. Its value is not merely
+bounded but determined: the optimal mistake bound equals the Littlestone dimension, the depth of the
+deepest shattered mistake tree (\leanname{optimal_mistake_bound_eq_ldim}, an equality proved by a Standard
+Optimal Algorithm upper bound and a matching adversary lower bound), and finiteness of that dimension
+characterizes online learnability (\leanname{littlestone_characterization}). Because the adversary is
+adaptive rather than random, the game is strictly harder than PAC: online learnability implies PAC
+learnability but the converse fails, with thresholds on the reals as witness (VC dimension one, Littlestone
+dimension infinite; \leanname{online_strictly_stronger_pac}).}
 \label{fig:online-protocol}
 \end{figure}
 
@@ -503,3 +533,29 @@ In the partial-information (bandit) setting only the loss of the routed key is o
 The implication online $\Rightarrow$ PAC is verified (\leanname{FLT_Proofs.Theorem.Separation.online_imp_pac}).  Make it quantitative for attention: convert the online mistake bound of a finite-Littlestone attention class into a PAC sample-complexity bound via online-to-batch, and decide whether the conversion is tight or loses a factor, sharpening the relation between \cref{op:ldim-attention} here and the VC question \cref{op:attention-vc} of \Cref{ch:pac}.
 \end{openprob}
 
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:online-protocol}}
+
+Each exercise perturbs the game. Show, in the figure's grammar (an adversarial sequential protocol whose value is a combinatorial invariant, solid where a kernel theorem determines that value and dashed where the value is borrowed from the literature or open), that the generalized figure subsumes it as an \emph{instance} (a setting where the value equals the Littlestone dimension), a \emph{boundary} (where realizability is dropped or the gap to PAC becomes strict), or a \emph{frontier} (a dashed, open value).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{A finite-Littlestone class.} Play the game on a class of finite Littlestone dimension, such as thresholds on a finite domain. Show this is an instance: the value is determined, the optimal mistake bound equals the Littlestone dimension (\leanname{optimal_mistake_bound_eq_ldim}), and finiteness makes the class online learnable (\leanname{littlestone_characterization}).
+
+\item \textbf{The value is two-sided.} Separate the equality into its halves. Show this is an instance whose content is the conjunction: the Standard Optimal Algorithm guarantees at most $\Ldim$ mistakes (\leanname{soa_mistakes_bounded}) and the adversary forces at least $\Ldim$ (\leanname{adversary_lower_bound}), so the value is determined, not merely bounded, only because both directions are proved.
+
+\item \textbf{Drop realizability.} Remove the constraint that some hypothesis fits every label. Show this is a boundary the figure marks but does not cross: the mistake bound becomes vacuous, the right notion is regret against the best fixed hypothesis, and although the kernel defines bounded regret (\leanname{RegretBounded}) it proves no theorem tying regret to a dimension, so the agnostic value is drawn dashed and cited (\cite{CesaBianchiLugosi2006}, \cref{op:regret-constant}).
+
+\item \textbf{The gap to PAC.} Compare the game with the PAC framework. Show this is the figure's principal boundary: online learnability implies PAC learnability but the converse fails, witnessed by thresholds on $\R$ with $\VC=1$ and $\Ldim=\infty$ (\leanname{online_strictly_stronger_pac}, \leanname{pac_not_implies_online}), so an adaptive adversary is strictly stronger than any random distribution.
+
+\item \textbf{The conservative leg.} Keep only the implication that online learnability gives PAC learnability. Show this is an instance on the safe side of the gap: a finite Littlestone bound forces a finite VC bound, so the criterion adds no statistical power (\leanname{online_imp_pac}), the one-way half of the strict separation.
+
+\item \textbf{Multiclass labels.} Replace binary labels by a finite label set. Show this is a frontier that re-types the value: the natural conjecture is that a multiclass tree-dimension still pins the optimal mistake bound, but the kernel has no multiclass online value theorem (\cref{op:online-multiclass}), so the generalized value is dashed and cited (\cite{DanielyShalevShwartz2014}).
+
+\item \textbf{Bandit feedback.} Let the learner observe only whether its prediction was correct, not the true label. Show this is a frontier: the partial-information game has its own value, governed by a bandit analogue of the Littlestone dimension that the kernel does not formalize, so the value edge is dashed and open (\cref{op:bandit-attention}).
+
+\item \textbf{An efficient optimal learner.} Ask whether the Standard Optimal Algorithm can be run in polynomial time per round. Show this is a frontier on the algorithmic axis: the value is achieved information-theoretically, but computing the version-space Littlestone dimensions the algorithm needs may be intractable, so the efficiency of an optimal learner is an open, dashed annotation (\cref{op:soa-computable}).
+
+\item \textbf{Online to batch.} Convert an online learner into a batch one by averaging or by the longest-survivor rule. Show this is an instance that runs the gap backward: a mistake-bounded online learner yields a PAC learner with sample complexity governed by the mistake bound, the constructive direction underlying \leanname{online_imp_pac}, so the conversion lands inside the verified web.
+
+\item \textbf{A minimax for the value.} Ask whether the game value is a minimax that factors through a single object, the deepest shattered mistake tree, dual to a potential the Standard Optimal Algorithm descends. Show this is the figure's most general open frontier: it would present the value not as two matched bounds but as one duality, yet no such minimax or potential duality is formalized in the kernel, so the meta-edge is dashed over an otherwise solid value.
+\end{enumerate}
