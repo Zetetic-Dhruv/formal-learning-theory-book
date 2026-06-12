@@ -579,25 +579,64 @@ pseudodimension.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[scale=0.9]
-  % Axes
-  \draw[->] (0,0) -- (7,0) node[right] {$x$};
-  \draw[->] (0,-0.5) -- (0,4) node[above] {$f(x)$};
+  % single margin value: forbidden band is [t_i - \g, t_i + \g], width 2\g, centred on t_i
+  \def\g{0.5}
 
-  % Thresholds
+  % --- Axes ---
+  \draw[->] (0,-0.5) -- (7,-0.5) node[right] {$x$};
+  \draw[->] (0,-0.5) -- (0,4.2) node[above] {$f(x)$};
+
+  % --- Per point: symmetric allowed zones, threshold, x-tick + label ---
   \foreach \i/\xpos/\tval in {1/1.5/1.5, 2/3.5/2.5, 3/5.5/1.8} {
+    \fill[edgeorange!22] (\xpos-0.32, \tval+\g) rectangle (\xpos+0.32, \tval+\g+0.85);
+    \fill[defblue!18]    (\xpos-0.32, \tval-\g-0.85) rectangle (\xpos+0.32, \tval-\g);
     \draw[dashed, notegray] (\xpos-0.5, \tval) -- (\xpos+0.5, \tval)
-      node[right, font=\tiny] {$t_{\i}$};
-    \fill[edgeorange!30] (\xpos-0.3, \tval+0.5) rectangle (\xpos+0.3, \tval+1.2);
-    \fill[defblue!20] (\xpos-0.3, \tval-1.0) rectangle (\xpos+0.3, \tval-0.3);
-    \node[font=\tiny] at (\xpos, \tval+0.85) {$\geq t_i{+}\gamma$};
-    \node[font=\tiny] at (\xpos, \tval-0.65) {$\leq t_i{-}\gamma$};
-    \draw[<->, thick, sepgreen] (\xpos+0.4, \tval-0.3) -- (\xpos+0.4, \tval+0.5)
-      node[midway, right, font=\tiny, text=sepgreen] {$2\gamma$};
+      node[right, font=\tiny, notegray] {$t_{\i}$};
+    \draw (\xpos, -0.55) -- (\xpos, -0.45);
+    \node[font=\tiny] at (\xpos, -0.75) {$x_{\i}$};
   }
+
+  % --- zone labels + 2gamma brace, marked once at x_1 to keep it clean ---
+  \node[font=\tiny, edgeorange!80!black] at (1.5, 1.5+\g+0.45) {$\geq t_i{+}\gamma$};
+  \node[font=\tiny, defblue]             at (1.5, 1.5-\g-0.45) {$\leq t_i{-}\gamma$};
+  \draw[<->, thick, sepgreen] (1.5+0.42, 1.5-\g) -- (1.5+0.42, 1.5+\g)
+    node[midway, right, font=\tiny, text=sepgreen] {$2\gamma$};
+
+  % ===== FUNCTION CURVES (the witnesses that exhibit the definition) =====
+  % f_A realizes b=(1,0,1): >= t_1+g, <= t_2-g, >= t_3+g
+  \draw[thmred, very thick]
+    plot[smooth, tension=0.7] coordinates
+    {(0.3,1.9) (1.5,2.4) (2.5,2.3) (3.5,1.7) (4.5,1.9) (5.5,2.6) (6.4,2.7)};
+  \fill[thmred] (1.5,2.4) circle (2.2pt);
+  \fill[thmred] (3.5,1.7) circle (2.2pt);
+  \fill[thmred] (5.5,2.6) circle (2.2pt);
+  \node[thmred, font=\scriptsize] at (2.5,3.2) {$f_A\colon b{=}101$};
+
+  % f_B realizes b=(0,1,0): <= t_1-g, >= t_2+g, <= t_3-g
+  \draw[analogypurple, very thick, dashed]
+    plot[smooth, tension=0.7] coordinates
+    {(0.3,1.1) (1.5,0.6) (2.5,1.6) (3.5,3.3) (4.5,1.9) (5.5,0.9) (6.4,0.7)};
+  \fill[analogypurple] (1.5,0.6) circle (2.2pt);
+  \fill[analogypurple] (3.5,3.3) circle (2.2pt);
+  \fill[analogypurple] (5.5,0.9) circle (2.2pt);
+  \node[analogypurple, font=\scriptsize] at (4.6,3.6) {$f_B\colon b{=}010$};
 \end{tikzpicture}
-\caption{$\gamma$-fat-shattering.  At each point $x_i$, the threshold
-$t_i$ creates a gap of width $2\gamma$.  Functions must place values
-strictly within the shaded regions, not merely across the threshold.}
+\caption[$\gamma$-fat-shattering: function curves realizing labelings against shared
+thresholds]{$\gamma$-fat-shattering of $d$ points (here $d=3$).  The set
+$\{x_1,x_2,x_3\}$ is $\gamma$-fat-shattered when there are thresholds $t_1,t_2,t_3$ such
+that for every labeling some function clears the margin: at least $t_i+\gamma$ where the
+label is $1$, and at most $t_i-\gamma$ where the label is $0$.  Around each threshold the
+forbidden band of width $2\gamma$ is what makes the notion scale-sensitive, strictly
+stronger than merely crossing the threshold (the threshold-only condition is the
+pseudodimension, the $\gamma\to 0$ limit).  The two curves shown realize the complementary
+labelings $101$ (solid) and $010$ (dashed), sharing one threshold vector; a value dot marks
+where each function lands inside the correct zone at each $x_i$.  The full definition
+requires such a function for all $2^d$ labelings, and the largest fat-shatterable set is the
+$\gamma$-fat-shattering dimension; finiteness for every $\gamma$ characterizes agnostic
+real-valued PAC learnability (Alon, Ben-David, Cesa-Bianchi, and Haussler, 1997, a
+literature result).  The drawn configuration instantiates the kernel-formalized definition
+\leanname{FatShatteringDim}, with \leanname{Pseudodimension} as its zero-margin limit; the
+characterization theorem itself is not machine-checked.}
 \label{fig:fat-shattering}
 \end{figure}
 
@@ -1442,6 +1481,112 @@ require different objects, the $\Theta(\log k)$ gap of \Cref{open:multiclass-tig
 and the no-single-dimension question raised by Figure~\ref{fig:ch17-concept-map}.
 This is the frontier: whether the figure is one of many because the mathematics
 demands many, or only because no unifying primitive has yet been found.
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:fat-shattering}}
+
+Each exercise perturbs the witness picture.  Read Figure~\ref{fig:fat-shattering} as an
+\emph{exhibition} of \Cref{def:fat-shattering-ext}: a shared threshold vector
+$(t_1,t_2,t_3)$, a symmetric forbidden band of width $2\gamma$ centred on each $t_i$, and two
+function curves $f_A,f_B$ that realize the labelings $b=101$ and $b=010$ by landing, at every
+$x_i$, inside the correct allowed zone ($\geq t_i+\gamma$ or $\leq t_i-\gamma$).  Argue, in
+this grammar, that each perturbed picture subsumes the concrete $d=3$ one as an
+\emph{instance} (a labeling, a point, a band, or a threshold the figure already exhibits), a
+\emph{boundary} (one quantifier, one scale parameter, or one evidence status toggled, so the
+margin requirement, the $\fatshat_\gamma$ versus $\Pdim$ relation, or the verification status
+changes), or a \emph{frontier} (a structure or formalization the figure points to but does
+not contain).  Honesty rule: the configuration instantiates the kernel-formalized definition
+\leanname{FatShatteringDim}, but \Cref{thm:real-valued-char} is literature; do not assert that
+any characterization of real-valued learnability is machine-checked.
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The $d=3$ picture with two curves is the smallest faithful instance of the
+definition.}  Show the figure is a correct concrete witness for
+\Cref{def:fat-shattering-ext} with $d=3$: a single threshold vector $(t_1,t_2,t_3)$ shared by
+both curves, and two functions $f_A,f_B$ that, at each $x_i$, satisfy $f(x_i)\geq t_i+\gamma$
+where the label is $1$ and $f(x_i)\leq t_i-\gamma$ where it is $0$.  Verify the six value
+dots fall in their zones for $b=101$ and $b=010$, and argue this exhibits
+$\fatshat_\gamma(\mathcal F)\geq 3$ for any class containing $f_A,f_B$ and witnesses for the
+remaining labelings, with nothing claimed verified beyond the definition itself.
+
+\item \textbf{The curves, not the bands, are what make this an exhibition.}  Contrast the
+present figure with a version drawing only the thresholds and the $2\gamma$ bands.  Show that
+the bands alone depict the \emph{predicate} (the geometry of $f(x_i)\geq t_i+\gamma$ versus
+$\leq t_i-\gamma$), whereas the curves depict the \emph{witnesses} the existential in
+\Cref{def:fat-shattering-ext} asserts (``there exists $f\in\mathcal F$'').  Conclude that the
+defining content of fat-shattering is carried by the functions clearing the margin, exactly as
+the witness-exhibition reading of VC-shattering carries the content of the binary definition.
+
+\item \textbf{The $2\gamma$ band is the scale primitive.}  Read one band in isolation, say at
+$x_2$.  Show that the symmetric forbidden region $(t_2-\gamma,\,t_2+\gamma)$ is the one object
+in the figure with no binary analogue: in classification the outputs are already $0/1$ and no
+margin exists.  Argue this band is the grammar extension named in \Cref{def:fat-shattering-ext}
+(the new primitive beyond pseudodimension is the margin $\gamma$), and that its symmetry
+about $t_i$ is forced by the mirror-image clauses $f(x_i)\geq t_i+\gamma$ and
+$f(x_i)\leq t_i-\gamma$.
+
+\item \textbf{The threshold vector is the pre-margin primitive, shared across labelings.}
+Read the three dashed lines $t_1,t_2,t_3$ alone.  Show that a \emph{single} threshold vector
+must serve \emph{every} labeling: $f_A$ and $f_B$ realize opposite labelings yet are scored
+against the same $t_i$ (\Cref{def:fat-shattering-ext}).  Compare with
+\Cref{def:pseudodim-ext}, where the identical threshold-vector primitive appears without a
+margin, and argue that fat-shattering adds the band $2\gamma$ on top of the pseudodimension's
+threshold structure rather than replacing it.
+
+\item \textbf{$\gamma\to 0$ collapses fat-shattering to pseudodimension.}  Toggle the scale
+parameter to its limit.  Shrink the $2\gamma$ band to zero width and show the requirement
+degenerates from $f(x_i)\geq t_i+\gamma$ or $\leq t_i-\gamma$ to $f(x_i)\geq t_i$ or
+$<t_i$, which is precisely the $P$-shattering condition of \Cref{def:pseudodim-ext}.
+Conclude that $\fatshat_\gamma(\mathcal F)\to\Pdim(\mathcal F)$ as $\gamma\to 0$, so the figure
+in the zero-margin limit becomes the pseudodimension picture, and that both
+\leanname{FatShatteringDim} and \leanname{Pseudodimension} are kernel-formalized definitions
+with the latter the limit of the former.
+
+\item \textbf{The margin makes fat-shattering strictly stronger than threshold-crossing.}
+Push the previous boundary the other way.  Exhibit a class and a value
+$\gamma' > 0$ for which some labeling can be realized with values that merely cross each $t_i$
+(so the points are $P$-shattered) but cannot be realized while clearing the band by $\gamma'$
+on both sides.  Show this is the boundary at which $\fatshat_{\gamma'}(\mathcal F)$ drops below
+$\Pdim(\mathcal F)$: passing the threshold is not enough, the function must land in the light
+zone, which is the scale-sensitivity the figure draws.
+
+\item \textbf{Two curves shown, $2^d$ functions required.}  Replace the figure's pair of
+curves with the full witness set.  Show that \Cref{def:fat-shattering-ext} demands one function
+per labeling, hence $2^d=8$ functions for $d=3$, of which the figure exhibits $b=101$ and
+$b=010$; the remaining six (for instance $b=111$, all dots above; $b=000$, all dots below)
+must also land in their zones against the \emph{same} $(t_1,t_2,t_3)$.  Argue that generalizing
+the figure to arbitrary $d$ means asserting a function for every one of the $2^d$ binary
+strings, not adding more sample points alone.
+
+\item \textbf{Larger margins shatter fewer points.}  Toggle $\gamma$ upward.  Using
+\Cref{rmk:scale-family}, argue that widening every band (larger $\gamma$) makes the two
+allowed zones recede from each threshold, so functions of bounded range can clear the margin at
+fewer points; hence $\fatshat_\gamma(\mathcal F)$ is typically a decreasing function of
+$\gamma$.  Show this is why the characterizing object is a scale \emph{family}
+$\{\fatshat_\gamma\}_{\gamma>0}$, one finiteness requirement per $\gamma$, rather than a single
+number, and connect this to the grammar-growth reading of the real-valued setting.
+
+\item \textbf{Fat-shattering is a formalized definition; the characterization it drives is
+literature.}  Separate the two honesty grades the figure straddles.  Argue that the drawn
+configuration instantiates the kernel-formalized definition \leanname{FatShatteringDim}
+($\mathrm{sc}=0$), so it may be named as such, but that \Cref{thm:real-valued-char} (finite
+$\fatshat_\gamma$ for all $\gamma$ if and only if agnostic real-valued PAC learnability, due to
+Alon, Ben-David, Cesa-Bianchi, and Haussler, 1997) and \Cref{prop:pdim-covering} are
+literature results with no kernel proof.  State precisely which claim attaches to the figure (a
+definition is exhibited) and which does not (the kernel does not prove real-valued
+learnability).
+
+\item \textbf{Frontiers: the zero-margin limit, noise, the tight rate, and one invariant
+versus a family.}  Read the figure as pointing past itself.  (a) Pseudodimension is the
+$\gamma\to 0$ limit drawn in Exercise~5; does it \emph{characterize} realizable real-valued
+learning the way fat-shattering characterizes the agnostic case
+(\Cref{open:pdim-realizable})?  (b) What is the fat-shattering analogue of noise tolerance
+(\Cref{open:noise-fat})?  (c) Is the covering-number bound that $\fatshat_\gamma$ drives in the
+proof sketch of \Cref{thm:real-valued-char} tight, or can the $\log^2$ factor be removed?
+(d) Is the scale family $\{\fatshat_\gamma\}_{\gamma>0}$ reducible to a single invariant, or is
+the $\gamma$-indexed family irreducible?  Argue the figure is evidence for irreducibility: a
+static frame can draw only one $\gamma$, and \Cref{rmk:scale-family} insists the
+characterization is a family of finiteness conditions, not one number.
 \end{enumerate}
 
 \bigskip
