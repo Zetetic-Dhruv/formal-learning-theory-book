@@ -411,6 +411,46 @@ The chapter's argument is one sentence: the data model determines the theory. Mo
 
 Chapters~\ref{ch:pac}--\ref{ch:universal} develop each paradigm in full. The present chapter has identified the axis along which they separate.
 
+% ================================================================
+% TRANSFORMER CONNECTION (retrofit): attention as a measurable batch
+% learner over i.i.d. data; routing as a measurable partition;
+% the float32 forward-pass error of the readout.
+% ================================================================
+
+\section{The Data of a Transformer}
+\label{sec:ch2-transformer}
+
+This chapter has been about how data reaches a learner; it has left the learner itself implicit.  The consistent learner of \cref{thm:uc-pac} was defined inline---``output any $h \in \mathcal{H}$ agreeing with $S$''---with no $\sigma$-algebra on $\mathcal{H}$ and no requirement that the map $S \mapsto L(S)$ be measurable.  For the simplest classes that omission is harmless.  For a parametric attention model it is exactly the structure that must be supplied, and supplying it---machine-checked---exposes two data-axes the classical model suppresses: the \emph{measurability} of the data-to-hypothesis map, and the \emph{finite precision} in which data is actually read.
+
+\begin{prop}[Attention routing is a measurable partition]
+\label{prop:attention-measurable-routing}
+The data-dependent routing of a multi-head attention model---the partition of the query space according to which key each query attends to---is measurable, and the hypothesis class it induces is a well-behaved VC-measurability target.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.multiHeadArgmax_wellBehaved}  The same guarantee holds for a finite-cell router.\formal{TLT_Proofs.Tame.FiniteCellRouter.finiteCellRouter_wellBehaved}  Consequently the attention learner is a \emph{measurable} batch learner in the sense of the condition \leanname{LearnEvalMeasurable}\formal{FLT_Proofs.Theorem.Separation.LearnEvalMeasurable} that \cref{thm:uc-pac} left implicit.
+\end{prop}
+
+\begin{proof}
+Fix the parameters and a query~$x$.  The routing decision is the $\arg\max$ over keys of the scores $\langle x, k_i\rangle$, so the set of queries routed to key~$i$ is the intersection of the half-spaces $\{x : \langle x, k_i - k_j\rangle \geq 0\}$ over $j \neq i$---a Borel set.  The routing map $(\text{parameters}, x) \mapsto (\text{winning key})$ is therefore measurable, and the head's prediction is a measurable function of parameters and query.  A parametrized family of concepts with this joint measurability is by definition a well-behaved VC-measurability target, and the learner's selection $S \mapsto L(S)$ inherits measurability from it.  This is precisely \leanname{LearnEvalMeasurable}: the property that, for every sample size~$m$, the evaluation $(S, x) \mapsto L(S)(x)$ is measurable---the condition under which the uniform-convergence argument of \cref{thm:uc-pac} is rigorous rather than merely formal.
+\end{proof}
+
+The second axis is invisible in the real-valued data model of \cref{def:iid-sample} and unavoidable in practice: the learner does not read real numbers.
+
+\begin{prop}[The forward pass reads data in finite precision]
+\label{prop:attention-fp32}
+On real hardware the attention readout is a \texttt{float32} fold-sum of softmax-weighted values, not the idealized real-valued sum.  The executed result differs from the ideal by a bounded amount: for a fold of $m$ summands whose absolute values total at most~$S$,
+\[
+  \bigl|\,\mathrm{fp32fold}(v) - \textstyle\sum_i v_i\,\bigr| \;\leq\; 2^{-24}\,(m+1)\,S,
+\]\formal{TLT_Proofs.Bridge.Fp32.ClampedReductionRounding.fp32Foldl_error_le_of_sum_bound}
+and the executed IEEE-754 fold obeys an analogous accumulated-error envelope.\formal{TLT_Proofs.Bridge.Fp32.SequentialSummationBackwardError.ie32_foldl_envelope}
+\end{prop}
+
+\begin{proof}[Proof idea]
+Each addition in the fold commits a relative rounding error of at most the unit roundoff $2^{-24}$; propagating these through the $m$ summations and bounding by the total magnitude~$S$ gives the stated linear-in-$m$ envelope, a machine-checked instance of backward-error analysis.  The point is not the constant but its existence: the map from data to prediction that actually runs is the idealized one perturbed by a controlled, certified amount.
+\end{proof}
+
+\begin{remark}[A third coordinate of the data model]
+\label{rmk:attention-data-model}
+\Cref{rmk:vc-jurisdiction} held that a complexity measure is a property of the class \emph{together with} a data model.  Attention adds a coordinate that the four classical models share but never expose: the \emph{precision} in which the data is represented.  The i.i.d.\ jurisdiction is where the measurable routing of \cref{prop:attention-measurable-routing} lets the VC machinery apply at all; the float32 envelope of \cref{prop:attention-fp32} is the certified cost of executing that machinery on data a real machine can hold.  The classical theory idealizes both axes away---it assumes the learner measurable and the arithmetic exact---and a transformer is where neither assumption is free.
+\end{remark}
+
 \section{Exercises and Open Problems}
 \label{sec:ch2-open}
 
@@ -464,4 +504,19 @@ The four paradigms use four invariants (VC, mind-change ordinal, query complexit
 \begin{openprob}[Verifying the three-way separation constructively, \textsc{uk}]
 \label{op:three-way}
 The PAC/online/Gold separation is verified (\leanname{FLT_Proofs.Theorem.Separation.online_pac_gold_separation}), but the witnesses are produced existentially. Give a constructive, effective version: a single family of classes, indexed by a parameter, that realizes each pairwise separation with explicit witnesses and explicit obstructions, so that the entire separation lattice of \cref{tab:data-comparison} is exhibited by one parameterized construction rather than three independent ones.
+\end{openprob}
+
+\begin{openprob}[The measurable attention learner, \textsc{uk}]
+\label{op:attention-measurable}
+\Cref{prop:attention-measurable-routing} shows the attention learner is measurable, the condition \leanname{LearnEvalMeasurable} that \cref{thm:uc-pac} left implicit, with the routing well-behavedness as witness (\leanname{multiHeadArgmax_wellBehaved}).  Assemble these into a single verified statement: a parametric softmax-attention learner over i.i.d.\ data is PAC, with the measurability discharged rather than assumed.  The pieces are machine-checked; their composition into an end-to-end PAC guarantee for attention is not.
+\end{openprob}
+
+\begin{openprob}[Does PAC survive finite precision? \textsc{ku}]
+\label{op:attention-fp32-pac}
+\Cref{prop:attention-fp32} bounds the gap between the executed float32 attention learner and its idealized real-valued counterpart (\leanname{fp32Foldl_error_le_of_sum_bound}).  Does the PAC guarantee transfer to the executed learner, and at what cost---is there a sample-complexity penalty that scales with the precision (the unit roundoff $2^{-24}$), so that learnability degrades gracefully as arithmetic coarsens?  A known unknown joining the statistical and numerical error budgets.
+\end{openprob}
+
+\begin{openprob}[Attention under the other data models, \textsc{ku}]
+\label{op:attention-data-models}
+The mapping of \cref{sec:ch2-transformer} is i.i.d.\ (batch).  Where does attention sit under the other three data models of this chapter---is there an online (streaming) attention learner with a finite mistake bound, or a query-driven (active) one, and does the measurable-routing well-behavedness (\leanname{finiteCellRouter_wellBehaved}) transfer to those presentations, or does the data model change attention's learnability as it changes thresholds'?
 \end{openprob}
