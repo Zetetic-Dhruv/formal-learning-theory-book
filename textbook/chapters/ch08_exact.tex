@@ -78,52 +78,58 @@ Closedness ensures that every one-step extension of a state representative is eq
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    player/.style={draw, very thick, rounded corners, minimum width=2.8cm, minimum height=1cm, font=\small\bfseries, align=center},
-    stepbox/.style={font=\small, align=left, text width=5.5cm},
-    arr/.style={-{Stealth[length=2.5mm]}, thick},
-    note/.style={font=\scriptsize\itshape, text=notegray, align=left},
-    node distance=1.0cm
+    >={Stealth[length=2.2mm]},
+    pole/.style={draw, very thick, rounded corners, align=center, font=\small\bfseries,
+                 minimum width=2.3cm, minimum height=1.3cm},
+    lstep/.style={draw, semithick, rounded corners, align=center, font=\scriptsize,
+                 fill=sepgreen!10, draw=sepgreen!55!black, minimum width=3.0cm,
+                 minimum height=0.9cm, inner sep=3pt},
+    cyc/.style={-{Stealth[length=2mm]}, semithick, defblue!60!black},
+    q/.style={-{Stealth[length=2mm]}, semithick, thmred!70!black},
+    lit/.style={draw, densely dashed, thmred!70!black, rounded corners, fill=thmred!4,
+                align=left, font=\scriptsize, text=black!72, inner sep=4pt}
 ]
-% Players
-\node[player, fill=defblue!10] (learner) {Learner\\{\scriptsize (maintains table $(S,E,T)$)}};
-\node[player, fill=thmred!10, right=5.5cm of learner] (teacher) {MAT\\{\scriptsize (knows target DFA $A^*$)}};
-
-% Step 1: MQ phase
-\node[below=1.2cm of learner, anchor=north, stepbox] (s1) {%
-\textbf{1.} Fill table via $\mathrm{MQ}$:\\
-$T(s,e) \leftarrow \mathrm{MQ}(s \cdot e)$\\
-for all $s \in S \cup S\!\cdot\!\Sigma$, $e \in E$.};
-
-% Step 2: Close and make consistent
-\node[below=0.3cm of s1, anchor=north, stepbox] (s2) {%
-\textbf{2.} If table not closed: add\\
-witness $s \cdot a$ to $S$; go to 1.\\
-If not consistent: add\\
-distinguishing $a \cdot e$ to $E$; go to 1.};
-
-% Step 3: Conjecture
-\coordinate (mid) at ($(learner)!0.5!(teacher)$);
-\node[below=4.0cm of mid, font=\small, align=center] (conj) {%
-\textbf{3.} Build DFA $M$ from table.\\
-States $=$ distinct rows of $S$.};
-
-% Step 4: EQ
-\draw[arr, defblue!70!black] ($(conj.east)+(0,0.15)$) -- ++(1.8,0) node[above, midway, font=\small] {$\mathrm{EQ}(M)$} |- ($(teacher.south)+(0,-0.0)$);
-
-% Step 5: Response
-\node[below=5.8cm of teacher, anchor=north, stepbox, text width=4cm] (resp) {%
-If $L(M) = L$: return \textsc{yes}.\\
-Else: return counterexample $z$.};
-
-\draw[arr, thmred!70!black] (resp.west) -- ++(-1.5,0) node[above, midway, font=\small] {$z$} |- ($(s1.east)+(0,-0.1)$);
-
-% Annotations
-\node[note, below=0.3cm of resp] {Add $z$ and all prefixes of $z$\\to $S$; return to step 1.};
-
-% Termination
-\node[note, right=0.3cm of teacher, anchor=west, text width=3.2cm] {Termination: at most $n-1$\\equivalence queries, where\\$n = |$states of $A^*|$.};
+% --- agents (poles) ---
+\node[pole, fill=defblue!10, draw=defblue!60!black] (learner) at (-0.3,0)
+   {Learner\\[-1pt]{\scriptsize\mdseries table $(S,E,T)$}};
+\node[pole, fill=thmred!10, draw=thmred!60!black, minimum height=1.6cm] (mat) at (11,0)
+   {MAT\\[-1pt]{\scriptsize\mdseries knows $A^{\ast}$}\\[-1pt]{\tiny\mdseries\leanname{MinimallyAdequateTeacher}}};
+% --- the L* state-discovery loop (verified data-type nodes) ---
+\node[lstep] (n1) at (3.3,2.1) {1.~Fill table via $\mathrm{MQ}$\\{\tiny\leanname{MembershipOracle}}};
+\node[lstep] (n2) at (3.3,0) {2.~Close \& make consistent\\{\tiny\cref{def:closed-consistent}}};
+\node[lstep] (n3) at (3.3,-2.1) {3.~Conjecture DFA $M$\\{\tiny\leanname{DFA'}}};
+\node[lstep] (n4) at (7.7,-2.1) {4.~$\mathrm{EQ}(M)$\\{\tiny\leanname{EquivalenceOracle}}};
+\node[lstep] (n5) at (7.7,2.1) {5.~counterexample $z$\\{\tiny\leanname{Counterexample}}};
+% --- cycle edges ---
+\draw[cyc] (n1) -- (n2);  \draw[cyc] (n2) -- (n3);  \draw[cyc] (n3) -- (n4);
+\draw[cyc] (n4) -- (n5);  \draw[cyc] (n5) -- (n1);
+\draw[cyc, densely dashed] (n2.west) to[out=158,in=202]
+   node[font=\tiny, left, align=center]{not closed/\\consistent} (n1.west);
+% --- query interaction with the MAT ---
+\draw[q] (learner.north) to[out=65,in=115] node[font=\scriptsize, above]{membership queries $\mathrm{MQ}$} (mat.north);
+\draw[q] (n4.east) to[out=0,in=205] node[font=\tiny, above right, pos=0.6]{$\mathrm{EQ}$} (mat.south west);
+\draw[q, densely dashed] (mat.west) to[out=155,in=0] node[font=\tiny, above, pos=0.45]{$z$ / \textsc{yes}} (n5.east);
+% --- the criterion (Will) ---
+\node[font=\tiny, text=defblue!55!black, align=center, anchor=north] at (3.3,-2.85)
+   {halt iff $\mathrm{EQ}=$\textsc{yes} (\leanname{ExactLearnable})};
+% --- literature: correctness + termination (Angluin 1987, not kernel) ---
+\node[lit, text width=3.5cm, anchor=north] at (7.9,-2.9)
+   {\textbf{Correctness \& the $n-1$ bound:} converges to the minimal DFA in $\le n-1$ equivalence queries ($n=$ Myhill--Nerode index). Angluin 1987 (\cref{thm:lstar-complexity}); open in the kernel (\cref{op:lstar-formal}).};
 \end{tikzpicture}
-\caption{The $L^*$ protocol. The learner fills an observation table using membership queries, ensures it is closed and consistent, constructs a conjecture DFA, and submits it to the equivalence oracle. Each counterexample refines the table by introducing a new state distinction.}
+\caption[The $L^*$ exact-learning loop and its Myhill--Nerode reading]{The $L^*$ protocol as the
+exact-learning-via-a-MAT loop. A learner and a minimally adequate teacher cooperate to identify the
+minimal DFA for an unknown regular language. The observation table $(S,E,T)$ is a finite approximation of
+the Myhill--Nerode right-congruence of the target: its distinct rows are the equivalence classes
+discovered so far. Membership queries fill the table cell by cell; an equivalence query returns a
+counterexample that forces a new state class, splitting the current approximation. Closedness and
+consistency are exactly the conditions under which the table induces a well-defined DFA, and termination
+in at most $n-1$ equivalence queries is the index of the congruence ($n$ states in the minimal DFA). The
+data-types are verified scaffolding: the membership and equivalence oracles
+(\leanname{MembershipOracle}, \leanname{EquivalenceOracle}), the teacher
+(\leanname{MinimallyAdequateTeacher}), the algorithm object (\leanname{LStar}), the conjecture type
+(\leanname{DFA'}), and the success criterion (\leanname{ExactLearnable}). The correctness of the loop and
+the $n-1$ bound are Angluin's theorem (\cite{Angluin1987}), cited and not yet kernel-proved
+(\cref{op:lstar-formal}); they are drawn dashed.}
 \label{fig:lstar-protocol}
 \end{figure}
 
@@ -347,3 +353,29 @@ The $L^*$ membership-query count carries a factor $m$, the longest counterexampl
 The development types an LLM critic as a teacher (\leanname{FLT_Proofs.Learner.Active.LLMCritic}).  Determine the soundness conditions under which a large language model can serve as the membership and equivalence oracle for a downstream exact learner (when its answers are reliable enough that $L^*$ converges to the intended concept), bounding the error introduced by an unreliable teacher.
 \end{openprob}
 
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:lstar-protocol}}
+
+Each exercise perturbs the protocol. Show, in the figure's grammar (a cyclic state-discovery loop in which a learner refines a finite approximation of the target's Myhill--Nerode right-congruence by membership queries and is corrected by counterexamples from an equivalence oracle, with the flowchart's nodes drawn solid where a verified data-type certifies the object and the correctness-and-termination claims drawn dashed where they are Angluin's theorem, cited not proved), that the generalized picture subsumes the concrete one as an \emph{instance} (the loop run on a determined target), a \emph{boundary} (where one capability of the teacher or one condition on the table is toggled and the learnable class strictly grows or shrinks), or a \emph{frontier} (a dashed, open or literature-only edge).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The table is the right congruence.} Read the observation table not as scratch space but as the object being learned. Show this is the figure's defining instance: two access strings share a row exactly when they are indistinguishable by the suffixes in $E$, a finite slice of the Myhill--Nerode relation $s_1 \sim s_2 \iff (\forall w,\ s_1 w \in L \Leftrightarrow s_2 w \in L)$ (\cref{rmk:table-intuition}), so the distinct rows \emph{are} the equivalence classes discovered so far and the conjecture DFA is their quotient; the row map is typed by the truthful membership oracle (\leanname{FLT_Proofs.Data.MembershipOracle}).
+
+\item \textbf{Closedness and consistency are the quotient's well-definedness.} Toggle off closedness: let some $\mathrm{row}(s\cdot a)$ match no representative in $S$. Show this is the boundary that makes the conjecture illegal: without closedness the transition $\delta(\mathrm{row}(s),a)=\mathrm{row}(s\cdot a)$ has no target state, and without consistency it depends on the chosen representative (\cref{def:closed-consistent}); the two conditions are precisely what licenses the quotient automaton (\leanname{FLT_Proofs.Computation.DFA'}), so they are well-definedness constraints, not optimizations.
+
+\item \textbf{A counterexample is a new-class witness.} Replace the teacher's \textsc{yes}/counterexample reply by a bare bit ``correct or not''. Show this is the boundary that disables refinement: the equivalence oracle's counterexample carries the contract that $z$ is a point where the conjecture and target disagree (\leanname{FLT_Proofs.Data.EquivalenceOracle}; the witness is typed by \leanname{FLT_Proofs.Data.Counterexample}), and adding $z$ with its prefixes forces at least one new distinct row, i.e.\ splits a Myhill--Nerode class; a bare bit removes the witness and the loop can no longer discover the missing state.
+
+\item \textbf{The $n-1$ bound is the index of the congruence.} Read ``at most $n-1$ equivalence queries'' not as a runtime figure but as a structural identity. Show this is the frontier that grades termination: the minimal DFA has $n$ states, hence the congruence has index $n$ (\cref{rmk:table-intuition}, uniqueness by \cite{RabinScott1959}), the table starts at one class and gains at least one per counterexample, so termination after $\le n-1$ rounds \emph{is} the finiteness of the index (\cref{thm:lstar-complexity}); the bound is a literature theorem (\cite{Angluin1987}), not yet kernel-proved (\cref{op:lstar-formal}), so the termination annotation is drawn dashed.
+
+\item \textbf{The whole loop is cited, not verified.} Ask the kernel for the statement ``$L^*$ converges to the minimal DFA''. Show this is the figure's principal frontier: the nodes are verified types ($L^*$ itself is the structure \leanname{LStar} with fields \texttt{teacher}, \texttt{numStates}, \texttt{result}, all sorry-free, but with no method and no correctness lemma), so the objects are solid while the convergence-and-termination edges are dashed and carry \cite{Angluin1987}; closing this gap on top of the typed teacher (\leanname{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}) and \leanname{FLT_Proofs.Computation.DFA'} is exactly \cref{op:lstar-formal}.
+
+\item \textbf{The teacher is the only source of state-splits.} Read the minimally adequate teacher as the entire interface between learner and target. Show this is the instance that names the model: a MAT is a membership oracle and an equivalence oracle answering about one shared target (\leanname{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}, field \texttt{consistent} forcing $\texttt{mq.target}=\texttt{eq.target}$; \cref{def:mat}), and nothing else, so every state the learner discovers is forced by a query, never by distributional luck; this is what makes exact identification (\leanname{FLT_Proofs.Criterion.PAC.ExactLearnable}, \cref{def:exact-learning-formal}) attainable here.
+
+\item \textbf{Drop membership queries and the loop blows up.} Run the same cycle with equivalence queries alone. Show this is the boundary that collapses the discovery rate: without membership queries the learner cannot place a string in its Myhill--Nerode class, so each equivalence query removes only one candidate from the version space and an $N$-concept class costs $N-1$ queries in the worst case (\cref{prop:eq-lower}, \cite{Angluin1988}), whereas membership queries supply the structural bit that collapses an exponential count to the linear $n-1$ of \cref{thm:lstar-complexity}.
+
+\item \textbf{Passive data cannot drive the loop at all.} Replace the active teacher with random labelled examples drawn from a distribution. Show this is the frontier that separates the Wills: the same target class (DFAs) is exactly learnable by this loop (\cref{thm:lstar-complexity}) yet not PAC-learnable under cryptographic assumptions (\cref{thm:dfa-pac-hard}, \cite{KearnsValiant1994}), so the passive--active edge is qualitative, and the reverse direction (PAC-easy yet exact-hard) is itself open (\cref{op:reverse-separation}).
+
+\item \textbf{The counterexample length is a hidden cost on the arrows.} Refine the $z$-arrow by asking how long $z$ may be. Show this is a frontier on the membership budget: the equivalence oracle may return an adversarially long counterexample (\cref{rmk:counterexample-length}), so the membership-query count carries a factor $m$ (\cref{thm:lstar-complexity}); whether a learner can binary-search the counterexample to remove the linear dependence on $m$ is open (\cref{op:counterexample-length}, \cite{RivestSchapire1993}).
+
+\item \textbf{Any queryable function is an $L^*$ target.} Replace the unknown regular language by the binary string function of a trained attention model, answering membership by a forward pass and equivalence by sampling. Show this is the figure's most general instance: the model is a legitimate minimally adequate teacher (\cref{prop:transformer-extraction}, \cite{WeissGoldbergYahav2018}), so the same state-discovery loop extracts a DFA exact on the queried strings; whether the model's function even has a finite Myhill--Nerode index (a genuine regular core) so that extraction is exact rather than heuristic is open (\cref{op:transformer-regular}), and so is the soundness of an unreliable oracle such as an LLM critic (\cref{op:llm-teacher}).
+\end{enumerate}
