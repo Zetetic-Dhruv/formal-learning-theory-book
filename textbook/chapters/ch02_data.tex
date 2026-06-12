@@ -303,38 +303,41 @@ A mistake-bounded online learner guarantees its bound against \emph{any} sequenc
 \section{Taxonomy: Four Data Models, Four Theories}
 \label{sec:taxonomy}
 
-The preceding sections developed each data model individually; the four relate as a single structure.
+The preceding sections developed each data model individually. They do not merely sit side by side: each is pinned by a characterizing dimension, and the paradigms they generate are separated by machine-checked witnesses (Figure~\ref{fig:data-taxonomy}).\formal{FLT_Proofs.Theorem.Separation.online_strictly_stronger_pac}
 
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    model/.style={draw, thick, rounded corners, minimum width=3cm, minimum height=1cm, font=\small\bfseries, align=center},
-    stat/.style={model, fill=defblue!12},
-    gold/.style={model, fill=sepgreen!12},
-    query/.style={model, fill=edgeorange!12},
-    online/.style={model, fill=onlineblue!12},
-    arr/.style={-{Stealth[length=2mm]}, thick},
-    lbl/.style={font=\scriptsize, align=center, fill=white, inner sep=1.5pt}
+    cell/.style={draw, thick, rounded corners, minimum width=2.9cm, minimum height=1.05cm, font=\scriptsize, align=center},
+    contain/.style={-{Stealth[length=2mm]}, semithick, defblue},
+    strict/.style={-{Stealth[length=2mm]}, semithick, thmred},
+    lit/.style={{Stealth[length=1.5mm]}-{Stealth[length=1.5mm]}, dashed, notegray, semithick},
+    litd/.style={-{Stealth[length=1.5mm]}, dashed, notegray, semithick},
+    elab/.style={font=\tiny, text=notegray, inner sep=1.3pt, fill=white, align=center},
+    slab/.style={font=\tiny, text=thmred!80!black, inner sep=1.3pt, fill=white, align=center}
 ]
-% Four data models
-\node[stat]   (iid)  at (0,0)    {I.I.D.\ Sample};
-\node[gold]   (text) at (5.5,0)  {Text / Informant};
-\node[query]  (mq)   at (0,-3)   {MQ + EQ};
-\node[online] (str)  at (5.5,-3) {Adversarial Stream};
-
-% Arrows with labels
-\draw[arr, dashed, notegray] (iid) -- node[lbl, above] {remove distribution\\add enumeration} (text);
-\draw[arr, dashed, notegray] (iid) -- node[lbl, left, xshift=-2pt] {add interaction\\remove passivity} (mq);
-\draw[arr, dashed, notegray] (iid) -- node[lbl, right, xshift=-20pt, yshift=-4pt] {remove distribution\\add adversary} (str);
-\draw[arr, dashed, notegray] (text) -- node[lbl, right, xshift=2pt] {add adversary\\discrete $\to$ continuous} (str);
-
-% Paradigm labels
-\node[font=\scriptsize\itshape, defblue, below=0.15cm of iid] {PAC learning};
-\node[font=\scriptsize\itshape, sepgreen!70!black, below=0.15cm of text] {Gold identification};
-\node[font=\scriptsize\itshape, edgeorange!80!black, below=0.15cm of mq] {Exact learning};
-\node[font=\scriptsize\itshape, onlineblue, below=0.15cm of str] {Online learning};
+% compound nodes: data model + its characterizing dimension
+\node[cell, fill=onlineblue!12]         (str)  at (0, 2.85)   {\textbf{adversarial stream}\\Littlestone dim};
+\node[cell, fill=defblue!12]            (iid)  at (0, 0.7)    {\textbf{i.i.d.\ sample}\\VC dim};
+\node[cell, fill=sepgreen!12]           (text) at (-3.55,-1.5){\textbf{enumerative text}\\mind-change ordinal};
+\node[cell, fill=edgeorange!12, dashed] (mq)   at (3.55,-1.5) {\textbf{MQ\,+\,EQ}\\query complexity};
+\node[cell, fill=layergray, dashed, minimum height=0.8cm] (ctx) at (0,-3.35) {\textbf{in-context (attention)}};
+% spine: verified containment + strict separation (online vs PAC)
+\draw[contain] ([xshift=-7pt]str.south) -- node[elab,left]{online $\subseteq$ PAC} ([xshift=-7pt]iid.north);
+\draw[strict]  ([xshift=7pt]iid.north) -- node[slab,right]{$\not\Rightarrow$ thresholds:\\VC$=1$, Ldim$=\infty$} ([xshift=7pt]str.south);
+% Gold vs PAC (verified strict)
+\draw[strict] (text) -- node[slab,below right,pos=0.6]{$\not\Rightarrow$ finite support} (iid);
+% literature / open edges
+\draw[lit]  (iid) -- node[elab,above right,pos=0.5]{passive $\rightleftarrows$ exact\\(crypto, lit.)} (mq);
+\draw[litd] (ctx) -- node[elab,right]{measurability\\side-condition} (iid);
+\node[font=\tiny, text=sepgreen!55!black, anchor=north, inner sep=1pt] at (text.south) {\leanname{gold_theorem}: text obstruction};
+% legend
+\node[font=\tiny, anchor=west, text=notegray] at (-5.1,-4.35) {%
+  \textcolor{defblue}{\rule[0.45ex]{0.5cm}{0.9pt}}~containment (verified) \quad
+  \textcolor{thmred}{\rule[0.45ex]{0.5cm}{0.9pt}}~$\not\Rightarrow$ strict separation (verified) \quad
+  \textcolor{notegray}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~literature / open};
 \end{tikzpicture}
-\caption{The four data models and the paradigms they generate. Each arrow represents a modeling change; the text indicates which assumption is added or removed. No single paradigm subsumes the others.}
+\caption[The data models, their characterizing dimensions, and the proven separations]{\textbf{The four data models, the dimension that pins each one's learnability, and the proven separations between them.} Each model is shown with the single combinatorial quantity that decides what it can learn: independent samples by the Vapnik--Chervonenkis dimension, adversarial streams by the Littlestone dimension, enumerative texts by the mind-change ordinal, and interactive queries by query complexity. The first three pairings are exact characterizations, each verified end to end in the companion development as an equivalence between learnability and finiteness of the dimension; the query pairing is class-specific and drawn provisionally. The arrows are the chapter's principal content. A blue arrow records a verified containment (every stream-learnable class is also sample-learnable); a red arrow records a verified strict separation, each carrying the witness class the formal proof exhibits. The thresholds are the sharpest case: one class with the smallest possible sample dimension and unbounded stream dimension, so the same class receives two complexities under two presentations. That is the chapter's lesson: a complexity measure belongs to a class together with a data model, never to the class alone. Dashed arrows mark relationships known in the literature but not yet inside the kernel, the passive-versus-interactive gap on automata and the measurability caveat under which a prompt-style presentation can push the relevant event out of reach.}
 \label{fig:data-taxonomy}
 \end{figure}
 
@@ -520,3 +523,20 @@ The PAC/online/Gold separation is verified (\leanname{FLT_Proofs.Theorem.Separat
 \label{op:attention-data-models}
 The mapping of \cref{sec:ch2-transformer} is i.i.d.\ (batch).  Where does attention sit under the other three data models of this chapter: is there an online (streaming) attention learner with a finite mistake bound, or a query-driven (active) one, and does the measurable-routing well-behavedness (\leanname{finiteCellRouter_wellBehaved}) transfer to those presentations, or does the data model change attention's learnability as it changes thresholds'?
 \end{openprob}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:data-taxonomy}}
+
+Each exercise perturbs the data model. Show, in the figure's grammar, that the generalized diagram (each model pinned by a characterizing dimension, with verified separations and explicit witnesses) subsumes it as an \emph{instance} (a node or edge already present), a \emph{boundary} (a point on an existing edge or a side-condition), or a \emph{frontier} (an open node the diagram marks as such).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Noisy oracle.} Corrupt labels at a rate below one half. Show this is an instance of the i.i.d.\ node: the characterizing VC dimension is invariant, so noise is a stabilizer arrow that does not move the node (\cref{thm:noise-robust}, Angluin--Laird 1988).
+\item \textbf{Semi-supervised text.} Add a few labels to a positive-only text. Show this is a boundary, a point interpolating the verified text-to-sample gap, learnable exactly when it supplies the exclusion information the finite-support witness needs.
+\item \textbf{Active versus passive.} Let the learner choose its queries. Show this is the passive-to-exact edge itself, an instance: the label-complexity measure exists (\leanname{LabelComplexity}) though the characterization is class-specific (Angluin's $L^\ast$).
+\item \textbf{Stream with bounded memory.} Cap the learner's state. Show this is a frontier: it lives inside the online node's basin (it can only raise the mistake bound above the Littlestone dimension), but its own characterizing dimension is open, marked dashed.
+\item \textbf{Distribution shift.} Let the data be non-stationary. Show this is an instance of the online node: the Littlestone mistake bound holds against \emph{any} sequence, so distribution shift is the canonical adversarial order the node already dominates (\leanname{optimal_mistake_bound_eq_ldim}).
+\item \textbf{Equivalence-query budget.} Cap the number of equivalence queries. Show this is a boundary on the exact node, a point on the segment between the two verified endpoints (equivalence-queries-alone learns finite classes; membership-queries-alone cannot certify).
+\item \textbf{Partial labels.} Let the oracle abstain. Show this is a boundary between text and informant: partial labels are weakened exclusion, learnable exactly when they recover enough exclusion to defeat the Gold diagonalization (\leanname{gold_theorem}).
+\item \textbf{Adversarial versus stochastic order.} Switch the sample order from random to adversarial. Show this is the spine, the primary verified separation (\leanname{online_strictly_stronger_pac}): stochastic order makes VC govern, adversarial order makes Littlestone govern, with thresholds as the one class realizing VC one and Littlestone infinite.
+\item \textbf{Privacy constraint.} Require a differentially private learner. Show this is a frontier hanging off the i.i.d.\ node: under pure privacy the characterizing quantity is a representation dimension distinct from VC, and the kernel has no privacy infrastructure, so the node is dashed and open.
+\item \textbf{In-context presentation.} Let the data arrive as a prompt consumed by an attention learner. Show this is a boundary carrying a measurability side-condition: a hard attention head's failure event can be analytic but not Borel (\leanname{attention_nonBorel_badEvent}), so the characterizations apply only under the well-behavedness the four classical nodes silently assume.
+\end{enumerate}
