@@ -211,6 +211,17 @@ When all checks pass, \texttt{validate\_graph.py} produces:
 =================================================================
 \end{verbatim}
 
+\noindent\textbf{What the checks certify.}  The thirteen checks establish
+\emph{structural} integrity---valid JSON, unique and resolvable node
+identifiers, schema-conformant relations and fields, matching counts, and
+fully resolved citations.  They do \emph{not} certify the \emph{semantic}
+correctness of an edge's target or of an analogy's obstruction label: a
+well-formed but mis-targeted edge passes every check.  Semantic correctness is
+maintained separately, by reconciling the graph against the proofs in the main
+text---for instance, the corrections of \Cref{ch:extensions} to the
+Natarajan/DS relationship and of \Cref{ch:computational} to the assumption
+underlying computational hardness.
+
 \noindent When a check fails, the validator prints up to 20 detail lines identifying specific violations.  For example, a dangling edge endpoint produces:
 
 \begin{verbatim}
@@ -248,3 +259,59 @@ The benchmark consists of 15 tasks (see Appendix~\ref{app:traversals}).  Executi
 \end{verbatim}
 
 \noindent Scoring modes include \texttt{set\_match} (exact set equality), \texttt{chain\_match} (ordered sequence), and \texttt{structured\_explanation} (required elements present in structured output).  The expected output on a correct implementation is 15/15 tasks passed.
+
+% ----------------------------------------------------------
+\section{The Machine-Checked Layer}
+\label{sec:machine-checked}
+
+The validators above guard the \emph{graph}.  A second, independent layer
+guards a subset of the \emph{theorems}: where a result has a companion in the
+machine-checked Lean~4 development, the main text marks it with a
+\texttt{\textbackslash formal} footnote naming the verified declaration.  Each
+such declaration is \texttt{sorry}-free.  The companions fall in two
+libraries---the learning-theory kernel (FLT) and the transformer library
+(TLT).
+
+\begingroup\sloppy\emergencystretch=2.5em
+\smallskip
+\noindent\emph{Learning-theory kernel (FLT), representative sample:}
+\leanname{fundamental_theorem} (the fundamental theorem, \Cref{ch:pac});
+\leanname{vcdim_bounds_rademacher_quantitative}, \leanname{finite_massart_lemma},
+and \leanname{pac_bayes_finite} (\Cref{ch:generalization});
+\leanname{fundamental_vc_compression} (\Cref{ch:compression});
+\leanname{optimal_mistake_bound_eq_ldim} and the dimension-as-ordinal bridge
+\leanname{withTopNatToOrdinal}, \leanname{vcdim_to_ordinal_vcdim}
+(\Cref{ch:ordinals}); \leanname{vcdim_le_of_mistake_bounded},
+\leanname{pac_not_implies_online}, and \leanname{ex_not_implies_pac}
+(\Cref{ch:separations}); the multiclass and real-valued dimensions
+\leanname{NatarajanDim}, \leanname{Pseudodimension}, \leanname{FatShatteringDim}
+(\Cref{ch:extensions}); the minimax pair \leanname{finite_approx_minimax},
+\leanname{mwu_approx_minimax} (\Cref{ch:analogies}); and
+\leanname{vcdim_not_implies_hardness} (\Cref{ch:computational}).
+
+\smallskip
+\noindent\emph{Transformer library (TLT):}
+\leanname{softAttention_wellBehaved} (softmax attention is a well-behaved VC
+class, \Cref{ch:generalization}); \leanname{multiHeadArgmax_wellBehaved}
+(\Cref{ch:compression}); and the certified generalization bounds
+\leanname{attnHead_certified_generalization} for a single head and
+\leanname{config_capacity_law}, \leanname{CertifiedGeneralization} for an
+encoder stack (\Cref{ch:generalization}).
+
+\smallskip
+\noindent\textbf{Scope of the guarantee.}  The companion layer is partial by
+design, and the main text is explicit about its boundary.  Many cited theorems
+are \emph{not} machine-checked and are flagged as open formalization problems
+where they appear---among them the exact $2^{O(d)}$ Moran--Yehudayoff
+compression bound, the Brukhim et al.\ DS characterization of multiclass
+learnability, the Kearns--Valiant cryptographic hardness, and the Bousquet et
+al.\ universal-learning trichotomy.  Two suggestively named kernel declarations
+are deliberately \emph{not} cited as companions, because their statements do
+not prove what their names suggest: \leanname{rademacher_gen_bound}, which only
+asserts the existence of a non-negative real rather than the Rademacher
+generalization bound; and the kernel's \leanname{DSDim}, which is the
+``all labelings realizable'' dimension (satisfying $\DSdim \le \Ndim$) rather
+than the Daniely--Shalev-Shwartz DS dimension (which satisfies
+$\Ndim \le \DSdim$).  Both are recorded as formalization gaps in
+\Cref{ch:generalization} and \Cref{ch:extensions}.
+\par\endgroup
