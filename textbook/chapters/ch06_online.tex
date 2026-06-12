@@ -144,14 +144,15 @@ The \emph{Littlestone dimension} of a hypothesis class $\mathcal{H}$, denoted $\
     treenode/.style={draw, circle, thick, minimum size=0.7cm, fill=onlineblue!10, font=\small\bfseries},
     leafnode/.style={draw, rectangle, rounded corners, thick, minimum width=0.6cm, minimum height=0.45cm, fill=sepgreen!15, font=\scriptsize},
     edgelabel/.style={font=\scriptsize, midway},
+    advedge/.style={draw=thmred, line width=1.3pt},
     level 1/.style={sibling distance=5.6cm},
     level 2/.style={sibling distance=2.8cm},
     level 3/.style={sibling distance=1.4cm},
 ]
 \node[treenode] (root) {$4$}
-    child { node[treenode] {$2$}
-        child { node[treenode] {$1$}
-            child { node[leafnode] {$h_{\leq 0}$} edge from parent node[edgelabel, left] {$0$} }
+    child { node[treenode] (n2) {$2$}
+        child { node[treenode] (n1) {$1$}
+            child { node[leafnode] (h0) {$h_{\leq 0}$} edge from parent node[edgelabel, left] {$0$} }
             child { node[leafnode] {$h_{\leq 1}$} edge from parent node[edgelabel, right] {$1$} }
             edge from parent node[edgelabel, left] {$0$}
         }
@@ -175,17 +176,38 @@ The \emph{Littlestone dimension} of a hypothesis class $\mathcal{H}$, denoted $\
         }
         edge from parent node[edgelabel, right] {$1$}
     };
-
-% Annotation
-\node[right=0.3cm of root, font=\scriptsize\itshape, text=notegray, align=left, anchor=west, xshift=3.5cm] {
-    Domain: $X = \{1,2,\ldots,8\}$\\[2pt]
-    Class: thresholds $h_{\leq \theta}(x) = \ind[x \leq \theta]$\\[2pt]
-    Each internal node presents an instance.\\[2pt]
-    Each leaf witnesses a consistent $h \in \mathcal{H}$.\\[2pt]
-    Depth $= 3 = \lceil \log_2 8 \rceil$.
+% --- highlighted adversary run: root -> 2 -> 1 -> h_{<=0}, forces depth-many (3) mistakes ---
+\draw[advedge] (root) -- (n2);
+\draw[advedge] (n2) -- (n1);
+\draw[advedge] (n1) -- (h0);
+\node[font=\scriptsize\itshape, text=thmred, anchor=north, align=center] at ($(h0.south)+(0,-0.12)$)
+  {adversary run:\\$3$ mistakes forced};
+% --- the general meaning + verified handles (A4: verified >= vs borrowed =) ---
+\node[font=\scriptsize, align=left, anchor=north west] at (3.7,1.05) {%
+  \textbf{A shattered mistake tree.}\\[2pt]
+  \textit{$X=\{1,\dots,8\}$; thresholds $h_{\leq\theta}(x)=\ind[x\leq\theta]$.}\\[1pt]
+  \textit{internal node: an instance; leaf: a consistent $h$.}\\[1pt]
+  \textit{every path realizable $\Rightarrow$ tree shattered.}\\[3pt]
+  depth $=3=\Ldim(\mathcal{H})$\quad\leanname{LittlestoneDim}\\[1pt]
+  a depth-$d$ shattered tree forces $d$ mistakes:\\
+  \quad\leanname{adversary_core}\\[2pt]
+  here $\Ldim\geq 3$\quad\leanname{thresholdTree_shattered}\\[1pt]
+  \textcolor{notegray}{$=\lceil\log_2 8\rceil$\quad(\cite{Littlestone1988})}
 };
 \end{tikzpicture}
-\caption{A complete mistake tree of depth $3$ for the threshold class on $\{1,\ldots,8\}$. Each internal node is labeled with an instance; the left and right children correspond to labels $0$ and $1$. Every root-to-leaf path is consistent with the threshold hypothesis shown at the leaf. The adversary can traverse this tree from root to any leaf, forcing $3$ mistakes.}
+\caption[A shattered mistake tree: the witness object for the Littlestone dimension]{A complete mistake
+tree of depth $3$ for thresholds on $\{1,\ldots,8\}$, drawn as the general witness object it instantiates.
+Each internal node presents an instance and its two edges are the labels $0$ and $1$; every root-to-leaf
+path is realized by the threshold hypothesis at its leaf, which is what makes the tree shattered. A tree
+shattered at depth $d$ is an adversary strategy: descending from the root and labeling each instance to
+contradict the learner forces any learner to make at least $d$ mistakes (the highlighted path shows one
+such run forcing $3$), and the Littlestone dimension is by definition the depth of the deepest shattered
+tree (\leanname{LittlestoneDim}), with the lower bound itself a verified theorem (\leanname{adversary_core}).
+This concrete tree therefore certifies $\Ldim\geq 3$ for thresholds on eight points
+(\leanname{thresholdTree_shattered}); erasing the node labels leaves the abstract shattered mistake tree
+that defines the dimension for any class. The adversary here performs binary search on the threshold, so
+$n$ ordered points give depth $\lceil\log_2(n+1)\rceil$ (\cite{Littlestone1988}; the kernel proves the
+lower half and the infinite-domain case $\Ldim=\infty$).}
 \label{fig:mistake-tree}
 \end{figure}
 
@@ -558,4 +580,30 @@ Each exercise perturbs the game. Show, in the figure's grammar (an adversarial s
 \item \textbf{Online to batch.} Convert an online learner into a batch one by averaging or by the longest-survivor rule. Show this is an instance that runs the gap backward: a mistake-bounded online learner yields a PAC learner with sample complexity governed by the mistake bound, the constructive direction underlying \leanname{online_imp_pac}, so the conversion lands inside the verified web.
 
 \item \textbf{A minimax for the value.} Ask whether the game value is a minimax that factors through a single object, the deepest shattered mistake tree, dual to a potential the Standard Optimal Algorithm descends. Show this is the figure's most general open frontier: it would present the value not as two matched bounds but as one duality, yet no such minimax or potential duality is formalized in the kernel, so the meta-edge is dashed over an otherwise solid value.
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:mistake-tree}}
+
+Each exercise perturbs the tree. Show, in the figure's grammar (a shattered mistake tree whose depth is a lower bound on mistakes and whose maximum over all shattered trees is the Littlestone dimension, solid where a kernel theorem certifies the depth and dashed where the value is borrowed or open), that the generalized tree subsumes the concrete one as an \emph{instance} (another class whose deepest shattered tree gives its dimension), a \emph{boundary} (a non-adaptive tree, or a class where tree-depth strictly exceeds set-size), or a \emph{frontier} (a dashed, open tree dimension).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{A deeper threshold tree.} Replace $\{1,\ldots,8\}$ by $\{1,\ldots,2^d\}$ and build the depth-$d$ binary-search tree. Show this is an instance: the kernel certifies that the threshold tree on any index window $[lo,lo+2^d)$ is shattered (\leanname{thresholdTree_shattered}), so $\Ldim \ge d$, and the concrete figure is the case $d=3$.
+
+\item \textbf{The adversary run.} Read the highlighted root-to-leaf path as an execution rather than a drawing. Show this is the instance that gives the path its meaning: against \emph{any} learner the adversary descending a shattered depth-$d$ tree realizes exactly $d$ mistakes (\leanname{adversary_core}), so the depth is a genuine lower bound and not merely a count of nodes (\leanname{adversary_lower_bound}).
+
+\item \textbf{Erase the labels.} Strip the instances $\{4,2,6,\ldots\}$ and threshold leaves, keeping only the shape. Show this is the figure's generalizing move: the bare complete binary tree with a realizability certificate at each leaf is the abstract witness, the threshold labels are one filling, and $\Ldim$ is the deepest such shape by definition (\leanname{LittlestoneDim}).
+
+\item \textbf{A non-adaptive tree (the VC link).} Force every node at a given depth to present the \emph{same} instance, so the tree is a shattered \emph{set}. Show this is the boundary the figure shares with Figure~\ref{fig:vc-leq-ldim}: a shattered set of size $d$ is a special mistake tree of depth $d$, hence $\VC(\mathcal{H}) \le \Ldim(\mathcal{H})$ always (\leanname{BranchWiseLittlestoneDim_ge_VCDim}), the non-adaptive corner of the adaptive object.
+
+\item \textbf{Depth exceeds set-size.} Take thresholds on $\R$, where the adversary bisects the remaining interval forever. Show this is the boundary where adaptivity strictly wins: the tree dimension is infinite while the shattered-set dimension is one ($\VC=1$), so $\Ldim(\mathcal{H})$ can exceed $\VC(\mathcal{H})$ without bound (\leanname{ldim_threshold_top}, \leanname{online_strictly_stronger_pac}).
+
+\item \textbf{The deepest tree is the value.} Connect the depth bracket to the mistake bound of Figure~\ref{fig:online-protocol}. Show this is an instance that names the bracket: the optimal mistake bound equals the deepest shattered-tree depth (\leanname{optimal_mistake_bound_eq_ldim}), so the annotation ``depth $=\Ldim$'' is the verified value of the game, not a label local to this picture.
+
+\item \textbf{A finite class by counting leaves.} Let $|\mathcal{H}| < \infty$. Show this is an instance read off the tree's width: a complete depth-$d$ tree has $2^d$ leaves each needing a distinct consistent hypothesis, so $\Ldim(\mathcal{H}) \le \lfloor \log_2 |\mathcal{H}| \rfloor$ (\Cref{ex:ldim-examples}), the cardinality ceiling on how deep a shattered tree can run.
+
+\item \textbf{The exact threshold value.} Ask for the matching upper bound that turns $\Ldim \ge \lceil\log_2(n+1)\rceil$ into an equality on $\{1,\ldots,n\}$. Show this is a frontier the kernel only half-covers: the lower half is certified (\leanname{thresholdTree_shattered}) and the infinite case is $\Ldim=\infty$ (\leanname{ldim_threshold_top}), but the exact finite value is borrowed, so the ``$=\lceil\log_2\rceil$'' edge is drawn dashed and cited (\cite{Littlestone1988}).
+
+\item \textbf{Multiclass trees.} Give each internal node $|Y|>2$ children, one per label. Show this is a frontier that re-types the witness: the conjecture is that a multiclass tree-dimension still pins the optimal mistake bound, but the kernel formalizes only the binary $\Ldim$, so the multiclass deepest-tree value is dashed and open (\cref{op:online-multiclass}, \cite{DanielyShalevShwartz2014}).
+
+\item \textbf{The tree as dual of the SOA potential.} Ask whether the deepest shattered tree is one object serving twice: the adversary's strategy (this figure's lower bound) and the learner's potential, which the Standard Optimal Algorithm decreases by at least one per mistake. Show this is the most general open frontier: it would present $\Ldim$ as a single minimax through the tree rather than as two matched bounds, yet no such tree-potential duality is formalized in the kernel, so the meta-edge is dashed over an otherwise solid depth.
 \end{enumerate}
