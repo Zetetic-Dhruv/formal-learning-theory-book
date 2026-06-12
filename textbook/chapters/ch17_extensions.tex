@@ -31,11 +31,11 @@ analogue in the binary case.
 The chapter has six sections.
 
 \begin{enumerate}[leftmargin=*,itemsep=2pt]
-\item \textbf{Multiclass learning} (\Cref{sec:multiclass}): the Natarajan
+\item \textbf{Multiclass learning} (\Cref{sec:multiclass-ext}): the Natarajan
   dimension, the DS dimension, and the resolution of a thirty-year open problem.
 \item \textbf{Real-valued functions} (\Cref{sec:real-valued}):
   pseudodimension and fat-shattering dimension.
-\item \textbf{Agnostic learning} (\Cref{sec:agnostic}): dropping realizability
+\item \textbf{Agnostic learning} (\Cref{sec:agnostic-ext}): dropping realizability
   and the agnostic fundamental theorem.
 \item \textbf{Noise-tolerant and partial concept learning}
   (\Cref{sec:noise-partial}): classification noise, malicious noise,
@@ -123,7 +123,7 @@ $\DSdim=\infty$ obstruction).}
 % ================================================================
 
 \section{Multiclass Learning: From Natarajan to DS}
-\label{sec:multiclass}
+\label{sec:multiclass-ext}
 
 Let $Y = [k] = \{1, 2, \ldots, k\}$ for some $k \geq 2$, and let
 $\mathcal{H} \subseteq Y^X$ be a multiclass hypothesis class.  The question
@@ -220,7 +220,7 @@ agree on all coordinates except possibly coordinate $i$.
 \end{defn}
 
 \begin{defn}[DS Dimension {\cite{DanielyShalevShwartz2014,BrukhimCarmonDinurMoranYehudayoff2022}}]
-\label{def:ds-dim}
+\label{def:ds-dim-ext}
 A set $\{x_1, \ldots, x_d\} \subseteq X$ is \emph{DS-shattered} by
 $\mathcal{H} \subseteq Y^X$ if there exists a function
 $f \colon \{x_1, \ldots, x_d\} \to Y$ such that for every $i \in [d]$,
@@ -437,7 +437,7 @@ a new primitive.
 \subsection{Pseudodimension}
 
 \begin{defn}[Pseudodimension {\cite{Pollard1984,Haussler1992}}]
-\label{def:pseudodim}
+\label{def:pseudodim-ext}
 The \emph{pseudodimension} $\Pdim(\mathcal{F})$ of a function class
 $\mathcal{F} \subseteq \R^X$ is the VC dimension of the class of subgraphs:
 \[
@@ -496,7 +496,7 @@ agnostic setting with real-valued targets, a scale-sensitive
 notion is needed.
 
 \begin{defn}[Fat-Shattering Dimension {\cite{AlonBenDavidCesaBianchiHaussler1997}}]
-\label{def:fat-shattering}
+\label{def:fat-shattering-ext}
 For $\gamma > 0$, the \emph{$\gamma$-fat-shattering dimension}
 $\fatshat_\gamma(\mathcal{F})$ is the largest $d$ such that there exist
 $x_1, \ldots, x_d \in X$ and thresholds $t_1, \ldots, t_d \in \R$ satisfying:
@@ -577,7 +577,7 @@ margins are harder to maintain, so fewer points can be fat-shattered.
 % ================================================================
 
 \section{Agnostic Learning: Dropping Realizability}
-\label{sec:agnostic}
+\label{sec:agnostic-ext}
 
 All results so far have assumed \emph{realizability}: there exists some
 $h^* \in \mathcal{H}$ with $\risk_D(h^*) = 0$.  In practice, models are
@@ -585,7 +585,7 @@ always wrong; the question is how wrong.  The agnostic setting, introduced
 by Haussler~\cite{Haussler1992}, removes the realizability assumption entirely.
 
 \begin{defn}[Agnostic PAC Learning {\cite{Haussler1992}}]
-\label{def:agnostic-pac}
+\label{def:agnostic-pac-ext}
 A hypothesis class $\mathcal{H}$ is \emph{agnostically PAC learnable}
 if there exists a learner $A$ and a function $m \colon (0,1)^2 \to \N$ such
 that for every distribution $D$ over $X \times \{0,1\}$ (with \emph{no}
@@ -765,7 +765,7 @@ When the learner is restricted to output a hypothesis from $\mathcal{H}$
 itself, we call it a \emph{proper} learner.
 
 \begin{defn}[Proper and Improper PAC Learning]
-\label{def:proper-improper}
+\label{def:proper-improper-ext}
 A PAC learner $A$ for class $\mathcal{H}$ is \emph{proper} if
 $A(S) \in \mathcal{H}$ for all samples $S$.  It is \emph{improper} if
 $A(S)$ may lie in a larger class $\mathcal{H}' \supseteq \mathcal{H}$.

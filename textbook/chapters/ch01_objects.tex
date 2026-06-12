@@ -33,7 +33,7 @@ A \emph{hypothesis} $h : X \to Y$ is a candidate prediction rule that a learning
 \end{defn}
 
 \begin{defn}[Realizable and Agnostic]
-\label{def:realizable}
+\label{def:realizable-objects}
 The learning problem $(\mathcal{C}, \mathcal{H})$ is \emph{realizable} when every target is available to the learner, $\mathcal{C} \subseteq \mathcal{H}$.\formal{FLT_Proofs.Basic.Realizable} It is \emph{agnostic} when no such containment is assumed; the agnostic setting is precisely the \emph{absence} of a realizability hypothesis, and the learner competes against the best hypothesis in $\mathcal{H}$ rather than against a perfect one.
 \end{defn}
 
@@ -448,7 +448,7 @@ A concept class has finite VC dimension if and only if it admits a sample compre
 \]\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression}
 \end{thm}
 
-We prove this in \Cref{ch:compression}; here it closes the circle. Through \cref{thm:vc-char,thm:compression-char}, ``prefer the hypothesis that compresses'' and ``prefer the learnable hypothesis'' are the same condition on the class. The qualification ``with side information'' carries weight: whether every class of VC dimension $d$ admits a compression scheme of size $O(d)$ \emph{without} side information is the Littlestone--Warmuth conjecture, still open, and isolated as such in the verified development (\cref{op:compression}).\formal{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening}
+We prove this in \Cref{ch:compression}; here it closes the circle. Through \cref{thm:vc-char,thm:compression-char}, ``prefer the hypothesis that compresses'' and ``prefer the learnable hypothesis'' are the same condition on the class. The qualification ``with side information'' carries weight: whether every class of VC dimension $d$ admits a compression scheme of size $O(d)$ \emph{without} side information is the Littlestone--Warmuth conjecture, still open, and isolated as such in the verified development (\cref{op:compression-objects}).\formal{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening}
 
 \subsection{Structural Risk Minimization}
 
@@ -535,7 +535,7 @@ The first conjunct is \cref{prop:attention-wellbehaved}.  For the second, replac
 The following thirteen problems are research-grade. Each is anchored to a concept introduced above and tagged by its epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated question awaiting an answer; an \emph{unknown known} (\textsc{uk}) is a regularity present in the verified development or the literature that the surrounding theory has not yet absorbed into a clean statement. Where a verified handle exists, it is named.
 
 \begin{openprob}[Sample compression conjecture, \textsc{ku}]
-\label{op:compression}
+\label{op:compression-objects}
 \Cref{thm:compression-char} characterizes finite VC dimension by compression \emph{with} side information. Prove or refute the Littlestone--Warmuth conjecture: every class of VC dimension $d$ admits a sample compression scheme of size $O(d)$ \emph{without} side information. The gap is isolated in the verified development as \leanname{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening}; the best known unconditional bound is exponential in $d$, and $O(d)$ would tighten every compression-based generalization bound in \Cref{ch:compression}.
 \end{openprob}
 
@@ -585,7 +585,7 @@ The coding theorem $K(x) = -\log M(x) + O(1)$ (\cref{def:alg-prob}) hides an add
 \end{openprob}
 
 \begin{openprob}[The VC dimension of attention, \textsc{ku}]
-\label{op:attention-vc}
+\label{op:attention-vc-objects}
 \Cref{prop:attention-wellbehaved} shows the softmax-attention class $\mathcal{A}_{d,n_K}$ is a well-behaved object, so \cref{thm:vc-char} applies once its VC dimension is known to be finite.  Is $\VC(\mathcal{A}_{d,n_K})$ finite for every $d, n_K$, and what is its exact growth in $d$ and $n_K$?  A Pfaffian-function argument suggests finiteness, but no machine-checked bound exists; closing it would place attention definitively on the learnable side of the hub diagram (\cref{fig:concept-class-hub}) and is the verified counterpart to the well-behavedness handle \leanname{softAttention_wellBehaved}.
 \end{openprob}
 

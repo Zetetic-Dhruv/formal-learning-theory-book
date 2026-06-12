@@ -453,7 +453,7 @@ hypothesis revisions.  A different axis of relaxation tolerates
 \emph{errors} in the final hypothesis.
 
 \begin{defn}[$\Ex_a^*$ -- Anomalous Learning {\cite{CaseSmith1983}}]
-\label{def:anomalous}
+\label{def:anomalous-ord}
 For $a \in \N$, the class $\Ex_a^*$ consists of all concept classes
 $\mathcal{C}$ for which there exists a learner that converges to a
 hypothesis correct on all but at most $a$ inputs.  $\Ex^*$ allows
@@ -495,7 +495,7 @@ output hypotheses that are all extensionally correct, but the index
 may keep changing.
 
 \begin{defn}[$\BC$-Learning {\cite{CaseSmith1983}}]
-\label{def:bc-learning}
+\label{def:bc-learning-ord}
 A learner $M$ \emph{$\BC$-identifies} a function $f$ if there exists
 $t_0$ such that for all $t \geq t_0$, $\varphi_{h_t} = f$
 (extensional equality).  The hypothesis index $h_t$ may continue

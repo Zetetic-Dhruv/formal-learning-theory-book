@@ -322,7 +322,7 @@ The teaching dimension measures the cooperative communication complexity of lear
 \subsection{The minimally adequate teacher}
 
 \begin{defn}[Minimally Adequate Teacher {\cite{Angluin1988}}]
-\label{def:mat}
+\label{def:mat-agents}
 A \emph{minimally adequate teacher} (MAT) for $\mathcal{C}$ provides a membership oracle $\mathrm{MQ}$ and an equivalence oracle $\mathrm{EQ}$ (\Cref{ch:data}). A class is MAT-learnable if some algorithm exactly identifies any $c \in \mathcal{C}$ using polynomially many queries.
 \end{defn}
 
@@ -368,7 +368,7 @@ No analogue of the fundamental theorem of PAC learning exists for meta-learning:
 
 \begin{openprob}[A combinatorial characterization of MAT-learnability, \textsc{ku}]
 \label{op:mat-char}
-Which classes are learnable from a minimally adequate teacher (\cref{def:mat}) in polynomial time? Beyond DFAs the picture is partial---decision trees, certain Boolean formulas, residual finite-state automata are known positive. Give a combinatorial characterization analogous to the VC dimension for PAC learning, or show the query model admits none.
+Which classes are learnable from a minimally adequate teacher (\cref{def:mat-agents}) in polynomial time? Beyond DFAs the picture is partial---decision trees, certain Boolean formulas, residual finite-state automata are known positive. Give a combinatorial characterization analogous to the VC dimension for PAC learning, or show the query model admits none.
 \end{openprob}
 
 \begin{openprob}[Capacity of attention learners, \textsc{uk}]

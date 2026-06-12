@@ -194,7 +194,7 @@ succeed, and when is PAC learning possible at all?}
 The main result of this section is:
 
 \begin{thm}[VC Characterization of PAC Learnability {\cite{BlumerEhrenfeuchtHausslerWarmuth1989,VapnikChervonenkis1971}}]
-\label{thm:vc-char}
+\label{thm:vc-char-pac}
 Let $\mathcal{H}$ be a hypothesis class over domain $X$.  The following are
 equivalent:
 \begin{enumerate}[label=(\roman*)]
@@ -238,7 +238,7 @@ The growth function measures the effective richness of $\mathcal{H}$ on finite
 samples.
 
 \begin{defn}[Growth Function]
-\label{def:growth-function}
+\label{def:growth-function-pac}
 For a hypothesis class $\mathcal{H}$ over $X$ and integer $m \geq 1$,
 \[
   \growth_\mathcal{H}(m) = \max_{\{x_1, \ldots, x_m\} \subseteq X}
@@ -251,7 +251,7 @@ equality when $\mathcal{H}$ shatters some set of size $m$.  The Sauer--Shelah
 lemma says that finite VC dimension forces a polynomial bound.
 
 \begin{lemma}[Sauer--Shelah {\cite{Sauer1972,Shelah1972}}]
-\label{lem:sauer-shelah}
+\label{lem:sauer-shelah-pac}
 If $\VC(\mathcal{H}) = d$, then for all $m \geq d$,
 \[
   \growth_\mathcal{H}(m)
@@ -272,7 +272,7 @@ $\growth_\mathcal{H}(m) = O(m^d)$---polynomial, not exponential.
 % -----------------------------------------------
 
 \subsection{Stage 2: Uniform Convergence}
-\label{sec:uniform-convergence}
+\label{sec:uniform-convergence-pac}
 
 The uniform convergence property says that empirical risk converges to true risk
 \emph{simultaneously} for all hypotheses in $\mathcal{H}$, not just for a
@@ -495,7 +495,7 @@ shatter---controls everything.
 \section{The Fundamental Theorem of Statistical Learning}
 \label{sec:fundamental}
 
-The VC characterization (\Cref{thm:vc-char}) is the core equivalence.  But the
+The VC characterization (\Cref{thm:vc-char-pac}) is the core equivalence.  But the
 full picture is richer: PAC learnability is equivalent to \emph{nine}
 conditions, not just three.  The Fundamental Theorem packages them all.
 
@@ -601,7 +601,7 @@ The remaining directions:
 
 \begin{itemize}[leftmargin=*,itemsep=4pt]
 \item $\ref{F:finvc} \Leftrightarrow \ref{F:fingrowth}$:  By the Sauer--Shelah
-  lemma (\Cref{lem:sauer-shelah}), $\VC(\mathcal{H}) = d$ implies
+  lemma (\Cref{lem:sauer-shelah-pac}), $\VC(\mathcal{H}) = d$ implies
   $\growth_\mathcal{H}(m) \leq (em/d)^d < 2^m$ for $m$ large enough.
   Conversely, if $\VC(\mathcal{H}) = \infty$, then $\growth_\mathcal{H}(m) =
   2^m$ for all $m$ (since $\mathcal{H}$ shatters a set of every finite size).
@@ -695,7 +695,7 @@ The Fundamental Theorem reaches well beyond the geometric classes of \cref{ex:pa
 
 \begin{prop}[Soft attention meets the Fundamental Theorem's hypotheses]
 \label{prop:attention-pac}
-The soft-attention concept class $\mathcal{A}_{d,n_K}$ is a well-behaved VC-measurable target: every concept in it is measurable, and the class satisfies the regularity condition under which \cref{thm:vc-char,thm:fundamental} were proved.\formal{TLT.Bridge.softAttention_wellBehaved} Consequently the equivalence web applies to it verbatim: $\mathcal{A}_{d,n_K}$ is PAC learnable if and only if $\VC(\mathcal{A}_{d,n_K}) < \infty$, with the sample complexity of \cref{thm:vc-char}.
+The soft-attention concept class $\mathcal{A}_{d,n_K}$ is a well-behaved VC-measurable target: every concept in it is measurable, and the class satisfies the regularity condition under which \cref{thm:vc-char-pac,thm:fundamental} were proved.\formal{TLT.Bridge.softAttention_wellBehaved} Consequently the equivalence web applies to it verbatim: $\mathcal{A}_{d,n_K}$ is PAC learnable if and only if $\VC(\mathcal{A}_{d,n_K}) < \infty$, with the sample complexity of \cref{thm:vc-char-pac}.
 \end{prop}
 
 \begin{proof}
@@ -790,7 +790,7 @@ information structure.
 \subsection{The PAC Lower Bound}
 \label{sec:pac-lower}
 
-The upper bound of \Cref{thm:vc-char} gives $m = O(d/\varepsilon)$ in the
+The upper bound of \Cref{thm:vc-char-pac} gives $m = O(d/\varepsilon)$ in the
 realizable case.  The following shows this is tight up to constants.
 
 \begin{thm}[PAC Lower Bound]
@@ -898,7 +898,7 @@ The computational question---when can learning be done in polynomial
 time---is a separate and largely open problem.
 
 \begin{thm}[Computational Hardness {\cite{KearnsValiant1994}}]
-\label{thm:kearns-valiant}
+\label{thm:kearns-valiant-pac}
 Under standard cryptographic assumptions (specifically, the existence of
 one-way functions), there exist concept classes $\mathcal{C}$ with
 $\VC(\mathcal{C}) = O(\log n)$ that are PAC learnable
@@ -946,7 +946,7 @@ class $\mathcal{H}$:
 Finite VC dimension & Vapnik--Chervonenkis (1971) & \Cref{sec:vc-char} \\
 Uniform convergence & Vapnik--Chervonenkis (1971) & \Cref{thm:unif-conv} \\
 ERM is a PAC learner & Blumer et al.\ (1989) & \Cref{prop:erm-pac} \\
-PAC learnable & Valiant (1984) & \Cref{thm:vc-char} \\
+PAC learnable & Valiant (1984) & \Cref{thm:vc-char-pac} \\
 Agnostic PAC learnable & Haussler (1992) & \Cref{sec:agnostic} \\
 $\growth(m) < 2^m$ for some $m$ & Sauer--Shelah (1972) & \Cref{sec:proof-architecture} \\
 Finite compression scheme & Moran--Yehudayoff (2016) & \Cref{sec:compression-direction} \\
@@ -1076,12 +1076,12 @@ The Fundamental Theorem's compression equivalence \ref{F:compression} is the fin
 
 \begin{openprob}[Optimal constants in the sample complexity, \textsc{ku}]
 \label{op:sample-constant}
-\Cref{thm:vc-char,thm:pac-lower} bracket the realizable sample complexity as $\Theta(d/\varepsilon)$, and Hanneke~\cite{Hanneke2016} removed the logarithmic factor.  Determine the exact leading constant in both the realizable $\Theta(d/\varepsilon)$ and agnostic $\Theta(d/\varepsilon^2)$ rates, matching the verified lower bound \leanname{FLT_Proofs.Theorem.PAC.pac_lower_bound} to a constant-tight upper bound.
+\Cref{thm:vc-char-pac,thm:pac-lower} bracket the realizable sample complexity as $\Theta(d/\varepsilon)$, and Hanneke~\cite{Hanneke2016} removed the logarithmic factor.  Determine the exact leading constant in both the realizable $\Theta(d/\varepsilon)$ and agnostic $\Theta(d/\varepsilon^2)$ rates, matching the verified lower bound \leanname{FLT_Proofs.Theorem.PAC.pac_lower_bound} to a constant-tight upper bound.
 \end{openprob}
 
 \begin{openprob}[A characterization of efficient PAC learnability, \textsc{ku}]
 \label{op:efficient-pac}
-\Cref{thm:kearns-valiant} exhibits classes that are PAC learnable but not efficiently so.  The Fundamental Theorem characterizes information-theoretic learnability by a single dimension; give a combinatorial or complexity-theoretic characterization of which finite-VC classes are \emph{polynomial-time} PAC learnable, or prove (under standard assumptions) that no purely combinatorial characterization exists.
+\Cref{thm:kearns-valiant-pac} exhibits classes that are PAC learnable but not efficiently so.  The Fundamental Theorem characterizes information-theoretic learnability by a single dimension; give a combinatorial or complexity-theoretic characterization of which finite-VC classes are \emph{polynomial-time} PAC learnable, or prove (under standard assumptions) that no purely combinatorial characterization exists.
 \end{openprob}
 
 \begin{openprob}[Unifying the Rademacher face, \textsc{uk}]
@@ -1091,7 +1091,7 @@ The development proves a Rademacher-complexity face of the Fundamental Theorem--
 
 \begin{openprob}[The proper/improper price in PAC, \textsc{ku}]
 \label{op:proper-improper-pac}
-The Fundamental Theorem is representation-independent (\Cref{ch:objects}), yet \cref{thm:kearns-valiant} and the computational interlude show the proper/improper distinction is computationally sharp.  Exhibit an invariant of $\mathcal{H}$ that controls the proper-versus-improper sample or time gap, and characterize the classes for which proper PAC learning is no costlier than improper.
+The Fundamental Theorem is representation-independent (\Cref{ch:objects}), yet \cref{thm:kearns-valiant-pac} and the computational interlude show the proper/improper distinction is computationally sharp.  Exhibit an invariant of $\mathcal{H}$ that controls the proper-versus-improper sample or time gap, and characterize the classes for which proper PAC learning is no costlier than improper.
 \end{openprob}
 
 \begin{openprob}[Distribution-dependent learnability, \textsc{ku}]
