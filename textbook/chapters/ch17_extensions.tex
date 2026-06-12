@@ -963,32 +963,71 @@ witness ``3-term DNF: NP-hard proper, poly-time improper.''
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-  node distance=2cm and 3cm,
-  box/.style={
-    rectangle, rounded corners=4pt, draw, thick,
-    minimum width=3cm, minimum height=1cm,
-    font=\small, align=center
-  },
-  arr/.style={-{Stealth[length=6pt]}, thick}
+  >={Stealth[length=5pt]},
+  % cells: fill = learner type (improper green / proper red);
+  %        border = evidence (solid = machine-checked / dashed = literature)
+  cell/.style={rectangle, rounded corners=3pt, draw, thick,
+    minimum width=3.5cm, minimum height=1.3cm, font=\small, align=center, inner sep=3pt},
+  vcell/.style={cell},                 % solid border = kernel-verified
+  lcell/.style={cell, dashed},         % dashed border = literature
+  impf/.style={fill=sepgreen!12},
+  propf/.style={fill=thmred!12},
+  hd/.style={font=\small\bfseries\sffamily, align=center},
+  rl/.style={font=\small\bfseries\sffamily, align=center, text width=2.5cm},
+  verdict/.style={font=\scriptsize\itshape, text=notegray, align=center},
+  rel/.style={-{Stealth[length=5pt]}, dashed, notegray, thick}
 ]
+% --- column headers ---
+\node[hd, text=sepgreen] (hi) at (0,2.05)   {Improper\\[-1pt]{\scriptsize $h \in \mathcal{H}'$}};
+\node[hd, text=thmred]   (hp) at (4.7,2.05)  {Proper\\[-1pt]{\scriptsize $h \in \mathcal{H}$}};
 
-\node[box, fill=sepgreen!10] (imp) {Improper learner\\outputs $h \in \mathcal{H}'$};
-\node[box, fill=thmred!10, right=3cm of imp] (prop) {Proper learner\\outputs $h \in \mathcal{H}$};
+% --- row 1: STATISTICAL layer (SOLID border = machine-checked) ---
+\node[vcell, impf]  (si) at (0,0.65)   {$\Theta(d/\varepsilon)$ samples};
+\node[vcell, propf] (sp) at (4.7,0.65)  {$\Theta(d/\varepsilon)$ samples};
 
-\node[box, fill=layergray, below=1.5cm of imp] (samp) {Same sample\\complexity\\$\Theta(d/\varepsilon)$};
-\node[box, fill=layergray, below=1.5cm of prop] (comp) {Computational\\gap\\(NP-hard vs poly)};
+% --- row 2: COMPUTATIONAL layer (DASHED border = literature) ---
+\node[lcell, impf]  (ci) at (0,-1.35)  {Polynomial time\\{\footnotesize (via $k$-CNF)}};
+\node[lcell, propf] (cp) at (4.7,-1.35) {NP-hard\\{\footnotesize (via $k$-colouring)}};
 
-\draw[arr, sepgreen] (imp) -- (samp);
-\draw[arr, thmred] (prop) -- (comp);
-\draw[arr, dashed, notegray] (prop) -- node[above, font=\small\itshape] {restricted to $\mathcal{H}$} (imp);
+% --- row labels (left) ---
+\node[rl, text=defblue]    at (-2.95,0.65)  {Statistical\\[-1pt]{\scriptsize (machine-checked)}};
+\node[rl, text=boundbrown] at (-2.95,-1.35) {Computational\\[-1pt]{\scriptsize (literature)}};
 
-\node[below=0.3cm of samp, font=\small\itshape, text=notegray]
-  {Information-theoretic: no gap};
-\node[below=0.3cm of comp, font=\small\itshape, text=notegray]
-  {Computational: gap via $k$-colorability};
+% --- verdicts (right) ---
+\node[verdict] at (7.3,0.65)  {same:\\no gap};
+\node[verdict] at (7.3,-1.35) {differs:\\the gap};
+
+% --- restriction relation (row 1, between columns) ---
+\draw[rel] (sp.west) -- node[above, font=\scriptsize\itshape, text=notegray] {$\subseteq\mathcal{H}$} (si.east);
+
+% --- witness (bottom) ---
+\node[font=\scriptsize, align=center, text width=10cm] at (2.35,-2.75)
+  {\textbf{Witness.} $3$-term DNF is one class in all four cells: the same statistically,
+   yet NP-hard to learn properly and polynomial-time improperly (as $3$-CNF).};
 \end{tikzpicture}
-\caption{The proper/improper separation.  The information-theoretic sample
-complexity is the same; the computational complexity can differ dramatically.}
+\caption[Proper versus improper learning as a two-layer table: no statistical
+gap (machine-checked), a computational gap (literature)]{Proper versus improper
+PAC learning, read across two orthogonal layers.  A proper learner must output a
+hypothesis from the class itself; an improper learner may output any efficiently
+evaluatable predictor from a larger class (\Cref{def:proper-improper-ext}).  In
+the statistical, or sample-complexity, layer (top row) there is no separation at
+all: both proper and improper learning are characterised by finite VC dimension
+and both need $\Theta(d/\varepsilon)$ samples, and both halves are
+machine-checked.  The improper half is the fundamental theorem, that a class is
+PAC learnable exactly when its VC dimension is finite
+(\leanname{fundamental_theorem}); the proper half is a verified construction of a
+proper learner from finite VC dimension, producing a hypothesis in the class with
+error at most $1/3$ on bounded support
+(\leanname{vcdim_finite_imp_proper_finite_support_learner}), with the tight
+matching rate a literature refinement.  The gap appears only in the computational
+layer (bottom row), where $3$-term DNF is NP-hard to learn properly, by a
+reduction from graph $3$-colouring (Pitt and Valiant, 1988,
+\Cref{thm:pitt-valiant}), yet is learnable in polynomial time improperly by
+treating it as $3$-CNF.  That computational separation is a literature result
+that the statistical kernel does not reach, so the bottom row is drawn dashed and
+the top row solid.  The figure is the witness that the proper-improper
+distinction is invisible to sample complexity and lives entirely in the
+computational layer.}
 \label{fig:proper-improper}
 \end{figure}
 
@@ -1587,6 +1626,98 @@ proof sketch of \Cref{thm:real-valued-char} tight, or can the $\log^2$ factor be
 the $\gamma$-indexed family irreducible?  Argue the figure is evidence for irreducibility: a
 static frame can draw only one $\gamma$, and \Cref{rmk:scale-family} insists the
 characterization is a family of finiteness conditions, not one number.
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:proper-improper}}
+
+Each exercise perturbs the two-layer table.  Read Figure~\ref{fig:proper-improper} as a
+$2\times2$ lattice: two columns (improper, proper) and two layers (the statistical layer,
+whose cells are drawn solid because both are machine-checked; the computational layer, drawn
+dashed because the separation is literature).  Argue, in this grammar, that each perturbed
+picture subsumes the concrete one as an \emph{instance} (a cell, relation, or witness the
+table already exhibits), a \emph{boundary} (one layer, restriction, or evidence grade
+toggled, so the verdict or its verification status changes), or a \emph{frontier} (a
+formalization or setting the table points to but does not contain).  Honesty rule: the
+statistical row is kernel-verified, the computational row is literature; do not assert the
+computational gap is machine-checked.
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The table is the definition.}  Read \Cref{def:proper-improper-ext} directly off
+the grid.  Show this is the instance the figure exhibits: the columns encode the restriction
+$A(S)\in\mathcal H$ versus $A(S)\in\mathcal H'$, while the rows encode the layer in which that
+restriction is evaluated.  Explain why the definition names only one restriction yet the
+figure needs two layers: the restriction is fixed, but the verdict it produces is read once
+per layer.
+
+\item \textbf{The statistical no-gap row is doubly machine-checked.}  Read the top row, both
+cells solid.  Show this is the instance that proves, not merely asserts, the absence of a
+sample-complexity separation: the improper cell is the fundamental theorem that PAC
+learnability is exactly finite $\VC$ (\leanname{fundamental_theorem}), and the proper cell is a
+verified construction of a proper learner from finite $\VC$, one that outputs a hypothesis in
+the class with bounded error (\leanname{vcdim_finite_imp_proper_finite_support_learner}); since
+both cells carry $\Theta(d/\varepsilon)$ and both are kernel-verified, the equality is a
+theorem, not a slogan.
+
+\item \textbf{One witness threads all four cells.}  Trace $3$-term DNF through the grid.  Show
+this is the instance that inhabits the abstract lattice: a single class whose status is
+constant along the statistical row (learnable both ways) and splits along the computational
+row, NP-hard properly yet polynomial-time improperly as $3$-CNF (the separation box and
+\Cref{thm:pitt-valiant}).
+
+\item \textbf{The layer toggle is what produces the gap.}  Hold the columns fixed and
+intervene on the row.  Define $\mathrm{gap}(\text{layer})$ as the worst-case proper-to-improper
+cost ratio in that layer, and show this is the boundary the figure draws:
+$\mathrm{gap}(\text{statistical})=\Theta(1)$, forced by the two verified cells of Exercise~2,
+while $\mathrm{gap}(\text{computational})$ is superpolynomial unless $\mathrm{RP}=\mathrm{NP}$.
+The gap is an effect of the layer, not of the learner type alone.
+
+\item \textbf{Proper is improper restricted to the class.}  Read the dashed
+$\subseteq\mathcal H$ relation between the columns.  Show this is the boundary where a pure
+restriction of the hypothesis space (\Cref{def:proper-improper-ext}) leaves one quantity
+invariant and blows up another: the $\VC$ dimension of $\mathcal H$ is preserved, so the
+sample complexity is unchanged, but the cost of \emph{searching} $\mathcal H$ for a consistent
+member is not, which is exactly why the restriction is free in the top row and expensive in
+the bottom.
+
+\item \textbf{Qualitative learnability versus the tight rate.}  Read the proper statistical
+cell carefully.  Show this is the boundary between what the kernel verifies and what it
+sharpens: \leanname{vcdim_finite_imp_proper_finite_support_learner} delivers a proper learner
+with error at most $1/3$ on bounded support, which already places the proper cell in the same
+row as the improper one (proper learnability with no asymptotic sample blow-up), while the
+exact matching $\Theta(d/\varepsilon)$ bound remains a literature refinement
+(\cite{KearnsVazirani1994}), not a kernel theorem.
+
+\item \textbf{What the kernel sees, and what it does not.}  Read the solid top row against the
+dashed bottom row.  Show this is the boundary that the two border styles encode: the
+design-lab kernel reasons about sample complexity and statistical learnability and proves the
+whole top row, but exposes no handle for NP-hardness, so no cell of the bottom row is verified.
+Conclude that, for this topic, the verified-versus-literature frontier coincides exactly with
+the statistical-versus-computational frontier.
+
+\item \textbf{Formalize the NP-hardness.}  Treat the bottom-right cell as a formalization
+target.  The Pitt and Valiant reduction from graph $k$-colouring (\Cref{thm:pitt-valiant},
+\cite{PittValiant1988}) is literature; sketch what a machine-checked version would require, a
+kernel encoding of $k$-colouring, of the labelled-sample construction, and of the equivalence
+between a consistent $k$-term DNF and a proper $k$-colouring.  Show this is the frontier that
+would turn the bottom-right cell solid while the rest of the bottom row stayed literature.
+
+\item \textbf{The partial-concept failure of ERM.}  Add a third row.  In the partial-concept
+model (\Cref{def:partial-concept}, \cite{AlonHannekeHolzmanMoran2021}) there are classes of
+partial $\VC$ dimension $1$ with no finite-$\VC$ total extension that empirical risk
+minimization cannot learn at all.  Show this is the frontier where the proper and ERM route
+fails \emph{statistically} rather than computationally: unlike the computational row, the
+proper cell of this third row is empty (no learner) even though improper learning still
+succeeds, so the figure's two-layer picture is itself a special case of a taller table.
+
+\item \textbf{An invariance theorem for the gap.}  Conjecture that no statistical dimension
+detects the proper-improper gap: for every sample-complexity measure, the VC, Natarajan, and
+fat-shattering dimensions among them, the proper and improper cells agree.  Show this is the
+figure's deepest frontier, an invariance statement that the gap is invariant-zero under every
+statistical measurement and nonzero only under a runtime measurement; identify the already
+verified facts (\leanname{fundamental_theorem} on the improper side,
+\leanname{vcdim_finite_imp_proper_finite_support_learner} on the proper side) that would be the
+base case of such a theorem, and argue that no static frame can certify the universal claim,
+so this reading of the table is itself drawn dashed.
 \end{enumerate}
 
 \bigskip
