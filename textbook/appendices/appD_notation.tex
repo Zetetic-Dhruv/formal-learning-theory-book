@@ -63,7 +63,7 @@ $\mathcal{B}_\varepsilon(x)$ & Open ball of radius $\varepsilon$ centered at $x$
 $\VC(\mathcal{H})$ & Vapnik--Chervonenkis dimension: largest set shattered by $\mathcal{H}$. Macro: \verb|\VC|. & Ch.~5 \\
 $\Ldim(\mathcal{H})$ & Littlestone dimension: depth of deepest mistake tree for $\mathcal{H}$. Macro: \verb|\Ldim|. & Ch.~6 \\
 $\DSdim(\mathcal{H})$ & DS dimension (Daniely--Shalev-Shwartz): multiclass PAC characterization. Macro: \verb|\DSdim|. & Ch.~17 \\
-$\Ndim(\mathcal{H})$ & Natarajan dimension: multiclass generalization of VC dimension via two-colorings. Macro: \verb|\Ndim|. & Ch.~17 \\
+$\Ndim(\mathcal{H})$ & Natarajan dimension: multiclass generalization of VC via two-function shattering $(f_0, f_1)$.  Finite $\Ndim$ is sufficient but does \emph{not} characterize multiclass PAC learnability when $|Y| = \infty$; $\Ndim \leq \DSdim$, and $\DSdim$ is the characterizer. Macro: \verb|\Ndim|. & Ch.~17 \\
 $\Pdim(\mathcal{F})$ & Pseudodimension: VC dimension of the subgraph class $\{(x,t) : f(x) \geq t\}$. Macro: \verb|\Pdim|. & Ch.~10 \\
 $\fatshat_\gamma(\mathcal{F})$ & Fat-shattering dimension at scale $\gamma > 0$. Macro: \verb|\fatshat|. & Ch.~10 \\
 $\SQdim(\mathcal{C})$ & Statistical query dimension. Macro: \verb|\SQdim|. & Ch.~10 \\
@@ -166,7 +166,7 @@ $S \sim D^m$ & Sample drawn i.i.d.\ from $D$. & Ch.~2 \\
 \endlastfoot
 $\omega$ & First infinite ordinal; cardinality of $\N$. & Ch.~7 \\
 $\omega^k$ & Ordinal exponentiation (iterated $\omega$). & Ch.~13 \\
-$\omega^\omega$ & First epsilon-unreachable ordinal power (limit of $\omega, \omega^2, \omega^3, \ldots$). & Ch.~13 \\
+$\omega^\omega$ & The supremum of the finite powers $\omega, \omega^2, \omega^3, \ldots$. & Ch.~13 \\
 $\alpha, \beta$ & Arbitrary ordinals. & Ch.~13 \\
 $\mathrm{MC}(L, \mathcal{C})$ & Mind-change count: maximum number of hypothesis changes by learner $L$ on class $\mathcal{C}$. & Ch.~7 \\
 $\mathrm{MC}_\alpha$ & Ordinal mind-change bound at level $\alpha$. & Ch.~13 \\
