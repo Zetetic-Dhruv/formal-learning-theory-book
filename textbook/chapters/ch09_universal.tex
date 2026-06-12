@@ -412,54 +412,66 @@ combinatorial object.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    regime/.style={draw, thick, ellipse, minimum width=3.6cm,
-      minimum height=2.2cm, font=\small, align=center},
+    regime/.style={draw, thick, ellipse, minimum width=3.5cm, minimum height=2.0cm,
+      font=\small, align=center},
+    rate/.style={draw, densely dashed, rounded corners, font=\small\bfseries, inner sep=2pt},
     example/.style={font=\scriptsize, align=center, text=notegray},
-    label/.style={font=\small\bfseries, align=center},
-    connection/.style={thick, dashed, notegray},
+    hdl/.style={font=\tiny, text=defblue!55!black, align=center},
+    srctag/.style={font=\scriptsize\itshape, text=defblue, align=center},
+    solidbar/.style={very thick, {Stealth[length=2mm]}-{Stealth[length=2mm]}},
+    gate/.style={draw, semithick, rounded corners, fill=black!4, draw=black!45,
+      font=\scriptsize, align=center},
+    conn/.style={thin, densely dashed, notegray, -{Stealth[length=1.5mm]}},
 ]
-% Three regimes as overlapping regions
-\node[regime, fill=sepgreen!10] (exp) at (-3.5, 0) {};
-\node[label] at (-3.5, 0.4) {$e^{-n}$};
-\node[example] at (-3.5, -0.3) {finite classes\\halfspaces\\conjunctions};
-
-\node[regime, fill=defblue!10] (lin) at (0, 0) {};
-\node[label] at (0, 0.4) {$1/n$};
-\node[example] at (0, -0.3) {thresholds on $\R$\\intervals on $\R$};
-
-\node[regime, fill=thmred!10] (slow) at (3.5, 0) {};
-\node[label] at (3.5, 0.4) {arb.\ slow};
-\node[example] at (3.5, -0.3) {$\bigcup_k \mathcal{H}_k$\\unbounded\\unions};
-
-% Boundaries
-\draw[very thick, sepgreen!70!black, {Stealth[length=2mm]}-{Stealth[length=2mm]}]
-  (-1.6, -1.8) -- (-1.6, 1.8)
-  node[above, font=\scriptsize, align=center, text=sepgreen!70!black]
-  {$\Ldim < \infty$\\vs.\ $\Ldim = \infty$};
-
-\draw[very thick, thmred!70!black, {Stealth[length=2mm]}-{Stealth[length=2mm]}]
-  (1.7, -1.8) -- (1.7, 1.8)
-  node[above, font=\scriptsize, align=center, text=thmred!70!black]
-  {no $\infty$-VCL\\vs.\ $\infty$-VCL};
-
-% Chapter connections
-\node[font=\scriptsize\itshape, text=defblue, align=center] at (-3.5, -2.6)
-  {Ch.~6: Online\\(Littlestone dim)};
-\node[font=\scriptsize\itshape, text=defblue, align=center] at (0, -2.6)
-  {Ch.~5: PAC\\(VC dim)};
-\node[font=\scriptsize\itshape, text=defblue, align=center] at (3.5, -2.6)
-  {Ch.~9: Universal\\(VCL trees)};
-
-\draw[connection, -{Stealth[length=1.5mm]}] (-3.5, -2.2) -- (-1.8, -1.6);
-\draw[connection, -{Stealth[length=1.5mm]}] (0, -2.2) -- (0, -1.2);
-\draw[connection, -{Stealth[length=1.5mm]}] (3.5, -2.2) -- (1.9, -1.6);
+% --- three regimes: typed objects (SOLID) ---
+\node[regime, fill=sepgreen!10, draw=sepgreen!60!black] (exp) at (-3.6,0) {};
+\node[regime, fill=defblue!10, draw=defblue!60!black] (lin) at (0,0) {};
+\node[regime, fill=thmred!10, draw=thmred!60!black] (slow) at (3.6,0) {};
+% --- rate VALUES: BHMR literature/pending -> DASHED tags inside the top ---
+\node[rate, draw=sepgreen!65!black, text=sepgreen!40!black] at (-3.6,0.55) {$\Theta(e^{-n})$};
+\node[rate, draw=defblue!65!black, text=defblue!45!black] at (0,0.55) {$\Theta(1/n)$};
+\node[rate, draw=thmred!65!black, text=thmred!55!black] at (3.6,0.55) {arb.\ slow};
+% --- example classes ---
+\node[example] at (-3.6,-0.45) {finite classes,\\halfspaces, conjunctions};
+\node[example] at (0,-0.4) {thresholds,\\intervals on $\R$};
+\node[example] at (3.6,-0.45) {$\bigcup_k\mathcal{H}_k$\\unbounded unions};
+\node[hdl, anchor=north] at (0,-1.15) {VC$=1$, $\Ldim=\infty$\\\leanname{vcdim_threshold_finite}\\\leanname{ldim_threshold_top}};
+% --- boundary bars: left VERIFIED, right typed-object (both SOLID); rate consequence dashed ---
+\draw[solidbar, sepgreen!70!black] (-1.8,-1.5) -- (-1.8,1.7)
+   node[above, font=\scriptsize, align=center, text=sepgreen!70!black]
+   {$\Ldim<\infty$ vs.\ $\Ldim=\infty$\\{\tiny\leanname{littlestone_characterization} (verified)}};
+\draw[solidbar, thmred!70!black] (1.8,-1.5) -- (1.8,1.7)
+   node[above, font=\scriptsize, align=center, text=thmred!70!black]
+   {no $\infty$-VCL vs.\ $\infty$-VCL\\{\tiny\cref{def:vcl-tree} (\leanname{VCLTree})}};
+% --- cross-chapter dimensional sources ---
+\node[srctag] at (-3.6,-2.25) {Ch.~6 Online\\(Littlestone dim)};
+\node[srctag] at (0,-2.25) {Ch.~5 PAC\\(VC dim)};
+\node[srctag] at (3.6,-2.25) {Ch.~9 Universal\\(VCL trees)};
+\draw[conn] (-3.6,-1.85) to[out=75,in=-100] (-1.8,-1.55);
+\draw[conn] (3.6,-1.85) to[out=105,in=-80] (1.8,-1.55);
+\draw[conn] (0,-2.7) -- (0,-3.05);
+% --- VC gate: the whether-learnable rung (ch5), bottom of the ladder ---
+\node[gate, text width=11.6cm] (gate) at (0,-3.45)
+   {VC gate (\Cref{ch:pac}): $\VC(\mathcal{H})<\infty\iff\mathcal{H}$ lies in one of the three regimes; $\VC=\infty\Rightarrow$ not universally learnable.};
+% --- evidence-grade legend ---
+\node[font=\scriptsize\itshape, text=black!65, align=center, text width=12cm, anchor=north] at (0,-4.15)
+   {Solid bars: verified or typed boundaries. Dashed rate tags: the values $\Theta(e^{-n})$, $\Theta(1/n)$, arbitrarily slow are \cite{BousquetHannekeMoranVanHandelYehudayoff2021}, cited not yet machine-checked (\cref{op:trichotomy-formal}).};
 \end{tikzpicture}
-\caption{The three rate regimes and their governing combinatorial conditions.
-The left boundary is drawn by the Littlestone dimension (from online
-learning, \Cref{ch:online}); the right boundary by VCL trees (a hybrid of
-VC shattering and Littlestone trees).  The VC dimension (\Cref{ch:pac})
-determines \emph{whether} learning is possible; the Littlestone dimension
-and VCL trees determine \emph{how fast}.}
+\caption[The universal-rate spectrum: one cross-paradigm dimensional ladder]{The universal learning-rate
+landscape as a totally ordered spectrum of three regimes, partitioned by two boundary bars and induced by
+a single ladder of combinatorial dimensions drawn from three paradigms. The VC dimension (\Cref{ch:pac})
+is the coarsest rung, gating \emph{whether} a class is learnable at all; within the learnable classes the
+Littlestone dimension (\Cref{ch:online}, an online and adversarial quantity) draws the left boundary
+between the exponential and linear regimes, and this boundary is the one rate threshold the development
+verifies, since a finite Littlestone dimension is exactly online learnability
+(\leanname{littlestone_characterization}). The VCL tree (\cref{def:vcl-tree}), a hybrid of VC shattering
+and Littlestone trees, draws the right boundary between the linear and arbitrarily-slow regimes. The bars
+and the regime boxes are typed objects, drawn solid; the rate \emph{values} that name the regimes, and the
+claim that exactly one holds, are the theorem of Bousquet--Hanneke--Moran--van Handel--Yehudayoff, cited
+and not yet machine-checked (\cref{op:trichotomy-formal}), so the rate tags are dashed. Each example class
+is placed by its dimension: the threshold family, with VC dimension one yet infinite Littlestone dimension,
+straddles the left bar into the linear regime. The structural surprise is that an adversarial, online
+quantity governs the i.i.d.\ statistical convergence rate.}
 \label{fig:rate-regimes}
 \end{figure}
 
@@ -614,4 +626,30 @@ Each exercise perturbs the decision tree.  Argue, in the figure's grammar (a two
 \item \textbf{Leave the realizable case and the partition may refine.} Relabel the leaves for agnostic or bounded-noise data. Show this is the frontier that may add regimes: the trichotomy is sharp only in the realizable setting, and whether intermediate rates such as $1/\sqrt{n}$ appear, splitting a leaf or introducing a fourth, is open (\cref{op:intermediate-rates}); the figure's ``no fourth regime'' annotation is therefore a realizable-case claim, not a universal one.
 
 \item \textbf{Swap the VCL tree for a multiclass tree.} Replace binary labels by a finite or real-valued label set and the VCL tree by the DS or fat-shattering tree. Show this is the frontier that tests the ladder's stability: whether the three-regime structure persists with the new combinatorial object in the second diamond, or splits further, is open (\cref{op:universal-multiclass}, \Cref{ch:extensions}); decision two's object is paradigm-relative, while decision one's $\Ldim$ threshold is the fixed verified rung.
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:rate-regimes}}
+
+Each exercise perturbs the rate spectrum.  Argue, in the figure's grammar (a totally ordered three-regime spectrum, exponential inside linear inside arbitrarily-slow, separated by two boundary bars and induced by one dimensional ladder of increasing fineness: the VC dimension gates whether a class is learnable, the Littlestone dimension draws the left bar, the VCL tree draws the right bar; where the bars are drawn solid because a verified dimensional threshold or the VCL tree definition certifies them, and the rate values that name the regimes are drawn dashed because they are Bousquet--Hanneke--Moran--van Handel--Yehudayoff's theorem, cited not proved), that the perturbed picture subsumes the concrete one as an \emph{instance} (a class placed in its regime by its dimension), a \emph{boundary} (one dimension toggled so the class crosses a bar), or a \emph{frontier} (a dashed, open or literature-only edge).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The VC dimension is the gate, not a bar.} Read the spectrum bottom-up: ask first whether $\mathcal{H}$ is learnable at all. Show this is the instance that frames the whole picture: a finite VC dimension (\cref{def:vc-dim}) is what places a class in \emph{one of} the three regimes, since finite VC rules out an infinite VCL tree, and an infinite VC dimension drops the class off the spectrum entirely (not universally learnable); the VC dimension therefore sits underneath all three regimes as the whether-learnable rung of the ladder, the coarsest line drawn by \Cref{ch:pac}, while the Littlestone and VCL bars draw the two how-fast lines above it.
+
+\item \textbf{The left bar is the only verified rate boundary.} Read the exponential/linear bar not as a regime label but as a dimensional threshold. Show this is the spectrum's defining instance: the bar is exactly $\Ldim(\mathcal{H}) < \infty$ versus $\Ldim(\mathcal{H}) = \infty$, which is exactly online learnability versus not, by the Littlestone characterization (\cref{thm:littlestone-characterization}, \leanname{littlestone_characterization}); this is the one boundary on the spectrum that the kernel certifies, so the bar is solid even though the $\Theta(e^{-n})$ and $\Theta(1/n)$ labels beside it are dashed.
+
+\item \textbf{The threshold family straddles the left bar.} Instantiate $\mathcal{H}$ as thresholds (on $\mathbb{N}$, the verified witness for thresholds on $\R$). Show this is the boundary that lands on the middle regime: the class has VC dimension one, hence finite (\leanname{vcdim_threshold_finite}), yet Littlestone dimension infinite (\leanname{ldim_threshold_top}), so it sits to the learnable side of the VC gate but to the $\Ldim = \infty$ side of the left bar, placing it in the linear regime; the two dimensions are verified and pin the class's \emph{position}, while its $\Theta(1/n)$ \emph{rate} is the dashed literature claim (\cref{op:trichotomy-formal}).
+
+\item \textbf{Halfspaces sit in the exponential regime.} Replace $\mathcal{H}$ by halfspaces in $\R^d$. Show this is the instance on the left regime: halfspaces have finite Littlestone dimension $d$ (\cref{ex:ldim-examples}), so the class answers ``no'' at the left bar and lands in the exponential regime despite infinite cardinality; its membership to the left of the bar is certified by the Littlestone characterization (\leanname{littlestone_characterization}), and only the $\Theta(e^{-n})$ rate that names the regime is the dashed value (\cref{op:trichotomy-formal}).
+
+\item \textbf{An infinite VC dimension drops the class off the spectrum.} Take a class that shatters arbitrarily large finite sets. Show this is the boundary that exits the picture: infinite VC dimension forces an infinite VCL tree (every path shatters its instances), so the class crosses the right bar into the arbitrarily-slow regime and is not universally learnable at any uniform rate; the regime box is solid as a typed object (\leanname{UniversalLearnable}), but the lower bound ``for every $R(n)\to 0$, some realizable $D$ defeats every learner'' is the theorem, dashed and not kernel-proved (\cref{op:trichotomy-formal}).
+
+\item \textbf{Unbounded unions reach the right regime with finite VC.} Instantiate $\mathcal{H}$ as $\bigcup_k \mathcal{H}_k$, unions of finitely many intervals on $\R$ with no bound on the number. Show this is the instance that distinguishes the right bar from the VC gate: the class has finite VC dimension, so it clears the whether-learnable gate, yet admits infinite VCL trees, so it still lands in the arbitrarily-slow regime; this is why the right bar is a genuinely finer line than the VC gate, and why no single finite-VC argument places a class on the spectrum without consulting its VCL trees (\cref{op:vcl-characterization}).
+
+\item \textbf{The rates are typed but unproved.} Ask the kernel for the statement ``this class learns at rate $\Theta(e^{-n})$''. Show this is the spectrum's principal frontier: the three regimes are typed (the universal-rate criterion \cref{def:universal-rate} is \leanname{FLT_Proofs.Criterion.Extended.UniversalLearnable}), so the regime boxes are well-typed objects, but the rate \emph{values} and the ``exactly one of three'' partition are not machine-checked; the trichotomy theorem and its middle branch are pending and the universal-to-PAC direction rests on an unfinished boosting lemma, which is exactly \cref{op:trichotomy-formal} (\cite{BousquetHannekeMoranVanHandelYehudayoff2021}), so every rate label on the spectrum is dashed.
+
+\item \textbf{An online quantity draws a statistical line.} Read the left bar across paradigms. Show this is the frontier that makes the spectrum surprising: the same Littlestone dimension that bounds worst-case mistakes against an adversary in \Cref{ch:online} draws the exponential/linear boundary in the i.i.d.\ statistical setting (\cref{sec:surprise}), so the spectrum's left bar is imported wholesale from a different paradigm; a single structural reason for this cross-paradigm coincidence, beyond the trichotomy proof, is open (\cref{op:universal-online-bridge}).
+
+\item \textbf{Collapse the right bar to a single dimension.} Suppose someone exhibits an ordinal-valued measure whose finiteness equals ``no infinite VCL tree''. Show this would make the spectrum symmetric: the linear/arbitrarily-slow bar would read ``$\dim < \infty$'' the way the left bar reads ``$\Ldim < \infty$'', so a single ordinal invariant with three value-ranges would order the entire spectrum and both bars would become solid dimensional thresholds; whether such a dimension exists is open (\cref{op:vcl-characterization}, building on \leanname{FLT_Proofs.Complexity.Ordinal.OrdinalLittlestoneDim}).
+
+\item \textbf{Leave the realizable case and the spectrum may grow a regime.} Relabel the regimes for agnostic or bounded-noise data. Show this is the frontier that may add a bar: the three-regime spectrum is sharp only in the realizable setting, and whether an intermediate rate such as $1/\sqrt{n}$ appears, splitting a regime or inserting a fourth, is open (\cref{op:intermediate-rates}); the figure's three-regime totality is therefore a realizable-case claim, and the multiclass version with the fat-shattering tree in place of the VCL tree may refine it further (\cref{op:universal-multiclass}, \Cref{ch:extensions}).
 \end{enumerate}
