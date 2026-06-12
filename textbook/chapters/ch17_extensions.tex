@@ -261,12 +261,18 @@ one-inclusion hypergraph of $\mathcal{H}$.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-  scale=0.85,
+  scale=0.82,
   point/.style={circle, fill=defblue, inner sep=1.8pt},
   hyp/.style={font=\small},
-  brace/.style={decorate, decoration={brace, amplitude=5pt}}
+  agree/.style={circle, fill=defblue!20, draw=defblue, inner sep=1.8pt},
+  deviate/.style={circle, fill=thmred!20, draw=thmred, inner sep=1.8pt},
+  brace/.style={decorate, decoration={brace, amplitude=5pt}},
+  oigv/.style={circle, draw=defblue, fill=defblue!12, inner sep=2.4pt, font=\scriptsize},
+  cedge/.style={defblue, thick}
 ]
-% Default labeling
+% ===== LEFT PANEL: the DS witness table (the definition, d = 3) =====
+\node[font=\bfseries\small] at (1.5, 3.15) {Witness table};
+
 \node[hyp] at (-1.5, 2.0) {Default $f$:};
 \foreach \i/\lbl in {1/a, 2/b, 3/c} {
   \node[point] (x\i) at (1.5*\i, 2.0) {};
@@ -274,34 +280,75 @@ one-inclusion hypergraph of $\mathcal{H}$.
   \node[below=5pt, font=\small, text=defblue] at (x\i) {$\lbl$};
 }
 
-% Witness hypotheses
+% Witness h1 : deviates at x1 only
 \node[hyp] at (-1.5, 0.6) {$h_1$:};
-\foreach \i/\lbl/\col in {1/{\neq a}/thmred, 2/b/defblue, 3/c/defblue} {
-  \node[circle, fill=\col!20, draw=\col, inner sep=1.8pt] (h1\i) at (1.5*\i, 0.6) {};
-  \node[below=5pt, font=\small, text=\col] at (h1\i) {$\lbl$};
-}
+\node[deviate] (h11) at (1.5, 0.6) {};  \node[below=5pt, font=\small, text=thmred] at (h11) {$\neq a$};
+\node[agree]   (h12) at (3.0, 0.6) {};  \node[below=5pt, font=\small, text=defblue] at (h12) {$b$};
+\node[agree]   (h13) at (4.5, 0.6) {};  \node[below=5pt, font=\small, text=defblue] at (h13) {$c$};
 
+% Witness h2 : deviates at x2 only
 \node[hyp] at (-1.5, -0.4) {$h_2$:};
-\foreach \i/\lbl/\col in {1/a/defblue, 2/{\neq b}/thmred, 3/c/defblue} {
-  \node[circle, fill=\col!20, draw=\col, inner sep=1.8pt] (h2\i) at (1.5*\i, -0.4) {};
-  \node[below=5pt, font=\small, text=\col] at (h2\i) {$\lbl$};
-}
+\node[agree]   (h21) at (1.5, -0.4) {}; \node[below=5pt, font=\small, text=defblue] at (h21) {$a$};
+\node[deviate] (h22) at (3.0, -0.4) {}; \node[below=5pt, font=\small, text=thmred] at (h22) {$\neq b$};
+\node[agree]   (h23) at (4.5, -0.4) {}; \node[below=5pt, font=\small, text=defblue] at (h23) {$c$};
 
+% Witness h3 : deviates at x3 only
 \node[hyp] at (-1.5, -1.4) {$h_3$:};
-\foreach \i/\lbl/\col in {1/a/defblue, 2/b/defblue, 3/{\neq c}/thmred} {
-  \node[circle, fill=\col!20, draw=\col, inner sep=1.8pt] (h3\i) at (1.5*\i, -1.4) {};
-  \node[below=5pt, font=\small, text=\col] at (h3\i) {$\lbl$};
-}
+\node[agree]   (h31) at (1.5, -1.4) {}; \node[below=5pt, font=\small, text=defblue] at (h31) {$a$};
+\node[agree]   (h32) at (3.0, -1.4) {}; \node[below=5pt, font=\small, text=defblue] at (h32) {$b$};
+\node[deviate] (h33) at (4.5, -1.4) {}; \node[below=5pt, font=\small, text=thmred] at (h33) {$\neq c$};
 
-% Annotations
-\draw[brace] (5.3, 0.9) -- (5.3, -1.7)
-  node[midway, right=6pt, font=\small, align=left]
+\draw[brace] (5.15, 0.9) -- (5.15, -1.7)
+  node[midway, right=6pt, font=\scriptsize, align=left]
   {Each $h_i$ deviates\\from $f$ at $x_i$ only};
 
+% ===== separator =====
+\draw[gray!45, thin] (7.05, 3.3) -- (7.05, -2.5);
+
+% ===== RIGHT PANEL: the one-inclusion hypergraph (star = the witness) =====
+% OIG vertices = realized label-vectors; coordinate-i hyperedge joins vectors
+% agreeing off coord i. Here f and h_i agree off coord i, so the edges are
+% exactly {f,h_i}: a star. (h_i, h_j differ at TWO coords -> not adjacent.)
+\node[font=\bfseries\small] at (10.0, 3.15) {One-inclusion hypergraph};
+
+\node[oigv, fill=defblue!24] (Of)  at (10.0, 0.55) {$f$};
+\node[oigv] (Oh1) at (8.55, 1.75) {$h_1$};
+\node[oigv] (Oh2) at (11.45, 1.75) {$h_2$};
+\node[oigv] (Oh3) at (10.0, -1.30) {$h_3$};
+
+\draw[cedge] (Of) -- (Oh1) node[midway, above left=-2pt, font=\scriptsize, text=defblue] {$i{=}1$};
+\draw[cedge] (Of) -- (Oh2) node[midway, above right=-2pt, font=\scriptsize, text=defblue] {$i{=}2$};
+\draw[cedge] (Of) -- (Oh3) node[midway, right=1pt, font=\scriptsize, text=defblue] {$i{=}3$};
+
+\node[align=center, font=\scriptsize] at (10.0, -2.15)
+  {$f$ joins each $h_i$ along edge $i$; a minimum-outdegree\\
+   proper orientation (the learner) runs on this structure};
+
 \end{tikzpicture}
-\caption{DS-shattering of $\{x_1, x_2, x_3\}$.  The default labeling $f$
-assigns labels $a, b, c$.  Each witness $h_i$ disagrees with $f$ at
-exactly one coordinate (shown in red).}
+\caption[DS-shattering and its star in the one-inclusion hypergraph]{%
+DS-shattering of a $d$-element set (here $d = 3$) and its structure in the
+one-inclusion hypergraph.  On the left, a default labeling $f$ (blue) assigns
+$a, b, c$ to $x_1, x_2, x_3$, and for each point a witness hypothesis $h_i$ agrees
+with $f$ everywhere except it deviates at exactly that one coordinate (red).  The
+largest set admitting such a default-plus-single-deviation family is the DS
+dimension, and finiteness of the DS dimension characterizes multiclass PAC
+learnability: the 2022 resolution, due to Brukhim et al., of a problem open for
+thirty years (a literature result, \Cref{thm:multiclass-char}).  On the right, the
+same default and witnesses are redrawn in the one-inclusion hypergraph
+(\Cref{def:oig}): the vertex $f$ is joined to each $h_i$ along the coordinate-$i$
+edge, the star that the learning algorithm orients (a proper orientation of
+minimum outdegree).  The unbounded recurrence of this pattern, a large pseudo-cube,
+is what infinite DS dimension provides and what blocks learning.  DS-shattering is
+weaker per point than Natarajan shattering, which demands a global label pair
+$(f_0, f_1)$ with all $2^d$ interpolations realized
+(\Cref{def:natarajan-dim}), yet it captures the global structure Natarajan misses
+when the label set is infinite, where a class can have Natarajan dimension $1$ and
+infinite DS dimension (\Cref{prop:ds-vs-nat}).  This figure illustrates a
+literature definition: the kernel formalizes the Natarajan and the all-labelings
+strong-shattering dimensions and the verified inequality between them
+(\leanname{strongShatteringDim_le_NatarajanDim}, which runs the other way, from
+strong shattering to Natarajan), but not the DS dimension drawn here, whose
+formalization remains open (\Cref{open:formalize-ds}).}
 \label{fig:ds-shattering}
 \end{figure}
 
@@ -1289,6 +1336,112 @@ characterizes all extensions at once}, a no-free-lunch for shattering primitives
 which the Natarajan--DS gap is the one proven instance, is the meta-question about
 the whole backbone, and because no verifier yet certifies it, this reading of the
 map is drawn dotted.
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:ds-shattering}}
+
+Each exercise perturbs the witness picture.  Read Figure~\ref{fig:ds-shattering}
+at two coupled resolutions: on the left a \emph{witness table}, a default labeling
+$f$ together with one single-coordinate-deviation witness $h_i$ per point
+(\Cref{def:ds-dim-ext}), and on the right the same data as a \emph{star} in the
+one-inclusion hypergraph $\mathrm{OIG}(\mathcal H, S)$ (\Cref{def:oig}), the vertex
+$f$ joined to each $h_i$ along the coordinate-$i$ edge.  Argue, in this grammar,
+that each perturbed picture subsumes the concrete $d=3$ one as an \emph{instance}
+(a labeling, a deviation cell, or a coordinate edge the figure already exhibits), a
+\emph{boundary} (one quantifier, direction, or label-set assumption toggled, so the
+per-point requirement, the $\Ndim$ versus $\DSdim$ order, or the evidence status
+changes), or a \emph{frontier} (a structure or formalization the figure points to
+but does not contain).  Honesty rule: DS-shattering and the characterization it
+drives are literature; do not assert any DS object is machine-checked.
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The $d=3$ table is the smallest faithful instance of the definition.}
+Read only the left panel.  Show it is a correct concrete witness for
+\Cref{def:ds-dim-ext} with $d=3$: a single default $f$ assigning $a,b,c$, and three
+hypotheses $h_1,h_2,h_3$ each agreeing with $f$ on two coordinates and deviating on
+the third.  Argue that this is the defining instance of DS-shattering, not a
+theorem: it exhibits $\DSdim \ge 3$ for any class containing $\{f,h_1,h_2,h_3\}$,
+and nothing is claimed verified.
+
+\item \textbf{The table and the star are one object at two resolutions.}  Read the
+left and right panels together.  Show that ``a table of $d$ rows, each deviating
+from $f$ at exactly one coordinate'' is literally ``a star of $d$ coordinate-edges
+out of the central vertex $f$'' in $\mathrm{OIG}(\mathcal H, S)$ (\Cref{def:oig}),
+so the right panel is the instance that makes the table's structural content
+visible.  Conclude that generalizing the figure to arbitrary $d$ means drawing a
+$d$-edge star, not adding table rows.
+
+\item \textbf{The single-deviation cell is the DS primitive.}  Read one red cell
+in isolation, say $h_2$ at $x_2$.  Show that the whole definition is generated by
+this one move, deviate at exactly one point and agree elsewhere, iterated over the
+$d$ coordinates, and that this is the instance distinguishing DS-shattering from
+every all-labelings notion: DS asks for $d$ witnesses, one per coordinate, not for
+a witness per labeling.
+
+\item \textbf{DS-shattering needs only one witness per point, not all $2^d$.}
+Replace the figure's three witness rows with the $2^d = 8$ rows Natarajan
+shattering would require of a global pair $(f_0,f_1)$ (\Cref{def:natarajan-dim},
+\Cref{ex:natarajan-k3}).  Show this is the boundary where the per-point requirement
+weakens: the figure draws $d$ single flips, whereas N-shattering draws the full
+cube of interpolations, so DS-shattering is strictly the weaker demand at each
+point yet, by Exercise~5, can hold on larger sets.
+
+\item \textbf{Weaker per point, larger dimension: $\Ndim \le \DSdim$.}  Toggle the
+direction of comparison.  Using \Cref{prop:ds-vs-nat}, show every N-shattered set
+is DS-shattered (take $f = f_0$ and let $h_i$ realize the basis string $e_i$), so
+$\Ndim(\mathcal H) \le \DSdim(\mathcal H)$ always.  Argue this is the boundary the
+figure sits on: the per-point weakening (Exercise~4) is exactly what lets the
+dimension grow, and the star picture is the witness that DS asks less locally while
+encoding more globally.
+
+\item \textbf{The infinite-label obstruction: $\Ndim = 1$, $\DSdim = \infty$.}
+Push the previous boundary to its extreme.  Invoking the obstruction box, describe
+the Brukhim et al.\ (2022) class with $\Ndim(\mathcal H)=1$ yet
+$\DSdim(\mathcal H)=\infty$, where the one-inclusion hypergraph contains
+arbitrarily large pseudo-cubes although no three points are N-shattered.  Show this
+is the boundary at which the figure's local-looking table must be read globally:
+when $|Y|=\infty$, local two-label structure (Natarajan) does not bound the star
+structure (DS), and only the latter governs learnability.
+
+\item \textbf{The star is the object the algorithm runs on.}  Read the right panel
+as input to a learner.  Using the proof sketch of \Cref{thm:multiclass-char},
+explain that finiteness of $\DSdim$, no large pseudo-cube, yields a proper
+orientation of $\mathrm{OIG}(\mathcal H, S)$ with outdegree $O(\DSdim)$, and the
+learner returns a minimum-outdegree vertex.  Argue the figure's star is therefore
+not decoration but the boundary object between combinatorics (DS-shattering) and
+algorithm (the orientation), and that this theorem is literature, not
+kernel-verified.
+
+\item \textbf{The kernel verifies a different pair, running the other way.}  Read
+the provenance note in the caption.  The kernel formalizes \leanname{NatarajanDim}
+and the all-labelings \leanname{StrongShatteringDim} and proves
+\leanname{strongShatteringDim_le_NatarajanDim}, that is, strong-shattering dimension
+below Natarajan.  Show this is the boundary between what is drawn and what is
+checked: the verified inequality concerns the \emph{all-labelings} dimension (every
+$f\colon S\to Y$ realized) and runs \emph{opposite} to \Cref{prop:ds-vs-nat}'s
+$\Ndim\le\DSdim$, so no part of the figure's DS structure is among the
+machine-checked objects, and conflating \leanname{StrongShatteringDim} with the
+single-deviation DS notion would be an error.
+
+\item \textbf{Formalize the DS dimension (an unknown known).}  Treat the star as a
+formalization target.  Following \Cref{open:formalize-ds}, sketch what a kernel
+\texttt{DSShatteringDim} would require, the one-inclusion hypergraph, the
+default-plus-single-deviation predicate, and the orientation argument, and argue
+this is the frontier the figure points to: the picture is complete and correct as a
+definition, but no machine-checked theorem stands behind it, and closing
+$\Ndim\le\DSdim$ in Lean would be the move that turns this literature illustration
+into verified mathematics.
+
+\item \textbf{Is one primitive enough?}  Treat the figure as one of several
+multiclass shattering pictures.  Natarajan shattering needs a global pair and all
+$2^d$ interpolations; strong shattering needs all labelings; DS-shattering needs a
+default and $d$ single flips.  Ask whether a single shattering primitive could
+unify all three, so that one figure would replace the chapter's several, or whether
+the proliferation is necessary because finite and infinite label sets genuinely
+require different objects, the $\Theta(\log k)$ gap of \Cref{open:multiclass-tight}
+and the no-single-dimension question raised by Figure~\ref{fig:ch17-concept-map}.
+This is the frontier: whether the figure is one of many because the mathematics
+demands many, or only because no unifying primitive has yet been found.
 \end{enumerate}
 
 \bigskip
