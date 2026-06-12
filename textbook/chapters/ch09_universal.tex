@@ -173,48 +173,54 @@ $1/n^2$.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    decision/.style={draw, thick, diamond, aspect=2.2, inner sep=2pt,
-      font=\small, fill=defblue!8, align=center, minimum width=3cm},
-    outcome/.style={draw, thick, rounded corners, minimum width=2.8cm,
-      minimum height=1.2cm, font=\small, align=center},
-    arr/.style={-{Stealth[length=2.5mm]}, thick},
-    yeslabel/.style={font=\scriptsize\bfseries, text=sepgreen},
+    decision/.style={draw, thick, diamond, aspect=2.2, inner sep=2pt, font=\small,
+      fill=defblue!8, draw=defblue!70!black, align=center, minimum width=3cm},
+    outcome/.style={draw, thick, densely dashed, rounded corners, minimum width=2.7cm,
+      minimum height=1.25cm, font=\small, align=center},
+    sedge/.style={-{Stealth[length=2.5mm]}, thick},
+    dedge/.style={-{Stealth[length=2.5mm]}, thick, densely dashed},
+    yeslabel/.style={font=\scriptsize\bfseries, text=sepgreen!60!black},
     nolabel/.style={font=\scriptsize\bfseries, text=thmred},
+    hdl/.style={font=\tiny, text=defblue!55!black, align=center},
 ]
-% Decision 1
-\node[decision] (d1) {Infinite\\Littlestone tree?};
-
-% No → Exponential
-\node[outcome, fill=sepgreen!12, left=2.8cm of d1, yshift=-2.5cm] (exp) {%
-  \textbf{Exponential rate}\\[3pt]
-  $R(n) = \Theta(e^{-n})$\\[2pt]
-  {\scriptsize $\Ldim(\mathcal{H}) < \infty$}};
-
-% Yes → Decision 2
-\node[decision, right=2.8cm of d1, yshift=-2.5cm] (d2) {Infinite\\VCL tree?};
-
-% No → Linear
-\node[outcome, fill=defblue!12, left=2.5cm of d2, yshift=-2.5cm] (lin) {%
-  \textbf{Linear rate}\\[3pt]
-  $R(n) = \Theta(1/n)$\\[2pt]
-  {\scriptsize $\Ldim = \infty$, no $\infty$-VCL}};
-
-% Yes → Arbitrarily slow
-\node[outcome, fill=thmred!12, right=2.5cm of d2, yshift=-2.5cm] (slow) {%
-  \textbf{Arbitrarily slow}\\[3pt]
-  $\forall\, R(n) \to 0$: fails\\[2pt]
-  {\scriptsize $\infty$-VCL tree exists}};
-
-% Arrows
-\draw[arr] (d1) -- node[nolabel, left, pos=0.3] {No} (exp);
-\draw[arr] (d1) -- node[yeslabel, right, pos=0.3] {Yes} (d2);
-\draw[arr] (d2) -- node[nolabel, left, pos=0.3] {No} (lin);
-\draw[arr] (d2) -- node[yeslabel, right, pos=0.3] {Yes} (slow);
+% --- decisions: verified dimensional thresholds (solid) ---
+\node[decision] (d1) at (0,0) {Infinite\\Littlestone tree?};
+\node[hdl, below=1pt of d1] {\leanname{OrdinalLittlestoneDim}};
+\node[decision] (d2) at (3.6,-3.1) {Infinite\\VCL tree?};
+\node[hdl, below=1pt of d2] {\cref{def:vcl-tree}, \leanname{VCLTree}};
+% --- rate outcomes: typed regimes, but the rate THEOREMS are pending -> dashed boxes ---
+\node[outcome, fill=sepgreen!12, draw=sepgreen!60!black] (exp) at (-3.5,-6.1) {%
+  \textbf{Exponential}\\$R(n)=\Theta(e^{-n})$\\{\scriptsize $\Ldim<\infty$}};
+\node[outcome, fill=defblue!12, draw=defblue!60!black] (lin) at (1.5,-6.1) {%
+  \textbf{Linear}\\$R(n)=\Theta(1/n)$\\{\scriptsize $\Ldim=\infty$, no $\infty$-VCL}};
+\node[outcome, fill=thmred!12, draw=thmred!60!black] (slow) at (6.3,-6.1) {%
+  \textbf{Arbitrarily slow}\\$\forall\,R(n)\to0$: fails\\{\scriptsize $\infty$-VCL exists}};
+% --- edges: D1 solid (verified boundary), D2 dashed (rate consequence is literature) ---
+\draw[sedge] (d1) -- node[nolabel, above left, pos=0.35]{No}
+   node[hdl, below, pos=0.62]{\leanname{littlestone_characterization}} (exp);
+\draw[sedge] (d1) -- node[yeslabel, above right, pos=0.4]{Yes} (d2);
+\draw[dedge] (d2) -- node[nolabel, above left, pos=0.4]{No} (lin);
+\draw[dedge] (d2) -- node[yeslabel, above right, pos=0.4]{Yes} (slow);
+% --- the inclusion ladder + the formalization-status annotation ---
+\node[hdl, text=black!55, anchor=west] at (4.55,-1.15)
+   {$\{\Ldim{<}\infty\}\subsetneq\{$no $\infty$-VCL$\}\subsetneq\{$all$\}$};
+\node[font=\scriptsize\itshape, text=thmred!75!black, align=center, anchor=north, text width=11cm] at (1.4,-7.5)
+   {Solid: the decisions are verified thresholds, and \leanname{littlestone_characterization} is the one verified rate boundary. Dashed: the $\Theta$-rates and the trichotomy are \cite{BousquetHannekeMoranVanHandelYehudayoff2021}, typed but not yet machine-checked (\cref{op:trichotomy-formal}).};
 \end{tikzpicture}
-\caption{The trichotomy decision tree.  Two binary questions (does
-$\mathcal{H}$ have an infinite Littlestone tree?\ does it have an infinite
-VCL tree?) partition all hypothesis classes (with $|\mathcal{H}| \geq 3$)
-into exactly three rate regimes.  There is no fourth regime and no
+\caption[The universal-rate trichotomy: two tree-conditions, three regimes]{The trichotomy decision tree.
+Two combinatorial questions partition every hypothesis class with $|\mathcal{H}|\geq 3$ into exactly three
+universal learning-rate regimes. The first question, does $\mathcal{H}$ admit an infinite Littlestone
+tree, is a verified dimensional threshold: by the Littlestone characterization
+(\cref{thm:littlestone-characterization}, \leanname{littlestone_characterization}) a finite Littlestone
+dimension is exactly online learnability, and this is the boundary of the exponential regime
+$R(n)=\Theta(e^{-n})$. The second question, does $\mathcal{H}$ admit an infinite VCL tree, uses the VCL
+tree of \cref{def:vcl-tree}, which generalizes the Littlestone tree by requiring that the instances along
+each root-to-leaf path be shattered rather than merely consistent with one hypothesis; its finiteness
+separates the linear regime $R(n)=\Theta(1/n)$ from the arbitrarily-slow regime. The two decision nodes
+are drawn solid because the dimensions and the VCL tree are typed in the companion development; the three
+rate values and the ``exactly one of three'' claim are drawn dashed because they are the result of
+Bousquet--Hanneke--Moran--van Handel--Yehudayoff~\cite{BousquetHannekeMoranVanHandelYehudayoff2021}, cited
+here and not yet machine-checked (\cref{op:trichotomy-formal}). There is no fourth regime and no
 intermediate rate.}
 \label{fig:trichotomy-tree}
 \end{figure}
@@ -583,3 +589,29 @@ The linear regime is achieved by the one-inclusion predictor (\cref{def:oip}).  
 The trichotomy's central surprise is that the Littlestone dimension, an adversarial, online quantity, draws the exponential/linear boundary in the i.i.d.\ setting (\cref{sec:surprise}).  Find a single structural principle, beyond the trichotomy proof, that explains the cross-paradigm bridge: a reason the same combinatorial object should control both worst-case mistakes and average-case rates.
 \end{openprob}
 
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:trichotomy-tree}}
+
+Each exercise perturbs the decision tree.  Argue, in the figure's grammar (a two-question ladder of combinatorial tree-conditions of increasing permissiveness, finite Littlestone dimension inside no-infinite-VCL-tree inside all classes, whose two decision nodes are drawn solid where a verified ordinal dimension or the VCL tree definition certifies the threshold, and whose three rate leaves are drawn dashed where the rate value and the partition are Bousquet--Hanneke--Moran--van Handel--Yehudayoff's theorem, cited not proved), that the perturbed picture subsumes the concrete one as an \emph{instance} (a class routed to its regime), a \emph{boundary} (one tree-condition toggled so the regime jumps), or a \emph{frontier} (a dashed, open or literature-only edge).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The first diamond is the online-learnable boundary.} Read decision one not as a yes/no on trees but as a verified dimensional threshold. Show this is the figure's defining instance on the exponential branch: ``no infinite Littlestone tree'' is exactly $\Ldim(\mathcal{H}) < \infty$, which is exactly online learnability by the Littlestone characterization (\cref{thm:littlestone-characterization}, \leanname{littlestone_characterization}), so the \textsc{no} edge into the $\Theta(e^{-n})$ leaf is the only rate-regime boundary the kernel certifies; the ordinal refinement used for the universal setting is \leanname{FLT_Proofs.Complexity.Ordinal.OrdinalLittlestoneDim}.
+
+\item \textbf{The VCL tree generalizes the Littlestone tree by shattering.} Replace the second diamond's ``per-path consistency'' by ``per-path shattering''. Show this is the instance that names the second object: a VCL tree (\cref{def:vcl-tree}) demands that the instances along each root-to-leaf path be shattered, not merely consistent with a single hypothesis, so every Littlestone tree is a VCL tree and the converse fails (\cref{rmk:vcl-vs-littlestone}); this is why an infinite VCL tree can exist with $\Ldim < \infty$, making decision two strictly weaker than decision one and the ladder $\{\Ldim<\infty\} \subsetneq \{\text{no }\infty\text{-VCL}\} \subsetneq \{\text{all}\}$ strict at both steps.
+
+\item \textbf{The leaves are typed regimes, the rates are not theorems yet.} Ask the kernel for the statement ``this class learns at rate $\Theta(e^{-n})$''. Show this is the figure's principal frontier: the three regimes are typed (the universal-rate criterion \cref{def:universal-rate} is \leanname{FLT_Proofs.Criterion.Extended.UniversalLearnable}, the ordinal dimensions exist), so the leaf \emph{boxes} are well-typed objects, but the rate \emph{values} $\Theta(e^{-n})$, $\Theta(1/n)$, and arbitrarily-slow, together with the ``exactly one of three'' claim, are not machine-checked; closing them, by formalizing the middle-branch doubling construction and completing the boosting lemma in the universal-to-PAC direction, is exactly \cref{op:trichotomy-formal} (\cite{BousquetHannekeMoranVanHandelYehudayoff2021}), so those edges are dashed.
+
+\item \textbf{Collapse the second diamond to a single dimension.} Suppose someone exhibits an ordinal-valued measure whose finiteness equals ``no infinite VCL tree''. Show this would redraw decision two as a clean threshold matching decision one: the linear/arbitrarily-slow boundary would read ``$\dim < \infty$'' the way the exponential/linear boundary reads ``$\Ldim < \infty$'', unifying both diamonds into one ordinal invariant with three value-ranges; this single-invariant question is open (\cref{op:vcl-characterization}, building on \leanname{FLT_Proofs.Complexity.Ordinal.OrdinalLittlestoneDim}).
+
+\item \textbf{Shrink the class to a single threshold family.} Instantiate $\mathcal{H}$ as thresholds on $\mathbb{N}$. Show this is the boundary that lands on the middle leaf: thresholds have $\VC = 1 < \infty$ (\cref{def:vc-dim}) yet $\Ldim = \infty$, so decision one answers \textsc{yes} and decision two answers \textsc{no} (no infinite VCL tree), placing the class in the linear regime $\Theta(1/n)$; the witness is the threshold class of \Cref{ch:online}, whose $\Ldim=\infty$ is constructive while its $\Theta(1/n)$ rate is the dashed literature claim (\cref{op:trichotomy-formal}).
+
+\item \textbf{Force the bottom leaf with an infinite VC dimension.} Take a class that shatters arbitrarily large finite sets. Show this is the boundary into the arbitrarily-slow regime: infinite VC dimension forces an infinite VCL tree (a tree whose every path shatters its instances), so decision two answers \textsc{yes} and no learner achieves any uniform rate; the leaf is dashed because the lower bound ``for every $R(n)\to 0$, some realizable $D$ defeats every learner'' is the theorem, not kernel-proved (\cref{op:trichotomy-formal}, \cite{BousquetHannekeMoranVanHandelYehudayoff2021}).
+
+\item \textbf{A fixed attention head is never arbitrarily slow.} Replace $\mathcal{H}$ by a finite-head attention class on $\mathbb{R}^d$. Show this is the instance that prunes the bottom branch: finite VC dimension rules out an infinite VCL tree (\cref{prop:attention-trichotomy}, \leanname{FLT_Proofs.Criterion.Extended.UniversalLearnable}), so decision two answers \textsc{no} and the head is universally learnable; whether it sits in the exponential or the linear leaf is decided by its Littlestone dimension, whose finiteness for attention is itself open (\cref{op:attention-regime}, \cref{op:ldim-attention}).
+
+\item \textbf{The Littlestone dimension is an online quantity drawing a statistical line.} Read decision one across paradigms. Show this is the frontier that makes the tree surprising: the same invariant that bounds worst-case mistakes in the adversarial online setting of \Cref{ch:online} draws the exponential/linear boundary in the i.i.d.\ statistical setting (\cref{sec:surprise}), and a single structural reason for this cross-paradigm coincidence, beyond the trichotomy proof, is open (\cref{op:universal-online-bridge}).
+
+\item \textbf{Leave the realizable case and the partition may refine.} Relabel the leaves for agnostic or bounded-noise data. Show this is the frontier that may add regimes: the trichotomy is sharp only in the realizable setting, and whether intermediate rates such as $1/\sqrt{n}$ appear, splitting a leaf or introducing a fourth, is open (\cref{op:intermediate-rates}); the figure's ``no fourth regime'' annotation is therefore a realizable-case claim, not a universal one.
+
+\item \textbf{Swap the VCL tree for a multiclass tree.} Replace binary labels by a finite or real-valued label set and the VCL tree by the DS or fat-shattering tree. Show this is the frontier that tests the ladder's stability: whether the three-regime structure persists with the new combinatorial object in the second diamond, or splits further, is open (\cref{op:universal-multiclass}, \Cref{ch:extensions}); decision two's object is paradigm-relative, while decision one's $\Ldim$ threshold is the fixed verified rung.
+\end{enumerate}
