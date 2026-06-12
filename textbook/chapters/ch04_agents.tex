@@ -68,29 +68,67 @@ The same well-behavedness holds for the softmax-top-1 and multi-head argmax rout
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    root/.style={draw, very thick, rounded corners, fill=defblue!15, font=\small\bfseries, minimum width=2.4cm, minimum height=0.7cm},
-    branch/.style={draw, rounded corners, fill=layergray, font=\scriptsize, minimum width=2cm, minimum height=0.55cm, align=center},
-    leaf/.style={draw, rounded corners, fill=edgeorange!8, font=\scriptsize, minimum width=1.8cm, minimum height=0.5cm, align=center},
-    arr/.style={-{Stealth[length=1.5mm]}, thin, notegray},
-    level 1/.style={sibling distance=4.5cm, level distance=1.6cm},
-    level 2/.style={sibling distance=2.2cm, level distance=1.5cm}
+    font=\small,
+    root/.style={draw, very thick, rounded corners, fill=defblue!15, font=\small\bfseries,
+                 minimum width=2.4cm, minimum height=0.6cm, align=center},
+    pred/.style={draw, semithick, rounded corners, fill=layergray, font=\small,
+                 minimum width=2.5cm, minimum height=0.7cm, align=center},
+    sink/.style={draw, thick, rounded corners, align=center, font=\scriptsize,
+                 text width=3.3cm, inner sep=4pt},
+    gedge/.style={-{Stealth[length=2mm]}, sepgreen!60!black, semithick},
+    oedge/.style={-{Stealth[length=2mm]}, edgeorange!80!black, semithick, dashed},
+    meet/.style={notegray, dotted, thick},
+    elbl/.style={font=\scriptsize\itshape, fill=white, inner sep=1pt, text=black!65}
 ]
-\node[root] {Learner}
-  child { node[branch] {By data\\access}
-    child { node[leaf] {Passive} }
-    child { node[leaf] {Active} }
-  }
-  child { node[branch] {By state\\management}
-    child { node[leaf] {Iterative} }
-    child { node[leaf] {Set-driven} }
-  }
-  child { node[branch] {By hypothesis\\selection}
-    child { node[leaf] {Conservative} }
-    child { node[leaf] {Consistent} }
-    child { node[leaf] {Probabilistic} }
-  };
+% --- root anchor (held-constant Will) ---
+\node[root] (root) at (0,3.0) {Learner\\[-1pt]{\scriptsize\mdseries one learner, many constraints}};
+% --- predicate spine (verified typed predicates, solid-outlined nodes) ---
+\node[pred] (cons)  at (0,1.55) {Consistent\\[-2pt]{\tiny\ttfamily IsConsistent}};
+\node[pred] (consv) at (0,0.45) {Conservative\\[-2pt]{\tiny\ttfamily IsConservative}};
+\node[pred] (sd)    at (0,-0.65) {Set-driven\\[-2pt]{\tiny\ttfamily IsSetDriven}};
+\node[pred] (it)    at (0,-1.75) {Iterative\\[-2pt]{\tiny\ttfamily IsIterative}};
+% --- faint lattice-meet connectors (constraints on one learner) ---
+\draw[meet] (root) -- (cons);
+\draw[meet] (cons) -- (consv);
+\draw[meet] (consv) -- (sd);
+\draw[meet] (sd) -- (it);
+% --- regime sinks ---
+\node[sink, sepgreen!60!black, fill=sepgreen!8] (pac) at (-4.7,0.1)
+  {\textbf{In PAC: constraints are FREE}\\[2pt]learnable by a consistent proper ERM
+   (\leanname{ermLearn}); i.i.d.\ makes order irrelevant\\[2pt]
+   verified: \leanname{erm_consistent_realizable}};
+\node[sink, edgeorange!80!black, fill=edgeorange!8, dashed] (gold) at (4.7,-0.55)
+  {\textbf{In Gold/online: constraints BITE}\\[2pt]conservative from informant, not text;
+   set-driven forces unbounded memory on iterative\\[2pt]
+   literature: Gold; Angluin; K\"otzing--Palenta};
+% --- green solid edges: free in PAC ---
+\draw[gedge] (cons) -- (pac);
+\draw[gedge] (sd)   -- node[elbl, above, pos=0.45]{i.i.d.} (pac);
+\draw[gedge] (it)   -- (pac);
+% --- orange dashed edges: biting in Gold ---
+\draw[oedge] (consv) -- (gold);
+\draw[oedge] (sd)    -- node[elbl, above, pos=0.45]{memory} (gold);
+\draw[oedge] (it)    -- (gold);
+% --- legend ---
+\node[font=\scriptsize, text=black!60, align=center] at (0,-3.05)
+  {Solid green: free in PAC (kernel-verified).\quad Dashed orange: biting in Gold (literature).\quad
+   Boxes: verified predicates.};
 \end{tikzpicture}
-\caption{The learner taxonomy. Branches correspond to the axis of variation; leaves are the named specializations. The Bayesian, team, and meta learners are not shown here because they carry genuine mathematical content and are treated in dedicated sections below.}
+\caption[Lattice of learner constraints: free in PAC, biting in Gold]{The learner taxonomy as a
+lattice of typed constraints, drawn so that each constraint's bite is paradigm-relative. The four
+leaves (consistent, conservative, set-driven, iterative) are typed predicates on the base learner of
+\cref{def:learner}, verified definitions in the development, so each is a real, solid node; their
+conjunctions are meets in the lattice (a conservative, set-driven learner sits below two). The same
+predicate reads two ways. In PAC the constraints are free (green, solid): every PAC-learnable class is
+learnable by a consistent, proper empirical-risk minimizer (\leanname{erm_consistent_realizable}), and
+because the i.i.d.\ assumption makes example order irrelevant the set-driven and iterative distinctions
+collapse with it. In Gold's framework the same predicates bite (orange, dashed): some classes are
+identifiable by a conservative learner from an informant but not from text, and a set-driven class can
+force unbounded memory on any iterative learner. The Gold edges are dashed because they are results in
+the inductive-inference literature (Gold; Angluin; K\"otzing and Palenta), not yet theorems of the
+kernel, while every PAC-collapse edge is solid because the development proves it. The taxonomy has its
+sharpest teeth in Gold and online, and none in PAC. The named data-access and randomness variants are
+catalogued in \cref{tab:learner-types}.}
 \label{fig:learner-taxonomy}
 \end{figure}
 
@@ -410,3 +448,29 @@ In the PAC setting the set-driven/iterative distinction collapses because exampl
 \label{op:team-attention}
 Combine \cref{thm:team-power,prop:attention-mbl}: does a team of finite-head attention learners (a mixture-of-experts ensemble selected by the disjunctive criterion) identify classes that no single attention learner can, and is the resulting team itself a measurable batch learner? This connects the team hierarchy to the routed-expert architectures of modern practice.
 \end{openprob}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:learner-taxonomy}}
+
+Each exercise perturbs the constraint lattice. Show, in the figure's grammar (typed learner predicates as nodes, two regime edges reading the same constraint as free-in-PAC or biting-in-Gold, solid where a kernel theorem backs the edge and dashed where it is borrowed from the inductive-inference literature or open), that the generalized figure subsumes the perturbation as an \emph{instance} (a constraint already shown free or biting), a \emph{boundary} (a constraint whose bite flips between paradigms, or a tie a paradigm must break), or a \emph{frontier} (a dashed, open edge the figure can only annotate).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Consistency is free in PAC.} Impose consistency (\leanname{FLT_Proofs.Learner.Properties.IsConsistent}) on the PAC learner. Show this is the collapse instance on the green lane: every PAC-learnable class is learnable by a consistent, proper empirical-risk minimizer, so the constraint costs nothing in learnable-ness, verified with no gaps by \leanname{erm_consistent_realizable} resting on \leanname{empError_zero_iff_consistent} and closed by \leanname{fundamental_theorem}.
+
+\item \textbf{Properness rides with consistency.} Require additionally that the learner output a hypothesis from the class. Show this stays a green instance, not a new edge: the ERM witness already lies in $\mathcal{H}$ (\leanname{ermLearn_in_H}), so proper plus consistent is the \emph{same} collapse node, and the meet of the two constraints in the lattice is free in PAC for the same reason.
+
+\item \textbf{Conservativeness bites in Gold.} Read conservativeness (\leanname{FLT_Proofs.Learner.Properties.IsConservative}) on the Gold lane. Show this is a separation instance the figure must draw dashed: there are classes a conservative learner identifies from an informant but not from text, a result in the inductive-inference literature (\cite{Angluin1980,Gold1967,CaseSmith1983}) with no constraint-level theorem in the kernel, so the edge is orange and dashed.
+
+\item \textbf{The same predicate, two lanes.} Take consistency alone and ask where it sits. Show this is the figure's defining boundary: consistency is free in PAC (green, solid, \leanname{erm_consistent_realizable}) yet in Gold a consistent learner can be forced into infinitely many mind changes, so the one predicate carries a green edge in one paradigm and an orange edge in another, which is exactly the paradigm-relativity the lattice exists to display.
+
+\item \textbf{Set-driven against iterative memory.} Compare set-drivenness (\leanname{FLT_Proofs.Learner.Properties.IsSetDriven}) with iterativeness (\leanname{FLT_Proofs.Learner.Properties.IsIterative}) in the Gold and online settings. Show this is a separation instance, dashed: a set-driven class can force unbounded memory on any iterative learner (\cite{KotzingPalenta2016,Gold1967}), an edge the kernel does not yet prove, recorded open as \cref{op:order-sensitivity}.
+
+\item \textbf{Order-sensitivity collapses under i.i.d.} Now move the set-driven versus iterative pair into PAC. Show this is the boundary's other face: because the i.i.d.\ assumption makes example order irrelevant, the distinction that bites in Gold vanishes, so the orange dashed Gold edge becomes the green collapse edge into the same ERM node, the bite flipping off as the paradigm changes.
+
+\item \textbf{A constraint that bites only computationally.} Keep properness but ask for it under cryptographic hardness rather than information-theoretically. Show this is a frontier boundary: properness preserves the finite-VC PAC class (green on statistical grounds, \leanname{fundamental_theorem} is silent on computation) yet can cost strictly more computation, a separation on the resource axis the kernel does not carry, so the edge is dashed and cited to \cite{PittValiant1988}.
+
+\item \textbf{The probabilistic constraint.} Add internal randomness, the probabilistic variant (\leanname{FLT_Proofs.Learner.Properties.ProbabilisticLearner}). Show this is a tie the paradigm must break: in PAC randomness can be derandomized at no asymptotic cost so the constraint is free (green), while in the Gold limit a probabilistic identification criterion is a genuinely distinct success notion; the figure places the node and lets the paradigm label decide the lane, dashed where the kernel has only the structure and no separation.
+
+\item \textbf{Teams as a constraint that always bites.} Replace a single learner by a team (\leanname{FLT_Proofs.Learner.Properties.TeamLearner}). Show this is a separation instance robust across paradigms: two learners identify Gold classes no single learner can (\cref{thm:team-power}), the disjunctive-success mechanism, so unlike consistency the team relaxation bites in Gold and is not collapsed by PAC, and the edge is annotated by the team hierarchy of \cref{op:team-hierarchy}.
+
+\item \textbf{Is collapse a closure operator?} Ask whether ``impose consistency and properness'' is a reflector onto a subcategory: a closure operator under which PAC learnability is invariant and idempotent, so that a constraint is free exactly when it lies below the closure's fixed points and biting otherwise. Show this is the figure's principal open frontier: it would re-type both lanes as one Galois-style law classifying which constraints collapse in which paradigm, but no such adjunction is defined in the development, so the meta-edge is dashed and recorded as a known unknown alongside \cref{op:order-sensitivity}.
+\end{enumerate}
