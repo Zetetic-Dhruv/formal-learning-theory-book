@@ -3,9 +3,9 @@
     "project": "Formal Learning Theory Concept Graph",
     "version": "1.0",
     "date": "2026-03-16",
-    "description": "A machine-readable knowledge graph of formal learning theory. 142 nodes (133 kernel). 260 edges with 13 typed, invertible relation types. Formal definitions are neutral mathematical statements.",
+    "description": "A machine-readable knowledge graph of formal learning theory. 143 nodes (134 kernel). 260 edges with 13 typed, invertible relation types. Formal definitions are neutral mathematical statements.",
     "status": "v1.0 \u2014 Release. Single authoritative schema with 13 typed relations.",
-    "node_count": 142,
+    "node_count": 143,
     "edge_count": 260,
     "relation_types": [
       "analogy",
@@ -237,17 +237,17 @@
       }
     },
     "completeness": {
-      "total_nodes": 142,
-      "kernel_nodes": 133,
+      "total_nodes": 143,
+      "kernel_nodes": 134,
       "kernel_breakdown": {
-        "defined": 117,
+        "defined": 118,
         "proved": 16
       },
       "non_kernel": {
         "deferred": 6,
         "scope_boundary": 3
       },
-      "note": "Kernel = 133 nodes (defined + proved). Deferred nodes (6) are not kernel. Scope boundary nodes (3) mark explicit exclusions."
+      "note": "Kernel = 134 nodes (defined + proved). Deferred nodes (6) are not kernel. Scope boundary nodes (3) mark explicit exclusions."
     },
     "edge_design_notes": {
       "theory_building_evaluation": "Edges evaluated for theory-building utility. characterizes (equivalence), does_not_imply (separation), strictly_stronger (strict hierarchy), requires_assumption (conditional validity) are high-value for theory building. analogy edges have obstruction fields identifying what blocks formal upgrade. Generalization edges are typed as restricts (constraint removal, conservative) or extends_grammar (new primitives needed, generative).",
@@ -3153,6 +3153,29 @@
       }
     },
     {
+      "id": "cryptographic_hardness",
+      "name": "Cryptographic Hardness Assumption",
+      "category": "formal_object",
+      "layer": 0,
+      "references": [
+        "Kearns-Valiant 1994",
+        "Applebaum-Barak-Xiao 2008",
+        "Regev 2005"
+      ],
+      "status": "defined",
+      "description": "DEFINITION: A cryptographic hardness assumption is a conjectured average-case intractability premise (the Discrete Cube Root Assumption / DCRA, equivalently hardness of inverting RSA and of factoring; decisional composite residuosity; or Learning With Errors / LWE) asserting that no probabilistic polynomial-time algorithm solves the specified problem with non-negligible advantage. ROLE: it is the premise that the Kearns-Valiant (1994) information-versus-computation gap requires. A concept class of finite VC dimension is PAC-unlearnable in polynomial time only relative to such an assumption. CONTRAST: this is a cryptographic, complexity-theoretic premise, NOT an inductive-bias or hypothesis-space restriction. Inductive bias is a generalization device (restricting H to enable learning) and is unrelated to the cryptographic assumptions that make a finite-VC class computationally hard to learn. BARRIER (Applebaum-Barak-Xiao 2008): such average-case assumptions are inherently necessary; the hardness cannot be based on P!=NP alone via Karp reductions. HIERARCHY: one-way functions (weakest) to factoring to DCRA to LWE (strongest), each yielding hardness for a different concept class.",
+      "claim_type": "definition",
+      "formal_definition": "A conjectured average-case intractability assumption (DCRA and hardness of factoring, decisional composite residuosity, or Learning With Errors) asserting that no probabilistic polynomial-time algorithm solves the specified problem with non-negligible advantage. Serves as the premise of computational hardness-of-learning theorems such as Kearns-Valiant (1994).",
+      "bib_keys": [
+        "KearnsValiant1994",
+        "ApplebaumBarakXiao2008",
+        "Regev2005"
+      ],
+      "provenance": {
+        "field_origin": "Computational complexity and cryptography. DCRA-based hardness of PAC learning from Kearns-Valiant 1994; the cryptographic-assumption barrier from Applebaum-Barak-Xiao 2008; LWE from Regev 2005."
+      }
+    },
+    {
       "id": "sq_dimension",
       "name": "Statistical Query Dimension",
       "category": "complexity_measure",
@@ -5159,9 +5182,9 @@
     },
     {
       "source": "computational_hardness",
-      "target": "inductive_bias",
+      "target": "cryptographic_hardness",
       "relation": "requires_assumption",
-      "note": "The requires_assumption relation here means the hardness result depends on a cryptographic assumption (DCRA, factoring, LWE) that cannot be reduced to P!=NP alone (Applebaum-Barak-Xiao 2008). Target 'inductive_bias' represents the broader framework assumption context.",
+      "note": "The requires_assumption relation here means the Kearns-Valiant hardness result holds only relative to a cryptographic assumption (DCRA, factoring, LWE) that cannot be reduced to P!=NP alone via Karp reductions (Applebaum-Barak-Xiao 2008). The assumption is genuinely cryptographic, not an inductive-bias / hypothesis-space restriction.",
       "citation": "ApplebaumBarakXiao2008",
       "edge_level": "claim"
     },
