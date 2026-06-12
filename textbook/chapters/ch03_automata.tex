@@ -287,6 +287,90 @@ The chapter fixed the definitions---DFA, NFA, PDA, Turing machine, CFG, G\"odel 
 \item \textbf{The $\Delta^0_2$ bridge.} Identification in the limit is a precise computability concept: computation in the limit, equivalent to $\Delta^0_2$-computability (\cref{thm:shoenfield,thm:limit-bridge}). The equivalence anchors Gold's model in the arithmetical hierarchy and grounds the mind-change hierarchy of \Cref{ch:ordinals}.
 \end{enumerate}
 
+% ================================================================
+% SECTION: Transformer Connection (descriptive complexity)
+% ================================================================
+
+\section{The Descriptive Complexity of Attention}
+\label{sec:ch3-transformer}
+
+The chapter measured learnability against a computability yardstick. Gold identification was placed at $\Delta^0_2$ in the arithmetical hierarchy (\cref{thm:limit-bridge}), and that hierarchy is built by a single operation applied to a decidable base: existential projection over $\N$. A computable relation $R(x,y)$ becomes the recursively enumerable set $\{x : \exists y\, R(x,y)\}$; one more alternation, $\exists\forall$, reaches $\Sigma^0_2$ and with it the $\Delta^0_2$ ceiling of limiting recursion (\cref{def:limiting-recursion,thm:shoenfield}). The first step is already strict and irreversible: the halting set is the projection of a decidable relation and is not itself decidable.
+
+A second hierarchy has exactly this shape, built over a continuum rather than over $\N$, and modern attention lives on its first boundary. \Cref{ch:objects} showed (\cref{prop:soft-hard-borel}) that soft attention is measurable while hard attention need not be. Placed in the \emph{projective} hierarchy, that dichotomy becomes the descriptive-set-theoretic counterpart of the recursive/r.e.\ jump that organizes this chapter---the same projection machine, turned on a parameter space instead of on $\N$. The correspondence is structural, not an identity, and the closing remark draws the line.
+
+\subsection{The bad event is a projection}
+
+Fix a concept class presented as a parametrized family $e : \Theta \to (X \to \{0,1\})$ over a parameter space $\Theta$, with target concept $c$. The uniform-convergence argument of \Cref{ch:generalization} quantifies over a \emph{bad event} in the doubled (ghost) sample space: the set of samples on which \emph{some} hypothesis in the class shows a large train/test gap,
+\[
+  B_{m,\varepsilon} \;=\; \Bigl\{\,p \;:\; \exists\,\theta\in\Theta,\ \widehat{\mathrm{er}}_{\mathrm{ghost}}(e_\theta,p) - \widehat{\mathrm{er}}_{\mathrm{train}}(e_\theta,p) \;\geq\; \tfrac{\varepsilon}{2}\,\Bigr\}.
+\]
+The existential over $\theta$ is a projection---the same construction that drove this chapter's hierarchy, except the quantified variable now ranges over a parameter continuum, not over $\N$.
+
+\begin{prop}[The bad event is analytic]
+\label{prop:attention-analytic}
+Let $\Theta$ be a standard Borel space and suppose the evaluation map $(\theta,x)\mapsto e_\theta(x)$ and the target $c$ are measurable. Then the witness graph $W = \{(\theta,p) : \mathrm{gap}(e_\theta,p)\geq \varepsilon/2\}$ is Borel, and the bad event $B_{m,\varepsilon} = \{p : \exists\theta,\ (\theta,p)\in W\}$ is analytic ($\Sigma^1_1$).
+\end{prop}
+
+\begin{proof}
+The train and ghost empirical errors are finite averages of the loss $\ind[e_\theta(x_i)\neq c(x_i)]$ over the sample coordinates. Each summand is the indicator of $\{(\theta,p) : e_\theta(x_i)\neq c(x_i)\}$, measurable because $e$ and $c$ are; a finite sum and difference of measurable functions is measurable, so the gap is a measurable function of $(\theta,p)$ and $W$ is the Borel set where it is at least $\varepsilon/2$.\formal{FLT_Proofs.Complexity.BorelAnalyticBridge.paramWitnessSet_measurable} The bad event is the image of $W$ under the projection $(\theta,p)\mapsto p$. The projection of a Borel set from a product of standard Borel spaces is, by Suslin's theorem, an analytic set---a Borel image of a Borel set.\formal{FLT_Proofs.Complexity.BorelAnalyticBridge.borel_param_badEvent_analytic} Hence $B_{m,\varepsilon}$ is $\Sigma^1_1$.
+\end{proof}
+
+This is the continuum analogue of the chapter's opening move. There, projecting a decidable relation over $\N$ produced an r.e.\ set; here, projecting a Borel relation over a parameter continuum produces an analytic set. In both settings the projection can raise complexity, and the only question is whether it does.
+
+\subsection{The soft/hard dichotomy}
+
+Whether the projection of \cref{prop:attention-analytic} actually leaves the measurable world depends on the routing.
+
+\begin{prop}[Soft stays Borel; hard can escape]
+\label{prop:soft-hard-descriptive}
+Two facts hold of the attention bad event.
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \emph{Soft.} For every concrete transformer---finitely many heads over a finite-dimensional key space, with continuous softmax scores---the attention bad event is Borel: the projection of \cref{prop:attention-analytic} collapses back to the measurable level.\formal{TLT.transformerAttentionBadEvent_borel}
+\item \emph{Hard.} Granting the classical existence of an analytic non-Borel subset of $\R$ (Suslin 1917), there is a hard-attention head---a continuous scoring map over a Polish parameter space and two jointly measurable experts---whose $\arg\max$-routed bad event is analytic but not Borel.\formal{TLT.Strictness.attention_nonBorel_badEvent}
+\end{enumerate}
+Soft and hard attention therefore sit on opposite sides of the Borel/analytic boundary.\formal{TLT.Bridge.soft_vs_hard_attention_measurabilitySeparation}
+\end{prop}
+
+\begin{proof}
+\emph{(Soft.)} A concrete transformer's key--parameter space is finite-dimensional, hence $\sigma$-compact, and its scaled-dot-product score is continuous. For such a family the witness graph $W$ has $\sigma$-compact fibers, and the projection of a set with $\sigma$-compact fibers is a countable union of compact images, hence Borel. Instantiated end-to-end on the transformer's own parameter space this collapses the bad event of \cref{prop:attention-analytic} to the measurable level; the softmax concept class is well-behaved at every embedding dimension and key count for the same reason.
+
+\emph{(Hard.)} Let $A\subseteq\R$ be analytic and not Borel. Realize $A$ as the range of a continuous map $g:\beta\to\R$ from a Polish space $\beta$, which is possible exactly because $A$ is analytic. Build the hard head whose score for one key is the quadratic cost $(x-g(\rho))^2$ and zero for the other, so the $\arg\max$ routes $x$ to the first key precisely when $x=g(\rho)$. The induced concept class is the singleton-indicator class on $\mathrm{range}(g)=A$, and its bad event reduces to the planar witness set $\{(x,y) : y\in A,\ x\neq y\}$ pulled back along a measurable surjection. That planar set is analytic, being the intersection of the analytic cylinder $\{y\in A\}$ with the Borel off-diagonal,\formal{FLT_Proofs.Theorem.BorelAnalyticSeparation.planarWitnessEvent_analytic} and it is not Borel, because the vertical section through any $a\notin A$ pulls it back to $A$ itself and a Borel set cannot have a non-Borel section.\formal{FLT_Proofs.Theorem.BorelAnalyticSeparation.singleton_badEvent_not_measurable} Pulling back along a measurable surjection preserves non-measurability, so the hard bad event is not Borel.\formal{TLT.Strictness.witnessBadEventSet_not_measurable}
+\end{proof}
+
+The hard side is the genuine jump: an analytic set that no countable Borel construction reaches, the descriptive twin of the halting set. The $\arg\max$ performs the projection without the smoothing that would keep it tame.
+
+\subsection{The correspondence, and its limits}
+
+The two hierarchies align term by term.
+
+\begin{center}
+\small
+\begin{tabular}{lll}
+\toprule
+ & \textbf{Arithmetical (over $\N$)} & \textbf{Projective (over a continuum)} \\
+\midrule
+Decidable base       & recursive, $\Delta^0_1$ & Borel, $\Delta^1_1$ \\
+One projection       & r.e., $\Sigma^0_1$      & analytic, $\Sigma^1_1$ \\
+Strict witness       & halting set             & analytic non-Borel set \\
+Why it is strict     & Post, Kleene            & Suslin, Souslin \\
+Attention reads as   & \textemdash             & soft (Borel) vs.\ hard (analytic) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{remark}[Structural counterpart, not identity]
+\label{rmk:attention-descriptive}
+The two columns share an operation---existential projection over a decidable base, iterated---but they are not the same hierarchy, and three distinctions keep the reading honest.
+
+First, the superscript is not decorative. The arithmetical $\Sigma^0_n$ quantifies over natural numbers with a computable base predicate; the projective $\Sigma^1_n$ quantifies over points of a continuum (reals, or infinite sequences) with a Borel base. The attention bad event is $\Sigma^1_1$, a second-order object in its own right, and is \emph{not} the $\Sigma^0_2$ of the $\Delta^0_2$ bridge (\cref{def:delta-02}); the correspondence maps it to the first arithmetical jump, recursive to r.e.\ ($\Delta^0_1$ to $\Sigma^0_1$). Gold's $\Delta^0_2$ ceiling sits one alternation higher than the boundary attention occupies, and \cref{thm:shoenfield,thm:limit-bridge} stand on their own arithmetical grounds, not transported from the descriptive side.
+
+Second, ``not Borel'' is not ``not measurable.'' Every analytic set is universally measurable, so the hard bad event still has a well-defined probability under any sample distribution;\formal{FLT_Proofs.Complexity.BorelAnalyticBridge.analyticSet_nullMeasurableSet_ghostPairs} what fails is membership in the Borel $\sigma$-algebra, the hypothesis the clean uniform-convergence theorem silently assumes. The obstruction is to the standard \emph{route} to a generalization guarantee, not a proof that the class cannot be learned. And it is structural rather than pointwise: every individual hard-attention hypothesis is Borel, and non-measurability enters only through the existential over the class.\formal{FLT_Proofs.Theorem.BorelAnalyticSeparation.singletonClassOn_measurable}
+
+Third, the witness is elementary. The analytic non-Borel set it rests on exists in ZFC---Suslin's 1917 theorem---with no appeal to large cardinals or determinacy, which enter only above $\Sigma^1_1$. The pathology is not exotic; it is available one projection above Borel, exactly where attention places it.
+
+The softmax-to-$\arg\max$ move reads, in this chapter's own vocabulary, as the difference between a \rel{restricts} and an \rel{extends\_grammar} edge (\cref{def:restricts,def:extends-grammar}). Softmax is the conservative smoothing that keeps the class inside the Borel theory; $\arg\max$ adds the genuinely new descriptive power that can carry it across the boundary. Whether that reading can be made functorial---an exact correspondence between the smoothing operations of the two hierarchies, rather than a shared shape---is open, and recorded below.
+\end{remark}
+
 \section{Exercises and Open Problems}
 \label{sec:ch3-open}
 
@@ -340,4 +424,19 @@ The mind-change count is typed as an ordinal (\leanname{FLT_Proofs.Complexity.Mi
 \begin{openprob}[Effective separation witnesses, \textsc{uk}]
 \label{op:effective-witness}
 \Cref{prop:anbn} witnesses $\mathrm{REG} \subsetneq \mathrm{CFL}$ by a single language. Give a uniform, effective procedure that, from a description of any two adjacent Chomsky levels, outputs a witness language separating them together with its non-membership proof, turning the proper-containment chain of \cref{fig:chomsky} into one constructive theorem rather than four independent separations.
+\end{openprob}
+
+\begin{openprob}[The lightface refinement of the attention projection, \textsc{uk}]
+\label{op:attention-lightface}
+\Cref{prop:attention-analytic} places the attention bad event at $\Sigma^1_1$ by projecting a Borel witness graph (\leanname{FLT_Proofs.Complexity.BorelAnalyticBridge.borel_param_badEvent_analytic}) over a parameter continuum, whereas this chapter's hierarchy is lightface, over $\N$ (\cref{def:delta-02}). Give an effective, lightface-$\Sigma^1_1$ version of that projection for a recursively presented attention family, and decide whether the soft-to-hard smoothing corresponds functorially to the computable-approximation step that pulls a definition down to $\Delta^0_2$ (\cref{thm:shoenfield}), or holds only as the structural counterpart of \cref{rmk:attention-descriptive}.
+\end{openprob}
+
+\begin{openprob}[The exact descriptive level of hard attention, \textsc{ku}]
+\label{op:attention-wadge}
+\Cref{prop:soft-hard-descriptive} shows the hard-attention bad event can be analytic and not Borel (\leanname{TLT.Strictness.attention_nonBorel_badEvent}). Pin its exact position: exhibit a routing whose bad event is $\Sigma^1_1$-complete in the Wadge sense---at the very top of the first projective level, not merely above Borel---and determine whether any architecturally natural attention family attains completeness or whether all of them stay properly below it.
+\end{openprob}
+
+\begin{openprob}[A descriptive restricts/extends classification, \textsc{uk}]
+\label{op:attention-restricts-descriptive}
+The soft/hard boundary reads as a \rel{restricts} versus \rel{extends\_grammar} edge (\cref{rmk:attention-descriptive}). Classify the standard architectural relaxations---softmax to $\arg\max$, finitely to countably many heads, bounded to unbounded context---by whether each keeps the bad event Borel (\leanname{TLT.transformerAttentionBadEvent_borel}) or can push it to analytic non-Borel (\leanname{TLT.Strictness.attention_nonBorel_badEvent}), turning the two-point separation of \cref{prop:soft-hard-descriptive} into a map of the attention design space against the Borel/analytic boundary.
 \end{openprob}
