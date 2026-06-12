@@ -139,10 +139,10 @@ Edge notation: $\edge{source}{relation}{target}$.
 \begin{enumerate}[leftmargin=2em, nosep]
   \item $\edge{computational\_hardness}{lower\_bounds}{pac\_learning}$ \cite{KearnsValiant1994}
   \item $\edge{computational\_hardness}{used\_in\_proof}{vc\_dimension}$
-  \item $\edge{computational\_hardness}{requires\_assumption}{inductive\_bias}$ \cite{ApplebaumBarakXiao2008}
+  \item $\edge{computational\_hardness}{requires\_assumption}{cryptographic\_hardness}$ \cite{ApplebaumBarakXiao2008}
   \item $\edge{vc\_dimension}{does\_not\_imply}{computational\_hardness}$ \cite{KearnsValiant1994}
 \end{enumerate}
-\emph{Answer:} Computational hardness results (edge~1) show that under cryptographic assumptions (edge~3), polynomial-size circuits have finite $\VC$ but are not efficiently PAC-learnable. Finite $\VC$ alone does not imply tractability (edge~4).
+\emph{Answer:} Computational hardness results (edge~1) show that under cryptographic assumptions (edge~3), polynomial-size circuits have finite $\VC$ but are not efficiently PAC-learnable. Finite $\VC$ alone does not imply tractability (edge~4).  These are conditional separations, not a characterization: whether \emph{any} combinatorial dimension characterizes efficient PAC learnability remains open.
 \end{traversal}
 
 % ----------------------------------------------------------
