@@ -191,22 +191,77 @@ The DFA is the anchor for both edges. Figure~\ref{fig:restricts-extends} display
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-    box/.style={draw, thick, rounded corners, minimum width=2.4cm, minimum height=0.9cm, font=\small\bfseries, align=center},
-    arr/.style={-{Stealth[length=2.5mm]}, thick},
-    lbl/.style={font=\scriptsize, fill=white, inner sep=2pt, align=center}
+    font=\small,
+    obj/.style={draw, rounded corners, minimum height=0.6cm, minimum width=1.3cm,
+                inner sep=3pt, font=\small, align=center, fill=white},
+    consedge/.style={sepgreen!60!black, thick},
+    genedge/.style={edgeorange!80!black, thick},
+    eq/.style={{Stealth[length=1.8mm]}-{Stealth[length=1.8mm]}},
+    imp/.style={-{Stealth[length=2.2mm]}},
+    onedge/.style={font=\scriptsize, fill=white, inner sep=1.5pt},
+    note/.style={font=\scriptsize\itshape, text=black!65, align=center},
+    handle/.style={font=\scriptsize, text=black!75, align=center},
+    hdr/.style={font=\small\bfseries, align=center},
+    sep/.style={draw, gray!45, dashed, line width=0.4pt}
 ]
-\node[box, fill=sepgreen!12] (dfa) at (0,0) {DFA};
-\node[box, fill=sepgreen!12] (nfa) at (5,1.5) {NFA};
-\node[box, fill=edgeorange!12] (pda) at (5,-1.5) {PDA};
+% ---- column headers ----
+\node[hdr] at (0,3.05) {Classical instance: automata\\[-1pt]{\scriptsize\mdseries dashed, from the literature}};
+\node[hdr] at (6.0,3.05) {Verified instance: learning paradigms\\[-1pt]{\scriptsize\mdseries solid, design-lab Lean}};
+% ---- row labels ----
+\node[hdr, text=sepgreen!55!black, text width=2.3cm] at (-3.55,1.25)
+  {restricts\\(conservative)\\[1pt]{\scriptsize\mdseries same power: an equivalence}};
+\node[hdr, text=edgeorange!80!black, text width=2.3cm] at (-3.55,-1.75)
+  {extends\\(generative)\\[1pt]{\scriptsize\mdseries strictly larger: a separation}};
 
-\draw[arr, sepgreen!70!black] (nfa) -- node[lbl, above left] {\rel{restricts}\\{\scriptsize\itshape removes determinism}\\{\scriptsize\itshape same power}} (dfa);
-\draw[arr, edgeorange!80!black] (pda) -- node[lbl, below left] {\rel{extends\_grammar}\\{\scriptsize\itshape adds stack}\\{\scriptsize\itshape strictly more power}} (dfa);
+% ===== CONSERVATIVE / AUTOMATA : NFA == DFA =====
+\node[obj] (nfa)  at (-1.35,1.25) {NFA};
+\node[obj] (dfa1) at (1.15,1.25) {DFA};
+\draw[consedge, dashed, eq] (nfa) -- node[onedge]{$\equiv$} (dfa1);
+\node[note] at (-0.1,0.62) {subset construction (Rabin--Scott)};
 
-% Annotations
-\node[font=\scriptsize, text=sepgreen!70!black, anchor=west] at (6, 1.5) {Regular languages};
-\node[font=\scriptsize, text=edgeorange!80!black, anchor=west] at (6, -1.5) {Context-free languages};
+% ===== CONSERVATIVE / LEARNING : criterion == dimension =====
+\node[obj] (pac1) at (4.45,1.7) {PAC};
+\node[obj] (vc)   at (7.65,1.7) {finite VC};
+\draw[consedge, eq] (pac1) -- node[onedge]{$\Leftrightarrow$} (vc);
+\node[handle] at (6.05,2.18) {\leanname{fundamental_theorem}};
+\node[obj] (onl1) at (4.45,0.82) {online};
+\node[obj] (ld)   at (7.65,0.82) {finite Ldim};
+\draw[consedge, eq] (onl1) -- node[onedge]{$\Leftrightarrow$} (ld);
+\node[handle] at (6.05,0.32) {\leanname{littlestone_characterization}};
+
+% ===== GENERATIVE / AUTOMATA : PDA strictly extends DFA =====
+\node[obj] (pda)  at (-1.35,-1.75) {PDA};
+\node[obj] (dfa2) at (1.15,-1.75) {DFA};
+\draw[genedge, dashed, imp] (pda) -- node[onedge]{$+$\,stack} (dfa2);
+\node[note] at (-0.1,-2.4) {$\mathrm{REG}\subsetneq\mathrm{CFL}$ (pumping)};
+
+% ===== GENERATIVE / LEARNING : strict paradigm separations =====
+\node[obj] (onl2) at (4.45,-1.2) {online};
+\node[obj] (pac2) at (7.65,-1.2) {PAC};
+\draw[genedge, imp] (onl2) -- node[onedge]{$\subsetneq$} (pac2);
+\node[handle] at (6.05,-0.72) {\leanname{online_strictly_stronger_pac}};
+\node[obj] (ex)   at (4.45,-2.3) {EX};
+\node[obj] (pac3) at (7.65,-2.3) {PAC};
+\draw[genedge, imp] (ex) -- node[onedge]{$\not\subseteq$} (pac3);
+\node[handle] at (6.05,-2.78) {\leanname{ex_not_implies_pac}};
+
+% ---- dividers ----
+\draw[sep] (3.0,2.6) -- (3.0,-3.0);
+\draw[sep] (-2.55,-0.25) -- (8.9,-0.25);
 \end{tikzpicture}
-\caption{Two generalizations of the DFA. The NFA removes the determinism constraint (conservative: same expressive power, \cref{thm:nfa-dfa}). The PDA adds a stack (generative: strictly more power, \cref{prop:anbn}). Both arrows point toward the DFA to indicate that the DFA is the more constrained model.}
+\caption[Restricts versus extends: conservative equivalences and generative separations, in automata and in learning]{The
+\rel{restricts} and \rel{extends\_grammar} edge types as a paradigm-independent pattern, with one
+classical instance and one machine-checked instance. A restricts edge (conservative, green) removes a
+constraint and preserves expressive power, so it appears as an equivalence; an extends edge (generative,
+orange) adds a new primitive and recognizes a strictly larger class, so it appears as a separation. The
+automata instance is classical and drawn dashed: the NFA loses determinism but stays equivalent to the
+DFA (subset construction, Rabin--Scott, \cref{thm:nfa-dfa}), while the PDA adds a stack and strictly
+exceeds it (pumping, \cref{prop:anbn}). The learning instance is verified and drawn solid: each criterion
+is pinned to a dimension by an equivalence (PAC to finite VC by \leanname{fundamental_theorem}, online to
+finite Littlestone dimension by \leanname{littlestone_characterization}), while online learnability is
+strictly stronger than PAC (\leanname{online_strictly_stronger_pac}, witnessed by thresholds on the
+naturals) and exact identification is not contained in PAC (\leanname{ex_not_implies_pac}). Solid edges
+carry a design-lab theorem with no remaining gaps; dashed edges are cited, not claimed.}
 \label{fig:restricts-extends}
 \end{figure}
 
@@ -485,4 +540,21 @@ Each exercise perturbs the picture. Show, in the figure's grammar (one projectio
 \item \textbf{Effective refinement.} Present the descriptive ladder lightface, aligned rung for rung with the arithmetical one. Show this is the figure's principal open frontier: the dashed cross-ladder edge asking whether the soft-to-hard smoothing is the descriptive image of the computable-approximation step that pulls a definition down to the limit-computable level.
 \item \textbf{The coding theorem.} Add Kolmogorov complexity and algorithmic probability as a gauge on the enumerable rung. Show this is a frontier annotation: both are typed in the same substrate (\leanname{FLT_Proofs.Computation.KolmogorovComplexity}, \leanname{FLT_Proofs.Computation.AlgorithmicProbability}) but no theorem links them, so the metric attaches to the top rung dashed.
 \item \textbf{One witness for the whole chain.} Replace the four independent separations by a single procedure that, given two adjacent levels, outputs a separating language with its non-membership proof. Show this is a frontier that re-types every containment edge at once: only the regular-versus-context-free separation has even a prose witness, so the meta-edge that all containment lines share one witness-generator is the figure's most general open problem.
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:restricts-extends}}
+
+Each exercise perturbs the two-channel picture. Show, in the figure's grammar (one add-or-remove-a-resource mechanism running in two lanes, conservative for power-preserving edges that read as equivalences and generative for strict separations, solid where the verified development backs the edge and dashed where it is borrowed or open), that the generalized figure subsumes the perturbation as an \emph{instance} (an edge already present in one lane), a \emph{boundary} (a hard line the dichotomy draws, or a tie that must be broken), or a \emph{frontier} (a dashed, open edge the figure can only annotate).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{The PAC anchor as an equivalence.} Replace the bare PAC node by its characterization, PAC learnability iff finite VC dimension. Show this is an instance on the conservative lane: it is the power-preserving equivalence that defines the batch criterion, the learning counterpart of the subset construction, and it is verified with no gaps (\leanname{fundamental_theorem}).
+\item \textbf{The online criterion as an equivalence.} Pin the online node by finite Littlestone dimension. Show this is the second conservative instance: online learnability iff finite Littlestone dimension is a characterization, not a separation, so it sits in the same lane as the NFA-to-DFA equivalence, verified by \leanname{littlestone_characterization}.
+\item \textbf{The one-way implication.} Keep only that online learnability implies PAC learnability (\leanname{online_imp_pac}), which adds no power. Show this is the boundary between the two lanes: an implication that preserves power looks conservative, yet here the converse fails (\leanname{pac_not_implies_online}, thresholds on the naturals have finite VC but infinite Littlestone dimension), so the pair does not read as an equivalence and the figure resolves it into the generative lane as a strict separation.
+\item \textbf{Online strictly above PAC.} Now assert the full separation. Show this is a generative instance: online learnability is strictly stronger than PAC learnability, the bundle of the implication and the failure of its converse, verified by \leanname{online_strictly_stronger_pac}, exactly the learning analogue of the proper containment of regular in context-free.
+\item \textbf{Exact identification beside PAC.} Add identification in the limit as a third learning node. Show this is a generative instance: a class of finite-support indicators is exactly identifiable yet not PAC learnable, since its VC dimension is infinite, so EX is not contained in PAC (\leanname{ex_not_implies_pac}); the consolidated three-way picture is \leanname{online_pac_gold_separation}.
+\item \textbf{Improper to proper learning.} Restrict learners to output a hypothesis from the class. Show this is a boundary the dichotomy cannot place by power alone: properness preserves the PAC class (the same finite-VC characterization holds), so it is conservative on statistical grounds, yet under cryptographic hardness it can cost strictly more computation, a generative gap on the resource axis. The kernel carries no proper-learning separation, so the edge is drawn dashed and cited to \cite{PittValiant1988}.
+\item \textbf{Universal versus PAC.} Replace the PAC anchor by universal, data-dependent learnability. Show this is a boundary where the two lanes meet at a point: for binary classification the would-be separation is empty and the only edge is the power-preserving equivalence, cited to \cite{BousquetHannekeMoranVanHandelYehudayoff2021} and drawn dashed, since the universal-to-PAC half is in the development but its converse is not yet sorry-free.
+\item \textbf{Agnostic relaxation.} Drop realizability, moving from realizable to agnostic PAC. Show this is a conservative instance: the finite-VC characterization is unchanged, so agnostic PAC \rel{restricts} realizable PAC as a power-preserving relaxation rather than a new resource, an equivalence-flavored edge cited to \cite{ShalevShwartzBenDavid2014}.
+\item \textbf{The exact-learning teacher.} Add Angluin's minimally adequate teacher, membership plus equivalence queries, on top of identification in the limit. Show this is a generative frontier: supplying a counterexample-giving teacher adds a genuinely new primitive, the learning-side analogue of the PDA's stack, but the development has no query-learning declaration, so the edge is annotated dashed and cited to \cite{Angluin1987}.
+\item \textbf{A functorial law for the two lanes.} Ask whether every conservative edge is a forgetful functor and every generative edge its free left adjoint, so that the whole restricts-versus-extends classification becomes one categorical statement. Show this is the figure's principal open frontier: it would re-type both lanes at once and ask whether the classification of an arbitrary pair is decidable, but no such category or adjunction is defined, so the meta-edge is dashed and recorded as \cref{op:restricts-functor}.
 \end{enumerate}
