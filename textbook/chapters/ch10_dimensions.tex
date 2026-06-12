@@ -658,36 +658,69 @@ The dimension hierarchy for multiclass problems is:
 \centering
 \begin{tikzpicture}[
     dimbox/.style={draw, thick, rounded corners=3pt, minimum width=2.6cm,
-      minimum height=0.9cm, font=\small\bfseries, align=center},
-    arr/.style={-{Stealth[length=2.5mm]}, thick},
-    gaplabel/.style={font=\scriptsize\itshape, text=thmred, align=center},
+      minimum height=0.95cm, font=\small\bfseries, align=center},
+    dimboxdash/.style={dimbox, dashed},
+    ladsolid/.style={-{Stealth[length=2.5mm]}, thick},
+    laddash/.style={-{Stealth[length=2.5mm]}, thick, dashed, draw=notegray},
+    branch/.style={thick, defblue},
+    solidcall/.style={thick, draw=defblue},
+    dashcall/.style={thick, dashed, draw=notegray},
+    failcall/.style={thick, dashed, draw=thmred},
     implabel/.style={font=\scriptsize, text=notegray, align=center},
+    gaplabel/.style={font=\scriptsize\itshape, text=thmred, align=center},
 ]
-  \node[dimbox, fill=defblue!10] (vc) at (0,0) {$\VC$\\{\scriptsize binary}};
-  \node[dimbox, fill=edgeorange!10] (nat) at (4.5,0) {$\Ndim$\\{\scriptsize multiclass}};
-  \node[dimbox, fill=sepgreen!10] (ds) at (9,0) {$\DSdim$\\{\scriptsize multiclass}};
+  % --- the magnitude ladder spine: verified floor -> literature ceiling ---
+  \node[dimbox, fill=teal!14] (sst) at (0,0) {Strong\\shattering\\{\scriptsize dim.}};
+  \node[dimbox, fill=edgeorange!14] (nat) at (4,0) {$\Ndim$\\{\scriptsize Natarajan}};
+  \node[dimboxdash, fill=notegray!8] (ds) at (8,0) {$\DSdim$\\{\scriptsize DS / pseudo-cube}};
+  % --- VC: the binary face of Ndim, above the spine ---
+  \node[dimbox, fill=defblue!14, minimum width=2.2cm] (vc) at (4,2.0) {$\VC$\\{\scriptsize binary}};
 
-  \draw[arr] (vc) -- node[implabel, above] {generalizes\\to $|Y| \geq 2$} (nat);
-  \draw[arr] (nat) -- node[implabel, above] {$\Ndim < \infty$\\$\Leftarrow$ $\DSdim < \infty$} (ds);
+  % --- ladder edges: solid = kernel-verified, dashed = literature ---
+  \draw[ladsolid] (sst) -- node[implabel, above] {$\le$} (nat);
+  \draw[laddash] (nat) -- node[implabel, above] {$\le$} (ds);
+  \draw[branch] (vc) -- node[implabel, right, text=defblue] {\scriptsize $|Y|{=}2$:\ $\Ndim{=}\VC$} (nat);
 
-  \node[gaplabel, below=0.5cm of nat] (gap)
-    {$\Ndim < \infty \not\!\Rightarrow$ learnable\\
-     witness: $\Ndim = 1$, not learnable};
-  \draw[thick, dashed, thmred] (nat.south) -- (gap.north);
+  % --- characterization call-outs (each verdict hangs off its node) ---
+  \node[implabel, text=defblue, above=0.55cm of vc] (vcnote)
+    {$\VC<\infty \Leftrightarrow$ learnable\\{\scriptsize binary, verified}};
+  \draw[solidcall] (vc) -- (vcnote);
 
-  \node[implabel, below=0.5cm of ds] (correct)
-    {$\DSdim < \infty \Leftrightarrow$ learnable\\
-     {\scriptsize\upshape (Brukhim et al.\ 2022)}};
-  \draw[thick, sepgreen] (ds.south) -- (correct.north);
+  \node[gaplabel, below=0.6cm of nat] (gap)
+    {$\Ndim<\infty \not\Rightarrow$ learnable\\{\scriptsize witness $\Ndim=1$, $|Y|=\infty$}\\{\scriptsize (Daniely--Shalev-Shwartz 2014)}};
+  \draw[failcall] (nat) -- (gap);
 
-  \node[implabel, below=0.5cm of vc] (vcnote)
-    {$\VC < \infty \Leftrightarrow$ learnable\\
-     {\scriptsize\upshape (binary only)}};
-  \draw[thick, defblue] (vc.south) -- (vcnote.north);
+  \node[implabel, below=0.6cm of ds] (dscorrect)
+    {$\DSdim<\infty \Leftrightarrow$ learnable\\{\scriptsize (Brukhim et al.\ 2022,}\\{\scriptsize not formalized)}};
+  \draw[dashcall] (ds) -- (dscorrect);
+
+  % --- line-style legend: the evidence-grade key ---
+  \begin{scope}[shift={(-0.3,-3.75)}]
+    \draw[ladsolid] (0,0) -- (0.7,0);
+    \node[font=\scriptsize, anchor=west] at (0.85,0) {kernel-verified (sorry-free)};
+    \draw[laddash] (5.1,0) -- (5.8,0);
+    \node[font=\scriptsize, anchor=west] at (5.95,0) {literature / not yet formalized};
+  \end{scope}
 \end{tikzpicture}
-\caption{The multiclass dimension hierarchy.  The Natarajan dimension was the
-leading candidate for thirty years, but finite $\Ndim$ does not imply
-learnability.  The DS dimension is the correct characterization.}
+\caption[The multiclass dimension ladder: verified rungs versus literature.]{The
+multiclass dimension ladder, drawn at its evidence grade.  For binary classes
+($|Y|=2$) the VC dimension characterizes PAC learnability completely: a class is
+learnable if and only if its VC dimension is finite, and this equivalence is
+machine-checked (solid).  The obvious generalization to $k \ge 3$ labels is the
+Natarajan dimension (\leanname{NatarajanDim}), which equals the VC dimension when
+$|Y|=2$; but finite Natarajan dimension does \emph{not} imply learnability
+(Daniely--Shalev-Shwartz 2014, with a witness of Natarajan dimension one over an
+infinite label set), so the obvious dimension fails to characterize the multiclass
+regime.  The genuine characterization is the DS dimension, defined through
+pseudo-cubes in the one-inclusion hypergraph (Brukhim et al.\ 2022); it is correct
+but not yet formalized, so it and its equivalence are drawn dashed.  In its place the
+kernel verifies the all-labelings strong-shattering dimension
+(\leanname{StrongShatteringDim}) and the inequality
+\leanname{strongShatteringDim_le_NatarajanDim}, which is the \emph{reverse} of the
+genuine relationship $\Ndim \le \DSdim$.  Hence the full ladder
+$\mathrm{StrongShattering} \le \Ndim \le \DSdim$ has only its lower rung
+machine-checked: solid edges are kernel-verified, dashed edges are literature or not
+yet formalized.}
 \label{fig:dimension-hierarchy}
 \end{figure}
 
@@ -917,4 +950,30 @@ Each exercise perturbs the growth-function picture.  Argue, in the figure's gram
 \item \textbf{Is the bound tight from below?} Ask whether every class of VC dimension three grows as fast as the solid curve, or can stay strictly below it. Show this is the figure's tightness frontier: the kernel certifies only the upper bound (\leanname{sauer_shelah_quantitative}) and the solid curve plots a maximum class that attains it, but no declaration proves a matching lower bound, so whether a given class's growth reaches $\Theta(n^d)$ or drops further is classical for the extremal witness classes (\cite{Sauer1972}) and unformalized in general; this tightness is a dashed, open edge, and the degree it pins is what an optimal compression scheme of size $O(d)$ would also measure (\cref{op:od-compression-dim}).
 
 \item \textbf{Is the bend-degree the rank of a graded object?} Read ``the polynomial that bounds $\growth$ has degree $\VC$'' as a statement about a graded structure. Show this is the figure's deepest frontier: the growth function would be the Hilbert or Poincar\'e series of a graded object attached to $\mathcal{H}$ whose dimension is $\VC$, so ``polynomial of degree $d$'' becomes ``the representable functor has rank $d$'', recovering the chapter's other dimensions (Littlestone, Natarajan \leanname{NatarajanDim}, fat-shattering) as the same series specialized by a data-model and a scale; whether one such dimension functor exists, with the bend-slope as its rank, or the dimensions are provably non-unifiable, is open (\cref{op:dimension-functor}), so this reading of the curve is drawn dashed.
+\end{enumerate}
+
+\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:dimension-hierarchy}}
+
+Each exercise perturbs the dimension ladder.  Argue, in the figure's grammar (a magnitude ladder of combinatorial dimensions $\mathrm{StrongShattering} \le \Ndim \le \DSdim$, with the VC dimension as the binary specialization of $\Ndim$, drawn solid where the kernel certifies the object (the definitions \leanname{VCDim}, \leanname{NatarajanDim}, \leanname{StrongShatteringDim}, the verified rung \leanname{strongShatteringDim_le_NatarajanDim}, and the binary characterization \leanname{vc_characterization}) and dashed where the genuine DS dimension, the upper rung $\Ndim \le \DSdim$, the multiclass characterization, and the Natarajan failure are literature, cited not proved), that the perturbed picture subsumes the concrete ladder as an \emph{instance} (a label-set regime or class on which a rung collapses or is attained), a \emph{boundary} (one label-set size or one inequality toggled so a rung reverses or a characterization breaks), or a \emph{frontier} (a dashed, open or literature-only edge).
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Two labels collapse the ladder to the Fundamental Theorem.} Set $|Y| = 2$ and read the whole ladder. Show this is the figure's defining instance of the binary regime: when the label set has two elements the Natarajan dimension equals the VC dimension exactly (\cref{def:natarajan}, \leanname{NatarajanDim}), the strong-shattering dimension equals both, and the three rungs degenerate to the single binary characterization $\VC(\mathcal{H}) < \infty \Leftrightarrow \mathcal{H}$ is PAC learnable (\cref{thm:fundamental}, \leanname{vc_characterization}, \leanname{fundamental_theorem}); the ladder is the multiclass refinement of one verified equivalence, and the $|Y|=2$ slice is the only place the entire figure is solid.
+
+\item \textbf{The lower rung is the figure's only solid multiclass edge.} Read the bottom inequality alone. Show this is the instance that names the verified handle: from any set on which every labeling is realizable one builds a two-colouring Natarajan witness, so $\mathrm{StrongShatteringDim}(\mathcal{H}) \le \Ndim(\mathcal{H})$ for $|Y| \ge 2$ (\leanname{strongShatteringDim_le_NatarajanDim}), a genuine kernel theorem proved by exhibiting the witness, not asserted; this is the single machine-checked rung of the multiclass ladder, and the figure draws it solid while everything above it is cited.
+
+\item \textbf{The Natarajan dimension is the obvious lift, and it equals VC at the base.} Read the $\Ndim$ node as the natural generalization. Show this is the instance that states the figure's central object: the Natarajan dimension replaces ``all $2^d$ binary labelings'' by ``all $2^d$ labelings drawn from two opposing functions'' (\cref{def:natarajan}, \leanname{NatarajanDim}), which is exactly the VC dimension when $|Y|=2$ and a strict generalization otherwise; the figure draws it solid as a verified definition, leaving open only whether finiteness of it suffices for learning, which the next exercise denies.
+
+\item \textbf{Finite Natarajan dimension does not imply learnability.} Toggle the question from ``is $\Ndim$ defined'' to ``does $\Ndim < \infty$ characterize learning''. Show this is the figure's principal boundary, the red dashed failure: there is a class with $\Ndim(\mathcal{H}) = 1$ that is not PAC learnable (\cref{thm:natarajan-failure}, \cite{DanielyShalevShwartz2014}), so the obvious dimension can be as small as possible and still miss unlearnability; the implication $\Ndim < \infty \Rightarrow$ learnable is drawn dashed red because it is false, the one edge the figure refutes rather than asserts.
+
+\item \textbf{An infinite label set is where the obvious dimension fails.} Ask where the witness of the previous exercise lives. Show this is the boundary in the label-set sweep: the $\Ndim = 1$ unlearnable class requires $|Y| = \infty$ (\cref{thm:natarajan-failure}), because the Natarajan dimension reads only pairs of opposing functions and cannot see the combinatorial explosion of an unbounded label set; the gap is not informational but label-set-driven, and quantifying how large the DS dimension grows as a function of $|Y|$ when $\Ndim$ stays finite is open (\cref{op:natarajan-ds-gap}).
+
+\item \textbf{The DS dimension is the correct characterization, and it is literature.} Replace the failed rung by the true one. Show this is the instance that names the third object: a class is PAC learnable if and only if its DS dimension is finite (\cref{thm:ds-char}, \cite{BrukhimCarmonDinurMoranYehudayoff2022}), the multiclass analogue of the Fundamental Theorem, with the DS dimension defined via pseudo-cubes in the one-inclusion hypergraph (\cref{def:ds-dim}); both the dimension and its equivalence are drawn dashed because the genuine pseudo-cube notion is not machine-checked, so the figure cites the characterization rather than verifying it.
+
+\item \textbf{The kernel's handle is the reverse inequality, not the DS dimension.} Read the bottom rung against the top one. Show this is the boundary that separates the verified object from the literature object: the kernel proves $\mathrm{StrongShatteringDim} \le \Ndim$ (\leanname{strongShatteringDim_le_NatarajanDim}), whereas the genuine DS relationship is $\Ndim \le \DSdim$, the \emph{opposite} direction, and the DS dimension can be infinite while the Natarajan dimension is finite so no $\DSdim \le \Ndim$ bound can hold; the all-labelings strong-shattering dimension is therefore \emph{not} the DS dimension, and the figure must show the kernel's actual handle rather than silently substitute it for $\DSdim$.
+
+\item \textbf{The full ladder has a verified floor and a literature ceiling.} Read all three rungs as one chain. Show this is the boundary between evidence grades: the complete ladder is $\mathrm{StrongShattering} \le \Ndim \le \DSdim$, of which only the left inequality is kernel-verified (\leanname{strongShatteringDim_le_NatarajanDim}) while the right inequality $\Ndim \le \DSdim$ is literature (\cite{BrukhimCarmonDinurMoranYehudayoff2022}); the line-style is the statement that multiclass learnability is currently half machine-checked, the binary characterization and the lower rung solid, the multiclass characterization and the upper rung dashed.
+
+\item \textbf{Formalize the genuine DS dimension and its characterization.} Ask what it would take to make the dashed ceiling solid. Show this is the figure's headline frontier: formalizing the pseudo-cube DS dimension and the Brukhim et al.\ proof that $\DSdim(\mathcal{H}) < \infty$ iff $\mathcal{H}$ is multiclass PAC learnable would turn the dashed top rung and the dashed characterization into verified edges (\cref{op:ds-formal}), supplying the multiclass analogue of \leanname{vc_characterization}; until then the one-inclusion hypergraph and its pseudo-cubes (\cref{def:ds-dim}) are a typed-but-unproved target, and this is the chapter's principal open formalization.
+
+\item \textbf{Is there a single dimension functor under the whole ladder?} Read the three dimensions as one object specialized three ways. Show this is the figure's deepest frontier: the VC, Natarajan, and DS dimensions would be values of a single functor from concept classes (with label-preserving maps) to ordinals, recovered by specializing a data-model and a label-set, with the one-inclusion hypergraph as the representable structure whose pseudo-cube rank is the learnability dimension; whether one such dimension functor exists, recovering all rungs of the ladder, or the dimensions are provably non-unifiable, is open (\cref{op:dimension-functor}), so this reading of the ladder is drawn dashed.
 \end{enumerate}
