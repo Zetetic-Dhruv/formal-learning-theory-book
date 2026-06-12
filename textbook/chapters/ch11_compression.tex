@@ -22,17 +22,17 @@ sample complexity bounds (\Cref{sec:sample-bounds}) show that the VC dimension
 $d$ determines the sample complexity up to constant factors.  Compression
 schemes (\Cref{sec:compression}) provide a different explanation of
 learnability: a class is learnable if and only if the training data can be
-``compressed'' to a \emph{bounded} subset that determines the hypothesis---though
+``compressed'' to a \emph{bounded} subset that determines the hypothesis, though
 \emph{how} small that subset can be is precisely the open question.  The natural
-conjecture---that compression of size $O(d)$ always suffices---has been open
+conjecture (that compression of size $O(d)$ always suffices) has been open
 since 1986.  It is one of the oldest and most embarrassing open problems in
 learning theory, and it is the centerpiece of this chapter.
 
 Occam's razor (\Cref{sec:occam}) provides the bridge between compression and
 generalization: any algorithm that finds a ``short'' description of the data
 generalizes.  The information-theoretic notions of
-\Cref{sec:info-foundations}---description length, Kolmogorov complexity,
-covering numbers---supply the vocabulary for making ``short'' precise.
+\Cref{sec:info-foundations} (description length, Kolmogorov complexity,
+covering numbers) supply the vocabulary for making ``short'' precise.
 
 \medskip
 
@@ -77,14 +77,14 @@ lower bound holds for every learner.
 The classical upper bound of Blumer et al.~\cite{BlumerEhrenfeuchtHausslerWarmuth1989}
 gave $O\!\bigl(\frac{d}{\varepsilon}\log\frac{1}{\varepsilon} +
 \frac{1}{\varepsilon}\log\frac{1}{\delta}\bigr)$, with a logarithmic overhead
-in the $d/\varepsilon$ term.  Removing this overhead---proving that the correct
-dependence on $d$ is linear, not $d \log(1/\varepsilon)$---required substantial
+in the $d/\varepsilon$ term.  Removing this overhead (proving that the correct
+dependence on $d$ is linear, not $d \log(1/\varepsilon)$) required substantial
 effort.  The matching lower bound was established by Ehrenfeucht et
 al.~\cite{EhrenfeuchtHausslerKearnsValiant1989}.  The tight upper bound without
 the logarithmic factor was completed by Simon and Zilles~\cite{SimonZilles2015}
 and, in a sharper form addressing the constant, by
 Hanneke~\cite{Hanneke2016}.  Hanneke's result shows that \emph{any} consistent
-learner achieves the optimal bound---no algorithmic cleverness beyond
+learner achieves the optimal bound: no algorithmic cleverness beyond
 consistency is needed.
 \end{remark}
 
@@ -192,7 +192,7 @@ subsamples:
 Setting this $\leq \delta$ and solving for $m$ gives the stated bound.
 \end{proof}
 
-The converse direction---does learnability imply compression?---is where the
+The converse direction (does learnability imply compression?) is where the
 story becomes a forty-year open problem.
 
 \subsection{The Compression Conjecture}
@@ -222,7 +222,7 @@ compression scheme of size $2^{O(d)}$.\formal{FLT_Proofs.Theorem.PAC.fundamental
 \end{thm}
 
 This landmark result of Moran and Yehudayoff~\cite{MoranYehudayoff2016}
-established that compression schemes \emph{exist} for every learnable class---a
+established that compression schemes \emph{exist} for every learnable class, a
 fact that was itself unknown before 2016.  The exponential bound $2^{O(d)}$ is,
 however, vastly larger than the conjectured $O(d)$.  The machine-checked form of
 the existence statement is the equivalence ``finite VC dimension iff a finite
@@ -270,8 +270,8 @@ exactly one coordinate.
 \end{defn}
 
 The one-inclusion graph mediates between the VC dimension and
-compression.  The key property is that its density---specifically, the
-minimum over all orientations of the maximum in-degree---controls
+compression.  The key property is that its density (specifically, the
+minimum over all orientations of the maximum in-degree) controls
 whether a compression scheme of size $d$ exists.
 
 \begin{thm}[One-Inclusion Graph Orientation {\cite{RubinsteinKroese2007,KuzminWarmuth2007}}]
@@ -306,7 +306,7 @@ bit, which can only happen at the boundaries of the block: either the
 leftmost $1$ becomes $0$ or the rightmost $1$ becomes $0$ (or the
 reverse).  The graph can be oriented so that each vertex points toward
 its two boundary points.  The compressed subsample consists of the two
-boundary points of the interval---exactly the information needed to
+boundary points of the interval: exactly the information needed to
 reconstruct $[a, b]$ on the sample.
 
 The mechanism is subtle: it is not the \emph{endpoints} of the
@@ -329,7 +329,7 @@ $\VC(\mathcal{M}) = d$ by adding concepts until the Sauer--Shelah
 bound is achieved with equality.  The maximum class has compression of
 size $d$, and the compression scheme can in principle be pulled back to
 $\mathcal{H}$.  However, the fattening introduces auxiliary
-concepts---the reconstruction function, given a compressed subsample,
+concepts; the reconstruction function, given a compressed subsample,
 must decide which of many $\mathcal{M}$-consistent concepts actually
 belongs to $\mathcal{H}$.  The number of such choices is exponential
 in $d$, and encoding this choice inflates the compression size to
@@ -386,7 +386,7 @@ $\mathcal{H}$.  A \emph{spanning set} for $P^+$ is a subset
 $T \subseteq P^+$ such that
 $\bigcap\{h \in \mathcal{H} : h(x) = 1\;\forall x \in T\}
  = \bigcap\{h \in \mathcal{H} : h(x) = 1\;\forall x \in P^+\}$%
----i.e., $T$ imposes the same constraints as the full positive set.
+that is, $T$ imposes the same constraints as the full positive set.
 A minimal spanning set has size $\leq d = \VC(\mathcal{H})$, because
 the VC dimension bounds the number of independent constraints.  The
 compression function selects a minimal spanning set; the
@@ -444,12 +444,12 @@ in the VC dimension.
 The exponential bound is, as for general classes, almost certainly far from
 tight, and the argmax (hard-attention) router suggests why.  When the softmax is
 sharpened to a top-$1$ selection, the head's output on a query $x$ is determined
-entirely by the single key whose score is largest---and the routing rule that
+entirely by the single key whose score is largest, and the routing rule that
 selects this key is again well-behaved,\formal{TLT_Proofs.Routing.MeasurableScoreRouting.multiHeadArgmax_wellBehaved}
 partitioning the query space into finitely many Borel cells.  A query's label
 depends only on \emph{which cell it lands in}, and each cell is pinned down by a
-bounded number of ``support keys''---the attention analogue of the support
-vectors of \Cref{ex:svm-compression}.  This picture predicts a compression of
+bounded number of ``support keys'' (the attention analogue of the support
+vectors of \Cref{ex:svm-compression}).  This picture predicts a compression of
 size $O(n_K)$, linear in the context length.  But turning the heuristic into a
 theorem runs into exactly the obstacle of \Cref{op:compression}: the support-key
 set is selected with knowledge of the whole sample, and pulling it back to a
@@ -484,7 +484,7 @@ polynomial bounds.
 \emph{Approach 1: Direct construction.}  For each verified class
 family (halfspaces, intervals, intersection-closed, maximum classes),
 one can construct a compression scheme tailored to the family's
-structure.  The constructions exploit distinct properties---geometric
+structure.  The constructions exploit distinct properties: geometric
 anchoring for SVMs, lattice minimality for intersection-closed classes,
 one-inclusion graph orientation for maximum classes.  But these
 properties are incomparable: no single structural assumption covers all
@@ -499,8 +499,8 @@ non-maximum classes, no such orientation theorem is known.
 Non-maximum one-inclusion graphs can have vertices with degree much
 larger than $d$, and no known orientation strategy achieves in-degree
 $O(d)$ in general.  The maximum class case is tight, but the
-combinatorial extremality that makes it work---achieving the
-Sauer--Shelah bound with equality---is exactly what arbitrary classes
+combinatorial extremality that makes it work (achieving the
+Sauer--Shelah bound with equality) is exactly what arbitrary classes
 lack.
 
 \medskip
@@ -511,15 +511,15 @@ handle all VC classes but pays an exponential price: the Radon-type
 argument iterates a doubling construction $d$ times, producing
 compression of size $2^{O(d)}$.  Improving this requires either a
 fundamentally different topological tool or a way to avoid the
-iterative blowup---and the iterative structure appears intrinsic to
+iterative blowup; the iterative structure appears intrinsic to
 the proof method, not an artifact of a loose analysis.
 
 \medskip
 The conjecture sits at the intersection of three mathematical
-territories---combinatorics (VC dimension, growth functions, maximum
+territories: combinatorics (VC dimension, growth functions, maximum
 classes), topology (Radon partitions, convex position), and
 information theory (description length, reconstruction
-complexity)---and each territory contributes techniques that
+complexity); and each territory contributes techniques that
 illuminate a piece of the puzzle while leaving the central question
 open.  A resolution may require connecting these territories in a way
 that current methods do not.
@@ -573,7 +573,7 @@ conjecture concerns the labeled case specifically.
 
 Compression schemes are a combinatorial form of Occam's razor: prefer the
 hypothesis determined by the fewest data points.  The information-theoretic
-form---prefer the hypothesis with the shortest description---was formalized by
+form (prefer the hypothesis with the shortest description) was formalized by
 Blumer, Ehrenfeucht, Haussler, and Warmuth.
 
 \begin{defn}[Occam Algorithm {\cite{BlumerEhrenfeuchtHausslerWarmuth1987}}]
@@ -629,8 +629,8 @@ the output hypothesis need not be determined by a subsample of the input.
 Occam's razor is thus a relaxation of compression.
 \end{remark}
 
-The converse of the Occam theorem---does every PAC-learnable class admit an
-Occam algorithm?---was partially answered by Board and Pitt:
+The converse of the Occam theorem (does every PAC-learnable class admit an
+Occam algorithm?) was partially answered by Board and Pitt:
 
 \begin{thm}[Partial converse {\cite{BoardPitt1992}}]
 \label{thm:board-pitt}
@@ -730,7 +730,7 @@ where $C$ is a universal constant.
 
 The integral $\int_0^1 \sqrt{\log \mathcal{N}(\varepsilon, \mathcal{F}, d_n)}\;
 d\varepsilon$ is the \emph{Dudley entropy integral}.  It bounds the expected
-supremum of the empirical process indexed by $\mathcal{F}$---the quantity that
+supremum of the empirical process indexed by $\mathcal{F}$, the quantity that
 controls uniform convergence and hence generalization.  When
 $\mathcal{N}(\varepsilon, \mathcal{F}, d_n) \leq (C/\varepsilon)^d$ (as for
 VC classes), the integral evaluates to $O(\sqrt{d})$, recovering the standard
@@ -811,8 +811,8 @@ size $\mathrm{poly}(d)$?  Even this weaker form of the compression conjecture
 remains open.
 \end{openprob}
 
-The chapter's three main themes---tight sample complexity, compression, and
-Occam's razor---are unified by a single idea: \emph{learnability is equivalent
+The chapter's three main themes (tight sample complexity, compression, and
+Occam's razor) are unified by a single idea: \emph{learnability is equivalent
 to the existence of a short summary of the evidence}.  The VC dimension tells
 us \emph{that} a short summary exists; the compression conjecture asks
 \emph{how short}.  The answer, after forty years, remains: we do not know.
@@ -827,8 +827,8 @@ us \emph{that} a short summary exists; the compression conjecture asks
 
 The $O(d)$ conjecture (\Cref{op:compression}) is the gravitational center, but
 the frontier it anchors is wider.  The following ten problems branch off it.
-Each is tagged as a \emph{known unknown} (KU)---sharply posed, the obstruction
-articulated but unresolved---or an \emph{unknown known} (UK), where even the
+Each is tagged as a \emph{known unknown} (KU): sharply posed, the obstruction
+articulated but unresolved; or an \emph{unknown known} (UK), where even the
 right invariant or vocabulary is still missing.  Where a machine-checked
 statement or a literature anchor exists, it is named.
 
@@ -848,7 +848,7 @@ positive answer is the first step toward \Cref{op:compression}~\cite{MoranYehuda
 \emph{maximum} class with in-degree $\leq d$.  Does every (non-maximum) class of
 VC dimension $d$ admit an orientation of in-degree $\mathrm{poly}(d)$?  An
 affirmative answer would yield polynomial compression.  No orientation theorem
-is known off the maximum case---an unknown known: the combinatorial object is in
+is known off the maximum case; this is an unknown known: the combinatorial object is in
 hand, the extremal lever that tames it is not~\cite{KuzminWarmuth2007}.
 \end{openprob}
 
@@ -856,7 +856,7 @@ hand, the extremal lever that tames it is not~\cite{KuzminWarmuth2007}.
 \label{op:agnostic-compression}
 The schemes of this chapter are realizable: they reconstruct a hypothesis
 \emph{consistent} with the sample.  Does every VC-$d$ class admit an
-\emph{agnostic} compression scheme of size $O(d)$---one whose reconstruction has
+\emph{agnostic} compression scheme of size $O(d)$, one whose reconstruction has
 error at most $\mathrm{opt} + \varepsilon$ when no consistent hypothesis
 exists?  A known unknown, sharpened by David, Moran, and
 Yehudayoff~\cite{DavidMoranYehudayoff2016}.
@@ -869,7 +869,7 @@ $\mathcal{A}_{d,n_K}$ is compressible at size $2^{O(d)}$
 (\leanname{softAttention_wellBehaved}), and the support-key heuristic predicts
 $O(n_K)$.  Does $\mathcal{A}_{d,n_K}$ in fact admit a compression scheme of size
 $O(n_K)$, or even $O(\VC)$?  This is \Cref{op:compression} instantiated for a
-contemporary architecture---part known unknown (the target is precise), part
+contemporary architecture: part known unknown (the target is precise), part
 unknown known (no compression invariant specific to attention yet
 exists)~\cite{MoranYehudayoff2016}.
 \end{openprob}
@@ -886,7 +886,7 @@ shattering~\cite{SimonZilles2015}.
 \begin{openprob}[Stable and replicable compression]
 \label{op:stable-compression}
 Does every VC class admit a compression scheme that is \emph{stable} under
-resampling---changing one training example changes $O(1)$ of the selected
+resampling, such that changing one training example changes $O(1)$ of the selected
 indices?  Stability would link compression to differential privacy and
 replicability, where an equivalence with online learnability is already
 known~\cite{BunLivniMoran2020}.  An unknown known: the stability invariant for
@@ -898,7 +898,7 @@ compression has no accepted definition yet.
 In multiclass learning, finite Daniely--Shalev-Shwartz (DS) dimension
 characterizes learnability.  Is finite DS dimension equivalent to a bounded
 \emph{list} compression scheme, where reconstruction outputs a short list of
-hypotheses containing a consistent one?  An unknown known---the multiclass
+hypotheses containing a consistent one?  An unknown known, as the multiclass
 compression vocabulary is still being built~\cite{BrukhimCarmonDinurMoranYehudayoff2022}.
 \end{openprob}
 
@@ -917,7 +917,7 @@ Ben-David, Cesa-Bianchi, and Haussler).
 Every known VC-$d$ class compresses to $O(d)$ points; the obstruction to the
 conjecture is constructing schemes, not ruling them out.  Is there a VC-$d$
 class provably \emph{requiring} compression size $\omega(d)$?  No super-linear
-lower bound is known---a known unknown on the negative side of the ledger, and
+lower bound is known; this is a known unknown on the negative side of the ledger, and
 its resolution either way would be decisive.
 \end{openprob}
 
@@ -991,7 +991,7 @@ operator on compression schemes has not been formulated~\cite{MoranYehudayoff201
     sits between VC dimension and teaching dimension.  But whether
     the compression conjecture implies
     $\text{compression size} \leq O(\mathrm{TD})$ or
-    $\text{compression size} \leq O(\VC)$ remains open---these are
+    $\text{compression size} \leq O(\VC)$ remains open; these are
     distinct (and incomparable) questions.
   \end{enumerate}
 

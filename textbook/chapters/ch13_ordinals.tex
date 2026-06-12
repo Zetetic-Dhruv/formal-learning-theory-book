@@ -15,7 +15,7 @@
 
 How many times must a learner change its mind before converging to a correct
 hypothesis?  In \Cref{ch:gold} we saw that $\Ex$-learners are permitted
-finitely many mind changes, but the number may be unbounded---no single
+finitely many mind changes, but the number may be unbounded: no single
 integer $n$ suffices to bound the mind changes across all target functions in
 the class.  This observation raises a natural question: can one \emph{measure}
 the mind-change complexity of a class, and does that measure yield a strict
@@ -165,7 +165,7 @@ No $\Ex_k$ contains $\mathcal{C}$.
 
 One might try to rescue the integer hierarchy by allowing $\Ex_\omega$
 as a ``catch-all'' for classes learnable with finitely many but unbounded
-mind changes.  But this merely relabels the gap---it does not give a
+mind changes.  But this merely relabels the gap; it does not give a
 \emph{refined} hierarchy.  The gap between $\bigcup_n \Ex_n$ and $\Ex$
 may itself contain structure: some classes might require the learner
 to perform mind changes that depend on mind changes, a kind of
@@ -205,7 +205,7 @@ supplies.  Two notations $a, a'$ with $|a| = |a'|$ can give
 $\Ex_a \neq \Ex_{a'}$ (Exercise~6).  When the theorems below write
 ``$\Ex_\alpha$'' and ``for all constructive~$\alpha$,'' they mean: fix a
 notation for each ordinal; the strictness statements hold for these
-fixed notations.  Which ordinals---as opposed to notations---admit a
+fixed notations.  Which ordinals (as opposed to notations) admit a
 notation-invariant $\Ex_\alpha$ is the subject
 of~\cite{MartinSharmaStephan2006} and is only partially understood.
 \end{remark}
@@ -213,7 +213,7 @@ of~\cite{MartinSharmaStephan2006} and is only partially understood.
 The key insight is operational: a counter initialized to $\omega$ can
 be decremented to any finite value $n$, but a counter initialized to
 $n$ can only be decremented $n$ times.  So $\Ex_\omega$ is strictly
-stronger than every $\Ex_n$---a learner with an $\omega$-counter can
+stronger than every $\Ex_n$: a learner with an $\omega$-counter can
 ``spend'' its first mind change moving from $\omega$ to some finite $n$,
 after which it has $n$ mind changes remaining.  The value $n$ can
 depend on the data seen so far.
@@ -224,8 +224,8 @@ proof theory, where ordinal analysis assigns ordinal ``proof-theoretic
 strengths'' to formal systems.  Just as the consistency strength of
 Peano arithmetic is measured by the ordinal $\varepsilon_0$, the
 mind-change complexity of a class is measured by a constructive ordinal.
-The analogy is not perfect---the ordinals in learning theory stay well
-below $\varepsilon_0$---but the structural parallel guided the discovery.
+The analogy is not perfect (the ordinals in learning theory stay well
+below $\varepsilon_0$), but the structural parallel guided the discovery.
 \end{historical}
 
 \begin{example}
@@ -240,8 +240,8 @@ operates as follows:
 \item Each subsequent mind change decrements the (now finite) counter.
 \end{enumerate}
 After the first mind change, the learner has a finite counter, so it
-changes its mind at most finitely many times.  The crucial point is
-that the size of the finite counter is chosen \emph{adaptively}---it
+changes its mind at most finitely many times.  The key point is
+that the size of the finite counter is chosen \emph{adaptively}: it
 depends on the data.  This is exactly what an $\omega$-counter provides
 and a fixed integer counter does not.
 \end{example}
@@ -392,7 +392,7 @@ not $\Ex_\alpha$-learnable for any constructive $\alpha$.  The
 construction uses a priority argument: define $\mathcal{C}$ by
 simultaneously diagonalizing against all $\alpha$-bounded learners
 for all $\alpha$.  The learner for $\mathcal{C}$ is an ordinary
-$\Ex$-learner with no ordinal counter---its mind-change count is finite
+$\Ex$-learner with no ordinal counter; its mind-change count is finite
 on each input but grows faster than any constructive ordinal as a
 function of the input.  We refer to Ambainis, Jain, and
 Sharma~\cite{AmbainisJainSharma1999} for the full priority construction,
@@ -546,8 +546,8 @@ on $\{0, \ldots, t\}$ and follows $\varphi_e$ on $\{t+1, t+2, \ldots\}$.
 
 Since $\varphi_e = g$ and $f_{g,e}(x) = g(x)$ for $x \geq 1$, each
 hypothesis $h_t$ (for $t$ large enough that $f_{g,e}(0)$ has been
-observed) computes $f_{g,e}$.  The indices $h_t$ may differ---the
-learner may construct different programs at each step---but they all
+observed) computes $f_{g,e}$.  The indices $h_t$ may differ (the
+learner may construct different programs at each step), but they all
 compute the same function.  This is $\BC$-identification.
 
 \medskip
@@ -606,7 +606,7 @@ numbering.  An $\Ex$-learner has no such room.  It must converge to a
 Now fill $\mathcal{C}$ with infinitely many functions that differ only
 in their self-referential label at argument~$0$.  The $\BC$-learner
 reads the label, builds a correct program, moves on.  The $\Ex$-learner
-reads the label too---but it must commit.  Commit to which index?
+reads the label too, but it must commit.  Commit to which index?
 Every candidate is correct extensionally for the current function but
 wrong syntactically for all the others.  The learner converges; the
 class shifts; the index is wrong.  The trap is shut.
@@ -740,7 +740,7 @@ The mind-change ordinal of a class $\mathcal{C}$ is the least
 constructive ordinal $\alpha$ such that $\mathcal{C} \in \Ex_\alpha$,
 if such an ordinal exists.  If $\mathcal{C} \in \Ex \setminus
 \bigcup_\alpha \Ex_\alpha$, then $\mathcal{C}$ has no ordinal
-mind-change bound---its mind-change complexity exceeds all constructive
+mind-change bound; its mind-change complexity exceeds all constructive
 ordinals.
 
 \begin{defn}[Mind-Change Ordinal of a Class]
@@ -820,7 +820,7 @@ The mistake-bound equality is an adversary argument matched against the
 algorithm's potential.  Its engine is the machine-checked descent step:
 a mistake on a version space of finite Littlestone dimension strictly
 lowers that dimension, so iterating bounds the mistakes by the initial
-rank.  The online counter never passes~$\omega$---it starts at a finite
+rank.  The online counter never passes~$\omega$; it starts at a finite
 rank (or, for an infinite-dimensional class, at~$\omega$) and counts down
 by ordinary induction.  The transfinite levels $\Ex_{\omega^2},
 \Ex_{\omega^\omega}, \ldots$ of this chapter are the price of
@@ -838,7 +838,7 @@ attention lives at the very bottom of the ordinal picture, alongside
 halfspaces and the other geometric classes.  The transfinite mind-change
 hierarchy is invisible to such classes.  It becomes necessary only when
 the objects learned are programs and the success criterion is exact
-identification---the recursion-theoretic regime of this chapter, which no
+identification (the recursion-theoretic regime of this chapter), which no
 finite-capacity concept class can reach.  Placing attention in the ordinal
 landscape thus also marks where that landscape first becomes non-trivial.
 \end{remark}
@@ -870,8 +870,8 @@ Stephan, and Ventsov~\cite{SharmaStephanVentsov2004}.
 \label{op:formalize-ordinal-hierarchy}
 The dimension-to-ordinal bridge is machine-checked
 (\leanname{withTopNatToOrdinal}), but the Freivalds--Smith hierarchy
-itself---constructive ordinals, $\alpha$-bounded learners, the strict
-inclusions of \Cref{thm:ordinal-hierarchy}---has no verified counterpart.
+itself (constructive ordinals, $\alpha$-bounded learners, the strict
+inclusions of \Cref{thm:ordinal-hierarchy}) has no verified counterpart.
 Can the ordinal mind-change hierarchy be formalized in a proof assistant,
 including the priority constructions?  An unknown known: the recursion-
 theoretic machinery has no formal home yet.
@@ -889,8 +889,8 @@ unknown~\cite{MartinSharmaStephan2006}.
 \begin{openprob}[The ordinal rank of attention]
 \label{op:attention-ordinal-rank}
 \Cref{rem:attention-ordinal} places the attention class at a finite VC
-rank, but its \emph{Littlestone} dimension---the online mind-change
-rank---may still be infinite (thresholds already are).  Is the Littlestone
+rank, but its \emph{Littlestone} dimension (the online mind-change
+rank) may still be infinite (thresholds already are).  Is the Littlestone
 dimension of a softmax-attention class finite, and if so what is its exact
 ordinal rank?  A known unknown on the transformer side
 (\leanname{softAttention_wellBehaved}, \leanname{optimal_mistake_bound_eq_ldim}).
@@ -898,8 +898,8 @@ ordinal rank?  A known unknown on the transformer side
 
 \begin{openprob}[A verified online-to-transfinite bridge]
 \label{op:online-transfinite}
-The online descent---each mistake strictly lowers the Littlestone
-dimension---is machine-checked (\leanname{ldim_strict_decrease_on_mistake})
+The online descent (each mistake strictly lowers the Littlestone
+dimension) is machine-checked (\leanname{ldim_strict_decrease_on_mistake})
 and stays below~$\omega$.  Is there a single formal framework in which this
 verified finite descent and the transfinite mind-change counter are
 instances of one well-founded-recursion principle?  An unknown known: the
@@ -918,7 +918,7 @@ included~\cite{CaseSmith1983}?  A known unknown of formalization.
 \label{op:hessenberg-tight}
 Exercise~3 gives $\mathcal{C}_1 \cup \mathcal{C}_2 \in
 \Ex_{\alpha \oplus \beta}$ for the natural (Hessenberg) sum.  Is this bound
-tight---are there classes whose union's mind-change ordinal is exactly
+tight: are there classes whose union's mind-change ordinal is exactly
 $\alpha \oplus \beta$ and no smaller?  A known unknown about resource
 composition.
 \end{openprob}
@@ -934,8 +934,8 @@ unknown~\cite{AmbainisJainSharma1999}.
 \begin{openprob}[An ordinal anomaly hierarchy]
 \label{op:ordinal-anomaly}
 The anomaly count~$a$ in $\Ex_a^*$ is a natural number.  Is there a
-well-founded transfinite anomaly hierarchy---an $\Ex_\beta^*$ indexed by
-ordinals---and does it interleave with the mind-change ordinals?  An
+well-founded transfinite anomaly hierarchy (an $\Ex_\beta^*$ indexed by
+ordinals), and does it interleave with the mind-change ordinals?  An
 unknown known: the transfinite anomaly object has not been defined.
 \end{openprob}
 
@@ -944,7 +944,7 @@ unknown known: the transfinite anomaly object has not been defined.
 The chapter's mind-change ordinal and the verified ordinal VC dimension
 (\leanname{vcdim_to_ordinal_vcdim}) are two ordinal-valued measures on
 overlapping domains.  For classes where both are defined, how are they
-related---is one always a bound on the other?  A known
+related: is one always a bound on the other?  A known
 unknown~\cite{MartinSharmaStephan2006}.
 \end{openprob}
 

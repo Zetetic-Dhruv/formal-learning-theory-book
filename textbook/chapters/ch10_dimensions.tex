@@ -10,8 +10,8 @@ Part~II characterized learnability in four paradigms, and in each case the
 answer was a number: the VC dimension for PAC learning, the Littlestone
 dimension for online learning, the mind-change ordinal for Gold-style
 identification, the teaching dimension for exact learning.  This chapter and
-the three that follow develop these numbers---and the two dozen others in the
-concept graph---as objects of study in their own right.
+the three that follow develop these numbers (and the two dozen others in the
+concept graph) as objects of study in their own right.
 
 The present chapter treats \emph{combinatorial dimensions}: quantities defined
 by asking how richly a hypothesis class can label finite configurations of
@@ -160,8 +160,8 @@ behaviors $\mathcal{H}$ can exhibit on any $n$ points.\formal{FLT_Proofs.Complex
 
 The growth function satisfies $\growth_\mathcal{H}(n) \leq 2^n$ always, with
 equality when $\mathcal{H}$ shatters some set of size~$n$.  The remarkable
-content of the Sauer--Shelah lemma is that once shattering fails---at
-$n = \VC(\mathcal{H}) + 1$---the growth function drops from exponential to
+content of the Sauer--Shelah lemma is that once shattering fails (at
+$n = \VC(\mathcal{H}) + 1$), the growth function drops from exponential to
 polynomial \emph{immediately and permanently}.
 
 
@@ -263,7 +263,7 @@ of $\mathcal{H}'$:
   $h \in \mathcal{H}'$ with $h(x) = b$ realizes the full labeling.
 \end{enumerate}
 
-Crucially, the sets in (1) do not contain $x$, and the sets in (2) do
+The sets in (1) do not contain $x$, and the sets in (2) do
 contain $x$, so they are disjoint families.  Therefore,
 \[
   |\mathcal{H}'|
@@ -352,7 +352,7 @@ shatterability of \emph{trees}: it asks for the deepest complete binary tree
 whose every root-to-leaf path is realized.  We recall the definition for
 reference.
 
-\begin{defn}[Mistake Tree --- Recall]
+\begin{defn}[Mistake Tree, Recall]
 \label{def:mistake-tree-recall}
 A \emph{mistake tree} for $\mathcal{H} \subseteq \{0,1\}^X$ is a complete
 binary tree in which each internal node is labeled with an instance $x \in X$,
@@ -361,7 +361,7 @@ root-to-leaf path is consistent with some $h \in \mathcal{H}$
 (see \Cref{def:mistake-tree}).
 \end{defn}
 
-\begin{defn}[Littlestone Dimension --- Recall]
+\begin{defn}[Littlestone Dimension, Recall]
 \label{def:ldim-recall}
 The \emph{Littlestone dimension} $\Ldim(\mathcal{H})$ is the maximum depth
 of a mistake tree for $\mathcal{H}$ (\Cref{def:ldim}).  The
@@ -485,8 +485,7 @@ Binary classification has a clean answer: a class $\mathcal{H} \subseteq
 What is the corresponding answer when the label set $Y$ has $k \geq 3$
 elements?  This question, first posed in the 1980s, was open for thirty
 years.  Its resolution required not merely a new proof technique but a
-fundamentally new combinatorial dimension.  The story is worth telling in
-full, because the obvious candidate turned out to be wrong.
+fundamentally new combinatorial dimension, because the obvious candidate turned out to be wrong.
 
 
 \subsection{The Natarajan Dimension: The Obvious Candidate}
@@ -575,7 +574,7 @@ A \emph{pseudo-cube of dimension $d$} in $G_\mathcal{H}$ is a subhypergraph
 isomorphic to the complete $d$-dimensional hypercube graph $\{0,1\}^d$.
 
 The DS dimension $\DSdim(\mathcal{H})$ is the supremum over all finite
-$S \subseteq X$ of the maximum dimension of a pseudo-cube in $G_\mathcal{H}$.\footnote{The genuine DS dimension is not machine-checked. The kernel types a related but distinct notion---the \emph{all-labelings} (strong shattering) dimension \leanname{FLT_Proofs.Complexity.Structures.StrongShatteringDim}, the largest $S$ on which every $f \colon S \to Y$ is realizable---whose value is at most $\Ndim$, the reverse of the genuine DS relationship $\Ndim \le \DSdim$. Formalizing the pseudo-cube DS dimension is \cref{op:ds-formal}.}
+$S \subseteq X$ of the maximum dimension of a pseudo-cube in $G_\mathcal{H}$.\footnote{The genuine DS dimension is not machine-checked. The kernel types a related but distinct notion: the \emph{all-labelings} (strong shattering) dimension \leanname{FLT_Proofs.Complexity.Structures.StrongShatteringDim}, the largest $S$ on which every $f \colon S \to Y$ is realizable, whose value is at most $\Ndim$, the reverse of the genuine DS relationship $\Ndim \le \DSdim$. Formalizing the pseudo-cube DS dimension is \cref{op:ds-formal}.}
 \end{defn}
 
 \begin{thm}[Multiclass Characterization
@@ -593,7 +592,7 @@ exactly the role that the VC dimension plays for binary classification.
 \begin{historical}
 \textbf{Why the Natarajan dimension fails and the DS dimension succeeds.}
 The Natarajan dimension examines the labeling structure of $\mathcal{H}$ by
-projecting onto pairs of opposing functions---a fundamentally binary lens
+projecting onto pairs of opposing functions, a fundamentally binary lens
 applied to a multiclass problem.  The DS dimension, by contrast, examines
 the full combinatorial structure of the one-inclusion hypergraph, which
 encodes all the ways hypotheses can disagree on single points.
@@ -694,7 +693,7 @@ SQ dimension
   & \Cref{ch:extensions} \\
 \addlinespace
 VCL tree
-  & ---
+  & (none)
   & A tree structure used in the trichotomy theorem (\Cref{ch:universal})
     to separate exponential from arbitrarily slow learners.  Combines VC
     and Littlestone structure.
@@ -745,7 +744,7 @@ The VC dimension locates a class in the PAC landscape; the Littlestone
 dimension locates it in the online landscape; the DS dimension locates it in
 the multiclass landscape; the fat-shattering dimension locates it in the
 real-valued landscape.  No single dimension suffices for all purposes, because
-the landscapes are genuinely different---as the separation results of
+the landscapes are genuinely different, as the separation results of
 \Cref{ch:separations} will make precise.
 
 The next chapter turns from combinatorial dimensions to a different family of
@@ -766,7 +765,7 @@ A fixed-architecture soft-attention class has finite VC dimension, so the Sauer-
 The class is a well-behaved VC-measurable target (\cref{prop:attention-pac}), and its concepts are cut out by a bounded number of smooth inequalities in finitely many parameters; such parametric families shatter no arbitrarily large set, so $\VC(\mathcal{A}_{d,n_K}) < \infty$.  Sauer--Shelah then bounds $\growth_{\mathcal{A}}(n) \leq (en/\VC)^{\VC}$.
 \end{proof}
 
-The other dimensions of this chapter then read off the rest of the attention class's profile.  Its \emph{Littlestone} dimension---finite or infinite---decides whether the class is online learnable and whether its universal rate is exponential or linear (\Cref{ch:universal}); finiteness is open (\cref{op:attention-dim-profile}).  Its \emph{star number} governs how cheaply an active learner can extract the head's behaviour by querying, the methodology of \Cref{ch:exact}.  And when attention routes over a label set of size $n_K \geq 3$---a genuine multiclass head---its \emph{DS} dimension, not its Natarajan dimension, is what decides learnability, by the same thirty-year correction told above.  The single architecture is thus a point in every one of this chapter's dimension spaces at once, and the spaces disagree about it in exactly the ways the separation results of \Cref{ch:separations} predict.
+The other dimensions of this chapter then read off the rest of the attention class's profile.  Its \emph{Littlestone} dimension (finite or infinite) decides whether the class is online learnable and whether its universal rate is exponential or linear (\Cref{ch:universal}); finiteness is open (\cref{op:attention-dim-profile}).  Its \emph{star number} governs how cheaply an active learner can extract the head's behaviour by querying, the methodology of \Cref{ch:exact}.  And when attention routes over a label set of size $n_K \geq 3$ (a genuine multiclass head), its \emph{DS} dimension, not its Natarajan dimension, is what decides learnability, by the same thirty-year correction told above.  The single architecture is thus a point in every one of this chapter's dimension spaces at once, and the spaces disagree about it in exactly the ways the separation results of \Cref{ch:separations} predict.
 
 \section{Open Problems}
 \label{sec:ch10-open}
@@ -775,7 +774,7 @@ Each problem is anchored to a result above and tagged: a \emph{known unknown} (\
 
 \begin{openprob}[The dimension profile of attention, \textsc{uk}]
 \label{op:attention-dim-profile}
-\Cref{prop:attention-vc-dim} pins the VC dimension of a finite-head attention class as finite.  Compute the full dimension profile---VC, Littlestone, star number, and (for multiclass heads) DS---as functions of the architecture and score temperature, settling the regime questions of \Cref{ch:online,ch:universal} for attention in one stroke.
+\Cref{prop:attention-vc-dim} pins the VC dimension of a finite-head attention class as finite.  Compute the full dimension profile (VC, Littlestone, star number, and, for multiclass heads, DS) as functions of the architecture and score temperature, settling the regime questions of \Cref{ch:online,ch:universal} for attention in one stroke.
 \end{openprob}
 
 \begin{openprob}[The optimal compression of VC classes, \textsc{ku}]
@@ -820,5 +819,5 @@ The chapter catalogs a dozen dimensions, each governing one paradigm.  Determine
 
 \begin{openprob}[The dual VC dimension and attention routing, \textsc{uk}]
 \label{op:dual-vc-attention}
-The development types the dual class and proves a dual-to-primal shattering transfer (\leanname{FLT_Proofs.Complexity.DualVC.dual_shatters_imp_original_shatters}).  Interpret the dual VC dimension of an attention class---shattering by the \emph{keys} rather than the inputs---and determine what it measures about a transformer's routing capacity.
+The development types the dual class and proves a dual-to-primal shattering transfer (\leanname{FLT_Proofs.Complexity.DualVC.dual_shatters_imp_original_shatters}).  Interpret the dual VC dimension of an attention class (shattering by the \emph{keys} rather than the inputs) and determine what it measures about a transformer's routing capacity.
 \end{openprob}

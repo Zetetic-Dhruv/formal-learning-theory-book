@@ -11,9 +11,9 @@
 \chapter{Automata, Languages, and Computability}
 \label{ch:automata}
 
-This chapter assembles the automata-theoretic and computability-theoretic vocabulary required by Gold's model of identification in the limit (\Cref{ch:gold}). Much of the material is standard; the reader who needs the full classical development should consult Hopcroft and Ullman~\cite{HopcroftUllman1979} or Sipser~\cite{Sipser2013}. Every model defined here is typed in the companion Lean~4 development's computability substrate, and three results---the pumping separation of regular from context-free languages, the subset construction, and one direction of the limit lemma---are proved in full.
+This chapter assembles the automata-theoretic and computability-theoretic vocabulary required by Gold's model of identification in the limit (\Cref{ch:gold}). Much of the material is standard; the reader who needs the full classical development should consult Hopcroft and Ullman~\cite{HopcroftUllman1979} or Sipser~\cite{Sipser2013}. Every model defined here is typed in the companion Lean~4 development's computability substrate, and three results (the pumping separation of regular from context-free languages, the subset construction, and one direction of the limit lemma) are proved in full.
 
-Two things here are not standard vocabulary. First, the distinction between \emph{restricts} and \emph{extends\_grammar} edges---two ways one computational model can generalize another, one conservative and one genuinely new---is illustrated through the NFA/DFA and PDA/DFA pairs (\S\ref{sec:restricts-extends}); the distinction pervades the entire knowledge graph. Second, limiting recursion connects computability to learning by placing Gold's identification in the limit at a precise level of the arithmetical hierarchy (\S\ref{sec:bridge}).
+Two things here are not standard vocabulary. First, the distinction between \emph{restricts} and \emph{extends\_grammar} edges (two ways one computational model can generalize another, one conservative and one genuinely new) is illustrated through the NFA/DFA and PDA/DFA pairs (\S\ref{sec:restricts-extends}); the distinction pervades the entire knowledge graph. Second, limiting recursion connects computability to learning by placing Gold's identification in the limit at a precise level of the arithmetical hierarchy (\S\ref{sec:bridge}).
 
 % ================================================================
 % SECTION 1: The Chomsky Hierarchy
@@ -118,7 +118,7 @@ The classes differ sharply in closure. Table~\ref{tab:closure} records the facts
 \begin{proof}
 (i) Let $M_1 = (Q_1,\Sigma,\delta_1,s_1,F_1)$ and $M_2 = (Q_2,\Sigma,\delta_2,s_2,F_2)$ accept $L_1, L_2$. The product DFA on state set $Q_1 \times Q_2$ with transition $\delta((q_1,q_2),a) = (\delta_1(q_1,a),\delta_2(q_2,a))$, start $(s_1,s_2)$, and accepting set $\{(q_1,q_2): q_1 \in F_1 \text{ or } q_2 \in F_2\}$ simulates both machines in parallel and accepts exactly $L_1 \cup L_2$.
 
-(ii) The languages $L_1 = \{a^n b^n c^m : n,m \geq 0\}$ and $L_2 = \{a^m b^n c^n : n,m \geq 0\}$ are each context-free (a single matched block, the other free), but $L_1 \cap L_2 = \{a^n b^n c^n : n \geq 0\}$, which is not context-free---the pumping lemma for context-free languages forces any pumped factor to disturb the three-way balance. Hence the context-free languages are not closed under intersection.
+(ii) The languages $L_1 = \{a^n b^n c^m : n,m \geq 0\}$ and $L_2 = \{a^m b^n c^n : n,m \geq 0\}$ are each context-free (a single matched block, the other free), but $L_1 \cap L_2 = \{a^n b^n c^n : n \geq 0\}$, which is not context-free; the pumping lemma for context-free languages forces any pumped factor to disturb the three-way balance. Hence the context-free languages are not closed under intersection.
 \end{proof}
 
 \begin{table}[ht]
@@ -139,22 +139,22 @@ R.E.          & $\checkmark$ & $\checkmark$ & $\times$     & $\checkmark$ & $\ch
 \end{table}
 
 % ================================================================
-% SECTION 2: restricts vs extends_grammar (Profile C — Revelation)
+% SECTION 2: restricts vs extends_grammar (Profile C - Revelation)
 % ================================================================
 
 \section{Two Kinds of Generalization: Restricts vs.\ Extends}
 \label{sec:restricts-extends}
 
-The Chomsky hierarchy is a containment chain, but its edges are not all of one type. Moving between levels sometimes removes a constraint (a more flexible model with no new primitive) and sometimes adds a genuinely new resource (a model with a mechanism it lacked). This distinction---conservative versus generative generalization---is a recurring structural motif of the knowledge graph, and the automata hierarchy provides its first concrete instance.
+The Chomsky hierarchy is a containment chain, but its edges are not all of one type. Moving between levels sometimes removes a constraint (a more flexible model with no new primitive) and sometimes adds a genuinely new resource (a model with a mechanism it lacked). This distinction, conservative versus generative generalization, is a recurring structural motif of the knowledge graph, and the automata hierarchy provides its first concrete instance.
 
 \begin{defn}[Restricts]
 \label{def:restricts}
-Model $B$ \rel{restricts} model $A$ if $B$ is obtained from $A$ by \emph{removing a constraint}: every $A$ is already a $B$ (after trivial embedding), and the two recognize the same class of languages. The generalization is conservative---it adds representational flexibility without expanding expressive power.
+Model $B$ \rel{restricts} model $A$ if $B$ is obtained from $A$ by \emph{removing a constraint}: every $A$ is already a $B$ (after trivial embedding), and the two recognize the same class of languages. The generalization is conservative; it adds representational flexibility without expanding expressive power.
 \end{defn}
 
 \begin{defn}[Extends Grammar]
 \label{def:extends-grammar}
-Model $B$ \rel{extends\_grammar} model $A$ if $B$ is obtained by \emph{adding a new computational primitive}: $B$ recognizes a strictly larger class. The generalization is generative---it requires a fundamentally new resource.
+Model $B$ \rel{extends\_grammar} model $A$ if $B$ is obtained by \emph{adding a new computational primitive}: $B$ recognizes a strictly larger class. The generalization is generative; it requires a fundamentally new resource.
 \end{defn}
 
 The DFA is the anchor for both edges. Figure~\ref{fig:restricts-extends} displays the structure, and the two propositions below supply the rigorous content of each edge.
@@ -193,13 +193,13 @@ Every NFA with $n$ states has an equivalent DFA with at most $2^n$ states; hence
 Let $N = (Q, \Sigma, \Delta, S_0, F)$ be an NFA (with $S_0$ the set of start states after $\varepsilon$-closure). Define a DFA $D$ on the power set $2^Q$ by $\delta(T, a) = \bigcup_{q \in T} \Delta(q, a)$ (each set extended by $\varepsilon$-closure), start state $S_0$, and accepting sets $\{T : T \cap F \neq \varnothing\}$. By induction on $|w|$, the state $\hat\delta(S_0, w)$ of $D$ after reading $w$ is exactly the set of states $N$ can occupy after $w$: the base case is $S_0$, and the inductive step is the definition of $\delta$. Thus $D$ accepts $w$ iff some run of $N$ ends in $F$ iff $N$ accepts $w$, so $L(D) = L(N)$. The DFA has $|2^Q| = 2^n$ states.
 \end{proof}
 
-This is a \rel{restricts} edge: the NFA needs no new primitive, only a relaxed structural requirement. The cost is representational---an exponential blow-up in states---not expressive.
+This is a \rel{restricts} edge: the NFA needs no new primitive, only a relaxed structural requirement. The cost is representational, an exponential blow-up in states, not expressive.
 
 \paragraph{The PDA--DFA edge: generative generalization.}
-A PDA adds an unbounded stack: not the removal of a constraint but the introduction of a new primitive, the ability to store and retrieve unbounded LIFO information. By \cref{prop:anbn}, the consequence is a strict increase in power---$\{a^n b^n\}$ is context-free but not regular, so $\mathrm{REG} \subsetneq \mathrm{CFL}$. This is an \rel{extends\_grammar} edge, and the gap is witnessed by the failure of the pumping lemma, a property that holds for every regular language and fails for $\{a^n b^n\}$.
+A PDA adds an unbounded stack: not the removal of a constraint but the introduction of a new primitive, the ability to store and retrieve unbounded LIFO information. By \cref{prop:anbn}, the consequence is a strict increase in power: $\{a^n b^n\}$ is context-free but not regular, so $\mathrm{REG} \subsetneq \mathrm{CFL}$. This is an \rel{extends\_grammar} edge, and the gap is witnessed by the failure of the pumping lemma, a property that holds for every regular language and fails for $\{a^n b^n\}$.
 
 \paragraph{Why this distinction matters.}
-When $B$ \rel{restricts} $A$, the theory of $A$ transfers intact---same characterization theorems, same closure properties, same complexity measures. When $B$ \rel{extends\_grammar} $A$, the old theory typically breaks: new characterization theorems are needed, and closure properties change (\cref{tab:closure}: context-free languages lose closure under intersection and complement, \cref{prop:closure}). The distinction reappears in the learning setting. Relaxing a convergence requirement (behaviorally correct learning relaxing syntactic convergence) is conservative; adding a resource (a teacher who supplies counterexamples) is generative. Recognizing which is at work predicts whether existing results transfer.
+When $B$ \rel{restricts} $A$, the theory of $A$ transfers intact: same characterization theorems, same closure properties, same complexity measures. When $B$ \rel{extends\_grammar} $A$, the old theory typically breaks: new characterization theorems are needed, and closure properties change (\cref{tab:closure}: context-free languages lose closure under intersection and complement, \cref{prop:closure}). The distinction reappears in the learning setting. Relaxing a convergence requirement (behaviorally correct learning relaxing syntactic convergence) is conservative; adding a resource (a teacher who supplies counterexamples) is generative. Recognizing which is at work predicts whether existing results transfer.
 
 % ================================================================
 % SECTION 3: Computability Foundations
@@ -279,7 +279,7 @@ The equivalence settles three points used in \Cref{ch:gold}.
 \section{What This Chapter Established}
 \label{sec:ch3-summary}
 
-The chapter fixed the definitions---DFA, NFA, PDA, Turing machine, CFG, G\"odel numbering, partial computable function---needed for the identification-in-the-limit chapters, each typed against the verified computability substrate, and proved the load-bearing facts in full. Two structural ideas carry forward.
+The chapter fixed the definitions (DFA, NFA, PDA, Turing machine, CFG, G\"odel numbering, partial computable function) needed for the identification-in-the-limit chapters, each typed against the verified computability substrate, and proved the load-bearing facts in full. Two structural ideas carry forward.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The \rel{restricts}/\rel{extends\_grammar} distinction.} The NFA--DFA pair (conservative, same power, \cref{thm:nfa-dfa}) and the PDA--DFA pair (generative, strictly more power, \cref{prop:anbn}) are the first concrete instance of an edge-type distinction that recurs throughout the graph. Whether a generalization is conservative or generative determines whether existing theory transfers or must be rebuilt.
@@ -296,7 +296,7 @@ The chapter fixed the definitions---DFA, NFA, PDA, Turing machine, CFG, G\"odel 
 
 The chapter measured learnability against a computability yardstick. Gold identification was placed at $\Delta^0_2$ in the arithmetical hierarchy (\cref{thm:limit-bridge}), and that hierarchy is built by a single operation applied to a decidable base: existential projection over $\N$. A computable relation $R(x,y)$ becomes the recursively enumerable set $\{x : \exists y\, R(x,y)\}$; one more alternation, $\exists\forall$, reaches $\Sigma^0_2$ and with it the $\Delta^0_2$ ceiling of limiting recursion (\cref{def:limiting-recursion,thm:shoenfield}). The first step is already strict and irreversible: the halting set is the projection of a decidable relation and is not itself decidable.
 
-A second hierarchy has exactly this shape, built over a continuum rather than over $\N$, and modern attention lives on its first boundary. \Cref{ch:objects} showed (\cref{prop:soft-hard-borel}) that soft attention is measurable while hard attention need not be. Placed in the \emph{projective} hierarchy, that dichotomy becomes the descriptive-set-theoretic counterpart of the recursive/r.e.\ jump that organizes this chapter---the same projection machine, turned on a parameter space instead of on $\N$. The correspondence is structural, not an identity, and the closing remark draws the line.
+A second hierarchy has exactly this shape, built over a continuum rather than over $\N$, and modern attention lives on its first boundary. \Cref{ch:objects} showed (\cref{prop:soft-hard-borel}) that soft attention is measurable while hard attention need not be. Placed in the \emph{projective} hierarchy, that dichotomy becomes the descriptive-set-theoretic counterpart of the recursive/r.e.\ jump that organizes this chapter; it is the same projection machine, turned on a parameter space instead of on $\N$. The correspondence is structural, not an identity, and the closing remark draws the line.
 
 \subsection{The bad event is a projection}
 
@@ -304,7 +304,7 @@ Fix a concept class presented as a parametrized family $e : \Theta \to (X \to \{
 \[
   B_{m,\varepsilon} \;=\; \Bigl\{\,p \;:\; \exists\,\theta\in\Theta,\ \widehat{\mathrm{er}}_{\mathrm{ghost}}(e_\theta,p) - \widehat{\mathrm{er}}_{\mathrm{train}}(e_\theta,p) \;\geq\; \tfrac{\varepsilon}{2}\,\Bigr\}.
 \]
-The existential over $\theta$ is a projection---the same construction that drove this chapter's hierarchy, except the quantified variable now ranges over a parameter continuum, not over $\N$.
+The existential over $\theta$ is a projection, the same construction that drove this chapter's hierarchy, except the quantified variable now ranges over a parameter continuum, not over $\N$.
 
 \begin{prop}[The bad event is analytic]
 \label{prop:attention-analytic}
@@ -312,7 +312,7 @@ Let $\Theta$ be a standard Borel space and suppose the evaluation map $(\theta,x
 \end{prop}
 
 \begin{proof}
-The train and ghost empirical errors are finite averages of the loss $\ind[e_\theta(x_i)\neq c(x_i)]$ over the sample coordinates. Each summand is the indicator of $\{(\theta,p) : e_\theta(x_i)\neq c(x_i)\}$, measurable because $e$ and $c$ are; a finite sum and difference of measurable functions is measurable, so the gap is a measurable function of $(\theta,p)$ and $W$ is the Borel set where it is at least $\varepsilon/2$.\formal{FLT_Proofs.Complexity.BorelAnalyticBridge.paramWitnessSet_measurable} The bad event is the image of $W$ under the projection $(\theta,p)\mapsto p$. The projection of a Borel set from a product of standard Borel spaces is, by Suslin's theorem, an analytic set---a Borel image of a Borel set.\formal{FLT_Proofs.Complexity.BorelAnalyticBridge.borel_param_badEvent_analytic} Hence $B_{m,\varepsilon}$ is $\Sigma^1_1$.
+The train and ghost empirical errors are finite averages of the loss $\ind[e_\theta(x_i)\neq c(x_i)]$ over the sample coordinates. Each summand is the indicator of $\{(\theta,p) : e_\theta(x_i)\neq c(x_i)\}$, measurable because $e$ and $c$ are; a finite sum and difference of measurable functions is measurable, so the gap is a measurable function of $(\theta,p)$ and $W$ is the Borel set where it is at least $\varepsilon/2$.\formal{FLT_Proofs.Complexity.BorelAnalyticBridge.paramWitnessSet_measurable} The bad event is the image of $W$ under the projection $(\theta,p)\mapsto p$. The projection of a Borel set from a product of standard Borel spaces is, by Suslin's theorem, an analytic set, a Borel image of a Borel set.\formal{FLT_Proofs.Complexity.BorelAnalyticBridge.borel_param_badEvent_analytic} Hence $B_{m,\varepsilon}$ is $\Sigma^1_1$.
 \end{proof}
 
 This is the continuum analogue of the chapter's opening move. There, projecting a decidable relation over $\N$ produced an r.e.\ set; here, projecting a Borel relation over a parameter continuum produces an analytic set. In both settings the projection can raise complexity, and the only question is whether it does.
@@ -325,8 +325,8 @@ Whether the projection of \cref{prop:attention-analytic} actually leaves the mea
 \label{prop:soft-hard-descriptive}
 Two facts hold of the attention bad event.
 \begin{enumerate}[leftmargin=*,itemsep=2pt]
-\item \emph{Soft.} For every concrete transformer---finitely many heads over a finite-dimensional key space, with continuous softmax scores---the attention bad event is Borel: the projection of \cref{prop:attention-analytic} collapses back to the measurable level.\formal{TLT.transformerAttentionBadEvent_borel}
-\item \emph{Hard.} Granting the classical existence of an analytic non-Borel subset of $\R$ (Suslin 1917), there is a hard-attention head---a continuous scoring map over a Polish parameter space and two jointly measurable experts---whose $\arg\max$-routed bad event is analytic but not Borel.\formal{TLT.Strictness.attention_nonBorel_badEvent}
+\item \emph{Soft.} For every concrete transformer (finitely many heads over a finite-dimensional key space, with continuous softmax scores) the attention bad event is Borel: the projection of \cref{prop:attention-analytic} collapses back to the measurable level.\formal{TLT.transformerAttentionBadEvent_borel}
+\item \emph{Hard.} Granting the classical existence of an analytic non-Borel subset of $\R$ (Suslin 1917), there is a hard-attention head (a continuous scoring map over a Polish parameter space and two jointly measurable experts) whose $\arg\max$-routed bad event is analytic but not Borel.\formal{TLT.Strictness.attention_nonBorel_badEvent}
 \end{enumerate}
 Soft and hard attention therefore sit on opposite sides of the Borel/analytic boundary.\formal{TLT.Bridge.soft_vs_hard_attention_measurabilitySeparation}
 \end{prop}
@@ -353,22 +353,22 @@ Decidable base       & recursive, $\Delta^0_1$ & Borel, $\Delta^1_1$ \\
 One projection       & r.e., $\Sigma^0_1$      & analytic, $\Sigma^1_1$ \\
 Strict witness       & halting set             & analytic non-Borel set \\
 Why it is strict     & Post, Kleene            & Suslin, Souslin \\
-Attention reads as   & \textemdash             & soft (Borel) vs.\ hard (analytic) \\
+Attention reads as   & --                      & soft (Borel) vs.\ hard (analytic) \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \begin{remark}[Structural counterpart, not identity]
 \label{rmk:attention-descriptive}
-The two columns share an operation---existential projection over a decidable base, iterated---but they are not the same hierarchy, and three distinctions keep the reading honest.
+The two columns share an operation (existential projection over a decidable base, iterated) but they are not the same hierarchy, and three distinctions keep the reading honest.
 
 First, the superscript is not decorative. The arithmetical $\Sigma^0_n$ quantifies over natural numbers with a computable base predicate; the projective $\Sigma^1_n$ quantifies over points of a continuum (reals, or infinite sequences) with a Borel base. The attention bad event is $\Sigma^1_1$, a second-order object in its own right, and is \emph{not} the $\Sigma^0_2$ of the $\Delta^0_2$ bridge (\cref{def:delta-02}); the correspondence maps it to the first arithmetical jump, recursive to r.e.\ ($\Delta^0_1$ to $\Sigma^0_1$). Gold's $\Delta^0_2$ ceiling sits one alternation higher than the boundary attention occupies, and \cref{thm:shoenfield,thm:limit-bridge} stand on their own arithmetical grounds, not transported from the descriptive side.
 
 Second, ``not Borel'' is not ``not measurable.'' Every analytic set is universally measurable, so the hard bad event still has a well-defined probability under any sample distribution;\formal{FLT_Proofs.Complexity.BorelAnalyticBridge.analyticSet_nullMeasurableSet_ghostPairs} what fails is membership in the Borel $\sigma$-algebra, the hypothesis the clean uniform-convergence theorem silently assumes. The obstruction is to the standard \emph{route} to a generalization guarantee, not a proof that the class cannot be learned. And it is structural rather than pointwise: every individual hard-attention hypothesis is Borel, and non-measurability enters only through the existential over the class.\formal{FLT_Proofs.Theorem.BorelAnalyticSeparation.singletonClassOn_measurable}
 
-Third, the witness is elementary. The analytic non-Borel set it rests on exists in ZFC---Suslin's 1917 theorem---with no appeal to large cardinals or determinacy, which enter only above $\Sigma^1_1$. The pathology is not exotic; it is available one projection above Borel, exactly where attention places it.
+Third, the witness is elementary. The analytic non-Borel set it rests on exists in ZFC (Suslin's 1917 theorem) with no appeal to large cardinals or determinacy, which enter only above $\Sigma^1_1$. The pathology is not exotic; it is available one projection above Borel, exactly where attention places it.
 
-The softmax-to-$\arg\max$ move reads, in this chapter's own vocabulary, as the difference between a \rel{restricts} and an \rel{extends\_grammar} edge (\cref{def:restricts,def:extends-grammar}). Softmax is the conservative smoothing that keeps the class inside the Borel theory; $\arg\max$ adds the genuinely new descriptive power that can carry it across the boundary. Whether that reading can be made functorial---an exact correspondence between the smoothing operations of the two hierarchies, rather than a shared shape---is open, and recorded below.
+The softmax-to-$\arg\max$ move reads, in this chapter's own vocabulary, as the difference between a \rel{restricts} and an \rel{extends\_grammar} edge (\cref{def:restricts,def:extends-grammar}). Softmax is the conservative smoothing that keeps the class inside the Borel theory; $\arg\max$ adds the genuinely new descriptive power that can carry it across the boundary. Whether that reading can be made functorial (an exact correspondence between the smoothing operations of the two hierarchies, rather than a shared shape) is open, and recorded below.
 \end{remark}
 
 \section{Exercises and Open Problems}
@@ -388,12 +388,12 @@ Each problem is anchored to a concept above and tagged: a \emph{known unknown} (
 
 \begin{openprob}[Myhill--Nerode and the exact regularity criterion, \textsc{uk}]
 \label{op:myhill-nerode}
-The pumping lemma (\cref{lemma:pumping}) is necessary but not sufficient for regularity. Formalize the Myhill--Nerode theorem---$L$ is regular iff its right-congruence has finite index, which also yields the unique minimal DFA---on top of \leanname{FLT_Proofs.Computation.IsRegularLang}. This is the structural foundation that the $L^\ast$ learner of \Cref{ch:exact} exploits.
+The pumping lemma (\cref{lemma:pumping}) is necessary but not sufficient for regularity. Formalize the Myhill--Nerode theorem ($L$ is regular iff its right-congruence has finite index, which also yields the unique minimal DFA) on top of \leanname{FLT_Proofs.Computation.IsRegularLang}. This is the structural foundation that the $L^\ast$ learner of \Cref{ch:exact} exploits.
 \end{openprob}
 
 \begin{openprob}[Arithmetical complexity of the criterion hierarchy, \textsc{ku}]
 \label{op:criterion-hierarchy}
-\Cref{thm:limit-bridge} places explanatory identification at $\Delta^0_2$. Locate the other Gold criteria---behaviorally correct, vacillatory, anomalous, finite---in the arithmetical hierarchy, and determine which strictly exceed $\Delta^0_2$. The criteria are typed (\leanname{FLT_Proofs.Criterion.Gold.BCLearnable} and siblings) but their hierarchy positions are not yet pinned.
+\Cref{thm:limit-bridge} places explanatory identification at $\Delta^0_2$. Locate the other Gold criteria (behaviorally correct, vacillatory, anomalous, finite) in the arithmetical hierarchy, and determine which strictly exceed $\Delta^0_2$. The criteria are typed (\leanname{FLT_Proofs.Criterion.Gold.BCLearnable} and siblings) but their hierarchy positions are not yet pinned.
 \end{openprob}
 
 \begin{openprob}[A functorial account of restricts vs.\ extends, \textsc{uk}]
@@ -408,12 +408,12 @@ $\{a^n b^n\}$ (\cref{prop:anbn}) is context-free. Characterize which subclasses 
 
 \begin{openprob}[The coding theorem for the computability substrate, \textsc{uk}]
 \label{op:coding-theorem}
-The substrate types Kolmogorov complexity and algorithmic probability (\leanname{FLT_Proofs.Computation.KolmogorovComplexity}, \leanname{FLT_Proofs.Computation.AlgorithmicProbability}). Formalize the coding theorem $K(x) = -\log \mathrm{P}(x) + O(1)$ relating them, with the constant explicit in the reference machine---the same gap left open for model selection in \Cref{ch:objects} (Problem in \S\ref{sec:ch1-open}).
+The substrate types Kolmogorov complexity and algorithmic probability (\leanname{FLT_Proofs.Computation.KolmogorovComplexity}, \leanname{FLT_Proofs.Computation.AlgorithmicProbability}). Formalize the coding theorem $K(x) = -\log \mathrm{P}(x) + O(1)$ relating them, with the constant explicit in the reference machine; this is the same gap left open for model selection in \Cref{ch:objects} (Problem in \S\ref{sec:ch1-open}).
 \end{openprob}
 
 \begin{openprob}[The transfinite mind-change hierarchy, \textsc{uk}]
 \label{op:mind-change-ordinals}
-The mind-change count is typed as an ordinal (\leanname{FLT_Proofs.Complexity.MindChange.MindChangeOrdinal}), finite exactly when the learner converges correctly. Formalize the Freivalds--Smith transfinite mind-change hierarchy---identification with at most $\alpha$ mind changes for a countable ordinal $\alpha$---and prove the strictness of the resulting hierarchy, which \Cref{ch:ordinals} develops informally.
+The mind-change count is typed as an ordinal (\leanname{FLT_Proofs.Complexity.MindChange.MindChangeOrdinal}), finite exactly when the learner converges correctly. Formalize the Freivalds--Smith transfinite mind-change hierarchy (identification with at most $\alpha$ mind changes for a countable ordinal $\alpha$) and prove the strictness of the resulting hierarchy, which \Cref{ch:ordinals} develops informally.
 \end{openprob}
 
 \begin{openprob}[Closure of the recursive languages under learning operations, \textsc{ku}]
@@ -433,10 +433,10 @@ The mind-change count is typed as an ordinal (\leanname{FLT_Proofs.Complexity.Mi
 
 \begin{openprob}[The exact descriptive level of hard attention, \textsc{ku}]
 \label{op:attention-wadge}
-\Cref{prop:soft-hard-descriptive} shows the hard-attention bad event can be analytic and not Borel (\leanname{TLT.Strictness.attention_nonBorel_badEvent}). Pin its exact position: exhibit a routing whose bad event is $\Sigma^1_1$-complete in the Wadge sense---at the very top of the first projective level, not merely above Borel---and determine whether any architecturally natural attention family attains completeness or whether all of them stay properly below it.
+\Cref{prop:soft-hard-descriptive} shows the hard-attention bad event can be analytic and not Borel (\leanname{TLT.Strictness.attention_nonBorel_badEvent}). Pin its exact position: exhibit a routing whose bad event is $\Sigma^1_1$-complete in the Wadge sense (at the very top of the first projective level, not merely above Borel) and determine whether any architecturally natural attention family attains completeness or whether all of them stay properly below it.
 \end{openprob}
 
 \begin{openprob}[A descriptive restricts/extends classification, \textsc{uk}]
 \label{op:attention-restricts-descriptive}
-The soft/hard boundary reads as a \rel{restricts} versus \rel{extends\_grammar} edge (\cref{rmk:attention-descriptive}). Classify the standard architectural relaxations---softmax to $\arg\max$, finitely to countably many heads, bounded to unbounded context---by whether each keeps the bad event Borel (\leanname{TLT.transformerAttentionBadEvent_borel}) or can push it to analytic non-Borel (\leanname{TLT.Strictness.attention_nonBorel_badEvent}), turning the two-point separation of \cref{prop:soft-hard-descriptive} into a map of the attention design space against the Borel/analytic boundary.
+The soft/hard boundary reads as a \rel{restricts} versus \rel{extends\_grammar} edge (\cref{rmk:attention-descriptive}). Classify the standard architectural relaxations (softmax to $\arg\max$, finitely to countably many heads, bounded to unbounded context) by whether each keeps the bad event Borel (\leanname{TLT.transformerAttentionBadEvent_borel}) or can push it to analytic non-Borel (\leanname{TLT.Strictness.attention_nonBorel_badEvent}), turning the two-point separation of \cref{prop:soft-hard-descriptive} into a map of the attention design space against the Borel/analytic boundary.
 \end{openprob}

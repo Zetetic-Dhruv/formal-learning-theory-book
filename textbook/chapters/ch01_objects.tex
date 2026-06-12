@@ -11,7 +11,7 @@
 
 Every learning problem begins with the same question: given data drawn from an unknown source, find a rule that predicts well on future data. This chapter introduces the mathematical vocabulary for making that question precise.
 
-The vocabulary divides into three groups of unequal importance. The first group---domain, label, concept, hypothesis---is atomic: these are the sets and functions from which everything else is built. They require only brief definitions. The second group---concept class, hypothesis space, version space, inductive bias---carries genuine mathematical content, because the relationships between these objects determine what is learnable; we prove the load-bearing facts in full. The third group---Bayesian inference, minimum description length, minimum message length---appears to be vocabulary but is actually a network of near-miss analogies, each encoding a different answer to the same question about model selection.
+The vocabulary divides into three groups of unequal importance. The first group, domain, label, concept, hypothesis, is atomic: these are the sets and functions from which everything else is built. They require only brief definitions. The second group, concept class, hypothesis space, version space, inductive bias, carries genuine mathematical content, because the relationships between these objects determine what is learnable; we prove the load-bearing facts in full. The third group, Bayesian inference, minimum description length, minimum message length, appears to be vocabulary but is actually a network of near-miss analogies, each encoding a different answer to the same question about model selection.
 
 Every typed object in this chapter has a counterpart in a machine-checked Lean~4 development, and every theorem whose proof we give is mirrored there. Where a result has a verified companion we name it in a footnote; where one does not exist, we cite the literature instead.
 
@@ -24,7 +24,7 @@ The following objects are the type-level substrate of learning theory. They are 
 \label{def:domain-label-concept}
 A \emph{domain} $X$ is a set whose elements are called \emph{instances}. A \emph{label set} $Y$ is a set of possible outputs; in binary classification, $Y = \{0, 1\}$. A \emph{concept} is a function $c : X \to Y$.\formal{FLT_Proofs.Basic.Concept}
 
-Equivalently, when $Y = \{0,1\}$, a concept $c$ can be identified with the subset $\{x \in X : c(x) = 1\} \subseteq X$. Both perspectives---function and set---are used throughout the literature. We adopt the function view as primary, matching the typed definition $\leanname{Concept X Y} := X \to Y$, and switch to the set view when it simplifies combinatorial arguments (as in shattering, \cref{def:shatter-vc}).
+Equivalently, when $Y = \{0,1\}$, a concept $c$ can be identified with the subset $\{x \in X : c(x) = 1\} \subseteq X$. Both perspectives, function and set, are used throughout the literature. We adopt the function view as primary, matching the typed definition $\leanname{Concept X Y} := X \to Y$, and switch to the set view when it simplifies combinatorial arguments (as in shattering, \cref{def:shatter-vc}).
 \end{defn}
 
 \begin{defn}[Hypothesis, Target Concept, Proper/Improper]
@@ -118,7 +118,7 @@ Each measure asks a different question about the same object:
 \item \textbf{Rademacher complexity} asks: how well can $\mathcal{C}$ correlate with random noise? (Controls generalization bounds.)
 \end{itemize}
 
-These 13 measures are not independent. Many of them are related by \rel{upper\_bounds}, \rel{lower\_bounds}, and \rel{characterizes} edges in the graph. But none of them is reducible to another. Each captures a genuine aspect of $\mathcal{C}$'s complexity that the others miss. The fact that a single mathematical object---a set of functions---supports 13 inequivalent complexity measures is one of the structural surprises of the field.
+These 13 measures are not independent. Many of them are related by \rel{upper\_bounds}, \rel{lower\_bounds}, and \rel{characterizes} edges in the graph. But none of them is reducible to another. Each captures a genuine aspect of $\mathcal{C}$'s complexity that the others miss. The fact that a single mathematical object (a set of functions) supports 13 inequivalent complexity measures is one of the structural surprises of the field.
 
 The reason the concept class is the hub, rather than any one paradigm or measure, is a single theorem. To state it we need the first of the measures.
 
@@ -144,11 +144,11 @@ For a concept class $\mathcal{C}$ over a measurable domain $X$ (subject to the m
 \]\formal{FLT_Proofs.Theorem.PAC.vc_characterization}
 \end{thm}
 
-The proof occupies \Cref{ch:pac} (sufficiency, via empirical risk minimization and uniform convergence) and \Cref{ch:dimensions} (necessity, via a hard distribution on a shattered set); it is the reason the concept class is the hub of \cref{fig:concept-class-hub}. The class, through a single combinatorial invariant of itself, decides its own learnability. The equivalence extends to a five-way characterization---PAC learnability, finite VC dimension, the existence of a bounded sample compression scheme, uniform convergence of Rademacher complexity, and a finite sample-complexity bound are all equivalent.\formal{FLT_Proofs.Theorem.PAC.fundamental_theorem} We meet the compression and Rademacher faces in \Cref{ch:compression,ch:generalization}.
+The proof occupies \Cref{ch:pac} (sufficiency, via empirical risk minimization and uniform convergence) and \Cref{ch:dimensions} (necessity, via a hard distribution on a shattered set); it is the reason the concept class is the hub of \cref{fig:concept-class-hub}. The class, through a single combinatorial invariant of itself, decides its own learnability. The equivalence extends to a five-way characterization: PAC learnability, finite VC dimension, the existence of a bounded sample compression scheme, uniform convergence of Rademacher complexity, and a finite sample-complexity bound are all equivalent.\formal{FLT_Proofs.Theorem.PAC.fundamental_theorem} We meet the compression and Rademacher faces in \Cref{ch:compression,ch:generalization}.
 
 \begin{remark}[The equivalence is asymmetric]
 \label{rmk:vc-asymmetry}
-\Cref{thm:vc-char} is an ``iff'', but its two halves are proved by opposite kinds of argument. The sufficiency direction ($\VC < \infty \Rightarrow$ learnable) is constructive: it exhibits an algorithm---empirical risk minimization---and bounds its error. The necessity direction (learnable $\Rightarrow \VC < \infty$) is non-constructive: from an infinite VC dimension it produces a distribution on which every learner fails, without exhibiting any particular hard instance the learner must confront in advance. The two directions cross the boundary between combinatorics and measure theory in opposite directions, and whether the necessity direction admits a constructive proof is open (\cref{op:asymmetry}).
+\Cref{thm:vc-char} is an ``iff'', but its two halves are proved by opposite kinds of argument. The sufficiency direction ($\VC < \infty \Rightarrow$ learnable) is constructive: it exhibits an algorithm, empirical risk minimization, and bounds its error. The necessity direction (learnable $\Rightarrow \VC < \infty$) is non-constructive: from an infinite VC dimension it produces a distribution on which every learner fails, without exhibiting any particular hard instance the learner must confront in advance. The two directions cross the boundary between combinatorics and measure theory in opposite directions, and whether the necessity direction admits a constructive proof is open (\cref{op:asymmetry}).
 \end{remark}
 
 We can now compute the invariant on the smallest interesting classes, and in doing so witness a separation that recurs throughout the book.
@@ -226,7 +226,7 @@ Given a hypothesis space $\mathcal{H}$ and a sample $S = \{(x_i, y_i)\}_{i=1}^m$
 the set of hypotheses consistent with all observed data.\formal{FLT_Proofs.Complexity.GameInfra.versionSpace} The verified development carries both this operational form and a bundled structure $\leanname{VersionSpace}$ packaging $\mathcal{H}$, the data, and the consistency proof obligations together.\formal{FLT_Proofs.Basic.VersionSpace}
 \end{defn}
 
-Version-space elimination---returning any element of $\mathrm{VS}_{\mathcal{H},S}$---is perhaps the most natural learning algorithm imaginable. Its basic behavior is captured by four propositions, each a one-line consequence of the definition, and each the prototype for the convergence arguments of \Cref{ch:gold}.
+Version-space elimination (returning any element of $\mathrm{VS}_{\mathcal{H},S}$) is perhaps the most natural learning algorithm imaginable. Its basic behavior is captured by four propositions, each a one-line consequence of the definition, and each the prototype for the convergence arguments of \Cref{ch:gold}.
 
 \begin{prop}[Soundness, persistence, and monotonicity of the version space]
 \label{prop:version-space}
@@ -249,7 +249,7 @@ Fix $\mathcal{H}$, a target $c \in \mathcal{H}$, and a sample $S$ labeled by $c$
 (iv) By (i), $\mathrm{VS}_{\mathcal{H},S} \subseteq \mathcal{H}$. The Littlestone dimension is monotone under inclusion: a mistake tree shattered by a subclass is shattered, unchanged, by the superclass (each labeling realized inside the subclass is realized inside the superclass). Taking the supremum of shattered-tree depths over the smaller class gives a value no larger than over the larger one.
 \end{proof}
 
-Item (iii) is the engine of identification in the limit: as data accumulates, the version space contracts monotonically, and the question of \Cref{ch:gold} is whether it contracts to the target. Item (iv) says that this contraction never makes the residual problem harder in the online sense---a fact the Standard Optimal Algorithm exploits to achieve the optimal mistake bound.
+Item (iii) is the engine of identification in the limit: as data accumulates, the version space contracts monotonically, and the question of \Cref{ch:gold} is whether it contracts to the target. Item (iv) says that this contraction never makes the residual problem harder in the online sense, a fact the Standard Optimal Algorithm exploits to achieve the optimal mistake bound.
 
 The trouble with version-space elimination is computational. For most hypothesis classes of interest, the version space cannot be efficiently represented, enumerated, or sampled from. Two dual invariants quantify aspects of this difficulty. The \emph{eluder dimension}~\cite{RussoVanRoy2013} measures how long an adversary can keep producing examples on which consistent hypotheses still disagree, controlling exploration--exploitation tradeoffs. The \emph{star number} measures a complementary, purely combinatorial quantity.
 
@@ -284,7 +284,7 @@ It is tempting to believe that finiteness of the star number is \emph{equivalent
 
 \begin{defn}[Inductive Bias]
 \label{def:inductive-bias}
-The \emph{inductive bias} of a learner is the set of assumptions---explicit or implicit---that it uses to generalize from training data to unseen instances.
+The \emph{inductive bias} of a learner is the set of assumptions, explicit or implicit, that it uses to generalize from training data to unseen instances.
 \end{defn}
 
 This informal definition is the one usually given, and it suggests that inductive bias is not a single mathematical object. That suggestion is half right. The \emph{content} of a bias does change across paradigms, as the table below records. But the \emph{form} is uniform, and can be typed: a bias is a hypothesis space together with a real-valued preference ranking on concepts, structured so that nothing outside the space is preferred to anything inside it.
@@ -352,7 +352,7 @@ A concept class of infinite VC dimension is not PAC learnable; in particular the
 \end{cor}
 
 \begin{proof}
-If $\VC(\mathcal{C}) = \infty$, then $\mathcal{C}$ shatters sets of every size, so for each sample budget $m$ it shatters some $T$ with $|T| \geq 2m$. \Cref{thm:nfl} then supplies, for every learner, a target and distribution on which the expected error is at least $1/4$; taking $\varepsilon, \delta < 1/4$ shows the PAC criterion cannot be met. Hence infinite VC dimension precludes PAC learning---the necessity half of \cref{thm:vc-char}, here proved directly.\formal{FLT_Proofs.Complexity.Generalization.vcdim_infinite_not_pac} Since $\{0,1\}^X$ has infinite VC dimension, it is unlearnable, so any learnable class omits some functions; the omission \emph{is} the assumption that those functions are not the target.
+If $\VC(\mathcal{C}) = \infty$, then $\mathcal{C}$ shatters sets of every size, so for each sample budget $m$ it shatters some $T$ with $|T| \geq 2m$. \Cref{thm:nfl} then supplies, for every learner, a target and distribution on which the expected error is at least $1/4$; taking $\varepsilon, \delta < 1/4$ shows the PAC criterion cannot be met. Hence infinite VC dimension precludes PAC learning, the necessity half of \cref{thm:vc-char}, here proved directly.\formal{FLT_Proofs.Complexity.Generalization.vcdim_infinite_not_pac} Since $\{0,1\}^X$ has infinite VC dimension, it is unlearnable, so any learnable class omits some functions; the omission \emph{is} the assumption that those functions are not the target.
 \end{proof}
 
 \begin{remark}[No-Free-Lunch as a boundary of askability]
@@ -368,7 +368,7 @@ If $\VC(\mathcal{C}) = \infty$, then $\mathcal{C}$ shatters sets of every size, 
 \section{Three Faces of Model Selection}
 \label{sec:model-selection}
 
-Bayesian inference, minimum description length, and minimum message length are often described informally as ``the same idea.'' They are not. Each formalizes a different answer to the question ``which hypothesis should I prefer?''---and the differences between them are more instructive than any individual definition. Each is, in the sense of \cref{def:inductive-bias-typed}, a choice of preference score; the analogies among them are analogies among scores, and the obstructions are precisely where the scores fail to agree.
+Bayesian inference, minimum description length, and minimum message length are often described informally as ``the same idea.'' They are not. Each formalizes a different answer to the question ``which hypothesis should I prefer?''; the differences between them are more instructive than any individual definition. Each is, in the sense of \cref{def:inductive-bias-typed}, a choice of preference score; the analogies among them are analogies among scores, and the obstructions are precisely where the scores fail to agree.
 
 \subsection{The Definitions}
 
@@ -432,13 +432,13 @@ These three methods sit in a triangular analogy network in the graph, connected 
 \textbf{MDL $\leftrightarrow$ Bayesian:} obstruction type \emph{type\_mismatch}. MDL uses description lengths (integers under a code); Bayesian inference uses probability densities (reals under a measure). The connection $L(h) = -\log P(h)$ identifies description lengths with log-probabilities, but this identification breaks down when the code is not prefix-free or the prior is improper.
 \end{obstbox}
 
-That three different formalizations of ``prefer the simpler hypothesis'' are \emph{not} equivalent---and that the reasons for non-equivalence are themselves different (missing witness, missing witness, and type mismatch)---is a structural feature of learning theory that no single definition can convey. It is visible only in the graph.
+That three different formalizations of ``prefer the simpler hypothesis'' are \emph{not} equivalent, and that the reasons for non-equivalence are themselves different (missing witness, missing witness, and type mismatch), is a structural feature of learning theory that no single definition can convey. It is visible only in the graph.
 
 One bridge across this network is an actual theorem. The preference score of a Bayesian or MDL learner does control generalization, through the PAC-Bayes bound: for any prior fixed before seeing the data and any posterior, the expected risk is bounded by the empirical risk plus a complexity term governed by the $\KL$ divergence from prior to posterior~\cite{McAllester1999}. The bound is proved for finite hypothesis spaces in the verified development.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite} The obstruction boxes concern the three \emph{procedures}, which are not interchangeable; PAC-Bayes concerns the \emph{quantity} they share, a prior-weighted complexity, and shows it bounds error.
 
 \subsection{Compression, Occam, and the Fundamental Theorem}
 
-The MDL idea---prefer the hypothesis that compresses the data---connects directly to \cref{thm:vc-char}. A \emph{sample compression scheme} of size $k$ reconstructs any consistent labeling from a subsequence of at most $k$ of its own examples. Compression and finite VC dimension are equivalent.
+The MDL idea (prefer the hypothesis that compresses the data) connects directly to \cref{thm:vc-char}. A \emph{sample compression scheme} of size $k$ reconstructs any consistent labeling from a subsequence of at most $k$ of its own examples. Compression and finite VC dimension are equivalent.
 
 \begin{thm}[Compression characterizes finite VC dimension {\cite{MoranYehudayoff2016}}]
 \label{thm:compression-char}
@@ -472,16 +472,16 @@ Algorithmic probability connects to Kolmogorov complexity through the coding the
 The base vocabulary of learning theory is small: domain, label, concept, concept class, hypothesis space, version space. Each is a type, and each typed object has a machine-checked counterpart. At this level alone, four structural features are already visible.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item The concept class is a hub node: the same object is measured by 13 inequivalent complexity measures, and one of them---the VC dimension---decides learnability outright (\cref{thm:vc-char}). The multiplicity is not redundancy; it reflects 13 genuinely different aspects of a single object.
+\item The concept class is a hub node: the same object is measured by 13 inequivalent complexity measures, and one of them, the VC dimension, decides learnability outright (\cref{thm:vc-char}). The multiplicity is not redundancy; it reflects 13 genuinely different aspects of a single object.
 
 \item Inductive bias is not optional. The No-Free-Lunch theorem (\cref{thm:nfl}), proved here through its shattering engine, converts bias from a design choice into a precondition for the learnability question to be askable at all (\cref{cor:bias-mandatory}).
 
 \item Negative results are content, and rigor catches folklore. The asserted equivalence between finiteness of the star number and of the VC dimension is false, with singletons as an explicit witness (\cref{rmk:star-not-equiv}); the true relationship is a one-sided inequality (\cref{prop:star-ge-vc}).
 
-\item The three standard model-selection principles---Bayesian, MDL, MML---form a triangle of near-miss analogies whose obstructions differ pair by pair, while a genuine theorem (PAC-Bayes) and a genuine equivalence (compression $\leftrightarrow$ finite VC, \cref{thm:compression-char}) sit nearby and are often confused with them.
+\item The three standard model-selection principles, Bayesian, MDL, and MML, form a triangle of near-miss analogies whose obstructions differ pair by pair, while a genuine theorem (PAC-Bayes) and a genuine equivalence (compression $\leftrightarrow$ finite VC, \cref{thm:compression-char}) sit nearby and are often confused with them.
 \end{enumerate}
 
-These patterns---hub nodes, negative results as content, analogy obstructions, and the discipline of separating what is proved from what is merely said---recur throughout the book.
+These patterns recur throughout the book: hub nodes, negative results as content, analogy obstructions, and the discipline of separating what is proved from what is merely said.
 
 % ================================================================
 % TRANSFORMER CONNECTION (retrofit): attention as a concept class,
@@ -491,7 +491,7 @@ These patterns---hub nodes, negative results as content, analogy obstructions, a
 \section{The Objects of a Transformer}
 \label{sec:ch1-transformer}
 
-The vocabulary of this chapter is not confined to the classical examples. A single softmax-attention head, read as a binary predictor, is a concept in the exact sense of \cref{def:domain-label-concept}---a function $X \to \{0,1\}$---and letting its parameters vary produces a concept class in the sense of \cref{def:concept-class}. The question the chapter has asked of every object now returns with a sharp answer for the central object of modern machine learning: \emph{is the attention class a legitimate concept class, one to which the VC characterization applies?} Answering it requires exactly the measurability that \cref{thm:vc-char} deferred to \Cref{ch:generalization}, and that is where this section earns its place: it is the first point in the book where those ``mild measurability conditions'' are made concrete---and shown to be non-vacuous.
+The vocabulary of this chapter is not confined to the classical examples. A single softmax-attention head, read as a binary predictor, is a concept in the exact sense of \cref{def:domain-label-concept}, a function $X \to \{0,1\}$, and letting its parameters vary produces a concept class in the sense of \cref{def:concept-class}. The question the chapter has asked of every object now returns with a sharp answer for the central object of modern machine learning: \emph{is the attention class a legitimate concept class, one to which the VC characterization applies?} Answering it requires exactly the measurability that \cref{thm:vc-char} deferred to \Cref{ch:generalization}, and that is where this section earns its place: it is the first point in the book where those ``mild measurability conditions'' are made concrete, and shown to be non-vacuous.
 
 \begin{defn}[The softmax-attention concept class]
 \label{def:attention-concept-class}
@@ -517,16 +517,16 @@ The proof used continuity of the softmax in an essential way.  Removing it is no
 
 \begin{prop}[Softmax is the boundary of measurability]
 \label{prop:soft-hard-borel}
-Assume the existence of an analytic set of reals that is not Borel---a standard fact of classical descriptive set theory.  Then softmax attention is well-behaved at every $(d,n_K)$, \emph{and} there is a hard-attention witness---a continuous score map and two measurable experts---whose argmax-routed head has a bad event that is not measurable.\formal{TLT.Bridge.soft_vs_hard_attention_measurabilitySeparation}
+Assume the existence of an analytic set of reals that is not Borel (a standard fact of classical descriptive set theory).  Then softmax attention is well-behaved at every $(d,n_K)$, \emph{and} there is a hard-attention witness, a continuous score map and two measurable experts, whose argmax-routed head has a bad event that is not measurable.\formal{TLT.Bridge.soft_vs_hard_attention_measurabilitySeparation}
 \end{prop}
 
 \begin{proof}[Proof idea]
-The first conjunct is \cref{prop:attention-wellbehaved}.  For the second, replace the softmax by a hard $\arg\max$ over the scores.  The set of queries routed to a given key is then a level set of an $\arg\max$, and one can arrange---using a continuous reduction from an analytic non-Borel set---that the resulting bad event is the continuous preimage of that analytic set, hence analytic but not Borel, hence not measurable.  The two routes to attention thus sit on opposite sides of the Borel/analytic line: softmax stays measurable; $\arg\max$ can fall out of the measurable world entirely.
+The first conjunct is \cref{prop:attention-wellbehaved}.  For the second, replace the softmax by a hard $\arg\max$ over the scores.  The set of queries routed to a given key is then a level set of an $\arg\max$, and one can arrange, using a continuous reduction from an analytic non-Borel set, that the resulting bad event is the continuous preimage of that analytic set, hence analytic but not Borel, hence not measurable.  The two routes to attention thus sit on opposite sides of the Borel/analytic line: softmax stays measurable; $\arg\max$ can fall out of the measurable world entirely.
 \end{proof}
 
 \begin{remark}[Where the deferred conditions bite]
 \label{rmk:attention-measurability}
-\Cref{prop:soft-hard-borel} is the concrete content behind the parenthetical of \cref{thm:vc-char}.  The ``mild measurability conditions'' are not automatically met by every natural hypothesis class: hard attention violates them, and the violation is genuine---an analytic-not-Borel bad event over which no uniform-convergence statement can even be phrased.  The softmax is precisely the smoothing that restores measurability, and so the choice between soft and hard attention is, at the level of \emph{objects}, the choice of whether the learner's hypotheses form a class to which the theory of this book applies at all.
+\Cref{prop:soft-hard-borel} is the concrete content behind the parenthetical of \cref{thm:vc-char}.  The ``mild measurability conditions'' are not automatically met by every natural hypothesis class: hard attention violates them, and the violation is genuine: an analytic-not-Borel bad event over which no uniform-convergence statement can even be phrased.  The softmax is precisely the smoothing that restores measurability, and so the choice between soft and hard attention is, at the level of \emph{objects}, the choice of whether the learner's hypotheses form a class to which the theory of this book applies at all.
 \end{remark}
 
 \section{Exercises and Open Problems}
@@ -546,12 +546,12 @@ The following thirteen problems are research-grade. Each is anchored to a concep
 
 \begin{openprob}[Which finite-VC classes have finite star number? \textsc{ku}]
 \label{op:star}
-\Cref{prop:star-ge-vc} gives $\VC \leq \mathrm{star}$, and \cref{rmk:star-not-equiv} shows the gap can be infinite (singletons: $\VC = 1$, $\mathrm{star} = \infty$). Give a structural characterization---ideally a forbidden-subclass criterion---of the concept classes with finite VC dimension and finite star number. Because the star number controls active-learning label complexity~\cite{HannekeYang2015}, such a characterization would delimit exactly the classes for which active learning yields an exponential saving.
+\Cref{prop:star-ge-vc} gives $\VC \leq \mathrm{star}$, and \cref{rmk:star-not-equiv} shows the gap can be infinite (singletons: $\VC = 1$, $\mathrm{star} = \infty$). Give a structural characterization (ideally a forbidden-subclass criterion) of the concept classes with finite VC dimension and finite star number. Because the star number controls active-learning label complexity~\cite{HannekeYang2015}, such a characterization would delimit exactly the classes for which active learning yields an exponential saving.
 \end{openprob}
 
 \begin{openprob}[An inductive-bias dimension, \textsc{uk}]
 \label{op:bias-dimension}
-\Cref{cor:bias-mandatory} makes bias mandatory but offers no measure of how much bias a class encodes. Construct a complexity measure $b(\mathcal{C})$---an ``inductive-bias dimension''---that is monotone under inclusion, well-behaved under products, and lower-bounds achievable sample complexity uniformly over distributions, so that the No-Free-Lunch barrier becomes quantitative rather than merely qualitative. The typed bias of \cref{def:inductive-bias-typed} (a preference score with a monotonicity constraint) is the natural carrier for such a measure.
+\Cref{cor:bias-mandatory} makes bias mandatory but offers no measure of how much bias a class encodes. Construct a complexity measure $b(\mathcal{C})$, an ``inductive-bias dimension'', that is monotone under inclusion, well-behaved under products, and lower-bounds achievable sample complexity uniformly over distributions, so that the No-Free-Lunch barrier becomes quantitative rather than merely qualitative. The typed bias of \cref{def:inductive-bias-typed} (a preference score with a monotonicity constraint) is the natural carrier for such a measure.
 \end{openprob}
 
 \begin{openprob}[The proper/improper gap, \textsc{ku}]
@@ -581,7 +581,7 @@ The coding theorem $K(x) = -\log M(x) + O(1)$ (\cref{def:alg-prob}) hides an add
 
 \begin{openprob}[A functorial account of the thirteen measures, \textsc{ku}]
 \label{op:dimension-multiplicity}
-\Cref{fig:concept-class-hub} shows 13 complexity measures targeting the concept class. Determine whether they organize into a single partial order---or a functor from the category of concept classes (with label-preserving maps) to $\N \cup \{\infty\}$---and classify the pairs that admit two-sided polynomial comparisons against the pairs that are provably incomparable. A clean answer would explain why no measure subsumes the others while many pairs are nonetheless linked.
+\Cref{fig:concept-class-hub} shows 13 complexity measures targeting the concept class. Determine whether they organize into a single partial order, or a functor from the category of concept classes (with label-preserving maps) to $\N \cup \{\infty\}$, and classify the pairs that admit two-sided polynomial comparisons against the pairs that are provably incomparable. A clean answer would explain why no measure subsumes the others while many pairs are nonetheless linked.
 \end{openprob}
 
 \begin{openprob}[The VC dimension of attention, \textsc{ku}]
@@ -591,10 +591,10 @@ The coding theorem $K(x) = -\log M(x) + O(1)$ (\cref{def:alg-prob}) hides an add
 
 \begin{openprob}[A legitimate object for hard attention, \textsc{uk}]
 \label{op:hard-attention-object}
-\Cref{prop:soft-hard-borel} shows that argmax (hard) attention can fall outside the measurable concept classes, with an analytic-not-Borel bad event (\leanname{soft_vs_hard_attention_measurabilitySeparation}).  Identify a refined class of objects---an o-minimal or otherwise tame family of hypothesis classes---that contains hard attention and to which a uniform-convergence theory still applies, recovering hard attention as a legitimate learning object rather than a measurability pathology.
+\Cref{prop:soft-hard-borel} shows that argmax (hard) attention can fall outside the measurable concept classes, with an analytic-not-Borel bad event (\leanname{soft_vs_hard_attention_measurabilitySeparation}).  Identify a refined class of objects, an o-minimal or otherwise tame family of hypothesis classes, that contains hard attention and to which a uniform-convergence theory still applies, recovering hard attention as a legitimate learning object rather than a measurability pathology.
 \end{openprob}
 
 \begin{openprob}[Attention among the thirteen measures, \textsc{ku}]
 \label{op:attention-hub}
-\Cref{fig:concept-class-hub} measures the concept class with thirteen instruments.  Compute, for the softmax-attention class, the values of as many of them as possible---VC dimension, Littlestone dimension, Rademacher complexity, compression size---and determine which instruments agree and which diverge on this single modern object.  The well-behavedness of \cref{prop:attention-wellbehaved} guarantees the measures are defined; whether attention is a place where they coincide or a place where they pull apart is open.
+\Cref{fig:concept-class-hub} measures the concept class with thirteen instruments.  Compute, for the softmax-attention class, the values of as many of them as possible (VC dimension, Littlestone dimension, Rademacher complexity, compression size) and determine which instruments agree and which diverge on this single modern object.  The well-behavedness of \cref{prop:attention-wellbehaved} guarantees the measures are defined; whether attention is a place where they coincide or a place where they pull apart is open.
 \end{openprob}

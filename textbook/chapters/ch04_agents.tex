@@ -2,7 +2,7 @@
 % Rewritten against the design-lab Lean 4 kernel (FLT_Proofs.Learner.*) and the
 % transformers library (TLT_Proofs): typed learner abstraction, the Gibbs variational
 % principle in full, and a modern attention-learner instance of MeasurableBatchLearner.
-%   14 × Profile A (vocabulary: learner types and teacher types — TABLE, not definitions)
+%   14 x Profile A (vocabulary: learner types and teacher types - TABLE, not definitions)
 %   bayesian_learner = Profile E (Obstruction: posterior ≠ single hypothesis)
 %   gibbs_posterior = Profile C (Revelation: the Bayesian-PAC bridge)
 %   meta_learner = Profile F (Open Frontier: learning to learn)
@@ -15,7 +15,7 @@
 
 Chapters~\ref{ch:objects} and~\ref{ch:data} established what is learned (concept classes) and how data arrives (i.i.d.\ samples, texts, queries, streams). This chapter introduces the agents that do the learning and, in some settings, the agents that provide the data.
 
-Much of the vocabulary here is taxonomic: a learner is a function from data to hypotheses, and the field has named a dozen variants distinguished by which constraints they satisfy. These are best presented as a table. The chapter's genuine mathematical content lies in three places: the type mismatch between Bayesian posteriors and PAC hypotheses, resolved by the Gibbs posterior, whose optimality we prove in full; the surprising power of team learning; and the teacher models that connect to the teaching dimension and to Angluin's $L^\ast$. The learner abstraction and its constraints are typed in the verified development, and we close the opening section with a concrete modern instance---a finite-head attention learner---shown to satisfy the measurability condition that the PAC theory requires.
+Much of the vocabulary here is taxonomic: a learner is a function from data to hypotheses, and the field has named a dozen variants distinguished by which constraints they satisfy. These are best presented as a table. The chapter's genuine mathematical content lies in three places: the type mismatch between Bayesian posteriors and PAC hypotheses, resolved by the Gibbs posterior, whose optimality we prove in full; the surprising power of team learning; and the teacher models that connect to the teaching dimension and to Angluin's $L^\ast$. The learner abstraction and its constraints are typed in the verified development, and we close the opening section with a concrete modern instance, a finite-head attention learner, shown to satisfy the measurability condition that the PAC theory requires.
 
 % ================================================================
 % SECTION 1: The Learner Abstraction
@@ -56,7 +56,7 @@ Fix $k \geq 1$. A \emph{$k$-head attention learner} is given by a standard-Borel
 The argmax router partitions the input space into the cells $\{x : i = \arg\max_j s_\theta(x)_j\}$, each a finite intersection of the measurable score-comparison sets $\{x : s_\theta(x)_i \geq s_\theta(x)_j\}$; hence the routing map $(\theta, x) \mapsto \mathrm{route}_\theta(x)$ is measurable.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.FiniteScoreRouterCode.route_measurable} Composing the measurable router with the measurable experts gives a jointly measurable evaluation $(\theta, x) \mapsto e_\theta(x)_{\mathrm{route}_\theta(x)}$. Precomposing with the measurable selection $S \mapsto \theta(S)$ in the first coordinate preserves joint measurability, so $(S,x) \mapsto L(S)(x)$ is measurable, which is exactly \cref{def:measurable-learner}. The whole construction is a parametric learner family, and every parametric family with a measurable evaluation and selection is a measurable batch learner.\formal{TLT_Proofs.Learner.MeasurableParametricAttentionLearner.ParametricLearnerFamily.instMeasurableBatchLearner}
 \end{proof}
 
-The same well-behavedness holds for the softmax-top-1 and multi-head argmax routers, and for the scaled dot-product attention of a full transformer.\formal{TLT_Proofs.Routing.ScaledDotProductScoreRouter.attentionRouting_wellBehaved} The abstract learner of \cref{def:learner} therefore covers the architectures that dominate modern practice, and covers them inside the measurable sub-class on which the entire PAC apparatus operates. We return to the measurability boundary itself---where attention routing \emph{fails} to be Borel---in \Cref{ch:separations}.
+The same well-behavedness holds for the softmax-top-1 and multi-head argmax routers, and for the scaled dot-product attention of a full transformer.\formal{TLT_Proofs.Routing.ScaledDotProductScoreRouter.attentionRouting_wellBehaved} The abstract learner of \cref{def:learner} therefore covers the architectures that dominate modern practice, and covers them inside the measurable sub-class on which the entire PAC apparatus operates. We return to the measurability boundary itself (where attention routing \emph{fails} to be Borel) in \Cref{ch:separations}.
 
 % ================================================================
 % SECTION 2: Taxonomy Table
@@ -143,7 +143,7 @@ With advice &
 
 These distinctions generate strict separations in learning power within Gold's framework: there are classes identifiable by a conservative learner from informant but not from text, and classes identifiable by a set-driven learner that require unbounded memory for an iterative learner (\Cref{ch:gold,ch:separations}).
 
-In the PAC setting many of the distinctions collapse, and the collapse is a theorem rather than an observation: every PAC-learnable class is learnable by a consistent, proper learner---the empirical-risk minimizer, which returns any hypothesis consistent with the sample and succeeds once uniform convergence holds (\cref{thm:uc-pac}).\formal{FLT_Proofs.Complexity.Generalization.ermLearn} Because the i.i.d.\ assumption makes example order irrelevant, the set-driven/order-sensitive distinction also vanishes. The taxonomy has its sharpest teeth in the Gold and online paradigms, where the learner's memory and update policy genuinely affect what is learnable.
+In the PAC setting many of the distinctions collapse, and the collapse is a theorem rather than an observation: every PAC-learnable class is learnable by a consistent, proper learner (the empirical-risk minimizer, which returns any hypothesis consistent with the sample and succeeds once uniform convergence holds (\cref{thm:uc-pac})).\formal{FLT_Proofs.Complexity.Generalization.ermLearn} Because the i.i.d.\ assumption makes example order irrelevant, the set-driven/order-sensitive distinction also vanishes. The taxonomy has its sharpest teeth in the Gold and online paradigms, where the learner's memory and update policy genuinely affect what is learnable.
 
 % ================================================================
 % SECTION 3: The Bayesian–PAC Bridge
@@ -171,10 +171,10 @@ PAC learning requires a learner that outputs a single $h \in \mathcal{H}$ with $
 \qquad
 \text{Bayesian learner:} \quad (X \times Y)^m \to \Delta(\mathcal{H}).
 \]
-The naive resolution---output the MAP hypothesis $\hat{h} = \arg\max_h Q(h \mid S)$---discards most of the posterior and yields suboptimal generalization. The verified development records both the MAP read-off and the conversion of a Bayesian learner to an ordinary batch learner.\formal{FLT_Proofs.Bridge.bayesianToBatch} The sharper resolution is the Gibbs posterior.
+The naive resolution, outputting the MAP hypothesis $\hat{h} = \arg\max_h Q(h \mid S)$, discards most of the posterior and yields suboptimal generalization. The verified development records both the MAP read-off and the conversion of a Bayesian learner to an ordinary batch learner.\formal{FLT_Proofs.Bridge.bayesianToBatch} The sharper resolution is the Gibbs posterior.
 
 \begin{obstbox}
-\textbf{Bayesian $\to$ PAC type mismatch.} The Bayesian learner's output type ($\Delta(\mathcal{H})$) does not match the PAC learner's output type ($\mathcal{H}$). The PAC-Bayes theorem (\Cref{ch:generalization}) bounds the risk of a \emph{distribution} over hypotheses; extracting a single hypothesis with the bound intact requires an explicit randomized construction---the Gibbs posterior.
+\textbf{Bayesian $\to$ PAC type mismatch.} The Bayesian learner's output type ($\Delta(\mathcal{H})$) does not match the PAC learner's output type ($\mathcal{H}$). The PAC-Bayes theorem (\Cref{ch:generalization}) bounds the risk of a \emph{distribution} over hypotheses; extracting a single hypothesis with the bound intact requires an explicit randomized construction: the Gibbs posterior.
 \end{obstbox}
 
 \subsection{The Gibbs posterior and its optimality}
@@ -219,7 +219,7 @@ Substituting $\pi(h)\,e^{-\lambda \emprisk_S(h)} = Z_\lambda\,Q_\lambda(h)$ and 
 By Gibbs' inequality $\KL(Q \,\|\, Q_\lambda) \geq 0$, with equality if and only if $Q = Q_\lambda$. Hence $F_\lambda(Q) \geq -\ln Z_\lambda$, with equality exactly at $Q = Q_\lambda$.
 \end{proof}
 
-The PAC-Bayes bound's right-hand side is, up to the monotone square root and constants, an instance of $F_\lambda$: minimizing the complexity-penalized empirical risk over posteriors yields $Q_\lambda$. This is what makes the bound actionable---it names the posterior to use, not merely the existence of a good one---and it is the precise sense in which the Gibbs posterior converts a Bayesian learner into a PAC learner.\formal{FLT_Proofs.Theorem.PACBayes.gibbs_bound_of_pointwise}
+The PAC-Bayes bound's right-hand side is, up to the monotone square root and constants, an instance of $F_\lambda$: minimizing the complexity-penalized empirical risk over posteriors yields $Q_\lambda$. This is what makes the bound actionable: it names the posterior to use, not merely the existence of a good one, and it is the precise sense in which the Gibbs posterior converts a Bayesian learner into a PAC learner.\formal{FLT_Proofs.Theorem.PACBayes.gibbs_bound_of_pointwise}
 
 \begin{remark}[Gibbs $\neq$ MAP]
 \label{rmk:gibbs-vs-map}
@@ -249,7 +249,7 @@ A \emph{team} of size $k$ is a tuple of learners $(L_1, \ldots, L_k)$. The team 
 There exist concept classes identifiable by a team of size~2 but by no single learner.
 \end{thm}
 
-The increase in power is surprising on two counts. The team members receive the \emph{same} data---they neither partition the instance space nor communicate---so the power comes from the disjunctive success criterion alone: ``at least one succeeds'' is a weaker demand than ``the one learner succeeds,'' and the weaker demand enlarges the learnable classes. And the separation lives inside Gold's standard framework, not in exotic hypothesis spaces. The proof builds a class on which any single learner is forced into infinitely many mind changes by diagonalization (as in the text/informant separation of \Cref{ch:data}), while two learners with complementary strategies---one guessing large languages, one guessing small---guarantee that one converges. The argument appears in \Cref{ch:separations}.
+The increase in power is surprising on two counts. The team members receive the \emph{same} data; they neither partition the instance space nor communicate, so the power comes from the disjunctive success criterion alone: ``at least one succeeds'' is a weaker demand than ``the one learner succeeds,'' and the weaker demand enlarges the learnable classes. And the separation lives inside Gold's standard framework, not in exotic hypothesis spaces. The proof builds a class on which any single learner is forced into infinitely many mind changes by diagonalization (as in the text/informant separation of \Cref{ch:data}), while two learners with complementary strategies (one guessing large languages, one guessing small) guarantee that one converges. The argument appears in \Cref{ch:separations}.
 
 \begin{remark}[Teams and probabilistic learners]
 \label{rmk:team-prob}
@@ -335,7 +335,7 @@ Angluin's $L^\ast$ algorithm (\cref{thm:lstar}) makes DFAs MAT-learnable. The te
 \section{Deferred Agent Types}
 \label{sec:deferred}
 
-Three agent concepts in the knowledge graph---\nde{synthesizer} (a program-synthesis agent), \nde{verifier} (a correctness checker for synthesizer output), and \nde{llm\_critic} (a large language model used as a critic in a learning loop)---belong to the application layer. They are built \emph{from} the learner and teacher primitives above, and their treatment is deferred to \Cref{ch:frontiers}, in the context of program synthesis, neurosymbolic learning, and LLM-in-the-loop verification.
+Three agent concepts in the knowledge graph, \nde{synthesizer} (a program-synthesis agent), \nde{verifier} (a correctness checker for synthesizer output), and \nde{llm\_critic} (a large language model used as a critic in a learning loop), belong to the application layer. They are built \emph{from} the learner and teacher primitives above, and their treatment is deferred to \Cref{ch:frontiers}, in the context of program synthesis, neurosymbolic learning, and LLM-in-the-loop verification.
 
 % ================================================================
 % SECTION 7: Summary
@@ -347,7 +347,7 @@ Three agent concepts in the knowledge graph---\nde{synthesizer} (a program-synth
 The taxonomy rests on three substantive points.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{Most learner types are constraints on one abstraction.} The eight variants in Table~\ref{tab:learner-types} are orthogonal constraints---data access, state management, hypothesis selection---on the base type $L \colon (X \times Y)^\ast \to \mathcal{H}$, each a typed predicate in the development. The measurability condition (\cref{def:measurable-learner}) is the silent hypothesis of the statistical chapters, and a finite-head attention learner satisfies it (\cref{prop:attention-mbl}), placing transformers inside the abstraction on which the PAC apparatus operates.
+\item \textbf{Most learner types are constraints on one abstraction.} The eight variants in Table~\ref{tab:learner-types} are orthogonal constraints (data access, state management, hypothesis selection) on the base type $L \colon (X \times Y)^\ast \to \mathcal{H}$, each a typed predicate in the development. The measurability condition (\cref{def:measurable-learner}) is the silent hypothesis of the statistical chapters, and a finite-head attention learner satisfies it (\cref{prop:attention-mbl}), placing transformers inside the abstraction on which the PAC apparatus operates.
 
 \item \textbf{The Bayesian--PAC bridge is a variational fact.} The Bayesian learner outputs a posterior $Q \in \Delta(\mathcal{H})$; PAC learning wants a single $h \in \mathcal{H}$. The Gibbs posterior resolves this as the unique minimizer of the complexity-penalized empirical risk (\cref{prop:gibbs-variational}), which is why it is the right posterior to feed the PAC-Bayes bound.
 
@@ -368,7 +368,7 @@ No analogue of the fundamental theorem of PAC learning exists for meta-learning:
 
 \begin{openprob}[A combinatorial characterization of MAT-learnability, \textsc{ku}]
 \label{op:mat-char}
-Which classes are learnable from a minimally adequate teacher (\cref{def:mat-agents}) in polynomial time? Beyond DFAs the picture is partial---decision trees, certain Boolean formulas, residual finite-state automata are known positive. Give a combinatorial characterization analogous to the VC dimension for PAC learning, or show the query model admits none.
+Which classes are learnable from a minimally adequate teacher (\cref{def:mat-agents}) in polynomial time? Beyond DFAs the picture is partial: decision trees, certain Boolean formulas, and residual finite-state automata are known positive. Give a combinatorial characterization analogous to the VC dimension for PAC learning, or show the query model admits none.
 \end{openprob}
 
 \begin{openprob}[Capacity of attention learners, \textsc{uk}]
@@ -383,7 +383,7 @@ Which classes are learnable from a minimally adequate teacher (\cref{def:mat-age
 
 \begin{openprob}[The team hierarchy, \textsc{ku}]
 \label{op:team-hierarchy}
-\Cref{thm:team-power} separates teams of size~2 from single learners. Is the team hierarchy strict at every level---does a team of size $k+1$ identify classes that no team of size $k$ can---and is there a single parameter of $\mathcal{C}$ that determines the least team size required? Formalize the hierarchy on top of \leanname{FLT_Proofs.Learner.Properties.TeamLearner}.
+\Cref{thm:team-power} separates teams of size~2 from single learners. Is the team hierarchy strict at every level: does a team of size $k+1$ identify classes that no team of size $k$ can, and is there a single parameter of $\mathcal{C}$ that determines the least team size required? Formalize the hierarchy on top of \leanname{FLT_Proofs.Learner.Properties.TeamLearner}.
 \end{openprob}
 
 \begin{openprob}[Teaching dimension versus VC dimension, \textsc{ku}]
@@ -403,7 +403,7 @@ In the PAC setting the set-driven/iterative distinction collapses because exampl
 
 \begin{openprob}[A measurability dimension for learners, \textsc{uk}]
 \label{op:measurability-dimension}
-\Cref{def:measurable-learner} is binary---a learner is measurable or not. The attention router is measurable (\cref{prop:attention-mbl}) but lies one quantifier away from a non-Borel construction (\Cref{ch:separations}). Define a graded measurability complexity for learner families that places attention precisely, and relate it to the analytic-but-not-Borel boundary the development witnesses for attention routing.
+\Cref{def:measurable-learner} is binary: a learner is measurable or not. The attention router is measurable (\cref{prop:attention-mbl}) but lies one quantifier away from a non-Borel construction (\Cref{ch:separations}). Define a graded measurability complexity for learner families that places attention precisely, and relate it to the analytic-but-not-Borel boundary the development witnesses for attention routing.
 \end{openprob}
 
 \begin{openprob}[Teams of attention learners, \textsc{uk}]

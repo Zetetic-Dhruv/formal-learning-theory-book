@@ -1,10 +1,10 @@
 % Chapter 12: Generalization Bounds
-%   uniform_convergence: Profile B (load-bearing theorem --- symmetrization
+%   uniform_convergence: Profile B (load-bearing theorem: symmetrization
 %     + concentration proof IS the content)
-%   Five bound traditions: Profile G (framework bridge --- parallax)
+%   Five bound traditions: Profile G (framework bridge: parallax)
 %   rademacher_complexity: Profile A-to-B bridge (definition matters, but
 %     comparison to VC is the content)
-%   pac_bayes_bound: Profile E (obstruction --- looks Bayesian but prior
+%   pac_bayes_bound: Profile E (obstruction: looks Bayesian but prior
 %     has a fundamentally different role)
 %
 % Centerpiece: the symmetrization argument (Sec 2) and the five-framework
@@ -20,8 +20,8 @@ specific learning algorithm~$A$ and a specific training sample~$S$, what
 can we say about the generalization error of the hypothesis~$A(S)$?
 
 The answer is not unique.  Five distinct research traditions have developed
-bounds on the same quantity---the gap between true and empirical
-risk---each using different information about the learner:
+bounds on the same quantity (the gap between true and empirical
+risk), each using different information about the learner:
 
 \begin{enumerate}[leftmargin=*, itemsep=3pt]
 \item \textbf{VC/uniform convergence} measures the combinatorial richness
@@ -96,7 +96,7 @@ the core technical challenge that each framework addresses differently.
 The classical approach to generalization does not look at the algorithm at
 all.  Instead, it asks: does the empirical risk converge to the true risk
 \emph{uniformly over all hypotheses}?  If so, any hypothesis with small
-empirical risk automatically has small true risk---including the one the
+empirical risk automatically has small true risk, including the one the
 algorithm selects.
 
 \begin{defn}[Uniform Convergence]
@@ -153,7 +153,7 @@ to the convex functional $\sup$) gives:
 
 \emph{Why this helps.}  The left side involves the population
 quantity~$\risk_D(h)$, which we cannot compute.  The right side involves
-only \emph{two finite samples}---no population quantities remain.  This is
+only \emph{two finite samples}; no population quantities remain.  This is
 the symmetrization trick: the ghost sample replaces the unknown
 distribution.
 
@@ -223,8 +223,8 @@ the two-sided result.
 \begin{historical}
 The symmetrization argument was introduced by Vapnik and Chervonenkis
 (1971) in the original paper that defined what is now called the VC
-dimension.  The three-stage structure---ghost sample, sign-flip,
-finite reduction---was not initially presented in this clean form.  The
+dimension.  The three-stage structure (ghost sample, sign-flip,
+finite reduction) was not initially presented in this clean form.  The
 modern presentation, which passes through Rademacher complexity as an
 intermediate quantity, crystallized in the work of Koltchinskii (2001)
 and Bartlett--Mendelson (2002).  The Rademacher step (Stage~1b) was
@@ -254,7 +254,7 @@ convergence bound gives: with probability $\geq 1 - \delta$,
   \leq \sqrt{\frac{8(d+1)\log(2em/(d+1)) + 8\log(4/\delta)}{m}}.
 \]
 For $d = 10$ and $m = 10{,}000$, this gives a bound of approximately
-$0.12$ --- nontrivial and meaningful.  For a two-layer neural network
+$0.12$, a nontrivial and meaningful result.  For a two-layer neural network
 with $p = 10^6$ parameters (where naive VC bounds give
 $\VC \approx O(p \log p)$), the same formula gives a bound exceeding~$1$:
 the uniform convergence bound is \emph{vacuous}.
@@ -424,7 +424,7 @@ where the last step uses
 $\E[\|\sum_i \sigma_i x_i\|_2^2] = \sum_i \|x_i\|_2^2 \leq mB^2$ and
 Jensen's inequality.  Note: no dependence on ambient dimension.  A
 linear classifier in $\R^{10^6}$ with bounded norm has the same
-Rademacher complexity as one in $\R^{10}$---only the norm and the data
+Rademacher complexity as one in $\R^{10}$; only the norm and the data
 radius matter.
 \end{computational}
 
@@ -439,7 +439,7 @@ radius matter.
 
 The growth function $\growth_\mathcal{H}(m) = \max_{|S|=m}
 |\mathcal{H}|_S|$ mediates between VC dimension and generalization bounds.
-It is the growth function---not the VC dimension directly---that enters
+It is the growth function, not the VC dimension directly, that enters
 the uniform convergence argument (Stage~2 of the proof of
 \Cref{thm:vc-uniform}).  The VC dimension is a single number; the growth
 function is a whole sequence.
@@ -493,8 +493,8 @@ simultaneously,
   \risk_D(\rho) \leq \emprisk_S(\rho)
     + \sqrt{\frac{\KL(\rho \| \pi) + \log(2\sqrt{m}/\delta)}{2m}}.
 \]
-For finite~$\mathcal{H}$, the bound---with a cross-entropy complexity term in
-place of $\KL(\rho\|\pi)$---is machine-checked.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite}
+For finite~$\mathcal{H}$, the bound (with a cross-entropy complexity term in
+place of $\KL(\rho\|\pi)$) is machine-checked.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite}
 \end{thm}
 
 \begin{proof}
@@ -557,7 +557,7 @@ $\lambda = \sqrt{8m(\KL(\rho\|\pi) + \log(1/\delta))}$ yields
 \]
 The displayed change-of-measure argument yields the constant
 $\sqrt{2(\KL(\rho\|\pi) + \log(1/\delta))/m}$.  The sharper form stated in
-\Cref{thm:pac-bayes}---with $1/(2m)$ rather than $2/m$ under the root---requires
+\Cref{thm:pac-bayes} (with $1/(2m)$ rather than $2/m$ under the root) requires
 either Catoni's thermodynamic refinement~\cite{Catoni2007} or, for
 finite~$\mathcal{H}$, the direct union bound over hypotheses that the
 machine-checked companion follows; we do not reproduce either sharpening here.
@@ -576,7 +576,7 @@ fundamentally different role from a Bayesian prior.
 In Bayesian inference, the prior $\pi$ represents \emph{beliefs}
 about which hypothesis is true.  The posterior is obtained by Bayes'
 rule: $\rho(h) \propto \pi(h) \cdot \prod_i p(z_i \mid h)$.  The
-prior must be honest---it should reflect actual uncertainty.
+prior must be honest: it should reflect actual uncertainty.
 
 In PAC-Bayes, the prior is a \emph{reference measure} chosen for
 technical convenience.  It need not represent beliefs.  The ``posterior''
@@ -592,7 +592,7 @@ parameter~$\lambda$ that a true Bayesian would set to~$m$.
 PAC-Bayes prior lives in the space of reference measures.  They have
 the same mathematical type (distributions over~$\mathcal{H}$) but
 different \emph{epistemic types}.  This is why PAC-Bayes bounds hold
-for \emph{any} prior, including bad ones---the bound simply becomes
+for \emph{any} prior, including bad ones; the bound simply becomes
 large.  A Bayesian analysis with a bad prior can give arbitrarily
 wrong posteriors; a PAC-Bayes analysis with a bad prior gives a
 correct but loose bound.
@@ -680,8 +680,8 @@ A central result in stability theory is due to Shalev-Shwartz, Shamir,
 Srebro, and Sridharan~\cite{ShalevShwartzShamir2010}: beyond binary
 classification with 0--1 loss, \emph{learnability is equivalent to the
 existence of a stable empirical risk minimizer}.  In this more general
-setting---for instance, certain convex stochastic optimization
-problems---uniform convergence provably fails to characterize learnability,
+setting (for instance, certain convex stochastic optimization
+problems); uniform convergence provably fails to characterize learnability,
 yet stability succeeds.  We state this without proof; the construction
 separating learnability from uniform convergence is the technical core of
 the cited paper.
@@ -835,14 +835,14 @@ divided by the margin.
 The problem: for practical networks, this product is large.  A ResNet-18
 on CIFAR-10 has $\prod_i \|W_i\|_\sigma \approx 10^3$, making the bound
 vacuous (larger than~1).  Yet the network generalizes perfectly well.  The
-resolution of this tension---finding bounds that are both non-vacuous and
-predictive---remains one of the central open problems in learning theory.
+resolution of this tension (finding bounds that are both non-vacuous and
+predictive) remains one of the central open problems in learning theory.
 \end{example}
 
 \begin{openprob}[Tight deep network bounds]
 \label{op:deep-margins}
-For deep neural networks, all known generalization bounds---margin-based,
-PAC-Bayes, stability, and information-theoretic---are \emph{loose} in
+For deep neural networks, all known generalization bounds (margin-based,
+PAC-Bayes, stability, and information-theoretic) are \emph{loose} in
 the following sense: the bounds scale with quantities that grow with
 network size, yet empirically, larger networks generalize \emph{better}.
 
@@ -1017,8 +1017,8 @@ and obstruction relationships connect them:
 
 \item \textbf{Stability $\Rightarrow$ Information.}  A $\beta$-uniformly
   stable randomized algorithm satisfies $I(S; W) = O(m \beta^2)$.  The
-  operative step is a stability-to-divergence bound---replacing one example
-  perturbs the output distribution by $O(\beta)$ in KL divergence---not the
+  operative step is a stability-to-divergence bound (replacing one example
+  perturbs the output distribution by $O(\beta)$ in KL divergence), not the
   data-processing inequality; summing the per-coordinate contributions gives
   the $m\beta^2$ scaling.  Thus, for noisy algorithms, stability bounds imply
   information-theoretic bounds.
@@ -1034,7 +1034,7 @@ and obstruction relationships connect them:
 \item \textbf{Obstruction: Information $\not\Rightarrow$ Rademacher.}
   Information-theoretic bounds depend on the \emph{algorithm}; Rademacher
   bounds depend on the \emph{class}.  A deterministic ERM algorithm can have
-  $I(S; W)$ as large as $H(W)$---the full entropy of its output---while
+  $I(S; W)$ as large as $H(W)$ (the full entropy of its output) while
   operating on a class with small Rademacher complexity.  The two frameworks
   capture orthogonal aspects of generalization.
 
@@ -1125,7 +1125,7 @@ gap $O(1/\sqrt{m})$.  No dimension dependence.
 \textbf{Margin bound.}  If the margin is $\gamma$, the bound is
 $\hat{L}_\gamma + O(1/(\gamma\sqrt{m}))$.  If the data is
 well-separated ($\gamma = 0.1$, $\hat{L}_\gamma = 0$), this gives
-$O(10/\sqrt{m})$---worse constant but the zero margin-loss term
+$O(10/\sqrt{m})$, a worse constant, but the zero margin-loss term
 compensates.
 
 The three bounds are complementary.  In dimension $d = 1000$ with
@@ -1186,8 +1186,8 @@ but also worse training performance.
 \label{sec:certified-attention}
 
 The five frameworks are theorems about hypothesis classes and algorithms in
-the abstract.  For one concrete modern architecture---a softmax-attention
-head---the pipeline of \Cref{sec:uniform-convergence,sec:rademacher} has been
+the abstract.  For one concrete modern architecture, a softmax-attention
+head, the pipeline of \Cref{sec:uniform-convergence,sec:rademacher} has been
 carried out inside a proof assistant, producing a generalization guarantee
 that is machine-checked down to the floating-point execution of the head.
 
@@ -1234,8 +1234,8 @@ formalized.\formal{TLT.attnHead_certified_generalization}
 The construction lifts from one head to a depth-graded multi-head encoder
 stack: the budget becomes the Dudley capacity of the depth-replicated block,
 growing through the per-layer perturbation envelope with depth and head
-count, and the resulting predicate---true risk exceeds empirical risk plus
-budget plus rounding only on a $\delta$-event---is discharged for the stack
+count, and the resulting predicate (true risk exceeds empirical risk plus
+budget plus rounding only on a $\delta$-event) is discharged for the stack
 indexed by its architectural
 configuration.\formal{TLT.config_capacity_law}  That predicate is itself the
 machine-checked definition of a generalization
@@ -1248,7 +1248,7 @@ bound for a transformer component: the abstract theory of this chapter,
 instantiated and checked for attention.  It does \emph{not} resolve
 \Cref{op:deep-margins}.  The Dudley budget still grows with the parameter
 radius~$R$, the depth, and the head count, so on a large pretrained model the
-certificate is correct but loose---exactly as the classical bounds are.
+certificate is correct but loose, exactly as the classical bounds are.
 What it adds is a different axis of progress: a \emph{trustworthy} bound,
 whose constants and finite-precision corrections have been audited by a
 kernel rather than estimated by hand.
@@ -1274,8 +1274,8 @@ anchor is named where one exists.
 The empirical Rademacher complexity, the Massart finite lemma, and the VC
 bound $\mathcal{R}_m \leq \sqrt{2d\log(em/d)/m}$ are machine-checked
 (\Cref{def:rademacher,prop:rad-vc}), but the assembled high-probability bound
-of \Cref{thm:rademacher-bound}---symmetrization plus the two McDiarmid
-applications---is so far only a placeholder in the companion development.  Can
+of \Cref{thm:rademacher-bound} (symmetrization plus the two McDiarmid
+applications) is so far only a placeholder in the companion development.  Can
 the full data-dependent bound be formalized end to end?  A known unknown:
 classical on paper~\cite{BartlettMendelson2002}, open as a verified artifact.
 \end{openprob}
@@ -1285,7 +1285,7 @@ classical on paper~\cite{BartlettMendelson2002}, open as a verified artifact.
 The certificate of \Cref{prop:certified-attention} is correct but its Dudley
 budget grows with the parameter radius, depth, and head count
 (\leanname{config_capacity_law}).  Can one machine-check a bound for a
-realistic attention stack that is also \emph{non-vacuous} on a benchmark---a
+realistic attention stack that is also \emph{non-vacuous} on a benchmark: a
 verified analogue of the PAC-Bayes results for deep networks?  A known
 unknown, and the verified counterpart of \Cref{op:deep-margins}.
 \end{openprob}
@@ -1400,8 +1400,8 @@ Margin theory has the longest applied history (Vapnik, 1995; Bartlett,
 1998) and was reinvigorated by Bartlett, Foster, and Telgarsky (2017)
 for deep networks.
 
-The unification of these traditions---showing they are all projections
-of a single underlying phenomenon---remains an active research
+The unification of these traditions (showing they are all projections
+of a single underlying phenomenon) remains an active research
 direction.
 \end{historical}
 
@@ -1420,8 +1420,8 @@ learnability to sample compression.  The present chapter adds the
 \emph{analytic} layer: bounds that depend not just on the class but on
 the algorithm, the data, and the geometry of the learned hypothesis.
 The five frameworks exemplify a recurring theme of this book: the same
-mathematical phenomenon---in this case, the gap between training and
-test performance---looks different depending on which structural
+mathematical phenomenon (in this case, the gap between training and
+test performance) looks different depending on which structural
 information one chooses to measure.  No single framework captures the
 full picture, and the obstructions between frameworks (\Cref{fig:five-frameworks})
 are as informative as the implications.

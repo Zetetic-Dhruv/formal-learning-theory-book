@@ -47,7 +47,7 @@ Success criterion mismatch & Different optimization objectives & 1 \\
 \end{center}
 
 The distribution is itself revealing. The plurality of obstructions
-are type mismatches---analogies that fail because the mathematical
+are type mismatches: analogies that fail because the mathematical
 objects being compared belong to different formal categories. The second
 largest group, missing equivalence witnesses, represents the frontier:
 analogies that \emph{might} become theorems if someone proves the right
@@ -63,8 +63,8 @@ conjecture.
 
 A type mismatch obstruction arises when the source and target of an
 analogy belong to different formal categories in the concept graph.
-The analogy is structurally plausible---both concepts ``do something
-similar''---but they operate on different mathematical objects, and no
+The analogy is structurally plausible (both concepts ``do something
+similar''), but they operate on different mathematical objects, and no
 bridging theorem connects the two type systems.
 
 Type mismatches are the most common obstruction (12 of 32 edges) and
@@ -165,8 +165,8 @@ different parts of the type system. Making the analogy formal would
 require a bridging theorem that relates the two types. We conjecture that
 most of these gaps are structural rather than temporary, but this is a
 judgment, not a theorem: no impossibility result rules out a bridge for
-any individual pair, and at least one---information-theoretic bounds versus
-PAC-Bayes---already has partial bridges~\cite{HellstromDurisi2020}. The
+any individual pair, and at least one (information-theoretic bounds versus
+PAC-Bayes) already has partial bridges~\cite{HellstromDurisi2020}. The
 classification records where bridges are currently absent, not where they
 are provably impossible.
 
@@ -234,8 +234,8 @@ characterization.}
 Both theorems have the same logical form: ``a class is learnable in
 paradigm $P$ if and only if combinatorial dimension $d$ is finite.''
 The parallel is exact at the level of logical structure. But the
-dimensions measure different adversarial strengths---batch (VC) vs.\
-adaptive (Littlestone)---and $\VC \leq \Ldim$ with no reverse
+dimensions measure different adversarial strengths (batch (VC) vs.\
+adaptive (Littlestone)), and $\VC \leq \Ldim$ with no reverse
 bound.\formal{FLT_Proofs.Theorem.Separation.vcdim_le_of_mistake_bounded}
 The gap can be infinite (thresholds on $\R$). Alon et
 al.~\cite{AlonLivniMalliarisMoran2019} connected the two via
@@ -349,7 +349,7 @@ $\VC(\mathcal{H}) < \infty \Leftrightarrow$ finite sample
 complexity.\formal{FLT_Proofs.Theorem.PAC.fundamental_theorem} Unlike the
 other entries in this section, this relationship runs \emph{both} ways; it
 appears here as a cautionary case.  The analogy is usually stated as an
-identity---``sample complexity just \emph{is} VC dimension''---which
+identity (``sample complexity just \emph{is} VC dimension''), which
 collapses a two-directional theorem (an explicit upper bound one way, a
 matching lower bound the other, proved by different arguments) into a
 definition, erasing exactly the content the fundamental theorem supplies.
@@ -433,8 +433,8 @@ Both quantify ``how much side information shrinks the learner's search
 space.'' But advice operates in the Gold model (infinite stream,
 computable learner), while sample complexity operates in the PAC model
 (finite i.i.d.\ sample, distribution-free guarantees). No formal theorem
-bridges the two frameworks. The structural parallel---``side information
-helps''---is too vague to formalize without choosing a specific data
+bridges the two frameworks. The structural parallel (``side information
+helps'') is too vague to formalize without choosing a specific data
 model, and the two models are incompatible.
 
 \hfill\cite{KaufmannStephan2001}
@@ -462,7 +462,7 @@ its absence.
 \label{sec:proof-method}
 
 In these analogies, the source and target have the same theorem
-structure---the ``shape'' of the result is parallel---but the proof
+structure (the ``shape'' of the result is parallel), but the proof
 techniques from one do not transfer to the other.
 
 \begin{obstbox}
@@ -666,7 +666,7 @@ unresolved connections.
 
 \caption{The obstruction map: all 32 analogy edges colored by
 obstruction type.
-\textcolor{edgeorange}{\textbf{---}} type mismatch (12);
+\textcolor{edgeorange}{\rule[0.4ex]{1.1em}{0.9pt}} type mismatch (12);
 \textcolor{defblue}{\textbf{-\,-\,-}} missing equivalence witness (9);
 \textcolor{sepgreen}{\textbf{$\cdots$}} one-way theorem (4);
 \textcolor{thmred}{\textbf{-$\cdot$-}} data model mismatch (3);
@@ -709,7 +709,7 @@ step downward in generality tightens the bound but loses applicability.
 Together, the 32 analogy edges and their obstructions form a map of what
 formal learning theory does \emph{not yet} know how to unify. Many of the
 obstructions appear to be structural features of the landscape rather than
-removable obstacles---though, as noted above, that is a working judgment
+removable obstacles, though, as noted above, that is a working judgment
 rather than a proven impossibility. Understanding why an analogy fails is,
 in this field, as valuable as understanding why a theorem holds.
 
@@ -728,7 +728,7 @@ now machine-checked.
 
 The flagship is the correspondence \emph{online learning
 $\leftrightarrow$ zero-sum games}. A learner facing an adversary and a row
-player in a matrix game are, at first glance, only analogous---both react
+player in a matrix game are, at first glance, only analogous: both react
 to a worst-case opponent. The analogy is realized by the
 multiplicative-weights (Hedge) algorithm: run on the game matrix, it
 produces a distribution over rows whose guaranteed payoff is within
@@ -753,12 +753,12 @@ renormalized to a distribution. A potential argument bounds the gap
 between the algorithm's cumulative payoff and the best fixed row by
 $O(\sqrt{\log|R| / T})$ after $T$ rounds; taking $T$ large enough drives
 the gap below~$\varepsilon$. Those same weights, read as a mixed strategy,
-certify the minimax value---the boosting-as-a-game and regret-as-minimax
+certify the minimax value: the boosting-as-a-game and regret-as-minimax
 correspondence, formalized end to end.
 \end{proof}
 
 This realized analogy has a transformer face. The multiplicative-weights
-distribution is a softmax over accumulated scores---exactly the operation
+distribution is a softmax over accumulated scores, exactly the operation
 a softmax-attention head performs over its key scores. Attention is, in
 this precise sense, one step of the Hedge update, and the head's induced
 concept class is machine-checked to be
@@ -772,7 +772,7 @@ game is the same normalization that sits inside every attention layer.
 A taxonomy of obstructions would be vacuous if every analogy were blocked.
 \Cref{thm:mwu-minimax} is the existence proof that the frontier of
 \Cref{sec:missing-equiv} is worth pushing: an analogy that looked like a
-metaphor---``learning against an adversary is like playing a game''---is a
+metaphor (``learning against an adversary is like playing a game'') is a
 theorem, machine-checked, with a softmax at its center. The obstruction
 types classify only the analogies not yet so discharged.
 \end{remark}
@@ -804,7 +804,7 @@ prominent missing witness.  A known unknown~\cite{MoranYehudayoff2016}.
 \begin{openprob}[MML versus MDL]
 \label{op:mml-mdl}
 Is there a formal theorem relating Minimum Message Length and Minimum
-Description Length---an equivalence on a restricted class of priors, or a
+Description Length: an equivalence on a restricted class of priors, or a
 separation?  Both coding objects are formalizable (\leanname{MDLPrinciple},
 \leanname{KolmogorovComplexity}); neither direction has a witness.  A known
 unknown.
@@ -822,7 +822,7 @@ known~\cite{HellstromDurisi2020}.
 \begin{openprob}[Formalizing the obstruction taxonomy]
 \label{op:formalize-taxonomy}
 Can ``type mismatch,'' ``one-way theorem,'' and the other obstruction
-types be made precise---categorically, say---so that the classification of
+types be made precise (categorically, say), so that the classification of
 the 32 edges becomes a theorem rather than an expert judgment?  An unknown
 known: the meta-level vocabulary has no formal definition yet.
 \end{openprob}
@@ -830,7 +830,7 @@ known: the meta-level vocabulary has no formal definition yet.
 \begin{openprob}[Attention as Hedge, at scale]
 \label{op:attention-hedge}
 \Cref{thm:mwu-minimax} identifies a single softmax with one Hedge step.
-Does the no-regret guarantee survive composition---does a stacked
+Does the no-regret guarantee survive composition? Does a stacked
 attention model inherit a minimax/regret certificate, or does depth break
 the correspondence?  A known unknown on the transformer side
 (\leanname{mwu_approx_minimax}, \leanname{softAttention_wellBehaved}).
@@ -838,7 +838,7 @@ the correspondence?  A known unknown on the transformer side
 
 \begin{openprob}[Provable permanence of a type mismatch]
 \label{op:type-mismatch-impossibility}
-For a specific pair---algorithmic stability versus PAC-Bayes, say---is
+For a specific pair (algorithmic stability versus PAC-Bayes, say), is
 there a proof that \emph{no} bridging theorem exists, or is the
 ``permanence'' of \Cref{sec:type-mismatch} merely the current absence of a
 bridge?  A known unknown: the chapter conjectures permanence but proves

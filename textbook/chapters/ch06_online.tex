@@ -9,7 +9,7 @@
 
 In PAC learning, nature is indifferent: training data arrives as a random sample from a fixed distribution, and the learner's task is to generalize from this benign source. In online learning, nature is replaced by an adversary. There is no distribution. There is no training phase followed by a test phase. Instead, learning unfolds as a \emph{game}: at each round, the adversary presents an instance, the learner predicts a label, the adversary reveals the true label, and the game continues. The learner's goal is to bound the total number of mistakes, no matter what the adversary does.
 
-This change---from distribution to adversary, from batch to sequential, from probabilistic to combinatorial---transforms the mathematics entirely. PAC learning is characterized by a number (the VC dimension) through a probabilistic argument (concentration inequalities). Online learning is characterized by a \emph{tree} (the mistake tree) through a combinatorial argument (an explicit algorithm). The key theorem of this chapter---that the optimal mistake bound equals the Littlestone dimension---is proved not by bounding tail probabilities but by \emph{constructing an algorithm} that plays the game optimally.
+This change, from distribution to adversary, from batch to sequential, from probabilistic to combinatorial, transforms the mathematics entirely. PAC learning is characterized by a number (the VC dimension) through a probabilistic argument (concentration inequalities). Online learning is characterized by a \emph{tree} (the mistake tree) through a combinatorial argument (an explicit algorithm). The key theorem of this chapter, that the optimal mistake bound equals the Littlestone dimension, is proved not by bounding tail probabilities but by \emph{constructing an algorithm} that plays the game optimally.
 
 % ================================================================
 % SECTION 1: THE ONLINE LEARNING GAME
@@ -19,7 +19,7 @@ This change---from distribution to adversary, from batch to sequential, from pro
 \section{The Online Learning Game}
 \label{sec:online-game}
 
-Online learning is best understood as a protocol between two players: a \emph{learner} and an \emph{adversary}. The game is played over a domain $X$, a label set $Y = \{0,1\}$, and a hypothesis class $\mathcal{H} \subseteq \{0,1\}^X$. The adversary is constrained to be \emph{realizable}: there must exist some $h^* \in \mathcal{H}$ consistent with all of the adversary's labels. Beyond this, the adversary is unconstrained---in particular, the adversary may be \emph{adaptive}, choosing $x_t$ based on the learner's previous predictions.
+Online learning is best understood as a protocol between two players: a \emph{learner} and an \emph{adversary}. The game is played over a domain $X$, a label set $Y = \{0,1\}$, and a hypothesis class $\mathcal{H} \subseteq \{0,1\}^X$. The adversary is constrained to be \emph{realizable}: there must exist some $h^* \in \mathcal{H}$ consistent with all of the adversary's labels. Beyond this, the adversary is unconstrained; in particular, the adversary may be \emph{adaptive}, choosing $x_t$ based on the learner's previous predictions.
 
 \begin{defn}[Online Learning Protocol]
 \label{def:online-protocol}
@@ -85,7 +85,7 @@ The central question of online learning theory is: what determines $\mathrm{Opt}
 \section{Mistake Trees and the Littlestone Dimension}
 \label{sec:mistake-trees}
 
-The VC dimension counts the size of the largest \emph{set} that $\mathcal{H}$ can shatter. The Littlestone dimension counts the depth of the largest \emph{tree} that $\mathcal{H}$ can shatter. This shift---from sets to trees---is what captures the adversary's adaptive power.
+The VC dimension counts the size of the largest \emph{set} that $\mathcal{H}$ can shatter. The Littlestone dimension counts the depth of the largest \emph{tree} that $\mathcal{H}$ can shatter. This shift, from sets to trees, is what captures the adversary's adaptive power.
 
 \begin{defn}[Mistake Tree]
 \label{def:mistake-tree}
@@ -237,7 +237,7 @@ The $\SOA$ is an \emph{information-theoretically} optimal algorithm, but it is n
 \end{remark}
 
 % ================================================================
-% SECTION 4: THE LOWER BOUND — ADVERSARY STRATEGY
+% SECTION 4: THE LOWER BOUND - ADVERSARY STRATEGY
 % The adversary plays the mistake tree from root to leaf.
 % ================================================================
 
@@ -306,7 +306,7 @@ This definition contains a conceptual surprise: the regret can be small even whe
 
 \begin{remark}[Mistake bound vs.\ regret bound]
 \label{rmk:mistake-vs-regret}
-In the realizable case, the best hypothesis $h^*$ makes zero mistakes, so $\mathrm{Regret}_T$ equals the total mistake count. The regret framework is therefore a strict generalization of the mistake-bound framework. The regret formulation becomes essential when $\mathcal{H}$ is infinite or when realizability fails---precisely the settings where the Littlestone dimension may be infinite and the mistake-bound framework provides no guarantee.
+In the realizable case, the best hypothesis $h^*$ makes zero mistakes, so $\mathrm{Regret}_T$ equals the total mistake count. The regret framework is therefore a strict generalization of the mistake-bound framework. The regret formulation becomes essential when $\mathcal{H}$ is infinite or when realizability fails: precisely the settings where the Littlestone dimension may be infinite and the mistake-bound framework provides no guarantee.
 \end{remark}
 
 The Weighted Majority algorithm of Littlestone and Warmuth~\cite{Littlestone1988} achieves the following regret bound for finite $\mathcal{H}$.
@@ -341,7 +341,7 @@ The multiplicative-weights update of \cref{thm:weighted-majority} is the computa
 
 \begin{prop}[Softmax attention is an exponential-weights step]
 \label{prop:attention-hedge}
-The soft-attention weights $w_i(x) \propto \exp(s_i(x))$ are the Hedge distribution of \cref{thm:weighted-majority} over the $k$ keys.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.softmaxWeight} The weight order matches the score order---$w_i(x) \le w_j(x)$ if and only if $s_i(x) \le s_j(x)$---so the hard, argmax route attends to the maximally-weighted key, the Halving-style greedy specialization of the same update.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.softmaxWeight_le_iff_score}
+The soft-attention weights $w_i(x) \propto \exp(s_i(x))$ are the Hedge distribution of \cref{thm:weighted-majority} over the $k$ keys.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.softmaxWeight} The weight order matches the score order ($w_i(x) \le w_j(x)$ if and only if $s_i(x) \le s_j(x)$), so the hard, argmax route attends to the maximally-weighted key, the Halving-style greedy specialization of the same update.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.softmaxWeight_le_iff_score}
 \end{prop}
 
 \begin{proof}
@@ -352,7 +352,7 @@ The correspondence makes the regret framework of \cref{sec:regret} the right set
 
 \begin{remark}[Route stability]
 \label{rmk:route-stability}
-A tempered attention router's hard route is stable: away from a score tie, a small perturbation of the scores---or of the parameters and temperature that produce them---leaves the routed key unchanged.\formal{TLT_Proofs.TemperedDesignLaw.Stability.TD7_route_stable_proof} The inputs at which the route flips form the score-tie boundary, of the same measure-zero character that the mistake-tree analysis of \cref{sec:soa} exploits when it splits the version space by a single instance's label.  Stability is what lets the discrete, argmax-routed learner inherit the regret guarantee of its smooth softmax surrogate.
+A tempered attention router's hard route is stable: away from a score tie, a small perturbation of the scores, or of the parameters and temperature that produce them, leaves the routed key unchanged.\formal{TLT_Proofs.TemperedDesignLaw.Stability.TD7_route_stable_proof} The inputs at which the route flips form the score-tie boundary, of the same measure-zero character that the mistake-tree analysis of \cref{sec:soa} exploits when it splits the version space by a single instance's label.  Stability is what lets the discrete, argmax-routed learner inherit the regret guarantee of its smooth softmax surrogate.
 \end{remark}
 
 \section{The PAC--Online Gap}
@@ -421,7 +421,7 @@ $\Ldim = \infty$: We construct mistake trees of arbitrary depth. For any $d$, co
 This separation is the most important non-implication in the concept graph. It witnesses the edge $\nde{pac\_learning} \xrightarrow{\rel{does\_not\_imply}} \nde{online\_learning}$: a class can be PAC learnable (finite VC dimension) yet not online learnable (infinite Littlestone dimension). The converse implication does hold: $\Ldim < \infty$ implies $\VC < \infty$ (by $\VC \leq \Ldim$), so online learnability implies PAC learnability.\formal{FLT_Proofs.Theorem.Separation.online_imp_pac}
 
 \begin{separation}
-\textbf{PAC $\not\Rightarrow$ Online.} Witness: $\mathcal{H}_{\mathrm{thr}}$ on $\R$. The adversary in the online game can exploit the \emph{order structure} of $\R$ by performing binary search on the threshold. A random sample from a fixed distribution cannot exploit this ordering---with high probability, the sample reveals the threshold's location to within $\varepsilon$. The gap between PAC and online learnability is not a technicality: it reflects a fundamental difference between random and adversarial data.
+\textbf{PAC $\not\Rightarrow$ Online.} Witness: $\mathcal{H}_{\mathrm{thr}}$ on $\R$. The adversary in the online game can exploit the \emph{order structure} of $\R$ by performing binary search on the threshold. A random sample from a fixed distribution cannot exploit this ordering; with high probability, the sample reveals the threshold's location to within $\varepsilon$. The gap between PAC and online learnability is not a technicality: it reflects a fundamental difference between random and adversarial data.
 \end{separation}
 
 \begin{remark}[Why the gap arises]
@@ -435,7 +435,7 @@ In PAC learning, the distribution $D$ is fixed before the game begins; the learn
 The online learning model replaces PAC's probabilistic framework with a game between learner and adversary. The key structural results are:
 
 \begin{enumerate}[leftmargin=*, itemsep=3pt]
-\item \textbf{The Littlestone characterization.} The optimal mistake bound for online learning equals the Littlestone dimension $\Ldim(\mathcal{H})$---the maximum depth of a complete mistake tree. This is a \emph{combinatorial} characterization, in contrast to the VC dimension's \emph{set-combinatorial} characterization of PAC learning.
+\item \textbf{The Littlestone characterization.} The optimal mistake bound for online learning equals the Littlestone dimension $\Ldim(\mathcal{H})$, the maximum depth of a complete mistake tree. This is a \emph{combinatorial} characterization, in contrast to the VC dimension's \emph{set-combinatorial} characterization of PAC learning.
 
 \item \textbf{The SOA algorithm.} The upper bound is constructive: the Standard Optimal Algorithm achieves $\Ldim(\mathcal{H})$ mistakes by predicting the label whose version space has the larger Littlestone dimension. Each mistake provably reduces the Littlestone dimension of the version space by at least one.
 
@@ -443,10 +443,10 @@ The online learning model replaces PAC's probabilistic framework with a game bet
 
 \item \textbf{The PAC--Online gap.} $\VC(\mathcal{H}) \leq \Ldim(\mathcal{H})$ always, but the gap can be infinite (thresholds: $\VC = 1$, $\Ldim = \infty$). Online learnability implies PAC learnability, but not conversely.
 
-\item \textbf{The regret framework.} Regret bounds---measuring performance relative to the best fixed hypothesis---extend online learning beyond the realizable setting. The Littlestone dimension governs optimal regret rates even in the agnostic case.
+\item \textbf{The regret framework.} Regret bounds, measuring performance relative to the best fixed hypothesis, extend online learning beyond the realizable setting. The Littlestone dimension governs optimal regret rates even in the agnostic case.
 \end{enumerate}
 
-The combinatorial and algorithmic flavor of this chapter is not accidental. Online learning theory is fundamentally about trees and algorithms, where PAC learning theory is about sets and probabilities. Both paradigms measure the complexity of the same object (a hypothesis class $\mathcal{H}$), but through different instruments---and the instruments are not interchangeable.
+The combinatorial and algorithmic flavor of this chapter is not accidental. Online learning theory is fundamentally about trees and algorithms, where PAC learning theory is about sets and probabilities. Both paradigms measure the complexity of the same object (a hypothesis class $\mathcal{H}$), but through different instruments, and the instruments are not interchangeable.
 
 \section{Open Problems}
 \label{sec:ch6-open}
@@ -455,7 +455,7 @@ Each problem is anchored to a result above and tagged: a \emph{known unknown} (\
 
 \begin{openprob}[The Littlestone dimension of attention, \textsc{uk}]
 \label{op:ldim-attention}
-\Cref{prop:attention-hedge} identifies soft attention with exponential weights.  Determine the Littlestone dimension of a finite-head attention class as a function of the architecture and the inverse temperature: is it finite (so the class is online learnable, \cref{thm:littlestone-characterization}), and does it diverge as the temperature grows and the router approaches a hard threshold---the regime in which thresholds on $\R$ already give $\Ldim = \infty$ (\cref{prop:pac-online-sep})?
+\Cref{prop:attention-hedge} identifies soft attention with exponential weights.  Determine the Littlestone dimension of a finite-head attention class as a function of the architecture and the inverse temperature: is it finite (so the class is online learnable, \cref{thm:littlestone-characterization}), and does it diverge as the temperature grows and the router approaches a hard threshold, the regime in which thresholds on $\R$ already give $\Ldim = \infty$ (\cref{prop:pac-online-sep})?
 \end{openprob}
 
 \begin{openprob}[Regret of online attention routing, \textsc{uk}]
@@ -480,7 +480,7 @@ The mistake tree and $\SOA$ are defined for binary labels.  Determine the multic
 
 \begin{openprob}[Online learnability and privacy, \textsc{ku}]
 \label{op:private-online}
-Alon--Livni--Malliaris--Moran established that a class is online learnable if and only if it is differentially-privately PAC learnable---finite Littlestone dimension on both sides.  Formalize this equivalence on top of the verified Littlestone characterization (\leanname{FLT_Proofs.Theorem.Online.optimal_mistake_bound_eq_ldim}), and determine the quantitative dependence of the private sample complexity on $\Ldim(\mathcal{H})$.
+Alon--Livni--Malliaris--Moran established that a class is online learnable if and only if it is differentially-privately PAC learnable, with finite Littlestone dimension on both sides.  Formalize this equivalence on top of the verified Littlestone characterization (\leanname{FLT_Proofs.Theorem.Online.optimal_mistake_bound_eq_ldim}), and determine the quantitative dependence of the private sample complexity on $\Ldim(\mathcal{H})$.
 \end{openprob}
 
 \begin{openprob}[Quantitative route stability, \textsc{uk}]
@@ -490,12 +490,12 @@ Alon--Livni--Malliaris--Moran established that a class is online learnable if an
 
 \begin{openprob}[Bandit attention, \textsc{ku}]
 \label{op:bandit-attention}
-In the partial-information (bandit) setting only the loss of the routed key is observed, not the full label.  Determine the regret of online attention routing under bandit feedback---the $\sqrt{kT}$-versus-$\sqrt{T\ln k}$ gap between bandit and full-information exponential weights---and whether route stability mitigates the exploration cost.
+In the partial-information (bandit) setting only the loss of the routed key is observed, not the full label.  Determine the regret of online attention routing under bandit feedback (the $\sqrt{kT}$-versus-$\sqrt{T\ln k}$ gap between bandit and full-information exponential weights) and whether route stability mitigates the exploration cost.
 \end{openprob}
 
 \begin{openprob}[Halving versus the $\SOA$, \textsc{ku}]
 \label{op:halving-soa}
-\Cref{rmk:soa-halving} contrasts cardinality with Littlestone dimension.  Characterize the classes on which Halving is sub-optimal by an unbounded factor---where $\log_2|\mathcal{H}|$ (or its effective analogue) exceeds $\Ldim(\mathcal{H})$ arbitrarily---and give the structural property of $\mathcal{H}$ that the $\SOA$ exploits and Halving does not.
+\Cref{rmk:soa-halving} contrasts cardinality with Littlestone dimension.  Characterize the classes on which Halving is sub-optimal by an unbounded factor, where $\log_2|\mathcal{H}|$ (or its effective analogue) exceeds $\Ldim(\mathcal{H})$ arbitrarily, and give the structural property of $\mathcal{H}$ that the $\SOA$ exploits and Halving does not.
 \end{openprob}
 
 \begin{openprob}[Online-to-batch for attention, \textsc{uk}]

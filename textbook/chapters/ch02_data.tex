@@ -14,9 +14,9 @@
 
 Chapter~\ref{ch:objects} established \emph{what} is learned: concept classes, hypotheses, the objects on which complexity measures act. This chapter asks a prior question: \emph{how does data reach the learner?}
 
-The answer is load-bearing. Four different data models---i.i.d.\ samples, enumerative texts, query oracles, and adversarial streams---give rise to four different theories of learnability, characterized by four different complexity measures, and separated by explicit impossibility results. The data model is not a parameter of a single theory; it is the axis along which the field divides into distinct paradigms.
+The answer is load-bearing. Four different data models (i.i.d.\ samples, enumerative texts, query oracles, and adversarial streams) give rise to four different theories of learnability, characterized by four different complexity measures, and separated by explicit impossibility results. The data model is not a parameter of a single theory; it is the axis along which the field divides into distinct paradigms.
 
-We begin with vocabulary shared across all paradigms (\S\ref{sec:data-vocab}), then develop each data model in turn, organized by the mathematical content each one carries. Each data model is a type in the companion Lean~4 development, and the three results we prove in full---the text/informant separation, the inequality between the VC and Littlestone dimensions, and the passage from uniform convergence to PAC learnability---are mirrored there.
+We begin with vocabulary shared across all paradigms (\S\ref{sec:data-vocab}), then develop each data model in turn, organized by the mathematical content each one carries. Each data model is a type in the companion Lean~4 development, and the three results we prove in full (the text/informant separation, the inequality between the VC and Littlestone dimensions, and the passage from uniform convergence to PAC learnability) are mirrored there.
 
 % ================================================================
 % SECTION 1: Shared Vocabulary (Profile A concepts, ~12 lines total)
@@ -61,11 +61,11 @@ With vocabulary in place, we turn to the four data models. Each gets treatment p
 An \emph{i.i.d.\ sample} of size $m$ from a distribution $D$ over $X \times Y$ is a sequence $S = ((x_1, y_1), \ldots, (x_m, y_m))$ with each $(x_i, y_i)$ drawn independently from $D$. As a type it bundles a probability measure $D$ on $X \times Y$, a size $m$, and a function $\text{Fin } m \to X \times Y$; the learner knows $m$ but learns about $D$ only through $S$.\formal{FLT_Proofs.Data.IIDSample}
 \end{defn}
 
-The i.i.d.\ assumption is the most consequential modeling choice in the field. It is the foundation on which all of statistical learning theory---PAC learning, VC theory, generalization bounds, uniform convergence---is built, and what it buys, set against what it costs, is why the field has several paradigms instead of one.
+The i.i.d.\ assumption is the most consequential modeling choice in the field. It is the foundation on which all of statistical learning theory (PAC learning, VC theory, generalization bounds, uniform convergence) is built, and what it buys, set against what it costs, is why the field has several paradigms instead of one.
 
 \subsection{What i.i.d.\ buys: uniform convergence}
 
-The power of the i.i.d.\ assumption is \emph{uniform convergence}: empirical frequencies converge to true probabilities simultaneously across all hypotheses. The qualifier ``uniform'' is precise and load-bearing---the sample size at which the guarantee kicks in must be chosen \emph{before}, and hence independently of, the distribution and the target.
+The power of the i.i.d.\ assumption is \emph{uniform convergence}: empirical frequencies converge to true probabilities simultaneously across all hypotheses. The qualifier ``uniform'' is precise and load-bearing: the sample size at which the guarantee kicks in must be chosen \emph{before}, and hence independently of, the distribution and the target.
 
 \begin{defn}[Uniform convergence]
 \label{def:uc}
@@ -90,7 +90,7 @@ If $\mathcal{H}$ is nonempty and has uniform convergence, then $\mathcal{H}$ is 
 \begin{proof}
 Define the \emph{consistent learner} $L$: on a sample $S$, output any $h \in \mathcal{H}$ that agrees with every labeled point of $S$ if such an $h$ exists, and otherwise output a fixed $h_0 \in \mathcal{H}$ (available since $\mathcal{H} \neq \varnothing$). Given $\varepsilon, \delta > 0$, let $m_0$ be the sample size from uniform convergence at $(\varepsilon, \delta)$, and set the learner's sample budget to $m_0$.
 
-Fix a target $c \in \mathcal{H}$ and a distribution $D$ realizing it (the labels are $c$'s). The target $c$ is itself consistent with every sample, so a consistent hypothesis always exists, and $L(S)$ has empirical error $\emprisk(L(S)) = 0$. On the uniform-convergence event---which has probability at least $1 - \delta$ for $m \geq m_0$---every hypothesis, $L(S)$ among them, satisfies $|\emprisk - \risk| \leq \varepsilon$. Therefore
+Fix a target $c \in \mathcal{H}$ and a distribution $D$ realizing it (the labels are $c$'s). The target $c$ is itself consistent with every sample, so a consistent hypothesis always exists, and $L(S)$ has empirical error $\emprisk(L(S)) = 0$. On the uniform-convergence event (which has probability at least $1 - \delta$ for $m \geq m_0$), every hypothesis, $L(S)$ among them, satisfies $|\emprisk - \risk| \leq \varepsilon$. Therefore
 \[
 \risk(L(S)) \leq \emprisk(L(S)) + \varepsilon = 0 + \varepsilon = \varepsilon
 \]
@@ -133,7 +133,7 @@ Thresholds have $\VC = 1$ (\cref{prop:threshold-vc}), so by \cref{thm:uc-vc} the
 \section{Enumerative Data: Text and Informant}
 \label{sec:text-informant}
 
-In Gold's model of identification in the limit~\cite{Gold1967}, data arrives not as a random sample but as an enumeration, one element at a time, forever, and the learner must eventually converge to a correct hypothesis. Two variants of this process---\emph{text} and \emph{informant}---differ in a way that appears minor but produces a sharp separation.
+In Gold's model of identification in the limit~\cite{Gold1967}, data arrives not as a random sample but as an enumeration, one element at a time, forever, and the learner must eventually converge to a correct hypothesis. Two variants of this process, \emph{text} and \emph{informant}, differ in a way that appears minor but produces a sharp separation.
 
 \begin{defn}[Text Presentation]
 \label{def:text}
@@ -145,7 +145,7 @@ A \emph{text} for a language $L \subseteq \N$ is a data stream $t_1, t_2, \ldots
 An \emph{informant} for $L$ is a stream of pairs $(x_i, \ell_i)$ with $\ell_i = \ind[x_i \in L]$ in which every natural number eventually appears. As a type it extends a data stream with two conditions: labels are correct, and every point of $X$ eventually appears.\formal{FLT_Proofs.Data.InformantPresentation}
 \end{defn}
 
-A text provides \emph{positive data only}; an informant provides the membership status of every point. The distinction looks quantitative---an informant gives more. The following separation shows it is qualitative.
+A text provides \emph{positive data only}; an informant provides the membership status of every point. The distinction looks quantitative: an informant gives more. The following separation shows it is qualitative.
 
 \begin{thm}[Text $<$ Informant {\cite{Gold1967}}]
 \label{thm:text-informant}
@@ -168,7 +168,7 @@ The prefix $\sigma_1$ is also a legitimate beginning of a text for the finite se
 Now resume enumerating fresh natural numbers $k_1+1, k_1+2, \ldots$, again building toward a text for $\N$; $M$ must return to an $\N$-conjecture, ending stage $3$. Iterating, each stage forces $M$ to switch between an $\N$-hypothesis and a finite-set hypothesis. The limiting sequence is a genuine text (every element of its underlying language appears), yet $M$ never stabilizes. This contradicts identification, so no learner succeeds on $\mathcal{C}_{\mathrm{fin}}$ from text.
 \end{proof}
 
-The witness $\mathcal{C}_{\mathrm{fin}}$ is instructive: an extremely natural class---all finite sets plus the universal set---already separates the two data models. The obstruction is the impossibility of distinguishing ``all of $\N$'' from ``a large finite set'' using positive data alone.
+The witness $\mathcal{C}_{\mathrm{fin}}$ is instructive: an extremely natural class (all finite sets plus the universal set) already separates the two data models. The obstruction is the impossibility of distinguishing ``all of $\N$'' from ``a large finite set'' using positive data alone.
 
 \begin{remark}[The structural role of negative data]
 \label{rmk:negative-data}
@@ -176,7 +176,7 @@ The separation shows that negative data is not quantitatively ``more'' but quali
 \end{remark}
 
 \begin{historical}
-Gold's 1967 paper~\cite{Gold1967} introduced both data models and proved the separation for language identification. It predates PAC learning by 17 years and online learning by 21, making it one of the earliest impossibility results in computational learning theory. The framework remains the standard model for inductive inference and underlies the mind-change hierarchy of Freivalds--Smith and Case--Smith (\Cref{ch:ordinals}); the verified development types the full criterion hierarchy---finite, explanatory, behaviorally correct, vacillatory, and anomalous identification.\formal{FLT_Proofs.Criterion.Gold.BCLearnable}
+Gold's 1967 paper~\cite{Gold1967} introduced both data models and proved the separation for language identification. It predates PAC learning by 17 years and online learning by 21, making it one of the earliest impossibility results in computational learning theory. The framework remains the standard model for inductive inference and underlies the mind-change hierarchy of Freivalds--Smith and Case--Smith (\Cref{ch:ordinals}); the verified development types the full criterion hierarchy: finite, explanatory, behaviorally correct, vacillatory, and anomalous identification.\formal{FLT_Proofs.Criterion.Gold.BCLearnable}
 \end{historical}
 
 % ================================================================
@@ -263,7 +263,7 @@ The online protocol removes every comfort the i.i.d.\ model provides: no distrib
 
 \begin{defn}[Mistake tree and Littlestone dimension]
 \label{def:mistake-tree-data}
-A \emph{mistake tree} of depth $d$ is a complete binary tree whose internal nodes are labeled by instances $x \in X$; the inductive type is a leaf or a branch carrying an instance and two subtrees.\formal{FLT_Proofs.Complexity.Littlestone.MistakeTree} The tree is \emph{shattered} by $\mathcal{C}$ if, recursively, the root instance $x$ admits a concept in $\mathcal{C}$ labeling it $1$ whose restriction shatters the left subtree and a concept labeling it $0$ whose restriction shatters the right subtree---so that every root-to-leaf path is realized by some concept forcing a mistake at each node.\formal{FLT_Proofs.Complexity.Littlestone.MistakeTree.isShattered} The \emph{Littlestone dimension} $\Ldim(\mathcal{C})$ is the greatest depth of a shattered mistake tree.\formal{FLT_Proofs.Complexity.GameInfra.LittlestoneDim}
+A \emph{mistake tree} of depth $d$ is a complete binary tree whose internal nodes are labeled by instances $x \in X$; the inductive type is a leaf or a branch carrying an instance and two subtrees.\formal{FLT_Proofs.Complexity.Littlestone.MistakeTree} The tree is \emph{shattered} by $\mathcal{C}$ if, recursively, the root instance $x$ admits a concept in $\mathcal{C}$ labeling it $1$ whose restriction shatters the left subtree and a concept labeling it $0$ whose restriction shatters the right subtree, so that every root-to-leaf path is realized by some concept forcing a mistake at each node.\formal{FLT_Proofs.Complexity.Littlestone.MistakeTree.isShattered} The \emph{Littlestone dimension} $\Ldim(\mathcal{C})$ is the greatest depth of a shattered mistake tree.\formal{FLT_Proofs.Complexity.GameInfra.LittlestoneDim}
 \end{defn}
 
 \begin{warning}[Two shattering conventions]
@@ -279,10 +279,10 @@ For every concept class, $\VC(\mathcal{C}) \leq \Ldim(\mathcal{C})$.\formal{FLT_
 \end{prop}
 
 \begin{proof}
-Let $S = \{x_1, \ldots, x_d\}$ be shattered by $\mathcal{C}$ in the VC sense, with $d = \VC(\mathcal{C})$. Build the complete binary mistake tree $T$ of depth $d$ that queries $x_1$ at the root and, along every branch, queries $x_2, \ldots, x_d$ in order---the same instance at every node of a given level. Each root-to-leaf path corresponds to a labeling $b \in \{0,1\}^d$ of $S$. Because $S$ is shattered, some concept $c \in \mathcal{C}$ realizes exactly the labeling $b$ on $S$, and this single concept forces the prescribed mistake at every node of the path; this is precisely path-consistent shattering. Hence $T$ is a shattered mistake tree of depth $d$, so $\Ldim(\mathcal{C}) \geq d = \VC(\mathcal{C})$.
+Let $S = \{x_1, \ldots, x_d\}$ be shattered by $\mathcal{C}$ in the VC sense, with $d = \VC(\mathcal{C})$. Build the complete binary mistake tree $T$ of depth $d$ that queries $x_1$ at the root and, along every branch, queries $x_2, \ldots, x_d$ in order (the same instance at every node of a given level). Each root-to-leaf path corresponds to a labeling $b \in \{0,1\}^d$ of $S$. Because $S$ is shattered, some concept $c \in \mathcal{C}$ realizes exactly the labeling $b$ on $S$, and this single concept forces the prescribed mistake at every node of the path; this is precisely path-consistent shattering. Hence $T$ is a shattered mistake tree of depth $d$, so $\Ldim(\mathcal{C}) \geq d = \VC(\mathcal{C})$.
 \end{proof}
 
-The inequality can be arbitrarily loose. Thresholds on $\R$ have $\VC = 1$ but $\Ldim = \infty$ (\cref{prop:threshold-vc,prop:threshold-ldim}), so finite VC dimension does not bound the Littlestone dimension---the formal content of fragility~(1) above. What the Littlestone dimension buys in return is a clean characterization and an algorithm that meets it.
+The inequality can be arbitrarily loose. Thresholds on $\R$ have $\VC = 1$ but $\Ldim = \infty$ (\cref{prop:threshold-vc,prop:threshold-ldim}), so finite VC dimension does not bound the Littlestone dimension, which is the formal content of fragility~(1) above. What the Littlestone dimension buys in return is a clean characterization and an algorithm that meets it.
 
 \begin{thm}[Littlestone characterization {\cite{Littlestone1988}}]
 \label{thm:ldim-char}
@@ -293,7 +293,7 @@ The Standard Optimal Algorithm predicts, at each point, the label whose survivin
 
 \begin{remark}[What adversarial data buys: robustness]
 \label{rmk:online-robustness}
-A mistake-bounded online learner guarantees its bound against \emph{any} sequence---worst-case, non-stationary, distribution-shifting. The bound $\Ldim(\mathcal{C})$ holds regardless of how data is generated. This unconditional guarantee is what makes online learning the right framework when distributional assumptions are unjustified, and it is exactly the strength that the i.i.d.\ model trades away for the smaller invariant $\VC \leq \Ldim$.
+A mistake-bounded online learner guarantees its bound against \emph{any} sequence: worst-case, non-stationary, distribution-shifting. The bound $\Ldim(\mathcal{C})$ holds regardless of how data is generated. This unconditional guarantee is what makes online learning the right framework when distributional assumptions are unjustified, and it is exactly the strength that the i.i.d.\ model trades away for the smaller invariant $\VC \leq \Ldim$.
 \end{remark}
 
 % ================================================================
@@ -394,7 +394,7 @@ Passive $\not\Rightarrow$ Exact & DFAs & Crypto.\ hardness of PAC; & \cite{Anglu
 \end{tabular}
 \end{center}
 
-Each separation has the same logical structure: a witness class learnable under one data model but not another, together with an explicit obstruction. The PAC/online separation is verified directly---some class is PAC learnable but not online learnable\formal{FLT_Proofs.Theorem.Separation.pac_not_implies_online}---and extends to a three-way separation of PAC, online, and Gold identification.\formal{FLT_Proofs.Theorem.Separation.online_pac_gold_separation} The witnesses---thresholds, finite sets, finite automata---are among the simplest classes in the theory. Their simplicity is the signature of a genuine paradigm boundary rather than a parameter difference: even the simplest classes distinguish the paradigms.
+Each separation has the same logical structure: a witness class learnable under one data model but not another, together with an explicit obstruction. The PAC/online separation is verified directly (some class is PAC learnable but not online learnable\formal{FLT_Proofs.Theorem.Separation.pac_not_implies_online}) and extends to a three-way separation of PAC, online, and Gold identification.\formal{FLT_Proofs.Theorem.Separation.online_pac_gold_separation} The witnesses (thresholds, finite sets, finite automata) are among the simplest classes in the theory. Their simplicity is the signature of a genuine paradigm boundary rather than a parameter difference: even the simplest classes distinguish the paradigms.
 
 \section{What This Chapter Established}
 \label{sec:ch2-summary}
@@ -406,7 +406,7 @@ The chapter's argument is one sentence: the data model determines the theory. Mo
 
 \item \textbf{The separations are witnessed by simple classes.} Thresholds separate PAC from online (\cref{prop:vc-le-ldim} and the threshold gap); $\mathcal{C}_{\mathrm{fin}} \cup \{\N\}$ separates text from informant (\cref{thm:text-informant}); DFAs separate passive from interactive. The simplicity of the witnesses shows the boundaries are fundamental.
 
-\item \textbf{The complexity measure is a joint property of class and data model.} The VC dimension measures $\mathcal{C}$ against i.i.d.\ data; the Littlestone dimension measures it against adversarial data; $\VC \leq \Ldim$ orders them, and the gap is unbounded. Neither is ``the'' complexity of $\mathcal{C}$; each is the complexity of the class under a presentation. The same object has different complexities under different data models---a central structural insight of the field, and the reason uniform convergence does not transport to the adversarial setting (\cref{prop:uc-not-online}).
+\item \textbf{The complexity measure is a joint property of class and data model.} The VC dimension measures $\mathcal{C}$ against i.i.d.\ data; the Littlestone dimension measures it against adversarial data; $\VC \leq \Ldim$ orders them, and the gap is unbounded. Neither is ``the'' complexity of $\mathcal{C}$; each is the complexity of the class under a presentation. The same object has different complexities under different data models; this is a central structural insight of the field, and the reason uniform convergence does not transport to the adversarial setting (\cref{prop:uc-not-online}).
 \end{enumerate}
 
 Chapters~\ref{ch:pac}--\ref{ch:universal} develop each paradigm in full. The present chapter has identified the axis along which they separate.
@@ -420,15 +420,15 @@ Chapters~\ref{ch:pac}--\ref{ch:universal} develop each paradigm in full. The pre
 \section{The Data of a Transformer}
 \label{sec:ch2-transformer}
 
-This chapter has been about how data reaches a learner; it has left the learner itself implicit.  The consistent learner of \cref{thm:uc-pac} was defined inline---``output any $h \in \mathcal{H}$ agreeing with $S$''---with no $\sigma$-algebra on $\mathcal{H}$ and no requirement that the map $S \mapsto L(S)$ be measurable.  For the simplest classes that omission is harmless.  For a parametric attention model it is exactly the structure that must be supplied, and supplying it---machine-checked---exposes two data-axes the classical model suppresses: the \emph{measurability} of the data-to-hypothesis map, and the \emph{finite precision} in which data is actually read.
+This chapter has been about how data reaches a learner; it has left the learner itself implicit.  The consistent learner of \cref{thm:uc-pac} was defined inline (``output any $h \in \mathcal{H}$ agreeing with $S$'') with no $\sigma$-algebra on $\mathcal{H}$ and no requirement that the map $S \mapsto L(S)$ be measurable.  For the simplest classes that omission is harmless.  For a parametric attention model it is exactly the structure that must be supplied, and supplying it, machine-checked, exposes two data-axes the classical model suppresses: the \emph{measurability} of the data-to-hypothesis map, and the \emph{finite precision} in which data is actually read.
 
 \begin{prop}[Attention routing is a measurable partition]
 \label{prop:attention-measurable-routing}
-The data-dependent routing of a multi-head attention model---the partition of the query space according to which key each query attends to---is measurable, and the hypothesis class it induces is a well-behaved VC-measurability target.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.multiHeadArgmax_wellBehaved}  The same guarantee holds for a finite-cell router.\formal{TLT_Proofs.Tame.FiniteCellRouter.finiteCellRouter_wellBehaved}  Consequently the attention learner is a \emph{measurable} batch learner in the sense of the condition \leanname{LearnEvalMeasurable}\formal{FLT_Proofs.Theorem.Separation.LearnEvalMeasurable} that \cref{thm:uc-pac} left implicit.
+The data-dependent routing of a multi-head attention model (the partition of the query space according to which key each query attends to) is measurable, and the hypothesis class it induces is a well-behaved VC-measurability target.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.multiHeadArgmax_wellBehaved}  The same guarantee holds for a finite-cell router.\formal{TLT_Proofs.Tame.FiniteCellRouter.finiteCellRouter_wellBehaved}  Consequently the attention learner is a \emph{measurable} batch learner in the sense of the condition \leanname{LearnEvalMeasurable}\formal{FLT_Proofs.Theorem.Separation.LearnEvalMeasurable} that \cref{thm:uc-pac} left implicit.
 \end{prop}
 
 \begin{proof}
-Fix the parameters and a query~$x$.  The routing decision is the $\arg\max$ over keys of the scores $\langle x, k_i\rangle$, so the set of queries routed to key~$i$ is the intersection of the half-spaces $\{x : \langle x, k_i - k_j\rangle \geq 0\}$ over $j \neq i$---a Borel set.  The routing map $(\text{parameters}, x) \mapsto (\text{winning key})$ is therefore measurable, and the head's prediction is a measurable function of parameters and query.  A parametrized family of concepts with this joint measurability is by definition a well-behaved VC-measurability target, and the learner's selection $S \mapsto L(S)$ inherits measurability from it.  This is precisely \leanname{LearnEvalMeasurable}: the property that, for every sample size~$m$, the evaluation $(S, x) \mapsto L(S)(x)$ is measurable---the condition under which the uniform-convergence argument of \cref{thm:uc-pac} is rigorous rather than merely formal.
+Fix the parameters and a query~$x$.  The routing decision is the $\arg\max$ over keys of the scores $\langle x, k_i\rangle$, so the set of queries routed to key~$i$ is the intersection of the half-spaces $\{x : \langle x, k_i - k_j\rangle \geq 0\}$ over $j \neq i$, which is a Borel set.  The routing map $(\text{parameters}, x) \mapsto (\text{winning key})$ is therefore measurable, and the head's prediction is a measurable function of parameters and query.  A parametrized family of concepts with this joint measurability is by definition a well-behaved VC-measurability target, and the learner's selection $S \mapsto L(S)$ inherits measurability from it.  This is precisely \leanname{LearnEvalMeasurable}: the property that, for every sample size~$m$, the evaluation $(S, x) \mapsto L(S)(x)$ is measurable: this is the condition under which the uniform-convergence argument of \cref{thm:uc-pac} is rigorous rather than merely formal.
 \end{proof}
 
 The second axis is invisible in the real-valued data model of \cref{def:iid-sample} and unavoidable in practice: the learner does not read real numbers.
@@ -448,7 +448,7 @@ Each addition in the fold commits a relative rounding error of at most the unit 
 
 \begin{remark}[A third coordinate of the data model]
 \label{rmk:attention-data-model}
-\Cref{rmk:vc-jurisdiction} held that a complexity measure is a property of the class \emph{together with} a data model.  Attention adds a coordinate that the four classical models share but never expose: the \emph{precision} in which the data is represented.  The i.i.d.\ jurisdiction is where the measurable routing of \cref{prop:attention-measurable-routing} lets the VC machinery apply at all; the float32 envelope of \cref{prop:attention-fp32} is the certified cost of executing that machinery on data a real machine can hold.  The classical theory idealizes both axes away---it assumes the learner measurable and the arithmetic exact---and a transformer is where neither assumption is free.
+\Cref{rmk:vc-jurisdiction} held that a complexity measure is a property of the class \emph{together with} a data model.  Attention adds a coordinate that the four classical models share but never expose: the \emph{precision} in which the data is represented.  The i.i.d.\ jurisdiction is where the measurable routing of \cref{prop:attention-measurable-routing} lets the VC machinery apply at all; the float32 envelope of \cref{prop:attention-fp32} is the certified cost of executing that machinery on data a real machine can hold.  The classical theory idealizes both axes away: it assumes the learner measurable and the arithmetic exact, and a transformer is where neither assumption is free.
 \end{remark}
 
 \section{Exercises and Open Problems}
@@ -483,7 +483,7 @@ For the DFA learner of \cref{thm:lstar}, the equivalence-query count $n-1$ is op
 
 \begin{openprob}[The minimally adequate teacher, \textsc{uk}]
 \label{op:mat}
-\Cref{prop:mq-alone,prop:eq-alone} show each oracle alone is insufficient. Characterize exactly which concept classes become efficiently exactly learnable when the two oracles are combined---the ``minimally adequate teacher'' question---and relate this to the VC and Littlestone dimensions, since neither passive invariant governs query learning.
+\Cref{prop:mq-alone,prop:eq-alone} show each oracle alone is insufficient. Characterize exactly which concept classes become efficiently exactly learnable when the two oracles are combined (the ``minimally adequate teacher'' question) and relate this to the VC and Littlestone dimensions, since neither passive invariant governs query learning.
 \end{openprob}
 
 \begin{openprob}[An invariant for query learning, \textsc{ku}]
@@ -513,10 +513,10 @@ The PAC/online/Gold separation is verified (\leanname{FLT_Proofs.Theorem.Separat
 
 \begin{openprob}[Does PAC survive finite precision? \textsc{ku}]
 \label{op:attention-fp32-pac}
-\Cref{prop:attention-fp32} bounds the gap between the executed float32 attention learner and its idealized real-valued counterpart (\leanname{fp32Foldl_error_le_of_sum_bound}).  Does the PAC guarantee transfer to the executed learner, and at what cost---is there a sample-complexity penalty that scales with the precision (the unit roundoff $2^{-24}$), so that learnability degrades gracefully as arithmetic coarsens?  A known unknown joining the statistical and numerical error budgets.
+\Cref{prop:attention-fp32} bounds the gap between the executed float32 attention learner and its idealized real-valued counterpart (\leanname{fp32Foldl_error_le_of_sum_bound}).  Does the PAC guarantee transfer to the executed learner, and at what cost: is there a sample-complexity penalty that scales with the precision (the unit roundoff $2^{-24}$), so that learnability degrades gracefully as arithmetic coarsens?  A known unknown joining the statistical and numerical error budgets.
 \end{openprob}
 
 \begin{openprob}[Attention under the other data models, \textsc{ku}]
 \label{op:attention-data-models}
-The mapping of \cref{sec:ch2-transformer} is i.i.d.\ (batch).  Where does attention sit under the other three data models of this chapter---is there an online (streaming) attention learner with a finite mistake bound, or a query-driven (active) one, and does the measurable-routing well-behavedness (\leanname{finiteCellRouter_wellBehaved}) transfer to those presentations, or does the data model change attention's learnability as it changes thresholds'?
+The mapping of \cref{sec:ch2-transformer} is i.i.d.\ (batch).  Where does attention sit under the other three data models of this chapter: is there an online (streaming) attention learner with a finite mistake bound, or a query-driven (active) one, and does the measurable-routing well-behavedness (\leanname{finiteCellRouter_wellBehaved}) transfer to those presentations, or does the data model change attention's learnability as it changes thresholds'?
 \end{openprob}

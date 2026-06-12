@@ -114,7 +114,7 @@ Not all relation types carry the same metadata.  The schema declares relation-sp
 \rel{extends\_grammar}        & \emph{none beyond triple} & May carry optional \texttt{generalization\_type}. \\
 \end{longtable}
 
-\noindent\textbf{Design principle.}  The seven relations in the upper block encode mathematical claims---equivalences, bounds, separations, conditional validity, proof dependencies---and therefore require traceable citations.  The two separation types (\rel{strictly\_stronger} and \rel{does\_not\_imply}) additionally require a \texttt{witness} field: a concrete concept class, construction, or example that demonstrates the separation.  The six relations in the lower block encode structural or definitional relationships that do not assert a mathematical result and therefore need no external citation.
+\noindent\textbf{Design principle.}  The seven relations in the upper block encode mathematical claims (equivalences, bounds, separations, conditional validity, proof dependencies) and therefore require traceable citations.  The two separation types (\rel{strictly\_stronger} and \rel{does\_not\_imply}) additionally require a \texttt{witness} field: a concrete concept class, construction, or example that demonstrates the separation.  The six relations in the lower block encode structural or definitional relationships that do not assert a mathematical result and therefore need no external citation.
 
 % ----------------------------------------------------------
 \section{The Thirteen Relation Types}
@@ -144,7 +144,7 @@ Each relation type has a forward reading, an inverse reading, and specific seman
 \rel{measures} & 22 & Complexity measure $X$ quantifies a property of object $Y$. \newline Inverse: \rel{measured\_by}. \\[3pt]
 \rel{used\_in\_proof} & 14 & Theorem $X$ invokes concept $Y$ in its statement or proof.  Distinct from \rel{defined\_using}: the latter is a definitional prerequisite, while \rel{used\_in\_proof} records proof-level dependencies. \newline Inverse: \rel{proves\_about}.  Requires \texttt{citation}. \\[3pt]
 \rel{does\_not\_imply} & 9 & $X$ does \emph{not} imply $Y$, with a concrete separating witness.  These are the negative-layer edges that encode the field's ``what does not hold'' structure. \newline Inverse: \rel{not\_implied\_by}.  Requires \texttt{witness} and \texttt{citation}. \\[3pt]
-\rel{restricts} & 8 & $X$ generalizes $Y$ by removing a constraint: $Y = X +$ additional restriction.  Conservative generalization---no new formal primitives are needed. \newline Inverse: \rel{restricted\_from}. \\[3pt]
+\rel{restricts} & 8 & $X$ generalizes $Y$ by removing a constraint: $Y = X +$ additional restriction.  Conservative generalization: no new formal primitives are needed. \newline Inverse: \rel{restricted\_from}. \\[3pt]
 \rel{extends\_grammar} & 8 & $X$ generalizes $Y$ but required inventing new concepts or primitives not present in $Y$.  Generative grammar expansion.  Each edge carries an optional \texttt{generalization\_type} field (typically \texttt{new\_primitives\_required}). \newline Inverse: \rel{grammar\_extended\_by}. \\[3pt]
 \rel{upper\_bounds} & 8 & $X$ provides an upper bound on $Y$. \newline Inverse: \rel{bounded\_above\_by}.  Requires \texttt{citation}. \\[3pt]
 \rel{lower\_bounds} & 5 & $X$ provides a lower bound on $Y$. \newline Inverse: \rel{bounded\_below\_by}.  Requires \texttt{citation}. \\[3pt]
@@ -212,13 +212,13 @@ When all checks pass, \texttt{validate\_graph.py} produces:
 \end{verbatim}
 
 \noindent\textbf{What the checks certify.}  The thirteen checks establish
-\emph{structural} integrity---valid JSON, unique and resolvable node
+\emph{structural} integrity: valid JSON, unique and resolvable node
 identifiers, schema-conformant relations and fields, matching counts, and
 fully resolved citations.  They do \emph{not} certify the \emph{semantic}
 correctness of an edge's target or of an analogy's obstruction label: a
 well-formed but mis-targeted edge passes every check.  Semantic correctness is
 maintained separately, by reconciling the graph against the proofs in the main
-text---for instance, the corrections of \Cref{ch:extensions} to the
+text, for instance, the corrections of \Cref{ch:extensions} to the
 Natarajan/DS relationship and of \Cref{ch:computational} to the assumption
 underlying computational hardness.
 
@@ -269,7 +269,7 @@ guards a subset of the \emph{theorems}: where a result has a companion in the
 machine-checked Lean~4 development, the main text marks it with a
 \texttt{\textbackslash formal} footnote naming the verified declaration.  Each
 such declaration is \texttt{sorry}-free.  The companions fall in two
-libraries---the learning-theory kernel (FLT) and the transformer library
+libraries: the learning-theory kernel (FLT) and the transformer library
 (TLT).
 
 \begingroup\sloppy\emergencystretch=2.5em
@@ -302,7 +302,7 @@ encoder stack (\Cref{ch:generalization}).
 \noindent\textbf{Scope of the guarantee.}  The companion layer is partial by
 design, and the main text is explicit about its boundary.  Many cited theorems
 are \emph{not} machine-checked and are flagged as open formalization problems
-where they appear---among them the exact $2^{O(d)}$ Moran--Yehudayoff
+where they appear, among them the exact $2^{O(d)}$ Moran--Yehudayoff
 compression bound, the Brukhim et al.\ DS characterization of multiclass
 learnability, the Kearns--Valiant cryptographic hardness, and the Bousquet et
 al.\ universal-learning trichotomy.  The kernel declaration \leanname{rademacher_gen_bound} is deliberately
@@ -310,8 +310,8 @@ al.\ universal-learning trichotomy.  The kernel declaration \leanname{rademacher
 name suggests: it only asserts the existence of a non-negative real rather than
 the Rademacher generalization bound.  A second gap is one of coverage rather
 than naming: the kernel types the all-labelings shattering dimension
-\leanname{FLT_Proofs.Complexity.Structures.StrongShatteringDim}---bounded above
-by $\Ndim$---but not the Daniely--Shalev-Shwartz DS dimension, whose pseudo-cube
+\leanname{FLT_Proofs.Complexity.Structures.StrongShatteringDim}, bounded above
+by $\Ndim$, but not the Daniely--Shalev-Shwartz DS dimension, whose pseudo-cube
 definition gives the reverse bound $\Ndim \le \DSdim$, so the multiclass
 characterization is cited rather than verified.  Both are recorded as
 formalization gaps in \Cref{ch:generalization} and \Cref{ch:extensions}.

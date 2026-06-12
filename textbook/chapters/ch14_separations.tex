@@ -7,7 +7,7 @@
 \label{ch:separations}
 
 Most textbooks in learning theory treat separation results as scattered
-remarks---brief asides after a characterization theorem, noting that
+remarks: brief asides after a characterization theorem, noting that
 some plausible implication fails. This chapter reverses that convention.
 Here, the separations are first-class citizens: each one receives a
 formal statement, a witness construction, and an analysis of what
@@ -15,8 +15,8 @@ structural feature the witness exploits.
 
 A separation result has two components. The \emph{statement} asserts
 that some implication $A \Rightarrow B$ does not hold. The
-\emph{witness} is a concrete mathematical object---a concept class,
-a dimension pair, a computational reduction---that demonstrates the
+\emph{witness} is a concrete mathematical object (a concept class,
+a dimension pair, a computational reduction) that demonstrates the
 failure. The witness is the mathematics; the statement is merely its
 summary. Throughout this chapter, we privilege the construction over the
 claim.
@@ -43,7 +43,7 @@ demonstrating the gap.
 
 The first observation is structural: the lattice is \emph{sparse}.
 Thirteen edges connect concepts drawn from six paradigms and a dozen
-complexity measures. Most paradigm pairs are simply incomparable---they
+complexity measures. Most paradigm pairs are simply incomparable: they
 neither imply nor contradict each other, because they operate on
 different mathematical objects. The sparsity is itself informative:
 learning theory is not a linear hierarchy from weak to strong, but a
@@ -207,8 +207,8 @@ PAC-learnable class need not be exactly learnable on either count.
 The criterion axis alone already bites computationally. Consider a class
 $\mathcal{C}$ that is PAC learnable (finite VC dimension) but for which
 finding a hypothesis \emph{exactly} consistent in the proper representation
-is NP-hard---intersections of halfspaces in $\R^d$ are the standard
-example~\cite{PittValiant1988}. An improper PAC learner attains low error
+is NP-hard (intersections of halfspaces in $\R^d$ are the standard
+example~\cite{PittValiant1988}). An improper PAC learner attains low error
 through a surrogate class, yet exact identification of the target is
 intractable.
 
@@ -328,8 +328,8 @@ learning.}
 \emph{Witness.}
 The class of 3-term DNF formulas over $\{0,1\}^n$. Pitt and
 Valiant~\cite{PittValiant1988} showed that \emph{proper} PAC
-learning\formal{FLT_Proofs.Basic.IsProper}---where the hypothesis must
-itself be a 3-term DNF---is NP-hard, assuming
+learning\formal{FLT_Proofs.Basic.IsProper} (where the hypothesis must
+itself be a 3-term DNF) is NP-hard, assuming
 $\mathrm{RP} \neq \mathrm{NP}$. Yet the same class
 is efficiently PAC learnable \emph{improperly}: every 3-term DNF can be
 represented as a 3-CNF, and 3-CNFs are efficiently PAC learnable.
@@ -392,7 +392,7 @@ theorem is the crown jewel of binary classification.
 It does not survive contact with real-valued loss.
 
 Shalev-Shwartz et al.~\cite{ShalevShwartzShamir2010} construct a
-learning problem---arbitrary loss, multi-valued output---that is
+learning problem (arbitrary loss, multi-valued output) that is
 learnable, yet for which uniform convergence fails outright.  The
 nine-way equivalence collapses.  In its place they prove a different
 characterization: in the general learning setting, a problem is learnable
@@ -404,13 +404,13 @@ characterization to a sufficient condition.
 \emph{What the witness exploits.}
 The symmetrization argument at the heart of the Fundamental Theorem's
 proof requires the loss to take finitely many values.  Specifically:
-two.  That assumption is invisible in the binary setting---it looks like
+two.  That assumption is invisible in the binary setting: it looks like
 a harmless feature of the problem.  Make the loss real-valued and
 symmetrization breaks.  Uniform convergence stops characterizing
 learnability; the stable-AERM condition takes over as the
 characterization, indifferent to the cardinality of the loss.
 
-The Fundamental Theorem is not wrong.  It is \emph{local}---an artifact
+The Fundamental Theorem is not wrong.  It is \emph{local}: an artifact
 of the 0-1 loss that does not announce itself as such.
 
 \hfill\cite{ShalevShwartzShamir2010}
@@ -427,7 +427,7 @@ of the 0-1 loss that does not announce itself as such.
 The 4 \rel{strictly\_stronger} edges assert that one concept
 \emph{does} imply another, but the reverse fails: the stronger concept
 is a proper generalization. Each edge requires two proofs: one for the
-forward implication, and one---the witness---for the strictness of the
+forward implication, and one (the witness) for the strictness of the
 gap.
 
 % --- Strict 1 ---
@@ -505,7 +505,7 @@ learner whose error decays at some rate under each distribution
 \emph{separately}, whereas PAC learning demands a single sample-complexity
 bound uniform over all distributions. Removing the uniformity, every
 PAC-learnable class (finite VC dimension) is therefore universally
-learnable---indeed at an exponential rate. The strictness below shows the
+learnable, indeed at an exponential rate. The strictness below shows the
 converse fails.
 
 \medskip\noindent
@@ -515,7 +515,7 @@ established a trichotomy for universal learning rates: every concept
 class has either an exponential rate, an arbitrarily slow rate, or is
 not universally learnable at all. The trichotomy theorem shows that
 classes with $\VC(\mathcal{H}) = \infty$ but containing no infinite
-Littlestone tree achieve exponential universal learning rates---they
+Littlestone tree achieve exponential universal learning rates; they
 are universally learnable but \emph{not} PAC learnable (since PAC
 requires finite VC dimension).
 
@@ -550,8 +550,8 @@ a concept class using a hyperbolic pseudo-manifold with $\Ndim = 1$
 but $\DSdim = \infty$. The construction builds a concept class over an
 infinite label space where every pair of points admits only one
 non-trivial two-coloring (giving $\Ndim = 1$), but the global
-combinatorial structure---encoded in the oriented faces of the
-pseudo-manifold---is rich enough to drive the DS dimension to infinity.
+combinatorial structure (encoded in the oriented faces of the
+pseudo-manifold) is rich enough to drive the DS dimension to infinity.
 
 This is the witness that simultaneously demonstrates the separation
 $\Ndim \not\Rightarrow \text{PAC learnable}$ from \Cref{sec:separations}:
@@ -577,10 +577,10 @@ can now state explicitly.
 \label{thm:sparsity}
 This chapter establishes thirteen edges with explicit witnesses among the
 major learning paradigms and complexity measures of
-\Cref{fig:separation-lattice}---far fewer than the $\binom{k}{2}$ relations
+\Cref{fig:separation-lattice}, far fewer than the $\binom{k}{2}$ relations
 that $k$ such concepts could \emph{a priori} exhibit.  We do not claim a
 complete census of the lattice; the point is that the witnessed edges are
-scarce, and that many remaining pairs appear unrelated---they operate on
+scarce, and that many remaining pairs appear unrelated: they operate on
 different mathematical types, or are connected only by non-implicational
 relations (analogy, measurement, assumption) rather than by an implication
 that could be witnessed or refuted.
@@ -594,16 +594,16 @@ interaction protocols (adversarial instances versus query access); VC and
 SQ dimension measure different properties (combinatorial shattering versus
 correlation structure).  Between such concepts a clean implication is often
 not even the right question.  Where we \emph{can} ask it, this chapter
-witnesses one direction---Gold identification does not imply PAC learning,
-say---while establishing the reverse non-implication is, in several cases, a
+witnesses one direction (Gold identification does not imply PAC learning,
+say), while establishing the reverse non-implication is, in several cases, a
 separate open problem rather than a settled fact.
 
 The witnesses in this chapter make the incomparability concrete.
 Thresholds on $\R$ separate PAC from online learning. All finite subsets
 of $\N$ separate Gold identification from PAC learning. Parities
 separate VC dimension from SQ dimension. Each witness exploits a specific
-structural mismatch---in the data model, the success criterion, the
-adversarial model, or the computational model---and these mismatches are
+structural mismatch in the data model, the success criterion, the
+adversarial model, or the computational model; and these mismatches are
 not removable by clever proof techniques. They are features of the
 mathematical landscape.
 
@@ -630,12 +630,12 @@ hypothesis class lands on it. The softmax-attention concept class of
 \Cref{ch:generalization} is machine-checked to be
 well-behaved,\formal{TLT.Bridge.softAttention_wellBehaved} and with
 norm-bounded parameters it has finite capacity
-(\Cref{prop:certified-attention}); it therefore sits on the PAC node---it
+(\Cref{prop:certified-attention}); it therefore sits on the PAC node: it
 is PAC learnable.
 
 Its position relative to the \emph{online} node is open.  The
 witness for Separation~1 was a class of finite VC dimension and infinite
-Littlestone dimension---thresholds on~$\R$.  Attention compares query--key
+Littlestone dimension (thresholds on~$\R$).  Attention compares query--key
 scores, and threshold behavior on a score is exactly the structure that
 sends the Littlestone dimension to infinity while the VC dimension stays
 finite.  It is therefore possible that the softmax-attention class is its
@@ -682,8 +682,8 @@ one-sidedly separated?  A known unknown.
 \begin{openprob}[Formalizing the DS/Natarajan gap]
 \label{op:formalize-ds-natarajan}
 The pseudo-manifold witness with $\Ndim = 1$ and $\DSdim = \infty$ is cited
-from Brukhim et al., not derived.  Can the construction---and the
-non-learnability it implies---be machine-checked?  An unknown known: the
+from Brukhim et al., not derived.  Can the construction, and the
+non-learnability it implies, be machine-checked?  An unknown known: the
 oriented-hypergraph combinatorics has no formal
 home~\cite{BrukhimCarmonDinurMoranYehudayoff2022}.
 \end{openprob}
@@ -691,8 +691,8 @@ home~\cite{BrukhimCarmonDinurMoranYehudayoff2022}.
 \begin{openprob}[Formalizing the universal-learning trichotomy]
 \label{op:formalize-trichotomy}
 The forward edge universal$\,\Rightarrow\,$PAC is machine-checked, but the
-trichotomy that witnesses Strict~3---exponential, arbitrarily slow, or not
-at all---is not.  Can the Bousquet et al.\ trichotomy be formalized,
+trichotomy that witnesses Strict~3 (exponential, arbitrarily slow, or not
+at all) is not.  Can the Bousquet et al.\ trichotomy be formalized,
 closing the strictness direction?  An unknown
 known~\cite{BousquetHannekeMoranVanHandelYehudayoff2021}.
 \end{openprob}
@@ -701,7 +701,7 @@ known~\cite{BousquetHannekeMoranVanHandelYehudayoff2021}.
 \label{op:sq-vc-quantitative}
 Parities give $\VC = n$, $\SQdim = 2^n$ under the uniform distribution.
 Across all distributions, what is the tightest possible relationship
-between VC and SQ dimension---is the exponential gap always achievable, or
+between VC and SQ dimension: is the exponential gap always achievable, or
 distribution-dependent?  A known
 unknown~\cite{BlumFurstJacksonKearnsMansourRudich1994}.
 \end{openprob}

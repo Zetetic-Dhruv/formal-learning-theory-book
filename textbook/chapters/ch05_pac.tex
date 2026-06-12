@@ -10,8 +10,8 @@
 \chapter{PAC Learning and the Fundamental Theorem}
 \label{ch:pac}
 
-This is the central chapter of the book.  Every paradigm that follows---online
-learning, Gold-style identification, universal learning---will be understood
+This is the central chapter of the book.  Every paradigm that follows (online
+learning, Gold-style identification, universal learning) will be understood
 partly by how it resembles and partly by how it differs from what is
 established here.  The chapter builds toward a single destination: the
 Fundamental Theorem of Statistical Learning, which characterizes PAC
@@ -25,7 +25,7 @@ The chapter is organized as an ascent.
 
 \begin{enumerate}[leftmargin=*,itemsep=2pt]
 \item \textbf{The PAC framework} (\Cref{sec:pac-def}): the definition and its
-  moving parts.  Brief---the definition is not the centerpiece.
+  moving parts.  Brief: the definition is not the centerpiece.
 \item \textbf{The VC characterization proof} (\Cref{sec:vc-char}): the full
   proof that $\VC(\mathcal{H}) < \infty$ if and only if $\mathcal{H}$ is PAC
   learnable, built in four stages through Sauer--Shelah, uniform convergence,
@@ -113,7 +113,7 @@ consistent with target rectangle $R^*$, the ERM learner returns the
 tightest enclosing rectangle $R_S$ of the positive examples.  Since
 all positive examples lie in $R^*$, we have $R_S \subseteq R^*$:
 zero false positives.  The error region $R^* \setminus R_S$ consists
-of four \emph{strips}---one per side of $R^*$---each containing no
+of four \emph{strips} (one per side of $R^*$), each containing no
 positive sample.
 
 \medskip
@@ -132,7 +132,7 @@ bound over four strips gives
 Setting the right-hand side $\leq \delta$ yields
 $m = \frac{4}{\varepsilon}\ln\frac{4}{\delta}
 = O\!\bigl(\frac{d + \log(1/\delta)}{\varepsilon}\bigr)$
-with $d = 4$---matching the Fundamental Theorem's prediction with the
+with $d = 4$, matching the Fundamental Theorem's prediction with the
 tight $1/\varepsilon$ dependence.
 
 The analysis makes visible what the general proof obscures: the error
@@ -185,7 +185,7 @@ succeed, and when is PAC learning possible at all?}
 
 
 % ================================================================
-% SECTION 2: THE VC CHARACTERIZATION — FULL PROOF
+% SECTION 2: THE VC CHARACTERIZATION - FULL PROOF
 % ================================================================
 
 \section{The VC Characterization}
@@ -264,7 +264,7 @@ The proof of the Sauer--Shelah lemma is combinatorial, proceeding by induction
 on $m + d$.  It is given in full in \Cref{ch:dimensions}
 (\Cref{lem:sauer-shelah-proof}).  For the present chapter, we take it as given
 and use only the consequence: if $d = \VC(\mathcal{H}) < \infty$, then
-$\growth_\mathcal{H}(m) = O(m^d)$---polynomial, not exponential.
+$\growth_\mathcal{H}(m) = O(m^d)$: polynomial, not exponential.
 
 
 % -----------------------------------------------
@@ -474,7 +474,7 @@ was arbitrary, $\mathcal{H}$ is not PAC learnable.
 \begin{remark}[Strength of the converse]
 \label{rmk:converse-strength}
 The converse is stronger than ``not uniformly convergent'': it says no learner
-whatsoever---not just ERM---can PAC learn $\mathcal{H}$.  The argument works
+whatsoever (not just ERM) can PAC learn $\mathcal{H}$.  The argument works
 because the adversary chooses the distribution \emph{after} seeing the learner.
 This distribution-free adversarial structure is the engine that makes VC
 dimension necessary, not just sufficient.
@@ -484,8 +484,8 @@ The circle closes.  Finite VC dimension forces polynomial growth
 (Sauer--Shelah), which forces uniform convergence, which makes ERM
 succeed, which gives PAC learnability.  Infinite VC dimension shatters
 arbitrarily large sets, and the converse kills learnability outright.
-A single combinatorial quantity---the largest set the class can
-shatter---controls everything.
+A single combinatorial quantity, the largest set the class can
+shatter, controls everything.
 
 
 % ================================================================
@@ -525,7 +525,7 @@ The following are equivalent:
 \label{rmk:numbering}
 Condition~\ref{F:online} is an implication, not an equivalence: finite
 Littlestone dimension implies finite VC dimension (\Cref{ch:dimensions}), but
-the converse fails---thresholds on $\R$ have $\VC = 1$ but $\Ldim = \infty$
+the converse fails: thresholds on $\R$ have $\VC = 1$ but $\Ldim = \infty$
 (\Cref{ex:concept-classes}).  We include it to mark the boundary of the
 equivalence web: this is where the PAC--online separation begins.
 \end{remark}
@@ -577,7 +577,7 @@ equivalence web: this is where the PAC--online separation begins.
 bidirectional arrows are full equivalences.  The dashed arrow from
 $\Ldim < \infty$ is strict: finite Littlestone dimension implies PAC
 learnability, but not conversely.  The thick red diagonal marks the VC
-characterization---the core equivalence proved in
+characterization, the core equivalence proved in
 \Cref{sec:vc-char}.}
 \label{fig:equivalence-web}
 \end{figure}
@@ -673,7 +673,7 @@ equality).  Every class of VC dimension $d$ can be embedded, for sample
 complexity purposes, into a maximum class of VC dimension $d$ via a projection
 argument.  For maximum classes, the one-inclusion graph has special structure:
 its edges can be oriented so that every vertex has in-degree at most $d$.  This
-orientation defines a compression scheme---given sample $S$, output the
+orientation defines a compression scheme: given sample $S$, output the
 at-most-$d$ predecessors of the unique vertex in the one-inclusion graph
 determined by $S$.  The reconstruction uses the structure of the maximum class
 to recover a consistent hypothesis from these $d$ points.
@@ -702,7 +702,7 @@ The soft-attention concept class $\mathcal{A}_{d,n_K}$ is a well-behaved VC-meas
 The softmax routing map is continuous in the input, hence Borel; the score-comparison cells that select the attended key are measurable, so the joint map $(\text{parameters}, x) \mapsto$ concept value is measurable.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.FiniteScoreRouterCode.route_measurable} This is exactly the Krapp--Wirth well-behaved VC-measurable target hypothesis carried silently by the measure-theoretic steps of \cref{sec:vc-char}.  With that hypothesis discharged, the chain Sauer--Shelah $\to$ uniform convergence $\to$ ERM applies to $\mathcal{A}_{d,n_K}$ unchanged, as does the converse (\cref{thm:vc-converse}); the equivalences of \cref{thm:fundamental} therefore hold for the attention class.
 \end{proof}
 
-What \cref{prop:attention-pac} does \emph{not} settle is whether the VC dimension is finite, and that is the substantive question.  For a fixed architecture it is finite: the concepts of $\mathcal{A}_{d,n_K}$ are cut out by a bounded number of smooth inequalities in finitely many parameters, and such parametric families have finite VC dimension by the parameter-counting bounds of Goldberg--Jerrum and Anthony--Bartlett~\cite{AnthonyBartlett1999}.  A fixed attention head is therefore PAC learnable.  The \emph{sharp} VC dimension and sample complexity as functions of $d$, $n_K$, and the score temperature are not pinned down by the measurability result; determining them---in particular whether the dependence on $n_K$ is logarithmic or linear---is open (\cref{op:attention-vc}).
+What \cref{prop:attention-pac} does \emph{not} settle is whether the VC dimension is finite, and that is the substantive question.  For a fixed architecture it is finite: the concepts of $\mathcal{A}_{d,n_K}$ are cut out by a bounded number of smooth inequalities in finitely many parameters, and such parametric families have finite VC dimension by the parameter-counting bounds of Goldberg--Jerrum and Anthony--Bartlett~\cite{AnthonyBartlett1999}.  A fixed attention head is therefore PAC learnable.  The \emph{sharp} VC dimension and sample complexity as functions of $d$, $n_K$, and the score temperature are not pinned down by the measurability result; determining them (in particular whether the dependence on $n_K$ is logarithmic or linear) is open (\cref{op:attention-vc}).
 
 \section{The Agnostic Setting and the \texorpdfstring{$\varepsilon^2$}{epsilon-squared} Price}
 \label{sec:agnostic}
@@ -742,7 +742,7 @@ achieve $o(d/\varepsilon^2)$ in the agnostic setting, and no algorithm needs
 $\omega(d/\varepsilon)$ in the realizable setting.
 \end{thm}
 
-Where does the gap come from?  It is tempting to blame the proof technique---perhaps a
+Where does the gap come from?  It is tempting to blame the proof technique; perhaps a
 cleverer argument could recover $1/\varepsilon$ in the agnostic case.  It
 cannot.  The gap is fundamental, and the reason is information-theoretic.
 
@@ -775,7 +775,7 @@ arguments.  For finite $|\mathcal{H}|$, both realizable and agnostic sample
 complexities have the same dependence on $\varepsilon$ (up to the
 $\log|\mathcal{H}|$ factor).  The gap emerges only when $\mathcal{H}$ is
 infinite and VC dimension replaces $\log|\mathcal{H}|$.  Realizability is
-not just a simplifying assumption---it provides a qualitatively different
+not just a simplifying assumption; it provides a qualitatively different
 information structure.
 \end{remark}
 
@@ -894,8 +894,8 @@ and sufficient for statistical learning.''
 
 The Fundamental Theorem is an \emph{information-theoretic} characterization:
 it says when enough data exists to learn, regardless of computational cost.
-The computational question---when can learning be done in polynomial
-time---is a separate and largely open problem.
+The computational question (when can learning be done in polynomial
+time) is a separate and largely open problem.
 
 \begin{thm}[Computational Hardness {\cite{KearnsValiant1994}}]
 \label{thm:kearns-valiant-pac}
@@ -962,7 +962,7 @@ Four structural lessons emerge:
 
 \item \textbf{The $\varepsilon^2$ price is real.}  The agnostic setting costs
   $1/\varepsilon^2$ where the realizable setting costs $1/\varepsilon$.  This is
-  not a proof artifact---it is a lower bound.
+  not a proof artifact; it is a lower bound.
 
 \item \textbf{ERM is canonical but not unique.}  The Fundamental Theorem says ERM
   works whenever anything works, but other algorithms (compression-based,
@@ -981,7 +981,7 @@ learning in 1984, without the VC connection.  Blumer, Ehrenfeucht, Haussler,
 and Warmuth closed the loop in 1989, proving that finite VC dimension is both
 necessary and sufficient for PAC learning.  The compression equivalence was
 conjectured by Littlestone and Warmuth (1986) and proved by Moran and
-Yehudayoff (2016)---a 30-year gap that reflects the depth of the combinatorial
+Yehudayoff (2016), a 30-year gap that reflects the depth of the combinatorial
 argument.  The tight realizable sample complexity $\Theta(d/\varepsilon)$
 (removing logarithmic factors) was established by
 Hanneke~\cite{Hanneke2016}.
@@ -1029,8 +1029,8 @@ Hanneke~\cite{Hanneke2016}.
     depending on $D$), yet is not distribution-free PAC learnable.
     \emph{Hint:}  Let $\mathcal{H}$ be all measurable functions on
     $[0,1]$.  For any fixed $D$, the metric entropy of $\mathcal{H}$
-    under $L^1(D)$ is finite at every scale---one can $\varepsilon$-net
-    the class with $O(1/\varepsilon)$ functions---so PAC learning
+    under $L^1(D)$ is finite at every scale (one can $\varepsilon$-net
+    the class with $O(1/\varepsilon)$ functions), so PAC learning
     under $D$ is possible.  The distribution-free failure comes from
     the adversary's ability to concentrate $D$ on the points where
     the learner has not yet gathered information.
@@ -1086,7 +1086,7 @@ The Fundamental Theorem's compression equivalence \ref{F:compression} is the fin
 
 \begin{openprob}[Unifying the Rademacher face, \textsc{uk}]
 \label{op:rademacher-unify}
-The development proves a Rademacher-complexity face of the Fundamental Theorem---PAC learnability is equivalent to uniform vanishing of the Rademacher complexity.\formal{FLT_Proofs.Theorem.PAC.fundamental_rademacher} Integrate it into the equivalence web of \cref{fig:equivalence-web} as a tenth condition with explicit quantitative links to the VC and compression faces, and formalize the two-sided VC$\leftrightarrow$Rademacher comparison.
+The development proves a Rademacher-complexity face of the Fundamental Theorem: PAC learnability is equivalent to uniform vanishing of the Rademacher complexity.\formal{FLT_Proofs.Theorem.PAC.fundamental_rademacher} Integrate it into the equivalence web of \cref{fig:equivalence-web} as a tenth condition with explicit quantitative links to the VC and compression faces, and formalize the two-sided VC$\leftrightarrow$Rademacher comparison.
 \end{openprob}
 
 \begin{openprob}[The proper/improper price in PAC, \textsc{ku}]

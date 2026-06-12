@@ -6,9 +6,9 @@
 \chapter{Exact Learning and Query Models}
 \label{ch:exact}
 
-The previous chapters study learners that receive data passively---drawn from a distribution (PAC), or presented by an adversary (online), or enumerated by nature (Gold). This chapter studies what happens when the learner can \emph{ask questions}.
+The previous chapters study learners that receive data passively: drawn from a distribution (PAC), or presented by an adversary (online), or enumerated by nature (Gold). This chapter studies what happens when the learner can \emph{ask questions}.
 
-The exact learning model, introduced by Angluin~\cite{Angluin1987}, equips the learner with two oracles: a membership query oracle and an equivalence query oracle. The learner's goal is not approximate generalization but \emph{exact identification}: the game ends when the learner proposes a hypothesis that the equivalence oracle accepts. The central result of this chapter is that DFAs---computationally intractable under passive data~\cite{KearnsValiant1994}---become efficiently learnable with query access. This gap between passive and active learning is one of the sharpest structural results in the field.
+The exact learning model, introduced by Angluin~\cite{Angluin1987}, equips the learner with two oracles: a membership query oracle and an equivalence query oracle. The learner's goal is not approximate generalization but \emph{exact identification}: the game ends when the learner proposes a hypothesis that the equivalence oracle accepts. The central result of this chapter is that DFAs, computationally intractable under passive data~\cite{KearnsValiant1994}, become efficiently learnable with query access. This gap between passive and active learning is one of the sharpest structural results in the field.
 
 % ================================================================
 % SECTION 1: THE EXACT LEARNING FRAMEWORK
@@ -71,7 +71,7 @@ The observation table $(S, E, T)$ is:
 \end{itemize}
 \end{defn}
 
-Closedness ensures that every one-step extension of a state representative is equivalent to some existing representative---so the transition function of the conjectured DFA is well-defined. Consistency ensures that equivalent representatives behave identically under extension---so the transition function is well-defined as a function of equivalence classes, not of particular strings.
+Closedness ensures that every one-step extension of a state representative is equivalent to some existing representative, so the transition function of the conjectured DFA is well-defined. Consistency ensures that equivalent representatives behave identically under extension, so the transition function is well-defined as a function of equivalence classes, not of particular strings.
 
 \subsection{The Algorithm}
 
@@ -134,8 +134,8 @@ The $L^*$ algorithm proceeds as follows.
 
 \item \textbf{Close and make consistent.} Repeat until the table is both closed and consistent:
 \begin{itemize}[nosep]
-\item If the table is not closed---there exists $s \in S$, $a \in \Sigma$ with $\mathrm{row}(s \cdot a) \neq \mathrm{row}(s')$ for any $s' \in S$---add $s \cdot a$ to $S$ and fill new table entries via $\mathrm{MQ}$.
-\item If the table is not consistent---there exist $s_1, s_2 \in S$ with $\mathrm{row}(s_1) = \mathrm{row}(s_2)$ but $\mathrm{row}(s_1 \cdot a) \neq \mathrm{row}(s_2 \cdot a)$ for some $a \in \Sigma$---then there exists $e \in E$ witnessing the difference. Add $a \cdot e$ to $E$ and fill new entries via $\mathrm{MQ}$.
+\item If the table is not closed (there exists $s \in S$, $a \in \Sigma$ with $\mathrm{row}(s \cdot a) \neq \mathrm{row}(s')$ for any $s' \in S$), add $s \cdot a$ to $S$ and fill new table entries via $\mathrm{MQ}$.
+\item If the table is not consistent (there exist $s_1, s_2 \in S$ with $\mathrm{row}(s_1) = \mathrm{row}(s_2)$ but $\mathrm{row}(s_1 \cdot a) \neq \mathrm{row}(s_2 \cdot a)$ for some $a \in \Sigma$), then there exists $e \in E$ witnessing the difference. Add $a \cdot e$ to $E$ and fill new entries via $\mathrm{MQ}$.
 \end{itemize}
 
 \item \textbf{Conjecture.} When the table is closed and consistent, construct a DFA $M$:
@@ -164,11 +164,11 @@ where $m$ is the length of the longest counterexample received.
 \end{thm}
 
 \begin{proof}[Proof sketch]
-Each counterexample introduces at least one new distinct row in the observation table, because the counterexample witnesses a string that the current conjecture misclassifies. Since the minimal DFA has $n$ states and the table's distinct rows correspond to Myhill--Nerode equivalence classes, the number of distinct rows is bounded by $n$. The table starts with one row and gains at least one per counterexample, so at most $n - 1$ equivalence queries occur before the table has $n$ distinct rows---at which point the conjecture DFA is isomorphic to $A^*$.
+Each counterexample introduces at least one new distinct row in the observation table, because the counterexample witnesses a string that the current conjecture misclassifies. Since the minimal DFA has $n$ states and the table's distinct rows correspond to Myhill--Nerode equivalence classes, the number of distinct rows is bounded by $n$. The table starts with one row and gains at least one per counterexample, so at most $n - 1$ equivalence queries occur before the table has $n$ distinct rows, at which point the conjecture DFA is isomorphic to $A^*$.
 
 The membership query bound follows from the table dimensions: $|S| \leq n$, $|S \cdot \Sigma| \leq n|\Sigma|$, and $|E| \leq m \cdot n$ (each counterexample adds at most $m$ suffixes). The total number of cells is $O(n|\Sigma|) \times O(nm) = O(n^2 |\Sigma| m)$, each requiring one membership query.
 
-The full correctness proof---that a closed, consistent table yields a DFA consistent with all membership queries, and that the Myhill--Nerode theorem guarantees uniqueness---is given in Angluin~\cite{Angluin1987}.
+The full correctness proof (that a closed, consistent table yields a DFA consistent with all membership queries, and that the Myhill--Nerode theorem guarantees uniqueness) is given in Angluin~\cite{Angluin1987}.
 \end{proof}
 
 \begin{remark}[Why the table works]
@@ -201,11 +201,11 @@ The proof reduces the problem of breaking a cryptographic primitive to the probl
 The gap is not quantitative (more data needed) but \emph{qualitative} (no amount of passive data suffices for efficient learning, while a polynomial number of queries does). The mechanism is clear: membership queries let the learner probe the target's transition structure at chosen points, and equivalence queries provide directed feedback at the learner's current frontier of error. Random examples provide neither capability.
 \end{separation}
 
-This separation witnesses a fundamental edge in the concept graph: $\nde{pac\_learning} \not\Rightarrow \nde{exact\_learning}$ and $\nde{exact\_learning} \not\Rightarrow \nde{pac\_learning}$. Neither paradigm subsumes the other. The reverse direction---classes that are PAC-learnable but not efficiently exactly learnable---also holds, because simulating an equivalence oracle in the PAC setting requires enumerating hypotheses and checking consistency, which may be computationally intractable for some classes.
+This separation witnesses a fundamental edge in the concept graph: $\nde{pac\_learning} \not\Rightarrow \nde{exact\_learning}$ and $\nde{exact\_learning} \not\Rightarrow \nde{pac\_learning}$. Neither paradigm subsumes the other. The reverse direction (classes that are PAC-learnable but not efficiently exactly learnable) also holds, because simulating an equivalence oracle in the PAC setting requires enumerating hypotheses and checking consistency, which may be computationally intractable for some classes.
 
 \begin{remark}[The role of the cryptographic assumption]
 \label{rmk:crypto-assumption}
-The Kearns--Valiant result is \emph{conditional}: it assumes that certain cryptographic primitives are hard to break. Without this assumption, the PAC-hardness of DFAs is open. This is typical of computational hardness results in learning theory: unconditional lower bounds for PAC learning remain rare, and most known hardness results reduce from cryptography or from $\mathsf{NP}$-hardness assumptions. The exact learning model sidesteps computational hardness entirely---query access changes the information-theoretic landscape so fundamentally that the cryptographic barrier does not apply.
+The Kearns--Valiant result is \emph{conditional}: it assumes that certain cryptographic primitives are hard to break. Without this assumption, the PAC-hardness of DFAs is open. This is typical of computational hardness results in learning theory: unconditional lower bounds for PAC learning remain rare, and most known hardness results reduce from cryptography or from $\mathsf{NP}$-hardness assumptions. The exact learning model sidesteps computational hardness entirely; query access changes the information-theoretic landscape so fundamentally that the cryptographic barrier does not apply.
 \end{remark}
 
 \begin{figure}[ht]
@@ -238,7 +238,7 @@ The Kearns--Valiant result is \emph{conditional}: it assumes that certain crypto
 \subsection{Extracting an automaton from a transformer}
 \label{sec:dfa-extraction}
 
-The passive--active gap has a direct modern use: it is the principle behind \emph{automaton extraction} from trained neural sequence models.  A trained attention model computes a binary string function---accept/reject, or a thresholded next-token decision---and we may treat that function as the unknown target of an exact-learning game, with the model itself playing the minimally adequate teacher.
+The passive--active gap has a direct modern use: it is the principle behind \emph{automaton extraction} from trained neural sequence models.  A trained attention model computes a binary string function (accept/reject, or a thresholded next-token decision), and we may treat that function as the unknown target of an exact-learning game, with the model itself playing the minimally adequate teacher.
 
 \begin{prop}[A trained transformer is an $L^*$ target]
 \label{prop:transformer-extraction}
@@ -246,10 +246,10 @@ Let $f$ be the binary string function computed by a trained attention model.  An
 \end{prop}
 
 \begin{proof}
-The membership oracle $\mathrm{MQ}(s) = f(s)$ is total and truthful: a forward pass computes $f(s)$ exactly up to the bounded finite-precision forward error of the attention layer.\formal{TLT.Fp32AttnLit.attnLiteralForwardError} The equivalence oracle is approximate---it certifies $L(M) = f$ on a sampled test set rather than on all strings---so the conjecture is exact on the queries made and probably-approximately correct off them; with an exact equivalence oracle $L^*$ returns the minimal DFA for $f$ by \cref{thm:lstar-complexity}.  Either way the model is a legitimate $L^*$ teacher.
+The membership oracle $\mathrm{MQ}(s) = f(s)$ is total and truthful: a forward pass computes $f(s)$ exactly up to the bounded finite-precision forward error of the attention layer.\formal{TLT.Fp32AttnLit.attnLiteralForwardError} The equivalence oracle is approximate: it certifies $L(M) = f$ on a sampled test set rather than on all strings, so the conjecture is exact on the queries made and probably-approximately correct off them; with an exact equivalence oracle $L^*$ returns the minimal DFA for $f$ by \cref{thm:lstar-complexity}.  Either way the model is a legitimate $L^*$ teacher.
 \end{proof}
 
-This is how Weiss, Goldberg, and Yahav~\cite{WeissGoldbergYahav2018} extract interpretable automata from recurrent networks, and the construction applies to attention models verbatim.  It turns the passive--active gap into a methodology: a model opaque under passive inspection becomes a queryable teacher, and $L^*$ distills its regular core into a DFA one can read.  The caveat is the one above---the equivalence oracle is only approximate, so extraction is sound on the queries and heuristic beyond them, and whether a transformer's string function even \emph{has} a finite regular core is itself open (\cref{op:transformer-regular}).
+This is how Weiss, Goldberg, and Yahav~\cite{WeissGoldbergYahav2018} extract interpretable automata from recurrent networks, and the construction applies to attention models verbatim.  It turns the passive--active gap into a methodology: a model opaque under passive inspection becomes a queryable teacher, and $L^*$ distills its regular core into a DFA one can read.  The caveat is the one above: the equivalence oracle is only approximate, so extraction is sound on the queries and heuristic beyond them, and whether a transformer's string function even \emph{has} a finite regular core is itself open (\cref{op:transformer-regular}).
 
 \section{Query Complexity}
 \label{sec:query-complexity}
@@ -265,11 +265,11 @@ For DFAs, $L^*$ achieves $\mathrm{EQ} \leq n - 1$ and $\mathrm{MQ} = O(n^2 |\Sig
 
 \begin{prop}[Equivalence queries alone are expensive {\cite{Angluin1988}}]
 \label{prop:eq-lower}
-With equivalence queries alone---no membership queries---exactly learning a finite class of $N$ concepts requires at most $N - 1$ queries always, and $N - 1$ in the worst case. Membership queries break this bound: $L^*$ uses only $n - 1$ equivalence queries for an $n$-state DFA, although $|\mathcal{C}_n|$ is exponential in $n$.
+With equivalence queries alone (no membership queries), exactly learning a finite class of $N$ concepts requires at most $N - 1$ queries always, and $N - 1$ in the worst case. Membership queries break this bound: $L^*$ uses only $n - 1$ equivalence queries for an $n$-state DFA, although $|\mathcal{C}_n|$ is exponential in $n$.
 \end{prop}
 
 \begin{proof}
-Maintain the version space $V$ of candidates consistent with every counterexample received, initially the whole class.  Each query $\mathrm{EQ}(h)$ either returns \textsc{yes} (and the learner halts) or a counterexample that is inconsistent with $h$, so it removes at least $h$ from $V$; hence $|V|$ drops by at least one per query and $N - 1$ queries suffice to reach $|V| = 1$.  For the matching lower bound, take a class in which each concept differs from every other at a point unique to that pair, so that for any conjecture $h$ the adversary can return a counterexample consistent with all surviving candidates except $h$; then exactly one candidate is eliminated per query and $N - 1$ are forced.  The contrast with $L^*$ is the content of the chapter: membership queries supply the structural information---which Myhill--Nerode class a string belongs to---that equivalence queries alone cannot, collapsing an exponential query count to a linear one (\cref{prop:eq-alone} of \Cref{ch:data}).
+Maintain the version space $V$ of candidates consistent with every counterexample received, initially the whole class.  Each query $\mathrm{EQ}(h)$ either returns \textsc{yes} (and the learner halts) or a counterexample that is inconsistent with $h$, so it removes at least $h$ from $V$; hence $|V|$ drops by at least one per query and $N - 1$ queries suffice to reach $|V| = 1$.  For the matching lower bound, take a class in which each concept differs from every other at a point unique to that pair, so that for any conjecture $h$ the adversary can return a counterexample consistent with all surviving candidates except $h$; then exactly one candidate is eliminated per query and $N - 1$ are forced.  The contrast with $L^*$ is the content of the chapter: membership queries supply the structural information (which Myhill--Nerode class a string belongs to) that equivalence queries alone cannot, collapsing an exponential query count to a linear one (\cref{prop:eq-alone} of \Cref{ch:data}).
 \end{proof}
 
 \begin{remark}[Certificate complexity]
@@ -290,7 +290,7 @@ The exact learning framework connects to \emph{certificate complexity} in Boolea
 \item \textbf{Query complexity.} The number of queries required to exactly learn a class is the natural complexity measure, analogous to sample complexity in PAC learning.
 \end{enumerate}
 
-The gap between passive and active learning demonstrated by DFAs is not an isolated curiosity. It reflects a structural principle: the information geometry of a learning problem can change qualitatively when the learner moves from passive observation to active interrogation. This principle recurs in statistical experimental design, active learning in the PAC setting, and reinforcement learning---all settings where the learner's ability to choose which data to collect transforms the computational landscape.
+The gap between passive and active learning demonstrated by DFAs is not an isolated curiosity. It reflects a structural principle: the information geometry of a learning problem can change qualitatively when the learner moves from passive observation to active interrogation. This principle recurs in statistical experimental design, active learning in the PAC setting, and reinforcement learning: all settings where the learner's ability to choose which data to collect transforms the computational landscape.
 
 \section{Open Problems}
 \label{sec:ch8-open}
@@ -299,17 +299,17 @@ Each problem is anchored to a result above and tagged: a \emph{known unknown} (\
 
 \begin{openprob}[The regular core of a transformer, \textsc{uk}]
 \label{op:transformer-regular}
-\Cref{prop:transformer-extraction} extracts a DFA from a trained attention model, exact only on the queried strings.  Determine when a transformer's binary string function has a finite Myhill--Nerode index---a genuine regular core---so that $L^*$ extraction is exact rather than heuristic, and bound the number of states as a function of the architecture (depth, heads, context length).
+\Cref{prop:transformer-extraction} extracts a DFA from a trained attention model, exact only on the queried strings.  Determine when a transformer's binary string function has a finite Myhill--Nerode index (a genuine regular core) so that $L^*$ extraction is exact rather than heuristic, and bound the number of states as a function of the architecture (depth, heads, context length).
 \end{openprob}
 
 \begin{openprob}[An exact equivalence oracle for neural models, \textsc{ku}]
 \label{op:exact-eq-oracle}
-Extraction is approximate because the equivalence oracle samples rather than verifies.  Determine for which model classes an \emph{exact} equivalence query---``does this DFA agree with the model on all strings?''---is decidable, turning approximate extraction into exact $L^*$ learning, and relate the cost to formal verification of the attention layer.
+Extraction is approximate because the equivalence oracle samples rather than verifies.  Determine for which model classes an \emph{exact} equivalence query (``does this DFA agree with the model on all strings?'') is decidable, turning approximate extraction into exact $L^*$ learning, and relate the cost to formal verification of the attention layer.
 \end{openprob}
 
 \begin{openprob}[Formalizing $L^*$, \textsc{uk}]
 \label{op:lstar-formal}
-The $L^*$ correctness and complexity theorem (\cref{thm:lstar-complexity}) is cited, not verified.  Formalize $L^*$---the observation table, closedness, consistency, and the Myhill--Nerode termination argument---on top of the typed minimally adequate teacher (\leanname{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}) and \leanname{FLT_Proofs.Computation.DFA'}, with the $n-1$ equivalence-query bound proved.
+The $L^*$ correctness and complexity theorem (\cref{thm:lstar-complexity}) is cited, not verified.  Formalize $L^*$ (the observation table, closedness, consistency, and the Myhill--Nerode termination argument) on top of the typed minimally adequate teacher (\leanname{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}) and \leanname{FLT_Proofs.Computation.DFA'}, with the $n-1$ equivalence-query bound proved.
 \end{openprob}
 
 \begin{openprob}[A combinatorial dimension for MAT-learnability, \textsc{ku}]
@@ -339,11 +339,11 @@ The approximate equivalence oracle of \cref{prop:transformer-extraction} samples
 
 \begin{openprob}[Counterexample length, \textsc{ku}]
 \label{op:counterexample-length}
-The $L^*$ membership-query count carries a factor $m$, the longest counterexample length (\cref{rmk:counterexample-length}).  Determine whether a learner or a cooperative teacher can avoid the linear dependence on $m$---for instance by binary-searching counterexamples (Rivest--Schapire)---and what the optimal dependence is.
+The $L^*$ membership-query count carries a factor $m$, the longest counterexample length (\cref{rmk:counterexample-length}).  Determine whether a learner or a cooperative teacher can avoid the linear dependence on $m$, for instance by binary-searching counterexamples (Rivest--Schapire), and what the optimal dependence is.
 \end{openprob}
 
 \begin{openprob}[An LLM as a minimally adequate teacher, \textsc{uk}]
 \label{op:llm-teacher}
-The development types an LLM critic as a teacher (\leanname{FLT_Proofs.Learner.Active.LLMCritic}).  Determine the soundness conditions under which a large language model can serve as the membership and equivalence oracle for a downstream exact learner---when its answers are reliable enough that $L^*$ converges to the intended concept---bounding the error introduced by an unreliable teacher.
+The development types an LLM critic as a teacher (\leanname{FLT_Proofs.Learner.Active.LLMCritic}).  Determine the soundness conditions under which a large language model can serve as the membership and equivalence oracle for a downstream exact learner (when its answers are reliable enough that $L^*$ converges to the intended concept), bounding the error introduced by an unreliable teacher.
 \end{openprob}
 
