@@ -73,11 +73,11 @@ The concept graph embeds its own JSON schema in the \texttt{meta.json\_schema} o
 6 & Required edge fields & Every edge contains all 3 universal required fields: \texttt{source}, \texttt{target}, \texttt{relation}. \\
 7 & Edge constraints & Relation-specific required fields are present and non-empty.  See \S\ref{sec:edge-constraints} for the full constraint table. \\
 8 & No duplicate edges & No two edges share the same (\texttt{source}, \texttt{relation}, \texttt{target}) triple. \\
-9 & Bib keys resolve & All values in node \texttt{bib\_keys} arrays, \texttt{provenance.introduced\_by}, \texttt{provenance.proved\_by}, and edge \texttt{citation} fields that match the BibTeX key pattern \texttt{[A-Za-z]+[0-9]\{4\}[a-z]?} resolve against entries in the bibliography file. \\
+9 & Bib keys resolve & All values in node \code{bib_keys} arrays, \code{provenance.introduced_by}, \code{provenance.proved_by}, and edge \texttt{citation} fields that match the BibTeX key pattern \texttt{[A-Za-z]+[0-9]\{4\}[a-z]?} resolve against entries in the bibliography file. \\
 10 & Node count matches meta & The actual length of the \texttt{nodes} array equals \texttt{meta.node\_count} (currently 142). \\
 11 & Edge count matches meta & The actual length of the \texttt{edges} array equals \texttt{meta.edge\_count} (currently 260). \\
 12 & Status values in enum & Every node \texttt{status} value is one of: \texttt{defined}, \texttt{proved}, \texttt{deferred}, \texttt{scope\_note}. \\
-13 & No \texttt{generalizes\_unclassified} & No edges carry the legacy relation \texttt{generalizes\_unclassified}.  All such edges must be reclassified as either \rel{restricts} (constraint removal) or \rel{extends\_grammar} (new primitives) before release. \\
+13 & No \code{generalizes_unclassified} & No edges carry the legacy relation \code{generalizes_unclassified}.  All such edges must be reclassified as either \rel{restricts} (constraint removal) or \rel{extends\_grammar} (new primitives) before release. \\
 \end{longtable}
 
 % ----------------------------------------------------------
@@ -159,7 +159,7 @@ Each relation type has a forward reading, an inverse reading, and specific seman
 \texttt{validate\_bibliography\_links.py} performs three additional checks beyond those in the graph validator:
 
 \begin{enumerate}[leftmargin=2em]
-\item \textbf{Missing keys} (FAIL).  BibTeX keys referenced in node \texttt{bib\_keys}, \texttt{provenance.introduced\_by}, \texttt{provenance.proved\_by}, or edge \texttt{citation} fields that do not appear in \texttt{flt\_bibliography.bib}.  Each missing key is listed with all locations where it is referenced.
+\item \textbf{Missing keys} (FAIL).  BibTeX keys referenced in node \code{bib_keys}, \code{provenance.introduced_by}, \code{provenance.proved_by}, or edge \texttt{citation} fields that do not appear in \texttt{flt\_bibliography.bib}.  Each missing key is listed with all locations where it is referenced.
 
 \item \textbf{Malformed bib keys} (FAIL).  Entries in the \texttt{.bib} file whose keys do not match the canonical pattern \texttt{[A-Za-z]+[0-9]\{4\}[a-z]?} (e.g., \texttt{BlumerEhrenfeuchtHausslerWarmuth1989}).
 
@@ -172,8 +172,9 @@ Each relation type has a forward reading, an inverse reading, and specific seman
 \section{Sample Validator Output}
 \label{sec:sample-output}
 
-When all checks pass, \texttt{validate\_graph.py} produces:
+When all checks pass, \code{validate_graph.py} produces:
 
+{\small
 \begin{verbatim}
 =================================================================
   FLT Concept Graph Validation
@@ -210,6 +211,7 @@ When all checks pass, \texttt{validate\_graph.py} produces:
   RESULT: PASS
 =================================================================
 \end{verbatim}
+}
 
 \noindent\textbf{What the checks certify.}  The thirteen checks establish
 \emph{structural} integrity: valid JSON, unique and resolvable node

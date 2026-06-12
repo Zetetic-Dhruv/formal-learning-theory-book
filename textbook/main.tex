@@ -208,17 +208,43 @@
 \newcommand{\risk}{\ensuremath{R}}
 \newcommand{\emprisk}{\ensuremath{\hat{R}}}
 
-% Graph relations
-\newcommand{\rel}[1]{\texttt{\small #1}}
-\newcommand{\nde}[1]{\textsf{\small #1}}
+% Graph relations. The local \_ redefinition inserts a zero-width breakpoint
+% after each underscore so long snake_case edge/node labels wrap in tight captions.
+\newcommand{\rel}[1]{\texttt{\small\def\_{\textunderscore\discretionary{}{}{}}#1}}
+\newcommand{\nde}[1]{\textsf{\small\def\_{\textunderscore\discretionary{}{}{}}#1}}
 \newcommand{\edge}[3]{\nde{#1}\ensuremath{\;\xrightarrow{\text{\rel{#2}}}\;}\nde{#3}}
 
 % Growth function
 \newcommand{\growth}{\ensuremath{\Pi}}
 
 % Formal-companion references to the design-lab Lean 4 development
-\newcommand{\leanname}[1]{\texttt{\detokenize{#1}}}
-\newcommand{\formal}[1]{\footnote{Machine-checked as \texttt{\detokenize{#1}} in the companion Lean~4 development.}}
+% Long qualified names are wrapped: a zero-width breakpoint is inserted after
+% every '.' and '_' and at each camelCase boundary (lower-to-upper), so Lean
+% declarations never overflow the text block.
+\makeatletter
+\begingroup\catcode`\_=12 \gdef\lean@us{_}\endgroup
+\def\lean@end{\lean@end}
+\newif\iflean@lc
+\def\lean@brk#1{%
+  \ifx#1\lean@end
+  \else
+    \iflean@lc \ifnum`#1>64 \ifnum`#1<91 \discretionary{}{}{}\fi\fi \fi
+    #1%
+    \lean@lcfalse
+    \ifnum`#1>96 \ifnum`#1<123 \lean@lctrue \fi\fi
+    \if#1.\discretionary{}{}{}\fi
+    \if#1\lean@us\discretionary{}{}{}\fi
+    \expandafter\lean@brk
+  \fi}
+\newcommand{\leanname}[1]{\texttt{\lean@lcfalse\expandafter\lean@brk\detokenize{#1}\lean@end}}
+\newcommand{\formal}[1]{\footnote{Machine-checked as \leanname{#1} in the companion Lean~4 development.}}
+% \code: same wrapping for inline code identifiers that are not Lean declarations
+% (file names, JSON schema fields), so they break rather than overflow the margin.
+\newcommand{\code}[1]{\texttt{\lean@lcfalse\expandafter\lean@brk\detokenize{#1}\lean@end}}
+\makeatother
+% Let TeX accept slightly looser lines so the breakpoints above are taken
+% instead of overflowing the margin with an unbreakable identifier.
+\emergencystretch=4em
 
 % ============================================================
 % TITLE
