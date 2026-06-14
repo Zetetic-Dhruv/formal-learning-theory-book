@@ -20,8 +20,10 @@ noisy; the realizability assumption may fail.
 This chapter asks: how does the binary theory extend to these richer settings?
 The answer is not ``straightforwardly.''  Each extension requires
 \emph{new mathematical primitives}: new notions of shattering, new complexity
-measures, new assumptions.  The binary theory does not generalize by
-substitution; it generalizes by \emph{grammar growth}.  In the concept graph,
+measures, new assumptions.  The binary theory generalizes by \emph{grammar
+growth}: substituting richer labels into the old definitions is never enough,
+because each setting forces a primitive the old language cannot name.  In the
+concept graph,
 this is captured by edges of type \rel{extends\_grammar}: the source dimension
 extends the grammar of the VC dimension by introducing primitives that have no
 analogue in the binary case.
@@ -111,9 +113,9 @@ the relationship type: blue for \rel{characterizes}, orange for
 \rel{restricts}, brown for \rel{lower\_bounds}.  Line style marks the evidence
 grade: solid for a machine-checked kernel theorem, dashed for an established
 literature result, dotted for a conceptual grammar-extension or restriction.
-The chapter's thesis is that binary PAC theory does not generalize by
-substitution but by grammar growth, each extension adding a shattering primitive
-with no binary analogue.  Exactly one edge is solid: VC dimension characterizes
+The chapter's thesis is that binary PAC theory generalizes by grammar growth:
+each extension adds a shattering primitive with no binary analogue, so
+substituting richer labels into the binary definitions never suffices.  Exactly one edge is solid: VC dimension characterizes
 binary PAC learning (\leanname{fundamental_theorem}), the single rung the kernel
 has climbed.  The multiclass (DS), agnostic real-valued (fat-shattering),
 agnostic, and proper-versus-improper characterizations are established in the
@@ -209,12 +211,10 @@ This was the open problem that persisted for over thirty years.
 \end{historical}
 
 
-\begin{graphnode}[title={Graph Node: \nde{natarajan\_dimension}}]
-Layer~5: \texttt{complexity\_measure}.  Key edge:
-$\edge{natarajan\_dimension}{extends\_grammar}{vc\_dimension}$.
-The grammar extension is the two-function shattering primitive $(f_0, f_1)$.
-Open frontier: tight multiclass sample complexity without the $\log k$ factor.
-\end{graphnode}
+As a complexity measure, the \nde{natarajan\_dimension} extends the grammar of
+the \nde{vc\_dimension}: the extension is the two-function shattering primitive
+$(f_0, f_1)$.  The open frontier it leaves behind is a tight multiclass sample
+complexity without the $\log k$ factor.
 
 
 \subsection{The DS Dimension: A Thirty-Year Resolution}
@@ -430,9 +430,9 @@ When $|Y| = \infty$, local two-label constraints do not capture global
 learnability.
 
 \medskip\noindent
-\emph{Graph edge:}
-$\edge{natarajan\_dimension}{does\_not\_imply}{pac\_learning}$ with witness
-``Brukhim et al.\ 2022: non-learnable class with $\Ndim = 1$.''
+\emph{Graph edge.}  Finiteness of the \nde{natarajan\_dimension} does not imply
+\nde{pac\_learning}, witnessed by the Brukhim et al.\ (2022) non-learnable class
+with $\Ndim = 1$.
 \end{obstbox}
 
 
@@ -471,13 +471,11 @@ $D \leq O(\Ndim \cdot \log k)$.
 \end{proof}
 
 
-\begin{graphnode}[title={Graph Node: \nde{ds\_dimension}}]
-Layer~5: \texttt{complexity\_measure}.  Key edges:
-$\edge{ds\_dimension}{characterizes}{pac\_learning}$ (for multiclass).
-$\edge{ds\_dimension}{strictly\_stronger}{natarajan\_dimension}$ with
-witness: hyperbolic pseudo-manifold construction.
-This node resolved a 30-year open problem in the theory.
-\end{graphnode}
+As a complexity measure, the \nde{ds\_dimension} characterizes \nde{pac\_learning}
+in the multiclass setting, and it is strictly stronger than the
+\nde{natarajan\_dimension}, witnessed by the hyperbolic pseudo-manifold
+construction.  This is the measure that resolved a thirty-year open problem in
+the theory.
 
 
 % ================================================================
@@ -545,11 +543,8 @@ back to $L_1(P)$ through the layer-cake identity
 $f = \int_0^1 \ind[f \geq t]\,\mathrm{d}t$, yields the stated bound.
 \end{proof}
 
-\begin{graphnode}[title={Graph Node: \nde{pseudodimension}}]
-Layer~5: \texttt{complexity\_measure}.  Key edge:
-$\edge{pseudodimension}{extends\_grammar}{vc\_dimension}$.
-The grammar extension is the threshold primitive.
-\end{graphnode}
+As a complexity measure, the \nde{pseudodimension} extends the grammar of the
+\nde{vc\_dimension}, and the extension is the threshold primitive.
 
 
 \subsection{Fat-Shattering Dimension}
@@ -666,7 +661,8 @@ at accuracy $\gamma$.
 \begin{remark}[Scale families versus single numbers]
 \label{rmk:scale-family}
 The fat-shattering characterization is a \emph{family} of finiteness
-requirements (one for each $\gamma > 0$), not a single number.  This is
+requirements, one for each $\gamma > 0$, where a single threshold-free number
+would have sufficed in the binary case.  This is
 another instance of grammar growth: the real-valued setting requires a
 scale parameter that has no analogue in the binary theory.  In practice,
 $\fatshat_\gamma$ is often a decreasing function of $\gamma$; larger
@@ -762,17 +758,16 @@ condition ($\VC < \infty$), but the sample complexities differ:
   m_{\mathrm{agnostic}}(\varepsilon, \delta)
   = \Theta\!\left(\frac{d}{\varepsilon^2} + \frac{\log(1/\delta)}{\varepsilon^2}\right).
 \]
-The quadratic dependence on $1/\varepsilon$ in the agnostic case is
-inherent, not an artifact of the analysis: the lower bound is achieved by
+The quadratic dependence on $1/\varepsilon$ in the agnostic case is inherent: a
+matching lower bound forces it, so no sharper analysis can remove it.  The bound is achieved by
 distributions where the optimal hypothesis has error $1/2 - \varepsilon$,
 and distinguishing it from a hypothesis with error $1/2$ requires
 $\Omega(1/\varepsilon^2)$ samples by a Chernoff-bound argument.
 
 \medskip\noindent
-\emph{Graph edge:}
-$\edge{agnostic\_pac\_learning}{restricts}{pac\_learning}$: agnostic PAC
-learning \emph{generalizes} standard PAC learning by removing the
-realizability constraint.
+\emph{Graph edge.}  \nde{agnostic\_pac\_learning} restricts \nde{pac\_learning}
+in the graph: agnostic PAC learning \emph{generalizes} standard PAC learning by
+removing the realizability constraint.
 \end{separation}
 
 
@@ -954,9 +949,9 @@ improper (via 3-CNF).  This is the cleanest known computational separation
 in PAC learning.
 
 \medskip\noindent
-\emph{Graph edge:}
-$\edge{proper\_improper\_separation}{does\_not\_imply}{pac\_learning}$ with
-witness ``3-term DNF: NP-hard proper, poly-time improper.''
+\emph{Graph edge.}  The \nde{proper\_improper\_separation} does not imply
+\nde{pac\_learning}, witnessed by $3$-term DNF: NP-hard proper, polynomial-time
+improper.
 \end{separation}
 
 
@@ -1032,13 +1027,10 @@ computational layer.}
 \end{figure}
 
 
-\begin{graphnode}[title={Graph Node: \nde{proper\_improper\_separation}}]
-Layer~6: \texttt{impossibility}.  Key edges:
-$\edge{proper\_improper\_separation}{lower\_bounds}{pac\_learning}$ and
-$\edge{proper\_improper\_separation}{does\_not\_imply}{pac\_learning}$.
-Provenance: Pitt--Valiant 1988.  The proof is a direct reduction from
-graph coloring to consistent hypothesis finding.
-\end{graphnode}
+As an impossibility result, the \nde{proper\_improper\_separation} both
+lower-bounds \nde{pac\_learning} and fails to imply it.  Its provenance is
+Pitt--Valiant 1988, and the proof is a direct reduction from graph coloring to
+consistent hypothesis finding.
 
 
 % ================================================================
@@ -1081,7 +1073,7 @@ Noise model & Noise rate $\eta$
 \end{center}
 
 In each case, the extension is an \rel{extends\_grammar} edge in the concept
-graph, not a \rel{restricts} edge.  The distinction matters:
+graph rather than a \rel{restricts} edge.  The distinction matters:
 
 \begin{itemize}[leftmargin=*,itemsep=3pt]
 \item A \rel{restricts} edge means the target is a special case of the source
@@ -1307,26 +1299,27 @@ complexity?  A known unknown.
 
 \subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:ch17-concept-map}}
 
-Each exercise perturbs the concept map.  Read the figure as a concept graph
-carrying two independent codes: a \emph{color} for the relationship type
-(\rel{extends\_grammar} in orange, \rel{strictly\_stronger} in red,
-\rel{characterizes} in blue, \rel{restricts} in green, \rel{lower\_bounds} in
-brown), and a \emph{line style} for the evidence (solid where the kernel
-certifies a theorem sorry-free, dashed where the result is established in the
-literature, dotted where the edge is a conceptual grammar-extension or
-restriction).  Exactly one edge is solid, VC dimension characterizes binary PAC
-learning (\leanname{fundamental_theorem}); the three literature characterizations,
-the strictly-stronger edge, and the proper-improper lower bound are dashed; the
-four grammar-extension and restriction edges are dotted.  Argue, in this grammar,
-that each perturbed picture subsumes the concrete one as an \emph{instance} (an
-edge, node, or sub-map the figure already exhibits), a \emph{boundary} (one code,
+The concept map is a lattice with a single lit rung, and the exercises below test
+where that one rung sits.  The drawing carries two independent codes.  Color names
+the relationship type: \rel{extends\_grammar} in orange, \rel{strictly\_stronger}
+in red, \rel{characterizes} in blue, \rel{restricts} in green, \rel{lower\_bounds}
+in brown.  Line style names the evidence: solid where the kernel certifies a
+theorem sorry-free, dashed where the result is established in the literature,
+dotted where the edge is a conceptual grammar-extension or restriction.  Exactly
+one edge is solid, the VC dimension characterizing binary PAC learning
+(\leanname{fundamental_theorem}); the three literature characterizations, the
+strictly-stronger edge, and the proper-improper lower bound are dashed; the four
+grammar-extension and restriction edges are dotted.  Each exercise below reads the
+concrete map as a special case of a wider claim: sometimes an \emph{instance} (an
+edge, node, or sub-map already drawn), sometimes a \emph{boundary} (one code,
 direction, or evidence grade toggled so an edge changes color, style, or
-orientation), or a \emph{frontier} (a dashed or dotted edge whose formalization
-is the next move).
+orientation), sometimes a \emph{frontier} (a dashed or dotted edge whose
+formalization is the next move).  The asymmetry to keep in view: one rung is
+verified and everything around it is borrowed.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The one solid edge is the only rung the kernel has climbed.} Read
-only the solid stroke and ignore the dashed and dotted ones. Show this is the
+only the solid stroke and ignore the dashed and dotted ones. This is the
 figure's defining verified instance: of the ten edges, exactly one is
 machine-checked, the biconditional that VC dimension characterizes realizable
 binary PAC learnability (\leanname{fundamental_theorem}, over $\mathcal{H}
@@ -1335,11 +1328,12 @@ is a separate literature result, drawn dashed at $vc \to agn$), so the solid
 subgraph is the single edge $vc \to pac$ and everything above it in the grammar
 is borrowed; the all-dashed-and-dotted periphery is precisely the reach the
 kernel has not yet attained, which is why the figure is the abstract witness that
-the extensions form a frontier with one verified rung, not a settled tower.
+the extensions form a frontier with exactly one verified rung, the single edge
+$vc \to pac$, while the tower above it still awaits a verifier.
 
-\item \textbf{Grammar growth, not substitution, is the lesson the orange backbone
-encodes.} Read the orange \rel{extends\_grammar} edges as a class and ignore node
-identities. Show this is the instance that names the chapter's thesis
+\item \textbf{Grammar growth is the lesson the orange backbone encodes.} Read the
+orange \rel{extends\_grammar} edges as a class and ignore node
+identities. This orange subgraph is the instance that names the chapter's thesis
 (\Cref{sec:extends-grammar}): each orange edge marks a place where the binary
 language provably loses information and a new primitive must be added, the pair
 $(f_0, f_1)$ for Natarajan, the threshold vector then the margin $\gamma$ for the
@@ -1349,7 +1343,7 @@ vocabulary,'' and the map is the witness that no reduction to the binary theory
 (\Cref{rmk:non-reduction}) collapses these edges.
 
 \item \textbf{Each extension's new primitive is an instance of one move.} Pick any
-single orange edge and read its source. Show this is the instance that exhibits
+single orange edge and read its source. Each such edge is an instance that exhibits
 the per-extension primitive: $nat \to vc$ adds two-function shattering
 (\Cref{def:natarajan-dim}), $pdim \to vc$ adds the threshold vector
 (\Cref{def:pseudodim-ext}), the fat-shattering refinement adds the scale $\gamma$
@@ -1360,7 +1354,7 @@ relation rather than unrelated facts.
 
 \item \textbf{A node can be formalized as a structure while its characterizing edge
 stays literature.} Read the Natarajan, pseudodimension, and fat-shattering nodes
-together with the edges leaving them. Show this is the figure's principal evidence
+together with the edges leaving them. This pairing is the figure's principal evidence
 boundary: the three dimension nodes are machine-checked as kernel structures
 (\leanname{NatarajanDim}, \leanname{Pseudodimension}, \leanname{FatShatteringDim},
 each a sorry-free definition), yet the edges that would make them
@@ -1374,7 +1368,7 @@ kernel proves.
 
 \item \textbf{DS dominates Natarajan, yet the kernel verifies only the other rung.}
 Read the dashed red $ds \to nat$ edge and ask which inequality the kernel actually
-holds. Show this is the subtler evidence boundary: the strict domination $\Ndim
+holds. The answer marks a subtler evidence boundary: the strict domination $\Ndim
 \le \DSdim$ with the $\Ndim = 1$, $\DSdim = \infty$ obstruction
 (\Cref{prop:ds-vs-nat}, \cite{BrukhimCarmonDinurMoranYehudayoff2022}) is the
 literature content of the edge, but the kernel proves the \emph{reverse}
@@ -1387,7 +1381,7 @@ dimension and its domination, not the inequality the kernel currently certifies.
 
 \item \textbf{Agnostic drops realizability, yet VC still characterizes it in the
 literature.} Read the green $agn \to pac$ restriction edge together with the blue
-$vc \to agn$ edge. Show this is the boundary where the relationship type and the
+$vc \to agn$ edge. Together they mark the boundary where the relationship type and the
 evidence diverge: agnostic PAC generalizes standard PAC by removing the
 realizability constraint (the green \rel{restricts} edge,
 \Cref{def:agnostic-pac-ext}), and the characterizing condition is still finite VC
@@ -1397,18 +1391,18 @@ dimension (\Cref{thm:agnostic-ft}); but the kernel has only the \emph{definition
 agnostic node carry different evidence grades for the same setting.
 
 \item \textbf{Noise adds $\eta$, yet finite VC still suffices.} Read the new $noise
-\to pac$ edge that connects the previously floating node. Show this is the boundary
-that justifies its color and style: noise tolerance extends the grammar with the
+\to pac$ edge that connects the previously floating node. Its color and style sit
+on a boundary: noise tolerance extends the grammar with the
 noise rate $\eta$ (the orange \rel{extends\_grammar} edge), yet finite VC dimension
 plus a \emph{known} $\eta < 1/2$ already suffices for PAC learnability under
 classification noise (\Cref{thm:noise-tolerant},
 \cite{AngluinLaird1988}); because that theorem carries no kernel handle, the edge
-is dotted, not solid, and statistical-query learnability is the bridge
+is drawn dotted rather than solid, and statistical-query learnability is the bridge
 (\Cref{rmk:sq-noise}).
 
 \item \textbf{Formalizing one characterization turns a dashed edge solid.} Pick the
 multiclass or the agnostic characterization and ask what machine-checking it would
-change. Show this is the frontier the figure marks but cannot yet draw solid:
+change. This is the frontier the figure marks but cannot yet draw solid:
 formalizing the genuine DS dimension and \Cref{thm:multiclass-char} would promote
 $ds \to pac$ from dashed to solid (\Cref{open:formalize-ds}), and formalizing the
 agnostic fundamental theorem would promote $vc \to agn$; each such move grows the
@@ -1417,7 +1411,7 @@ periphery, and the figure's dashed edges are exactly the inventory of which
 characterization to climb next.
 
 \item \textbf{The open problems are the dashed and dotted edges read forward.} Read
-the periphery edges as a to-do list. Show this is the frontier that the map and the
+the periphery edges as a to-do list. This is the frontier the map and the
 open-problems section share a vocabulary for: closing the multiclass $\Theta(\log
 k)$ gap (\Cref{open:multiclass-tight}), proving pseudodimension characterizes
 realizable real-valued learning (\Cref{open:pdim-realizable}), and finding the
@@ -1428,12 +1422,12 @@ research frontier, and the lone solid edge is a lower bound on what is provable.
 
 \item \textbf{Is grammar growth itself a provable no-single-dimension invariant?}
 Read the entire orange backbone as a single claim about the impossibility of one
-universal measure. Show this is the figure's deepest frontier: the chapter proves
+universal measure. This is the figure's deepest frontier: the chapter proves
 grammar growth is \emph{necessary} only in the multiclass case, where the $\Ndim =
 1$, $\DSdim = \infty$ class shows no two-function dimension can characterize
 learnability when the label set is infinite (\Cref{prop:ds-vs-nat}), while for the
-real-valued, agnostic, and noisy settings the necessity is a working understanding,
-not a theorem; so the conjecture that \emph{no single combinatorial dimension
+real-valued, agnostic, and noisy settings the necessity remains a working
+understanding short of a theorem; so the conjecture that \emph{no single combinatorial dimension
 characterizes all extensions at once}, a no-free-lunch for shattering primitives of
 which the Natarajan--DS gap is the one proven instance, is the meta-question about
 the whole backbone, and because no verifier yet certifies it, this reading of the
@@ -1442,28 +1436,29 @@ map is drawn dotted.
 
 \subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:ds-shattering}}
 
-Each exercise perturbs the witness picture.  Read Figure~\ref{fig:ds-shattering}
-at two coupled resolutions: on the left a \emph{witness table}, a default labeling
-$f$ together with one single-coordinate-deviation witness $h_i$ per point
-(\Cref{def:ds-dim-ext}), and on the right the same data as a \emph{star} in the
+Figure~\ref{fig:ds-shattering} is a definition drawn twice, and these exercises
+read it at both resolutions.  On the left sits a \emph{witness table}: a default
+labeling $f$ with one single-coordinate-deviation witness $h_i$ per point
+(\Cref{def:ds-dim-ext}).  On the right sits the same data as a \emph{star} in the
 one-inclusion hypergraph $\mathrm{OIG}(\mathcal H, S)$ (\Cref{def:oig}), the vertex
-$f$ joined to each $h_i$ along the coordinate-$i$ edge.  Argue, in this grammar,
-that each perturbed picture subsumes the concrete $d=3$ one as an \emph{instance}
-(a labeling, a deviation cell, or a coordinate edge the figure already exhibits), a
+$f$ joined to each $h_i$ along the coordinate-$i$ edge.  Each item below widens the
+concrete $d=3$ drawing into a general claim, identifying it as an \emph{instance}
+(a labeling, a deviation cell, or a coordinate edge already shown), a
 \emph{boundary} (one quantifier, direction, or label-set assumption toggled, so the
 per-point requirement, the $\Ndim$ versus $\DSdim$ order, or the evidence status
-changes), or a \emph{frontier} (a structure or formalization the figure points to
-but does not contain).  Honesty rule: DS-shattering and the characterization it
-drives are literature; do not assert any DS object is machine-checked.
+changes), or a \emph{frontier} (a structure or formalization the figure points
+toward but does not contain).  One honesty rule governs the whole block: DS-shattering
+and the characterization it drives are literature, so no DS object here may be
+called machine-checked.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The $d=3$ table is the smallest faithful instance of the definition.}
 Read only the left panel.  Show it is a correct concrete witness for
 \Cref{def:ds-dim-ext} with $d=3$: a single default $f$ assigning $a,b,c$, and three
 hypotheses $h_1,h_2,h_3$ each agreeing with $f$ on two coordinates and deviating on
-the third.  Argue that this is the defining instance of DS-shattering, not a
-theorem: it exhibits $\DSdim \ge 3$ for any class containing $\{f,h_1,h_2,h_3\}$,
-and nothing is claimed verified.
+the third.  Argue that this is the defining instance of DS-shattering: it exhibits
+$\DSdim \ge 3$ for any class containing $\{f,h_1,h_2,h_3\}$, a worked example of the
+definition with nothing claimed verified, no theorem behind it.
 
 \item \textbf{The table and the star are one object at two resolutions.}  Read the
 left and right panels together.  Show that ``a table of $d$ rows, each deviating
@@ -1471,19 +1466,20 @@ from $f$ at exactly one coordinate'' is literally ``a star of $d$ coordinate-edg
 out of the central vertex $f$'' in $\mathrm{OIG}(\mathcal H, S)$ (\Cref{def:oig}),
 so the right panel is the instance that makes the table's structural content
 visible.  Conclude that generalizing the figure to arbitrary $d$ means drawing a
-$d$-edge star, not adding table rows.
+$d$-edge star; adding table rows is the same operation seen from the left.
 
 \item \textbf{The single-deviation cell is the DS primitive.}  Read one red cell
 in isolation, say $h_2$ at $x_2$.  Show that the whole definition is generated by
 this one move, deviate at exactly one point and agree elsewhere, iterated over the
 $d$ coordinates, and that this is the instance distinguishing DS-shattering from
-every all-labelings notion: DS asks for $d$ witnesses, one per coordinate, not for
-a witness per labeling.
+every all-labelings notion: DS asks for exactly $d$ witnesses, one per coordinate,
+where an all-labelings notion would demand one per labeling.
 
-\item \textbf{DS-shattering needs only one witness per point, not all $2^d$.}
+\item \textbf{DS-shattering needs only one witness per point, where Natarajan needs
+all $2^d$.}
 Replace the figure's three witness rows with the $2^d = 8$ rows Natarajan
 shattering would require of a global pair $(f_0,f_1)$ (\Cref{def:natarajan-dim},
-\Cref{ex:natarajan-k3}).  Show this is the boundary where the per-point requirement
+\Cref{ex:natarajan-k3}).  This swap exposes the boundary where the per-point requirement
 weakens: the figure draws $d$ single flips, whereas N-shattering draws the full
 cube of interpolations, so DS-shattering is strictly the weaker demand at each
 point yet, by Exercise~5, can hold on larger sets.
@@ -1500,8 +1496,8 @@ encoding more globally.
 Push the previous boundary to its extreme.  Invoking the obstruction box, describe
 the Brukhim et al.\ (2022) class with $\Ndim(\mathcal H)=1$ yet
 $\DSdim(\mathcal H)=\infty$, where the one-inclusion hypergraph contains
-arbitrarily large pseudo-cubes although no three points are N-shattered.  Show this
-is the boundary at which the figure's local-looking table must be read globally:
+arbitrarily large pseudo-cubes although no three points are N-shattered.  Here lies
+the boundary at which the figure's local-looking table must be read globally:
 when $|Y|=\infty$, local two-label structure (Natarajan) does not bound the star
 structure (DS), and only the latter governs learnability.
 
@@ -1510,15 +1506,16 @@ as input to a learner.  Using the proof sketch of \Cref{thm:multiclass-char},
 explain that finiteness of $\DSdim$, no large pseudo-cube, yields a proper
 orientation of $\mathrm{OIG}(\mathcal H, S)$ with outdegree $O(\DSdim)$, and the
 learner returns a minimum-outdegree vertex.  Argue the figure's star is therefore
-not decoration but the boundary object between combinatorics (DS-shattering) and
-algorithm (the orientation), and that this theorem is literature, not
+the boundary object between combinatorics (DS-shattering) and the algorithm (the
+orientation): the same drawing the learner consumes as input, doing real work
+rather than illustrating it, and that this theorem is literature, not
 kernel-verified.
 
 \item \textbf{The kernel verifies a different pair, running the other way.}  Read
 the provenance note in the caption.  The kernel formalizes \leanname{NatarajanDim}
 and the all-labelings \leanname{StrongShatteringDim} and proves
 \leanname{strongShatteringDim_le_NatarajanDim}, that is, strong-shattering dimension
-below Natarajan.  Show this is the boundary between what is drawn and what is
+below Natarajan.  This separates what is drawn from what is
 checked: the verified inequality concerns the \emph{all-labelings} dimension (every
 $f\colon S\to Y$ realized) and runs \emph{opposite} to \Cref{prop:ds-vs-nat}'s
 $\Ndim\le\DSdim$, so no part of the figure's DS structure is among the
@@ -1548,19 +1545,22 @@ demands many, or only because no unifying primitive has yet been found.
 
 \subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:fat-shattering}}
 
-Each exercise perturbs the witness picture.  Read Figure~\ref{fig:fat-shattering} as an
-\emph{exhibition} of \Cref{def:fat-shattering-ext}: a shared threshold vector
-$(t_1,t_2,t_3)$, a symmetric forbidden band of width $2\gamma$ centred on each $t_i$, and two
-function curves $f_A,f_B$ that realize the labelings $b=101$ and $b=010$ by landing, at every
-$x_i$, inside the correct allowed zone ($\geq t_i+\gamma$ or $\leq t_i-\gamma$).  Argue, in
-this grammar, that each perturbed picture subsumes the concrete $d=3$ one as an
-\emph{instance} (a labeling, a point, a band, or a threshold the figure already exhibits), a
-\emph{boundary} (one quantifier, one scale parameter, or one evidence status toggled, so the
-margin requirement, the $\fatshat_\gamma$ versus $\Pdim$ relation, or the verification status
-changes), or a \emph{frontier} (a structure or formalization the figure points to but does
-not contain).  Honesty rule: the configuration instantiates the kernel-formalized definition
-\leanname{FatShatteringDim}, but \Cref{thm:real-valued-char} is literature; do not assert that
-any characterization of real-valued learnability is machine-checked.
+Of the five figures in this chapter, this one alone draws a definition the kernel
+has formalized, so the exercises below trade on a sharp split between a verified
+definition and a borrowed theorem.  Figure~\ref{fig:fat-shattering} exhibits
+\Cref{def:fat-shattering-ext}: a shared threshold vector $(t_1,t_2,t_3)$, a
+symmetric forbidden band of width $2\gamma$ centred on each $t_i$, and two function
+curves $f_A,f_B$ that realize the labelings $b=101$ and $b=010$ by landing, at every
+$x_i$, inside the correct allowed zone ($\geq t_i+\gamma$ or $\leq t_i-\gamma$).
+Each item generalizes the concrete $d=3$ drawing, placing it as an \emph{instance}
+(a labeling, a point, a band, or a threshold already drawn), a \emph{boundary} (one
+quantifier, one scale parameter, or one evidence status toggled, so the margin
+requirement, the $\fatshat_\gamma$ versus $\Pdim$ relation, or the verification
+status changes), or a \emph{frontier} (a structure or formalization the figure
+points toward but does not contain).  Keep the split honest: the configuration
+instantiates the kernel-formalized definition \leanname{FatShatteringDim}, while
+\Cref{thm:real-valued-char} is literature, so no characterization of real-valued
+learnability may be called machine-checked.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The $d=3$ picture with two curves is the smallest faithful instance of the
@@ -1572,7 +1572,7 @@ dots fall in their zones for $b=101$ and $b=010$, and argue this exhibits
 $\fatshat_\gamma(\mathcal F)\geq 3$ for any class containing $f_A,f_B$ and witnesses for the
 remaining labelings, with nothing claimed verified beyond the definition itself.
 
-\item \textbf{The curves, not the bands, are what make this an exhibition.}  Contrast the
+\item \textbf{The curves are what make this an exhibition; the bands alone would not.}  Contrast the
 present figure with a version drawing only the thresholds and the $2\gamma$ bands.  Show that
 the bands alone depict the \emph{predicate} (the geometry of $f(x_i)\geq t_i+\gamma$ versus
 $\leq t_i-\gamma$), whereas the curves depict the \emph{witnesses} the existential in
@@ -1609,8 +1609,8 @@ with the latter the limit of the former.
 Push the previous boundary the other way.  Exhibit a class and a value
 $\gamma' > 0$ for which some labeling can be realized with values that merely cross each $t_i$
 (so the points are $P$-shattered) but cannot be realized while clearing the band by $\gamma'$
-on both sides.  Show this is the boundary at which $\fatshat_{\gamma'}(\mathcal F)$ drops below
-$\Pdim(\mathcal F)$: passing the threshold is not enough, the function must land in the light
+on both sides.  This is the boundary at which $\fatshat_{\gamma'}(\mathcal F)$ drops below
+$\Pdim(\mathcal F)$: passing the threshold no longer suffices, since the function must land in the light
 zone, which is the scale-sensitivity the figure draws.
 
 \item \textbf{Two curves shown, $2^d$ functions required.}  Replace the figure's pair of
@@ -1619,14 +1619,14 @@ per labeling, hence $2^d=8$ functions for $d=3$, of which the figure exhibits $b
 $b=010$; the remaining six (for instance $b=111$, all dots above; $b=000$, all dots below)
 must also land in their zones against the \emph{same} $(t_1,t_2,t_3)$.  Argue that generalizing
 the figure to arbitrary $d$ means asserting a function for every one of the $2^d$ binary
-strings, not adding more sample points alone.
+strings, the witness count growing exponentially while the sample points grow only linearly.
 
 \item \textbf{Larger margins shatter fewer points.}  Toggle $\gamma$ upward.  Using
 \Cref{rmk:scale-family}, argue that widening every band (larger $\gamma$) makes the two
 allowed zones recede from each threshold, so functions of bounded range can clear the margin at
 fewer points; hence $\fatshat_\gamma(\mathcal F)$ is typically a decreasing function of
-$\gamma$.  Show this is why the characterizing object is a scale \emph{family}
-$\{\fatshat_\gamma\}_{\gamma>0}$, one finiteness requirement per $\gamma$, rather than a single
+$\gamma$.  This monotonicity is why the characterizing object is a scale \emph{family}
+$\{\fatshat_\gamma\}_{\gamma>0}$, one finiteness requirement per $\gamma$ in place of a single
 number, and connect this to the grammar-growth reading of the real-valued setting.
 
 \item \textbf{Fat-shattering is a formalized definition; the characterization it drives is
@@ -1649,54 +1649,57 @@ proof sketch of \Cref{thm:real-valued-char} tight, or can the $\log^2$ factor be
 (d) Is the scale family $\{\fatshat_\gamma\}_{\gamma>0}$ reducible to a single invariant, or is
 the $\gamma$-indexed family irreducible?  Argue the figure is evidence for irreducibility: a
 static frame can draw only one $\gamma$, and \Cref{rmk:scale-family} insists the
-characterization is a family of finiteness conditions, not one number.
+characterization is a whole family of finiteness conditions, one per scale, beyond what any single number records.
 \end{enumerate}
 
 \subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:proper-improper}}
 
-Each exercise perturbs the two-layer table.  Read Figure~\ref{fig:proper-improper} as a
-$2\times2$ lattice: two columns (improper, proper) and two layers (the statistical layer,
-whose cells are drawn solid because both are machine-checked; the computational layer, drawn
-dashed because the separation is literature).  Argue, in this grammar, that each perturbed
-picture subsumes the concrete one as an \emph{instance} (a cell, relation, or witness the
-table already exhibits), a \emph{boundary} (one layer, restriction, or evidence grade
-toggled, so the verdict or its verification status changes), or a \emph{frontier} (a
-formalization or setting the table points to but does not contain).  Honesty rule: the
-statistical row is kernel-verified, the computational row is literature; do not assert the
-computational gap is machine-checked.
+This table earns its keep by separating two things textbooks usually run together:
+where proper and improper learning agree, and where they part.  Read
+Figure~\ref{fig:proper-improper} as a $2\times2$ lattice with two columns (improper,
+proper) and two layers.  The statistical layer is drawn solid because both its
+cells are machine-checked; the computational layer is dashed because the separation
+there is literature.  The exercises below lift the concrete table into a general
+claim, treating it as an \emph{instance} (a cell, relation, or witness already
+shown), a \emph{boundary} (one layer, restriction, or evidence grade toggled, so a
+verdict or its verification status changes), or a \emph{frontier} (a formalization
+or setting the table points toward but does not contain).  The honesty rule never
+relaxes: the statistical row is kernel-verified and the computational row is
+literature, so the computational gap is never to be called machine-checked.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The table is the definition.}  Read \Cref{def:proper-improper-ext} directly off
-the grid.  Show this is the instance the figure exhibits: the columns encode the restriction
+the grid.  The grid is the instance the figure exhibits: the columns encode the restriction
 $A(S)\in\mathcal H$ versus $A(S)\in\mathcal H'$, while the rows encode the layer in which that
 restriction is evaluated.  Explain why the definition names only one restriction yet the
 figure needs two layers: the restriction is fixed, but the verdict it produces is read once
 per layer.
 
 \item \textbf{The statistical no-gap row is doubly machine-checked.}  Read the top row, both
-cells solid.  Show this is the instance that proves, not merely asserts, the absence of a
-sample-complexity separation: the improper cell is the fundamental theorem that PAC
+cells solid.  This row is the instance that proves the absence of a
+sample-complexity separation outright, with two checked cells rather than a bare claim: the improper cell is the fundamental theorem that PAC
 learnability is exactly finite $\VC$ (\leanname{fundamental_theorem}), and the proper cell is a
 verified construction of a proper learner from finite $\VC$, one that outputs a hypothesis in
 the class with bounded error (\leanname{vcdim_finite_imp_proper_finite_support_learner}); since
-both cells carry $\Theta(d/\varepsilon)$ and both are kernel-verified, the equality is a
-theorem, not a slogan.
+both cells carry $\Theta(d/\varepsilon)$ and both are kernel-verified, the equality
+stands as a theorem with a machine-checked proof behind each half.
 
-\item \textbf{One witness threads all four cells.}  Trace $3$-term DNF through the grid.  Show
-this is the instance that inhabits the abstract lattice: a single class whose status is
+\item \textbf{One witness threads all four cells.}  Trace $3$-term DNF through the grid.  This
+single class is the instance that inhabits the abstract lattice: its status is
 constant along the statistical row (learnable both ways) and splits along the computational
 row, NP-hard properly yet polynomial-time improperly as $3$-CNF (the separation box and
 \Cref{thm:pitt-valiant}).
 
 \item \textbf{The layer toggle is what produces the gap.}  Hold the columns fixed and
 intervene on the row.  Define $\mathrm{gap}(\text{layer})$ as the worst-case proper-to-improper
-cost ratio in that layer, and show this is the boundary the figure draws:
+cost ratio in that layer, and read off the boundary the figure draws:
 $\mathrm{gap}(\text{statistical})=\Theta(1)$, forced by the two verified cells of Exercise~2,
 while $\mathrm{gap}(\text{computational})$ is superpolynomial unless $\mathrm{RP}=\mathrm{NP}$.
-The gap is an effect of the layer, not of the learner type alone.
+The gap is an effect of the layer: fixing the learner type and toggling only the
+row is what turns a $\Theta(1)$ ratio into a superpolynomial one.
 
 \item \textbf{Proper is improper restricted to the class.}  Read the dashed
-$\subseteq\mathcal H$ relation between the columns.  Show this is the boundary where a pure
+$\subseteq\mathcal H$ relation between the columns.  This relation marks the boundary where a pure
 restriction of the hypothesis space (\Cref{def:proper-improper-ext}) leaves one quantity
 invariant and blows up another: the $\VC$ dimension of $\mathcal H$ is preserved, so the
 sample complexity is unchanged, but the cost of \emph{searching} $\mathcal H$ for a consistent
@@ -1704,15 +1707,15 @@ member is not, which is exactly why the restriction is free in the top row and e
 the bottom.
 
 \item \textbf{Qualitative learnability versus the tight rate.}  Read the proper statistical
-cell carefully.  Show this is the boundary between what the kernel verifies and what it
+cell carefully.  This cell sits on the boundary between what the kernel verifies and what it
 sharpens: \leanname{vcdim_finite_imp_proper_finite_support_learner} delivers a proper learner
 with error at most $1/3$ on bounded support, which already places the proper cell in the same
 row as the improper one (proper learnability with no asymptotic sample blow-up), while the
 exact matching $\Theta(d/\varepsilon)$ bound remains a literature refinement
-(\cite{KearnsVazirani1994}), not a kernel theorem.
+(\cite{KearnsVazirani1994}) that the kernel does not yet prove.
 
 \item \textbf{What the kernel sees, and what it does not.}  Read the solid top row against the
-dashed bottom row.  Show this is the boundary that the two border styles encode: the
+dashed bottom row.  The two border styles encode a boundary: the
 design-lab kernel reasons about sample complexity and statistical learnability and proves the
 whole top row, but exposes no handle for NP-hardness, so no cell of the bottom row is verified.
 Conclude that, for this topic, the verified-versus-literature frontier coincides exactly with
@@ -1722,20 +1725,20 @@ the statistical-versus-computational frontier.
 target.  The Pitt and Valiant reduction from graph $k$-colouring (\Cref{thm:pitt-valiant},
 \cite{PittValiant1988}) is literature; sketch what a machine-checked version would require, a
 kernel encoding of $k$-colouring, of the labelled-sample construction, and of the equivalence
-between a consistent $k$-term DNF and a proper $k$-colouring.  Show this is the frontier that
+between a consistent $k$-term DNF and a proper $k$-colouring.  This is the frontier that
 would turn the bottom-right cell solid while the rest of the bottom row stayed literature.
 
 \item \textbf{The partial-concept failure of ERM.}  Add a third row.  In the partial-concept
 model (\Cref{def:partial-concept}, \cite{AlonHannekeHolzmanMoran2021}) there are classes of
 partial $\VC$ dimension $1$ with no finite-$\VC$ total extension that empirical risk
-minimization cannot learn at all.  Show this is the frontier where the proper and ERM route
+minimization cannot learn at all.  This is the frontier where the proper and ERM route
 fails \emph{statistically} rather than computationally: unlike the computational row, the
 proper cell of this third row is empty (no learner) even though improper learning still
 succeeds, so the figure's two-layer picture is itself a special case of a taller table.
 
 \item \textbf{An invariance theorem for the gap.}  Conjecture that no statistical dimension
 detects the proper-improper gap: for every sample-complexity measure, the VC, Natarajan, and
-fat-shattering dimensions among them, the proper and improper cells agree.  Show this is the
+fat-shattering dimensions among them, the proper and improper cells agree.  This conjecture is the
 figure's deepest frontier, an invariance statement that the gap is invariant-zero under every
 statistical measurement and nonzero only under a runtime measurement; identify the already
 verified facts (\leanname{fundamental_theorem} on the improper side,
@@ -1746,26 +1749,27 @@ so this reading of the table is itself drawn dashed.
 
 \subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:grammar-growth}}
 
-Read Figure~\ref{fig:grammar-growth} as a reasoner about generalization.  The hub
-is binary PAC learning, the single claim the kernel certifies sorry-free (finite
-VC characterizes realizable binary PAC, \leanname{fundamental_theorem}); each
-wavy orange arrow is an \rel{extends\_grammar} edge (\Cref{sec:extends-grammar})
-that grows the binary theory by adding one primitive with no binary analogue, and
-each corner box names the extended setting and its characterizing dimension.  The
-figure's whole content is that five different extensions are instances of one
-move, adding irreducible vocabulary, rather than five unrelated facts.  Argue, in
-this grammar, that each perturbed picture subsumes the concrete hub-and-spoke as
-an \emph{instance} (a box, an arrow, or a primitive the figure already exhibits),
-a \emph{boundary} (one label, direction, or evidence grade toggled so an edge
-changes meaning, kind, or status), or a \emph{frontier} (a structure or
-formalization the figure points to but does not contain).  Honesty rule: the hub
-is verified, the extension dimensions are formalized definitions, and the
-characterizations and the irreducibility claim are literature, with the
-multiclass case the one proven instance.
+This hub-and-spoke is the chapter's thesis drawn as a single picture: one verified
+center, four irreducible extensions radiating out.  The hub is binary PAC learning,
+the single claim the kernel certifies sorry-free (finite VC characterizes realizable
+binary PAC, \leanname{fundamental_theorem}).  Each wavy orange arrow is an
+\rel{extends\_grammar} edge (\Cref{sec:extends-grammar}) that grows the binary theory
+by adding one primitive with no binary analogue, and each corner box names the
+extended setting and its characterizing dimension.  The figure's whole content is
+that five different extensions are instances of one move, adding irreducible
+vocabulary, where a naive reading would file them as five unrelated facts.  Each
+exercise below widens the concrete hub-and-spoke into a general claim, identifying it
+as an \emph{instance} (a box, an arrow, or a primitive already drawn), a
+\emph{boundary} (one label, direction, or evidence grade toggled so an edge changes
+meaning, kind, or status), or a \emph{frontier} (a structure or formalization the
+figure points toward but does not contain).  The honesty rule holds throughout: the
+hub is verified, the extension dimensions are formalized definitions, and the
+characterizations and the irreducibility claim are literature, with the multiclass
+case the one proven instance.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The hub is the chapter's one verified rung.} Read only the center
-box and ignore the four spokes.  Show this is the figure's defining verified
+box and ignore the four spokes.  The hub is the figure's defining verified
 instance: of every claim in the diagram, exactly one is machine-checked, the
 biconditional that finite VC dimension characterizes realizable binary PAC
 learnability (\leanname{fundamental_theorem}, over $\mathcal{H} \subseteq
@@ -1775,16 +1779,16 @@ from it, which is why the heavier border marks the hub as the lower bound on wha
 the kernel currently proves.
 
 \item \textbf{Five extensions are instances of one move.} Read the four orange
-arrows as a single class and ignore which box each one reaches.  Show this is the
+arrows as a single class and ignore which box each one reaches.  This orange class is the
 instance that names the chapter's thesis (\Cref{sec:extends-grammar}): each arrow
 is one \rel{extends\_grammar} edge that adds a primitive absent from the binary
 language, so the question ``how does binary PAC generalize?'' has the structural
 answer ``by adding irreducible vocabulary,'' and the hub-and-spoke is the witness
-that the multiclass, real-valued, agnostic, and noisy extensions are instances of
-the same relation, not four separate constructions.
+that the multiclass, real-valued, agnostic, and noisy extensions are four instances of
+one relation, where they might have looked like four separate constructions.
 
 \item \textbf{Each spoke carries exactly one new primitive.} Pick any single arrow
-and read its label against its box.  Show this is the instance that exhibits the
+and read its label against its box.  Each arrow is the instance that exhibits its own
 per-extension primitive: the multiclass arrow adds the one-inclusion witness for
 the DS dimension (\Cref{def:ds-dim-ext}), the real-valued arrow adds a threshold
 vector and then the scale $\gamma$ for the pseudo- and fat-shattering dimensions
@@ -1795,7 +1799,7 @@ figure asserts these expansions are the same kind of move.
 
 \item \textbf{The corrected multiclass spoke is isomorphic to the DS witness
 picture.} Read the multiclass arrow's primitive, the one-inclusion witness, and
-compare it to Figure~\ref{fig:ds-shattering}.  Show this is the instance where the
+compare it to Figure~\ref{fig:ds-shattering}.  This is the instance where the
 spoke and the dimension it produces speak the same language: the one-inclusion
 witness is precisely the single-coordinate-deviation structure of the DS dimension
 (\Cref{def:ds-dim-ext}), the star in the one-inclusion hypergraph
@@ -1803,9 +1807,9 @@ $\mathrm{OIG}(\mathcal{H}, S)$ (\Cref{def:oig}); so the arrow that yields the
 $\DSdim$ box is labeled with the very object that defines $\DSdim$, and the
 multiclass spoke is a compressed pointer to the witness figure.
 
-\item \textbf{An \rel{extends\_grammar} edge is not a \rel{restricts} edge.} Read
-any orange arrow and ask whether it could be drawn as a special-case inclusion
-instead.  Show this is the figure's defining boundary: a \rel{restricts} edge
+\item \textbf{An \rel{extends\_grammar} edge resists redrawing as a \rel{restricts}
+edge.} Read any orange arrow and ask whether it could be drawn as a special-case
+inclusion instead.  Here is the figure's defining boundary: a \rel{restricts} edge
 would mean the extension is a special case of binary PAC needing no new
 vocabulary, whereas every arrow here marks a place where reduction to the binary
 theory loses information (the non-reduction principle, \Cref{rmk:non-reduction}),
@@ -1813,31 +1817,31 @@ so toggling any arrow from \rel{extends\_grammar} to \rel{restricts} would false
 claim the new primitive is dispensable, and the figure's wavy style is exactly the
 refusal to make that claim.
 
-\item \textbf{The multiclass box is $\DSdim$, so its primitive is one-inclusion,
-not two-function.} Read the top-left box and its arrow together and ask whether the
-primitive matches the dimension.  Show this is the boundary the corrected label
+\item \textbf{The multiclass box is $\DSdim$, so its primitive is the one-inclusion
+witness, where two-function shattering belongs to Natarajan.} Read the top-left box and its arrow together and ask whether the
+primitive matches the dimension.  Here is the boundary the corrected label
 protects: the box is characterized by the DS dimension, whose primitive is the
 one-inclusion witness, while two-function shattering is the Natarajan primitive
 (\Cref{def:natarajan-dim}, \cite{Natarajan1989}), and the two are not
 interchangeable because a class can have Natarajan dimension one and infinite DS
 dimension (\Cref{prop:ds-vs-nat}); so labeling this arrow ``two-function
-shattering'' would contradict its own box and the chapter's resolution that DS, not
-Natarajan, characterizes multiclass learnability (\Cref{thm:multiclass-char},
+shattering'' would contradict its own box and the chapter's resolution that DS is
+the dimension characterizing multiclass learnability, the role Natarajan cannot fill (\Cref{thm:multiclass-char},
 \cite{BrukhimCarmonDinurMoranYehudayoff2022}).
 
 \item \textbf{Agnostic keeps the same condition yet is still a grammar extension.}
-Read the bottom-left box, whose condition is finite VC, the same as the hub.  Show
-this is the boundary where the finiteness condition is unchanged but the edge is
-still \rel{extends\_grammar}: agnostic PAC drops realizability and measures success
+Read the bottom-left box, whose condition is finite VC, the same as the hub.  Here
+is the boundary where the finiteness condition is unchanged while the edge stays
+\rel{extends\_grammar}: agnostic PAC drops realizability and measures success
 relative to the best in class (\Cref{thm:agnostic-ft}, \cite{Haussler1992}), so the
-new vocabulary is the relative benchmark $\inf_{h \in \mathcal{H}} \risk(h)$, not a
-new dimension; the arrow therefore adds vocabulary without changing the finiteness
-condition, which shows generalization here is about language, not about the
-characterizing quantity.
+new vocabulary is the relative benchmark $\inf_{h \in \mathcal{H}} \risk(h)$ in
+place of a new dimension; the arrow therefore adds vocabulary without changing the
+finiteness condition, which shows generalization here is a matter of language while
+the characterizing quantity holds fixed.
 
 \item \textbf{The dimensions are formalized, but their characterizations are not.}
 Read the corner boxes as naming dimensions and ask which parts the kernel
-certifies.  Show this is the figure's principal evidence boundary: the
+certifies.  This is the figure's principal evidence boundary: the
 pseudodimension, the fat-shattering dimension, and the all-labelings strong
 shattering dimension are machine-checked structures (\leanname{Pseudodimension},
 \leanname{FatShatteringDim}, \leanname{StrongShatteringDim}, with the verified
@@ -1849,7 +1853,7 @@ borrowed, and drawing the boxes as verified because the dimensions are formalize
 would overstate what the kernel proves.
 
 \item \textbf{Formalizing one spoke's dimension is the next move.} Pick the
-multiclass spoke and ask what machine-checking it would change.  Show this is the
+multiclass spoke and ask what machine-checking it would change.  This is the
 frontier the figure marks but cannot yet draw verified: the $\DSdim$ box names a
 literature dimension, because the kernel's \leanname{StrongShatteringDim} is the
 all-labelings dimension and runs below \leanname{NatarajanDim}, the \emph{opposite}
@@ -1861,7 +1865,7 @@ characterization to climb next.
 
 \item \textbf{Is grammar growth itself a provable no-single-dimension invariant?}
 Read the entire orange backbone as one claim about the impossibility of a single
-universal measure.  Show this is the figure's deepest frontier and the chapter's
+universal measure.  This is the figure's deepest frontier and the chapter's
 synthesis: grammar growth is proved \emph{necessary} only for multiclass, where the
 $\Ndim = 1$, $\DSdim = \infty$ class shows no two-function dimension can
 characterize learnability when the label set is infinite (\Cref{prop:ds-vs-nat}),

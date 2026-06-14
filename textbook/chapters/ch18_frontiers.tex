@@ -94,7 +94,7 @@ The positive direction is settled in a weak sense.
   Warmuth~\cite{FloydWarmuth1995}.  Intersection-closed classes admit
   compression of size $d$~\cite{Helmbold2018}, and classes of small recursive
   teaching dimension compress to that dimension; these are the established
-  families, not a complete list.
+  families, and the list is illustrative rather than exhaustive.
 
 \item \textbf{Compression implies learning.}  The converse direction is
   established: a compression scheme of size $k$ yields PAC learning with
@@ -112,7 +112,9 @@ Blumer, Ehrenfeucht, Haussler, and Warmuth~\cite{BlumerEhrenfeuchtHausslerWarmut
 completed the characterization of PAC learnability through VC dimension.
 The conjecture was motivated by the observation that specific learnable
 classes (halfspaces, rectangles, decision lists) all admit small compression
-schemes, and the belief that this was not coincidental but structural.  Four
+schemes, and the belief that this regularity was structural: a property of
+finite-VC classes as such, which would make those three examples instances of
+a general law rather than a lucky coincidence.  Four
 decades later, the general case remains open.
 \end{historical}
 
@@ -238,9 +240,10 @@ Several partial explanations exist, none fully satisfactory.
   The budget is discharged from the layer norms and depth of the
   stack,\formal{TLT.config_capacity_law} so the bound is correct by
   construction.  Like its hand-proved cousins, however, it grows with depth and
-  norm and is not yet non-vacuous on large models: it answers
-  \Cref{op:deep-gen} on the axis of \emph{trust} rather than \emph{tightness},
-  adding a kernel-audited guarantee, not a smaller number.
+  norm and is not yet non-vacuous on large models: it advances
+  \Cref{op:deep-gen} along the axis of \emph{trust}, supplying a
+  kernel-audited guarantee, while leaving \emph{tightness} where it found it,
+  the same Dudley budget now merely certified rather than shrunk.
 \end{itemize}
 
 \begin{computational}
@@ -292,9 +295,9 @@ The gap has three aspects.
 The field appears to need a complexity measure that simultaneously accounts
 for:
 \begin{itemize}[leftmargin=*]
-\item the architecture (not just the function class),
-\item the optimization trajectory (not just the endpoint),
-\item the data distribution (not just worst-case analysis).
+\item the architecture, with the function class alone left underdetermined,
+\item the full optimization trajectory, the endpoint by itself being silent,
+\item the data distribution, which worst-case analysis discards.
 \end{itemize}
 
 Possible directions include:
@@ -729,8 +732,9 @@ conjecture would likely yield insight into generalization bounds; a
 combinatorial characterization of efficient learnability would likely
 require new structural theorems about VC classes; a computable approximation
 to Solomonoff induction would likely connect to both compression and
-universal learning.  The frontier of formal learning theory is not a
-collection of independent problems but a single, tightly coupled surface.
+universal learning.  The frontier of formal learning theory is a single,
+tightly coupled surface; the problems on it are entries into one shared
+geometry, and resolving any one would deform the rest.
 \end{computational}
 
 \bigskip
@@ -739,5 +743,6 @@ This chapter has surveyed what we do not know.  The theory developed in
 Chapters~1--17 provides a rigorous, interconnected framework for what we do
 know: characterization theorems, tight bounds, separation results, and
 structural analogies.  The open problems of this chapter mark the places
-where that framework reaches its current limits.  They are not embarrassments
-but invitations.
+where that framework reaches its current limits.  They are invitations: each
+section leads with one and ends by asking what argument would close it, which
+is the form a frontier takes when it is read as work to be done.

@@ -47,10 +47,10 @@ The chapter has three sections.
 \label{sec:gap}
 
 \begin{graphnode}[title={Graph Node: \nde{computational\_hardness}}]
-Layer: \texttt{meta}.  Incoming edge:
-$\edge{computational\_hardness}{requires\_assumption}{cryptographic\_hardness}$.
-This node represents the structural fact that efficient learnability requires
-assumptions beyond finite VC dimension, specifically, cryptographic hardness.
+The node \nde{computational\_hardness} records a structural fact that the
+Fundamental Theorem cannot see: efficient learnability requires assumptions
+beyond finite VC dimension.  Its sole dependency runs to
+\nde{cryptographic\_hardness}, which supplies exactly that missing premise.
 \end{graphnode}
 
 The central result is due to Kearns and Valiant~\cite{KearnsValiant1994}.
@@ -78,12 +78,15 @@ cryptographic assumption.
 
 \begin{remark}[The structure of the reduction]
 \label{rmk:kv-reduction}
-The Kearns--Valiant reduction is from a cryptographic primitive to a learning
-problem, not from a worst-case problem.  The learner is given random examples
+The Kearns--Valiant reduction runs from a cryptographic primitive to a learning
+problem.  Its source is that primitive, with all its average-case structure,
+and so the reduction sidesteps the worst-case starting point one might expect.
+The learner is given random examples
 $(x, c(x))$ where $x$ is drawn from a distribution and $c$ is the target
 concept.  If the learner succeeds in learning, it implicitly solves the
-cryptographic problem on random instances.  This is why the hardness is
-\emph{average-case}, not worst-case.
+cryptographic problem on random instances.  This is why the hardness lives in
+the \emph{average-case} world, over random instances rather than adversarial
+ones.
 \end{remark}
 
 \subsection{Why P $\neq$ NP Does Not Suffice}
@@ -131,9 +134,8 @@ roughly increasing order of generality:
 
 \begin{obstbox}
 The information--computation gap is an \emph{obstruction} in the concept
-graph: the edge
-$\edge{vc\_dimension}{characterizes}{pac\_learnability}$ is
-information-theoretically valid, but no analogous computational edge is known.
+graph.  The claim that VC dimension characterizes PAC learnability is
+information-theoretically valid, but no analogous computational characterization is known.
 Whether \emph{any} combinatorial dimension characterizes efficient PAC
 learnability is open; no such dimension has been found, and no proof rules
 one out.  What \emph{is} settled, and machine-checked, is a sharper local
@@ -179,8 +181,9 @@ The canonical example is the class of $3$-term DNF formulae.  Finding a
 consistent $3$-term DNF is $\mathrm{NP}$-hard~\cite{PittValiant1988}, but the
 class of $3$-term DNFs is contained in the class of $3$-CNF formulae, which
 \emph{is} efficiently learnable.  An improper learner simply outputs a $3$-CNF
-formula that is consistent with the data.  The hypothesis is not a DNF, but it
-classifies correctly.
+formula that is consistent with the data.  That hypothesis is a CNF wearing
+none of the target's DNF clothing, and it classifies every example correctly
+all the same.
 
 Information-theoretically, a proper learner always exists: any class of finite
 VC dimension is learned by proper empirical risk minimization, which returns a
@@ -192,16 +195,17 @@ but cannot be run efficiently, whereas the improper learner can.
 \begin{remark}[Representation vs.\ class]
 \label{rmk:representation}
 The proper--improper separation illustrates a principle that runs throughout
-computational learning theory: what matters for computational complexity is not
-the \emph{set of functions} $\mathcal{H} \subseteq \{0,1\}^X$ but the
-\emph{representation} of those functions.  Two representations of the same set
+computational learning theory: what governs computational complexity is the
+\emph{representation} of the functions, while the bare \emph{set of functions}
+$\mathcal{H} \subseteq \{0,1\}^X$ has no say in the matter.  Two representations of the same set
 of Boolean functions can have dramatically different computational properties.
 This is why the VC dimension, which depends only on the set
 $\mathcal{H}$, cannot capture computational learnability.
 \end{remark}
 
 The structural consequence is that efficient learnability is a property of
-\emph{represented} hypothesis classes, not of hypothesis classes as sets.  The
+\emph{represented} hypothesis classes; strip away the representation and the
+property goes with it.  The
 concept graph captures this through the node \nde{proper\_improper\_separation},
 which has type \texttt{separation} and connects to
 \nde{computational\_hardness} via a \rel{motivates} edge.
@@ -210,8 +214,9 @@ which has type \texttt{separation} and connects to
 \subsection{The Transformer Face of the Gap}
 \label{sec:attention-gap}
 
-The information--computation gap is not a museum piece; it is the daily
-condition of deep learning.  A softmax-attention head induces a concept class
+The information--computation gap is the daily working condition of deep
+learning, alive in every training run rather than shelved as a theorist's
+curiosity.  A softmax-attention head induces a concept class
 that is machine-checked to be well-behaved, hence of finite VC dimension and
 information-theoretically PAC
 learnable.\formal{TLT.Bridge.softAttention_wellBehaved} A proper learner for
@@ -224,9 +229,9 @@ kind on the conjecturally efficient-unlearnable side of
 The proper/improper distinction is what makes practice possible. Recovering
 the exact parameters of a target attention head, which is proper learning, is the
 regime where hardness bites. Gradient descent does something improper
-instead: it returns \emph{a} network that predicts well, not the target
-network, exactly as the $3$-CNF learner returns a CNF rather than the target
-DNF. The gap of this chapter is, in this sense, the precise reason that
+instead: it returns \emph{a} network that predicts well and lets the target
+network stay hidden, exactly as the $3$-CNF learner returns a CNF where the
+target was a DNF. The gap of this chapter is, in this sense, the precise reason that
 training large models is an improper-learning enterprise.
 
 
@@ -244,23 +249,25 @@ alone.
 
 \begin{defn}[The \rel{requires\_assumption} edge type]
 \label{def:requires-assumption}
-An edge $\edge{A}{requires\_assumption}{B}$ means: the result or property
-associated with node $A$ holds \emph{conditional on} the assumption encoded
-by node $B$.  If $B$ is falsified, the status of $A$ becomes indeterminate.
+When a node $A$ requires a node $B$ under this edge type, the result or property
+associated with $A$ holds \emph{conditional on} the assumption encoded
+by $B$.  If $B$ is falsified, the status of $A$ becomes indeterminate.
 \end{defn}
 
 The principal instances in the graph are:
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item $\edge{computational\_hardness}{requires\_assumption}{cryptographic\_hardness}$.
+\item \nde{computational\_hardness} requires \nde{cryptographic\_hardness}.
   The information--computation gap of \Cref{thm:kearns-valiant} holds only
   under cryptographic assumptions (hardness of factoring, or LWE).  Without
   them it remains conceivable, though it would be a startling
   collapse, that every class of finite VC dimension is efficiently learnable.
-  The assumption is genuinely cryptographic: the hardness of a specific
-  computational problem, not a constraint on the learner's hypothesis space.
+  The assumption is genuinely cryptographic: it asserts the hardness of a
+  specific computational problem, a fact about factoring or LWE that sits
+  entirely outside any constraint one might place on the learner's hypothesis
+  space.
 
-\item $\edge{posterior\_consistency}{requires\_assumption}{bayesian\_inference}$.
+\item \nde{posterior\_consistency} requires \nde{bayesian\_inference}.
   Posterior consistency (\Cref{ch:agents}, \Cref{sec:bayesian-pac}) holds under
   conditions on the prior and the model class.  When these conditions
   fail, for example when the prior assigns zero mass to neighborhoods of

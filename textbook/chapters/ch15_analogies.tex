@@ -163,12 +163,12 @@ The pattern across these 12 edges is consistent: the analogy identifies
 a genuine structural parallel, but the source and target live in
 different parts of the type system. Making the analogy formal would
 require a bridging theorem that relates the two types. We conjecture that
-most of these gaps are structural rather than temporary, but this is a
-judgment, not a theorem: no impossibility result rules out a bridge for
-any individual pair, and at least one (information-theoretic bounds versus
-PAC-Bayes) already has partial bridges~\cite{HellstromDurisi2020}. The
-classification records where bridges are currently absent, not where they
-are provably impossible.
+most of these gaps are structural rather than temporary, but this remains a
+judgment with the force of a hunch, no more: no impossibility result rules out a
+bridge for any individual pair, and at least one (information-theoretic bounds
+versus PAC-Bayes) already has partial bridges~\cite{HellstromDurisi2020}. The
+classification records where bridges are currently absent. Where they are
+provably impossible is a stronger claim the chapter nowhere makes.
 
 
 % ================================================================
@@ -265,8 +265,8 @@ inference selects (or averages over) hypotheses according to posterior
 probability. For certain prior--likelihood pairs, MML and MAP
 (maximum a posteriori) estimates coincide asymptotically. But MML is a
 coding-theoretic criterion and Bayesian inference is a probabilistic
-criterion; the equivalence is approximate and model-dependent, not a
-general theorem.
+criterion; the equivalence is approximate and model-dependent, holding for
+particular prior--likelihood pairs rather than as a general theorem.
 \end{obstbox}
 
 \begin{obstbox}
@@ -341,7 +341,7 @@ it is asymmetric.
 
 \begin{obstbox}
 \textbf{Sample complexity $\leftrightarrow$ VC dimension}
-(a theorem, not a definition).
+(a theorem that an identity-reading would erase).
 
 \medskip\noindent
 The fundamental theorem establishes the biconditional
@@ -377,9 +377,9 @@ The Sauer--Shelah lemma gives: $\log N(\varepsilon, \mathcal{H},
 L_1(P)) \leq d \cdot \log(2e/\varepsilon)$, bounding covering numbers
 from VC dimension.\formal{FLT_Proofs.Complexity.Rademacher.sauer_shelah_exp_bound} But covering numbers are defined for arbitrary
 metric spaces, while VC dimension applies only to binary hypothesis
-classes. VC dimension is a sufficient condition for covering number
-bounds, not a necessary one; the covering number framework is strictly
-more general.
+classes. Finite VC dimension suffices for covering number
+bounds; it is not required for them, since the covering number framework is
+strictly more general and bounds spaces that have no VC dimension at all.
 \end{obstbox}
 
 \begin{obstbox}
@@ -491,8 +491,8 @@ Both use ordinal-valued measures to characterize learnability in
 transfinite settings. Ordinal VC dimension (Martin--Sharma--Stephan)
 characterizes predictive complexity; mind-change ordinals characterize
 identification complexity in the Gold model. Both use ordinals, but they
-measure different things. The connection is mediated through predictive
-complexity, not direct: ordinal VC dimension governs prediction error
+measure different things. The connection is indirect, routed through predictive
+complexity: ordinal VC dimension governs prediction error
 bounds, while mind-change ordinals govern convergence to a correct
 hypothesis. The proof techniques (Ramsey-theoretic for ordinal VC,
 topological for mind-change) do not transfer.
@@ -722,8 +722,8 @@ Rademacher--VC relationship and the characterization-theorem parallel
 any of these would restructure the analogy map, converting a dashed blue
 edge into a solid theorem edge.
 
-\emph{Third}, the 4 one-way theorems show where asymmetry is
-structural, not accidental. Covering numbers bound Rademacher complexity
+\emph{Third}, the 4 one-way theorems show where the asymmetry is built into
+the objects, an artifact of nothing but the formalism itself. Covering numbers bound Rademacher complexity
 (Dudley) and are bounded by VC dimension (Sauer--Shelah), but these
 bounds flow in one direction only. The asymmetry reflects the
 generality hierarchy: covering numbers apply to metric spaces,
@@ -906,37 +906,39 @@ prediction game?  An unknown known on the transformer side
 
 \subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:obstruction-map}}
 
-Each exercise perturbs the obstruction map.  Read the figure as a concept
-graph whose every edge is an \rel{analogy} that fails, carrying two
-independent codes: a \emph{color and line style} for the obstruction type
-(the book's classification of \emph{why} the analogy is not a theorem, in six
-values, namely type mismatch, missing equivalence witness, one-way theorem
-only, data-model mismatch, proof-method mismatch, and success-criterion
-mismatch), and a \emph{filled dot} for the evidence, present on exactly the
-five edges where the kernel certifies a one-way bridge or an equivalence
-sorry-free.  Argue, in this grammar, that each perturbed picture subsumes the
-concrete one as an \emph{instance} (an edge, color class, or dotted handle the
-map already exhibits), a \emph{boundary} (one code, direction, or evidence
-grade toggled, so an edge changes color, gains or loses its dot, or is
-revealed as settled rather than open), or a \emph{frontier} (an undotted,
-open or literature-only edge whose formalization, or whose meta-level
-definition, is the next move).
+The obstruction map is the rare figure that says two things at once about every
+edge, so the exercises below pull on one code at a time and watch the other hold
+still.  Every edge is an \rel{analogy} that fails, and it wears two independent
+markings.  Its \emph{color and line style} record the obstruction type, the
+book's account of \emph{why} the analogy is not a theorem, drawn from six
+values: type mismatch, missing equivalence witness, one-way theorem only,
+data-model mismatch, proof-method mismatch, and success-criterion mismatch.  Its
+\emph{filled dot} records the evidence, appearing on exactly the five edges
+where the kernel certifies a one-way bridge or an equivalence sorry-free.  Three
+kinds of reading recur.  An \emph{instance} reading takes an edge, a color
+class, or a dotted handle the map already draws and shows the perturbed picture
+contains it.  A \emph{boundary} reading toggles one code, direction, or evidence
+grade, so an edge changes color, gains or loses its dot, or turns out to be
+settled where the eye read it as open.  A \emph{frontier} reading lands on an
+undotted edge, open or backed only by the literature, whose formalization or
+whose missing meta-level definition is the next move.  The chapter's honesty
+lives in the gap between the two codes, so watch where color and dot disagree.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The distribution of colors is the lesson, not any single edge.}
-Read the figure by counting colors and ignoring node identities.  Show this is
-the map's defining instance: thirty-two analogies fail across only six
-obstruction types, with type mismatch the plurality (twelve), so ``why does
-this analogy fail?'' has a finite-codomain answer rather than a case-by-case
-story.  The figure is the abstract witness that analogy-failure in learning
-theory is taxonomic, and the colour histogram, twelve type mismatches
-dominating, is the chapter's central claim that the field's most common
-bridges break for the most basic reason, that the objects compared are not the
-same kind of thing.
+\item \textbf{The whole lesson lives in the distribution of colors.}
+Read the figure by counting colors and ignoring node identities.  This is the
+map's defining instance: thirty-two analogies fail across only six obstruction
+types, with type mismatch the plurality (twelve), so ``why does this analogy
+fail?'' has a finite-codomain answer rather than a case-by-case story.  The
+figure is the abstract witness that analogy-failure in learning theory is
+taxonomic, and the colour histogram, twelve type mismatches dominating, carries
+the chapter's central claim that the field's most common bridges break for the
+most basic reason of all, that the objects compared are different kinds of
+thing.
 
 \item \textbf{The five dotted edges are the formalization frontier, and they
-are a minority.}  Read only the edges carrying a filled dot.  Show this is the
-instance that exposes where the kernel reaches into the analogy web: exactly
+are a minority.}  Read only the edges carrying a filled dot.  This instance
+exposes where the kernel reaches into the analogy web: exactly
 five of the thirty-two edges carry a verified one-way handle
 (\leanname{optimal_mistake_bound_eq_ldim}, \leanname{vcdim_le_of_mistake_bounded},
 \leanname{fundamental_vc_compression}, \leanname{fundamental_theorem},
@@ -948,32 +950,34 @@ precisely because formalization has so far bridged only a few of the field's
 analogies.
 
 \item \textbf{The twelve type-mismatch edges are the conceptual majority, and
-none is a theorem.}  Read only the orange strokes.  Show this is the instance
-that anchors the honesty of the two-code scheme: every type-mismatch edge
+none is a theorem.}  Read only the orange strokes.  This instance
+anchors the honesty of the two-code scheme: every type-mismatch edge
 (\Cref{sec:type-mismatch}) is an argument that source and target live in
-different formal categories, not a proved impossibility and not a verified
-bridge, so not one orange edge carries a dot.  Drawing color (a conceptual
-classification) and the dot (a verified handle) as separate axes is exactly
-what stops the reader from mistaking the book's analysis of \emph{why} an
+different formal categories, claiming neither a proved impossibility nor a
+verified bridge, which is why every last orange edge runs dotless.  Drawing
+color (a conceptual classification) and the dot (a verified handle) as separate
+axes is exactly what stops the reader from mistaking the book's analysis of
+\emph{why} an
 analogy fails for a kernel theorem that it fails.
 
 \item \textbf{The mistake bound and Littlestone dimension are equal, yet the
 edge is blue.}  Read the dotted blue edge between \nde{mistake\_bound} and
-\nde{littlestone\_dimension}.  Show this is the boundary that separates the
-obstruction type from the evidence: the pair \emph{is} a verified equivalence
+\nde{littlestone\_dimension}.  This edge is where the obstruction type and the
+evidence come apart: the pair \emph{is} a verified equivalence
 (\leanname{optimal_mistake_bound_eq_ldim}, hence the dot), so the ``missing
-witness'' is not a missing proof of equivalence but the stand-alone-measures
-distinction, that as complexity measures in their own right the two diverge
-when extended to bandit or partial-monitoring feedback
-(\Cref{sec:missing-equiv}).  The edge is blue because the naive ``these are
+witness'' names the stand-alone-measures distinction, the fact that as
+complexity measures in their own right the two diverge when extended to bandit
+or partial-monitoring feedback (\Cref{sec:missing-equiv}).  The proof of
+equivalence is in hand; what is missing is any reason to treat the two extended
+measures as one.  The edge is blue because the naive ``these are
 the same object'' reading fails even though the equivalence theorem holds,
 which is why the color and the dot genuinely disagree on this edge and the
 diagram needs both.
 
 \item \textbf{Finite VC gives some compression, but the dot does not certify
 $O(d)$.}  Read the dotted blue edge between \nde{compression\_scheme} and
-\nde{vc\_dimension}.  Show this is the boundary between a verified
-\emph{direction} and an open \emph{equivalence}: the dot marks
+\nde{vc\_dimension}.  Here a verified \emph{direction} and an open
+\emph{equivalence} meet on one edge: the dot marks
 \leanname{fundamental_vc_compression}, finite VC dimension implies \emph{some}
 finite compression scheme (of size exponential in $d$), but the sample
 compression conjecture, that the size is $O(d)$, is the prominent missing
@@ -982,25 +986,25 @@ analogy while the edge stays blue dashed because the equivalence that would
 discharge it is unproved, and promoting the edge to a solid theorem edge is
 exactly the content of the open problem.
 
-\item \textbf{Rademacher versus VC and label versus sample are settled
-non-equivalences, not conjectures.}  Read the two blue edges
+\item \textbf{Rademacher versus VC and label versus sample are already-settled
+non-equivalences wearing the open class's color.}  Read the two blue edges
 \nde{rademacher\_complexity}--\nde{vc\_dimension} and
-\nde{label\_complexity}--\nde{sample\_complexity}, which carry no dot.  Show
-this is the boundary the chapter's caveat draws inside the blue class: these
-are not open problems awaiting a proof of equivalence but \emph{established}
-non-equivalences (Rademacher complexity is data-dependent and can fall far
-below the VC bound; label complexity can be exponentially smaller than sample
-complexity, the content of active learning, \Cref{op:active-passive}), so the
-``missing witness'' is the recognition that the naive equivalence is false,
-not a gap to be closed.  The blue color groups them with the genuinely open
-MML edges, but the absence of a dot together with the prose distinguishes a
-known separation from a live conjecture.
+\nde{label\_complexity}--\nde{sample\_complexity}, which carry no dot.  This is
+the boundary the chapter's caveat draws inside the blue class: both edges are
+\emph{established} non-equivalences with the separation already in hand
+(Rademacher complexity is data-dependent and can fall far below the VC bound;
+label complexity can be exponentially smaller than sample complexity, the
+content of active learning, \Cref{op:active-passive}), so the ``missing
+witness'' here is the recognition that the naive equivalence is false, a verdict
+delivered rather than a gap left to close.  The blue color groups them with the
+genuinely open MML edges, while the absence of a dot together with the prose
+distinguishes a known separation from a live conjecture.
 
 \item \textbf{One green edge is verified and one is only classical, and the
 dot tells them apart.}  Read the two green dotted edges
 \nde{covering\_number}--\nde{vc\_dimension} and
-\nde{covering\_number}--\nde{rademacher\_complexity}.  Show this is the
-boundary where same color does not mean same evidence: covering numbers are
+\nde{covering\_number}--\nde{rademacher\_complexity}.  These two edges are the
+boundary where a shared color hides a split in the evidence: covering numbers are
 bounded by VC dimension via Sauer--Shelah, which is machine-checked
 (\leanname{sauer_shelah_exp_bound}, hence the dot), whereas covering numbers
 bound Rademacher complexity via Dudley's entropy integral, a classical result
@@ -1011,19 +1015,20 @@ literature bridge, which a one-code figure could not express.
 
 \item \textbf{The fundamental theorem is two-directional, and the dot warns
 against collapsing it.}  Read the dotted green edge between
-\nde{sample\_complexity} and \nde{vc\_dimension}.  Show this is the boundary
+\nde{sample\_complexity} and \nde{vc\_dimension}.  This edge sits on the line
 between a theorem and a definition: the dot marks \leanname{fundamental_theorem},
-the equivalence between finite VC dimension and finite sample complexity, but
+the equivalence between finite VC dimension and finite sample complexity, while
 the analogy is usually stated as an identity (``sample complexity just
 \emph{is} VC dimension''), which erases the content of the theorem, an
 explicit upper bound one way and a matching lower bound the other, proved by
 different arguments (\Cref{sec:one-way}).  The dot says the bridge is verified
-\emph{as a theorem}, not assumable as a definition, so the marker here guards a
-two-directional result against being read as a tautology.
+\emph{as a theorem}, something earned by proof rather than granted by
+definition, so the marker here guards a two-directional result against being
+read as a tautology.
 
 \item \textbf{Close the compression conjecture, or formalize the taxonomy, and
 the figure gains structure.}  Pick either the $O(d)$ compression direction or
-the meta-level classification.  Show this is the frontier the figure marks but
+the meta-level classification.  Either is a frontier the figure marks but
 cannot yet draw: proving compression size $O(d)$ would upgrade the
 \nde{compression\_scheme}--\nde{vc\_dimension} edge from a half-verified blue
 dash to a full equivalence (\Cref{op:compression-vc-analogy}), and separately,
@@ -1038,7 +1043,7 @@ relationship still awaits any witness in either direction
 \item \textbf{Is analogy-failure provably six-typed, a completeness theorem for
 the obstruction map?}  Ask whether the six colors are exhaustive, that every
 cross-paradigm analogy must fail for one of exactly these reasons and no
-seventh is possible.  Show this is the figure's deepest frontier: the diagram
+seventh is possible.  This is the figure's deepest frontier: the diagram
 exhibits six obstruction types as an expert classification, but whether six is
 a proved invariant of the analogy graph, a completeness theorem stating that
 the failure modes are exactly these and that, for instance, a specific type
