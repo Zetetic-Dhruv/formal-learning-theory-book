@@ -349,7 +349,7 @@ The conjecture has been verified for specific class families:
   $d$~\cite{FloydWarmuth1995,RubinsteinKroese2007}.
 
 \item \textbf{Intersection-closed classes.}  If $\mathcal{H}$ is closed under
-  intersections, compression of size $d$ exists~\cite{Helmbold2018}.
+  intersections, compression of size $d$ exists.
 
 \item \textbf{Classes of VC dimension 1.}  Trivially: a single point suffices.
 
@@ -537,26 +537,28 @@ $(\kappa, \rho)$ where $\kappa$ selects a set of $\leq k$ \emph{points}
 consistent with $S$ from these points alone.
 \end{defn}
 
-The natural analogue of the compression conjecture for unlabeled schemes is
-false.
+The compression conjecture has an unlabeled analogue, in which the stored
+subsample carries no labels and the reconstruction recovers them from the point
+positions alone.
 
-\begin{thm}[Unlabeled compression conjecture fails {\cite{MoranYehudayoff2016,CheriayanMoranShpilka2022}}]
-\label{thm:unlabeled-fails}
-There exist concept classes $\mathcal{H}$ with $\VC(\mathcal{H}) = d$ that do
-\emph{not} admit unlabeled compression schemes of size $f(d)$ for any function
-$f$ independent of $|\mathcal{H}|$.
+\begin{thm}[Bounded unlabeled compression {\cite{MoranYehudayoff2016}}]
+\label{thm:unlabeled-bounded}
+Every concept class $\mathcal{H}$ with $\VC(\mathcal{H}) = d$ admits an
+unlabeled compression scheme of size bounded by a function of $d$ alone,
+independent of $|\mathcal{H}|$.
 \end{thm}
 
-This negative result is sharp: while labeled compression of size $2^{O(d)}$
-always exists (\Cref{thm:moran-yehudayoff}), unlabeled compression cannot be
-bounded by any function of $d$ alone.  The labels carry essential information
-that cannot be recovered from the point locations.
+This matches the labeled case qualitatively: labeled compression of size
+$2^{O(d)}$ always exists (\Cref{thm:moran-yehudayoff}), and the unlabeled scheme
+stays bounded by a function of $d$ as well.  Whether the unlabeled size can be
+pushed to $O(d)$, matching the labeled conjecture, is the Kuzmin--Warmuth
+unlabeled compression conjecture~\cite{KuzminWarmuth2007}, open in general and
+proved for maximum classes.
 
 \begin{remark}
-The failure of unlabeled compression makes the labeled compression conjecture
-(\Cref{op:compression}) more subtle than it first appears: labels are
-\emph{necessary} for bounded-size compression, and the conjecture concerns the
-labeled case specifically.
+The unlabeled conjecture sharpens the labeled one (\Cref{op:compression}):
+recovering labels from the point positions alone is the extra demand, and
+whether it costs more than a constant factor in scheme size is unknown.
 \end{remark}
 
 
@@ -785,9 +787,9 @@ The landscape of this chapter is dominated by the compression conjecture.
 \node[openq] (noinfo) at (10.1,-2.0) {Drop side info?};
 \draw[openedge] (comp) -- node[lbl, pos=0.72] {\cref{op:side-info}} (noinfo);
 
-% --- the one refuted edge: unlabeled compression has no f(d) bound ---
-\node[refuted] (unlab) at (7.0,-6.2) {Unlabeled: no $f(d)$\\{\scriptsize\textbf{FALSE}}};
-\draw[rededge] (slin) -- node[lbl, right] {\cref{thm:unlabeled-fails}} (unlab);
+% --- the unlabeled variant: bounded size known, O(d) open ---
+\node[openq] (unlab) at (7.0,-6.2) {Unlabeled $O(d)$?};
+\draw[openedge] (slin) -- node[lbl, right] {\cite{KuzminWarmuth2007}} (unlab);
 
 % --- line-style legend: the evidence grade ---
 \begin{scope}[shift={(0,-3.7)}]
@@ -797,16 +799,14 @@ The landscape of this chapter is dominated by the compression conjecture.
   \node[font=\scriptsize, anchor=west] at (0.72,-0.5) {literature (cited)};
   \draw[openedge] (0,-1.0) -- (0.6,-1.0);
   \node[font=\scriptsize, anchor=west] at (0.72,-1.0) {open};
-  \draw[rededge] (0,-1.5) -- (0.6,-1.5);
-  \node[font=\scriptsize, anchor=west] at (0.72,-1.5) {refuted};
 \end{scope}
 \end{tikzpicture}
 \caption[Compression and learnability.]{The qualitative core: a class is PAC learnable
   if and only if its VC dimension is finite if and only if it admits a finite compression
   scheme with side information (\leanname{fundamental_vc_compression}). How short the summary
   can be is the open frontier: a bound of size $2^{O(d)}$ is known, while $O(d)$ and even
-  $\mathrm{poly}(d)$ remain open. Unlabeled compression of bounded size is impossible in
-  general (the red edge).}
+  $\mathrm{poly}(d)$ remain open. Unlabeled compression of bounded size also exists; whether it
+  reaches $O(d)$ is open.}
 \label{fig:compression-landscape}
 \end{figure}
 
@@ -1036,7 +1036,7 @@ perturbation lands on the verified core, on a known rung, or out on the open fro
 
 \item \textbf{The exponential gap.} The best known bound is $2^{O(d)}$ while the conjecture demands $O(d)$ (\cref{rmk:compression-gap}): at $d=20$ this is a gap from $\sim 10^6$ to $\sim 20$. Explain why the $2^{O(d)}$ bound (\cref{thm:moran-yehudayoff}, \cite{MoranYehudayoff2016}), unknown before 2016, is a literature result rather than a refinement of the conjecture.
 
-\item \textbf{The one refuted edge.} Dropping labels from the compressed subsample makes bounded-size compression impossible in general (\cref{def:unlabeled-compression}, \cref{thm:unlabeled-fails}). Show this is the lone edge settled in the negative, and explain what it tells you about where compressibility ends.
+\item \textbf{The unlabeled variant.} Bounded-size unlabeled compression exists for every VC class (\cref{def:unlabeled-compression}, \cref{thm:unlabeled-bounded}); whether it reaches the labeled $O(d)$ bound is the Kuzmin--Warmuth question, open in general and settled for maximum classes. Explain what dropping the stored labels costs, and why it leaves the size question open rather than closing it.
 
 \item \textbf{Compression as a dimension functor.} Read ``the smallest summary that reconstructs the data'' as a universal property: the optimal compression size as the minimal generating section of an evidence-functor on finite samples whose rank is the VC dimension. Discuss whether such a single dimension functor exists, unifying the size ladder, the side-information qualifier, and the alternative dimensions (recursive teaching, DS), or whether the notions are provably non-unifiable (\cref{op:dimension-functor}, \cref{op:rtd}).
 \end{enumerate}
