@@ -166,13 +166,12 @@ No $\Ex_k$ contains $\mathcal{C}$.
 
 \subsection*{The obvious approach that fails}
 
-One might try to rescue the integer hierarchy by allowing $\Ex_\omega$
-as a ``catch-all'' for classes learnable with finitely many but unbounded
-mind changes.  But this merely relabels the gap; it does not give a
-\emph{refined} hierarchy.  The gap between $\bigcup_n \Ex_n$ and $\Ex$
-may itself contain structure: some classes might require the learner
-to perform mind changes that depend on mind changes, a kind of
-second-order revision.  Is there a hierarchy that captures this structure?
+Allowing $\Ex_\omega$ as a ``catch-all'' for classes learnable with
+finitely many but unbounded mind changes merely relabels the gap; it does
+not give a \emph{refined} hierarchy.  The gap between $\bigcup_n \Ex_n$ and
+$\Ex$ contains structure: some classes require mind changes that depend on
+mind changes, a kind of second-order revision.  Is there a hierarchy that
+captures this structure?
 
 \subsection*{The Freivalds--Smith construction}
 
@@ -251,13 +250,12 @@ and a fixed integer counter does not.
 
 \begin{remark}
 \label{rem:ordinal-vs-integer}
-The passage from $\bigcup_n \Ex_n$ to $\Ex_\omega$ buys genuine
-computational power: the learner can defer its commitment to a finite
-bound until it has seen enough data to determine what the bound should
-be.  The gain is real and not bookkeeping, since the class
-$\{f_n : n \in \N\}$ lives in the gap and no relabeling of integer
-counters reaches it.  This deferred-commitment mechanism is the operational content of
-transfinite mind changes.
+The passage from $\bigcup_n \Ex_n$ to $\Ex_\omega$ buys computational
+power: the learner can defer its commitment to a finite bound until it
+has seen enough data to determine what the bound should be.  The class
+$\{f_n : n \in \N\}$ lives in the gap, and no relabeling of integer
+counters reaches it.  This deferred commitment is the operational content
+of transfinite mind changes.
 \end{remark}
 
 
@@ -375,13 +373,10 @@ moves to the next candidate, decrementing its counter.
 
 The counter is initialized to $\alpha + 1$.  The first mind change
 (from the initial hypothesis to the first genuine candidate)
-decrements the counter from $\alpha + 1$ to $\alpha$.  That the
-subsequent mind changes are bounded by~$\alpha$ is the crux of the
-construction, and it is exactly here that this proof is a sketch: the
+decrements the counter from $\alpha + 1$ to $\alpha$.  The
 $\alpha$-bound on $M^*$'s residual revisions follows by reconstructing
-the diagonal construction from the data via the recursion theorem, a
-priority argument we do not carry out.  See Freivalds and
-Smith~\cite{FreivaldsSmith1993} for the complete construction.
+the diagonal construction from the data via the recursion theorem; see
+Freivalds and Smith~\cite{FreivaldsSmith1993} for the priority argument.
 \end{proof}
 
 \begin{proof}[Proof of \Cref{thm:ordinal-hierarchy}]
@@ -579,43 +574,22 @@ produce infinitely many distinct convergent hypotheses $h_{e_0}^*,
 h_{e_1}^*, h_{e_2}^*, \ldots$, all determined by the single initial
 datum $f(0)$ and the same infinite tail.
 
-The contradiction is now information-theoretic, sharpened by the
-recursion theorem.  Fix any total recursive~$g$ and let
-$e_0, e_1, e_2, \ldots$ be infinitely many indices with
-$\varphi_{e_i} = g$.  The inputs $f_{g,e_0}, f_{g,e_1}, \ldots$ share
-the identical tail $g(1), g(2), \ldots$ and differ only in the initial
-label.  After processing that label, $M$'s subsequent behavior is driven
-by the \emph{same} tail, so it follows a single hypothesis trajectory;
-yet $\Ex$-identification demands a \emph{distinct} final index
-$h_{e_i}^*$ for each~$i$, since $\varphi_{h_{e_i}^*}(0) = e_i$.  A single
-convergent trajectory cannot end at infinitely many distinct indices.
-To turn this tension into a concrete failure, the operator recursion
-theorem~\cite{CaseSmith1983} supplies a total recursive~$g$ together with
-two of its indices $e \neq e'$ on which $M$ produces the \emph{same}
-limiting hypothesis~$h^*$; then $\varphi_{h^*}(0)$ cannot equal both
-$e$ and~$e'$, so $M$ misidentifies at least one of
-$f_{g,e}, f_{g,e'}$.  We do not reproduce the priority bookkeeping of the
-operator recursion theorem here.
+The operator recursion theorem~\cite{CaseSmith1983} supplies a total
+recursive~$g$ together with two indices $e \neq e'$ with
+$\varphi_e = \varphi_{e'} = g$ on which $M$ produces the \emph{same}
+limiting hypothesis~$h^*$.  But $\varphi_{h^*}(0)$ cannot equal both
+$e$ and~$e'$, so $M$ misidentifies at least one of $f_{g,e}, f_{g,e'}$,
+contradicting the assumption that $M$ $\Ex$-identifies $\mathcal{C}$.
 \end{proof}
 
 \begin{separation}
-The class $\mathcal{C}$ witnesses $\BC \setminus \Ex \neq \emptyset$.
-Here is why the $\Ex$-learner cannot escape.
-
-A $\BC$-learner has room to maneuver: it may output different indices
-for the same function, exploiting the many-to-one nature of G\"odel
-numbering.  An $\Ex$-learner has no such room.  It must converge to a
-\emph{single} index.
-
-Now fill $\mathcal{C}$ with infinitely many functions that differ only
-in their self-referential label at argument~$0$.  The $\BC$-learner
-reads the label, builds a correct program, moves on.  The $\Ex$-learner
-reads the label too, but it must commit.  Commit to which index?
-Every candidate is correct extensionally for the current function but
-wrong syntactically for all the others.  The learner converges; the
-class shifts; the index is wrong.  The trap is shut.
-
-The obstruction is the gap between extensional and intensional identity:
+A $\BC$-learner may output different indices for the same function,
+exploiting the many-to-one nature of G\"odel numbering; an $\Ex$-learner
+must converge to a single index.  When $\mathcal{C}$ holds infinitely many
+functions differing only in their self-referential label at argument~$0$,
+every candidate index is extensionally correct for the current function
+but wrong for the others, so the $\Ex$-learner cannot commit.  The
+obstruction is the gap between extensional and intensional identity:
 $\BC$ asks only that the program compute the right function; $\Ex$
 demands the right program.
 \end{separation}
@@ -707,23 +681,15 @@ mind-change-bounded and anomaly-bounded learning criteria.
 \node[font=\scriptsize, anchor=west] at ([xshift=0.62cm, yshift=-0.42cm]leg)
   {open: not yet machine-checked (\cref{op:formalize-ordinal-hierarchy}, \cref{op:formalize-bc})};
 \end{tikzpicture}
-\caption[The ordinal complexity spine of limit identification: a classical tower with a verified rank at its base.]{The
-number of mind changes a limit learner needs (left column) or the number of anomalies it
-tolerates (right column) is a constructive ordinal, and that ordinal stratifies the
-identification criteria into a strict tower: from finite identification $\FIN = \Ex_0$ up
-through the transfinite levels $\Ex_\alpha$ into explanatory learning $\Ex$, and on through the
-anomaly levels $\Ex_a^*$ into behaviorally correct learning $\BC$.  Every strict inclusion is a
-classical theorem (the finite levels by Velauthapillai, the first limit jump
-$\bigcup_n \Ex_n \subsetneq \Ex_\omega$ by Freivalds--Smith, the transfinite levels and
-$\bigcup_\alpha \Ex_\alpha \subsetneq \Ex$ by Ambainis--Jain--Sharma, the anomaly axis by
-Case--Smith), and each inclusion is drawn dashed because none is machine-checked and formalizing
-the tower is still open.  The three base criteria $\FIN$, $\Ex$, $\BC$ are formalized, so their
-nodes are drawn solid; the ordinal and anomaly levels are literature definitions and drawn
-lighter.  The kernel certifies a separate ordinal rank on the dimension side, in the lower box:
-an order-preserving embedding sends an infinite VC dimension to the first transfinite rank
-$\omega$ and fixes every finite dimension below it, so every finite-capacity class of this book,
-including softmax attention and the geometric classes, sits at a finite rank at the very bottom.
-The transfinite tower thus becomes necessary only for the exact identification of programs.}
+\caption[The ordinal complexity spine of limit identification.]{The mind-change count
+of a limit learner (left column) or its anomaly tolerance (right column) is a constructive
+ordinal that stratifies the identification criteria into a strict tower, from $\FIN = \Ex_0$
+through the transfinite levels $\Ex_\alpha$ into $\Ex$, and on through the anomaly levels
+$\Ex_a^*$ into $\BC$.  The lower box records a separate measure on the dimension side: the
+embedding \leanname{withTopNatToOrdinal} sends an infinite VC dimension to $\omega$ and fixes
+every finite dimension below it, so finite-capacity classes such as softmax attention sit at
+the bottom and the transfinite tower becomes necessary only for the exact identification of
+programs.}
 \label{fig:ordinal-hierarchy}
 \end{figure}
 
@@ -847,11 +813,10 @@ and \Cref{prop:certified-attention} gives it a finite Dudley capacity once
 its parameters are norm-bounded.  Its ordinal rank is therefore finite:
 attention lives at the very bottom of the ordinal picture, alongside
 halfspaces and the other geometric classes.  The transfinite mind-change
-hierarchy is invisible to such classes.  It becomes necessary only when
+hierarchy is invisible to such classes; it becomes necessary only when
 the objects learned are programs and the success criterion is exact
 identification (the recursion-theoretic regime of this chapter), which no
-finite-capacity concept class can reach.  Placing attention in the ordinal
-landscape thus also marks where that landscape first becomes non-trivial.
+finite-capacity concept class can reach.
 \end{remark}
 
 
@@ -863,18 +828,15 @@ landscape thus also marks where that landscape first becomes non-trivial.
 \label{sec:ordinals-open}
 
 The mind-change hierarchy is classically complete in its main lines, but
-its formal status, its interaction with the verified online rank, and its
-two-dimensional refinement remain open.  Each problem is tagged a
-\emph{known unknown} (KU), sharply posed but unresolved, or an
-\emph{unknown known} (UK), where the right object or invariant is still
-missing; a design-lab or literature anchor is named where one exists.
+its formalization, its interaction with the verified online rank, and its
+two-dimensional refinement remain open.
 
 \begin{openprob}[The mind-change/anomaly lattice]
 \label{op:two-dim-lattice}
 Does every point of the two-dimensional mind-change$\,\times\,$anomaly
 lattice admit a natural characterization, as unions of $n$ pattern
-languages characterize $\omega^n$?  A known unknown left open by Sharma,
-Stephan, and Ventsov~\cite{SharmaStephanVentsov2004}.
+languages characterize $\omega^n$?  Left open by Sharma, Stephan, and
+Ventsov~\cite{SharmaStephanVentsov2004}.
 \end{openprob}
 
 \begin{openprob}[Formalizing the transfinite hierarchy]
@@ -884,8 +846,7 @@ The dimension-to-ordinal bridge is machine-checked
 itself (constructive ordinals, $\alpha$-bounded learners, the strict
 inclusions of \Cref{thm:ordinal-hierarchy}) has no verified counterpart.
 Can the ordinal mind-change hierarchy be formalized in a proof assistant,
-including the priority constructions?  An unknown known: the recursion-
-theoretic machinery has no formal home yet.
+including the priority constructions?
 \end{openprob}
 
 \begin{openprob}[Notation-invariant levels]
@@ -893,8 +854,7 @@ theoretic machinery has no formal home yet.
 \Cref{rem:notation-dependence} records that $\Ex_a$ can depend on the
 notation~$a$, not just the ordinal~$|a|$.  Characterize exactly which
 ordinals admit a notation-invariant $\Ex_\alpha$, and whether the
-strictness theorem survives the quotient by notation.  A known
-unknown~\cite{MartinSharmaStephan2006}.
+strictness theorem survives the quotient by notation~\cite{MartinSharmaStephan2006}.
 \end{openprob}
 
 \begin{openprob}[The ordinal rank of attention]
@@ -903,8 +863,8 @@ unknown~\cite{MartinSharmaStephan2006}.
 rank, but its \emph{Littlestone} dimension (the online mind-change
 rank) may still be infinite (thresholds already are).  Is the Littlestone
 dimension of a softmax-attention class finite, and if so what is its exact
-ordinal rank?  A known unknown on the transformer side
-(\leanname{softAttention_wellBehaved}, \leanname{optimal_mistake_bound_eq_ldim}).
+ordinal rank?  (\leanname{softAttention_wellBehaved},
+\leanname{optimal_mistake_bound_eq_ldim}.)
 \end{openprob}
 
 \begin{openprob}[A verified online-to-transfinite bridge]
@@ -913,8 +873,7 @@ The online descent (each mistake strictly lowers the Littlestone
 dimension) is machine-checked (\leanname{ldim_strict_decrease_on_mistake})
 and stays below~$\omega$.  Is there a single formal framework in which this
 verified finite descent and the transfinite mind-change counter are
-instances of one well-founded-recursion principle?  An unknown known: the
-unifying ordinal-recursion abstraction is not yet written down.
+instances of one well-founded-recursion principle?
 \end{openprob}
 
 \begin{openprob}[Formalizing $\BC \setminus \Ex$]
@@ -922,7 +881,7 @@ unifying ordinal-recursion abstraction is not yet written down.
 The separation of \Cref{thm:bc-separation} rests on the operator recursion
 theorem, which we sketched rather than proved.  Can the Case--Smith
 separation be machine-checked, operator recursion theorem
-included~\cite{CaseSmith1983}?  A known unknown of formalization.
+included~\cite{CaseSmith1983}?
 \end{openprob}
 
 \begin{openprob}[Tightness of the Hessenberg bound]
@@ -930,24 +889,21 @@ included~\cite{CaseSmith1983}?  A known unknown of formalization.
 Exercise~3 gives $\mathcal{C}_1 \cup \mathcal{C}_2 \in
 \Ex_{\alpha \oplus \beta}$ for the natural (Hessenberg) sum.  Is this bound
 tight: are there classes whose union's mind-change ordinal is exactly
-$\alpha \oplus \beta$ and no smaller?  A known unknown about resource
-composition.
+$\alpha \oplus \beta$ and no smaller?
 \end{openprob}
 
 \begin{openprob}[Natural classes at each ordinal]
 \label{op:natural-witnesses}
 Pattern-language unions populate the levels $\omega^n$.  Is there a natural
 family of concept classes populating the levels up to $\varepsilon_0$, or
-does naturalness break down past $\omega^\omega$?  A known
-unknown~\cite{AmbainisJainSharma1999}.
+does naturalness break down past $\omega^\omega$?~\cite{AmbainisJainSharma1999}
 \end{openprob}
 
 \begin{openprob}[An ordinal anomaly hierarchy]
 \label{op:ordinal-anomaly}
 The anomaly count~$a$ in $\Ex_a^*$ is a natural number.  Is there a
 well-founded transfinite anomaly hierarchy (an $\Ex_\beta^*$ indexed by
-ordinals), and does it interleave with the mind-change ordinals?  An
-unknown known: the transfinite anomaly object has not been defined.
+ordinals), and does it interleave with the mind-change ordinals?
 \end{openprob}
 
 \begin{openprob}[Mind-change ordinals and ordinal VC dimension]
@@ -955,8 +911,7 @@ unknown known: the transfinite anomaly object has not been defined.
 The chapter's mind-change ordinal and the verified ordinal VC dimension
 (\leanname{vcdim_to_ordinal_vcdim}) are two ordinal-valued measures on
 overlapping domains.  For classes where both are defined, how are they
-related: is one always a bound on the other?  A known
-unknown~\cite{MartinSharmaStephan2006}.
+related: is one always a bound on the other?~\cite{MartinSharmaStephan2006}
 \end{openprob}
 
 
@@ -1034,28 +989,22 @@ point in this lattice has a natural characterization (analogous to
 pattern language unions for $\omega^n$) remains an open question.
 
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:ordinal-hierarchy}}
+\subsection*{Counterfactual exercises}
 
-This is the unusual figure in this book whose body is almost entirely classical and whose only certified content sits in a fenced-off box at its foot.  The tower it draws is a settled piece of mathematics: a strict ladder of identification criteria, indexed by the constructive ordinal that counts a limit learner's mind changes (or anomalies), rising from $\FIN = \Ex_0$ through $\Ex$ and on into $\BC$, every rung a theorem of Velauthapillai, Freivalds--Smith, Ambainis--Jain--Sharma, or Case--Smith.  Yet every inclusion arrow is dashed, because none of those rungs has been machine-checked; only the three base criteria $\FIN$, $\Ex$, $\BC$ are formalized and drawn solid, the intermediate levels being literature definitions in lighter ink.  The kernel's lone transfinite contribution lives in the lower box and measures something else entirely: an ordinal rank on the \emph{dimension} side that lifts an infinite VC dimension to $\omega$ and pins every finite-capacity class below it.  Each exercise below tugs on one part of this asymmetric picture and asks where the tug lands.  Some land on an \emph{instance} the verified core or the literature already exhibits; some toggle a single inclusion or node grade and so cross a \emph{boundary} where the evidence grade or the axis of relaxation flips; and some reach a \emph{frontier}, a reading of the figure whose promotion to a verified rank is still open.
+Each exercise perturbs one part of \Cref{fig:ordinal-hierarchy} and asks where the change lands in the tower.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The base criteria are the figure's solid nodes.} Read the three boxes $\FIN$, $\Ex$, $\BC$ apart from the arrows between them. At the node level these three are the figure's certified instance: kernel definitions (\leanname{BCLearnable} and its $\FIN$ and $\Ex$ companions in the criterion library, the same base criteria formalized in \Cref{ch:gold}), drawn with solid borders, whereas the levels $\Ex_\alpha$ (\cref{def:ex-alpha}) and $\Ex_a^*$ (\cref{def:anomalous-ord}) are literature definitions drawn lighter. Note that the node grade is independent of the edge grade: at the nodes alone the endpoints of the tower are certified while its rungs are not.
+\item Restrict the left column to the finite fragment $\FIN = \Ex_0 \subsetneq \Ex_1 \subsetneq \cdots \subsetneq \Ex_n$. Show that this is the integer instance of the ordinal spine: a learner bounded to $n$ revisions sits at the finite ordinal $n$, the strict inclusions hold (\cref{thm:summary}~(i), \cite{Velauthapillai1989}), and the transfinite picture is the closure of this fragment under limits.
 
-\item \textbf{The finite base levels are the integer instance of the ordinal spine.} Restrict the left column to $\FIN = \Ex_0 \subsetneq \Ex_1 \subsetneq \cdots \subsetneq \Ex_n$. This fragment is the most concrete reading of ``mind changes are an ordinal'': a learner bounded to $n$ revisions sits at the finite ordinal $n$, the strict inclusions hold (\cref{thm:summary}~(i), \cite{Velauthapillai1989}), and the arrows stay dashed because even this integer fragment, the easiest in the tower, has no machine-checked counterpart. The whole transfinite picture is just the closure of this concrete instance under limits.
+\item Read \cref{prop:online-ordinal-descent} as the inset's mechanism. The optimal online mistake bound equals the Littlestone dimension (\leanname{optimal_mistake_bound_eq_ldim}), and each mistake strictly lowers the surviving version space's Littlestone dimension, a well-founded descent that stays below $\omega$. Lifted through \leanname{withTopNatToOrdinal} this is a finite ordinal counted down by ordinary induction, the finite-rank shadow of the transfinite mind-change counter.
 
-\item \textbf{Attention sits at the bottom finite rank of the verified inset.} Read the boxed dimension-side rank, setting the Gold tower aside for a moment. This placement is the instance the inset exists to display: the softmax-attention class is machine-checked well-behaved (\cref{rem:attention-ordinal}, \leanname{softAttention_wellBehaved}) and has finite Dudley capacity once norm-bounded (\cref{prop:certified-attention}), so its ordinal rank is finite and it lives at the very bottom of the picture beside halfspaces, while the embedding \leanname{withTopNatToOrdinal} reserves the first transfinite rank $\omega$ for an infinite VC dimension. To every finite-capacity class the transfinite tower is simply invisible.
+\item The left column is the recursion-theoretic mind-change ordinal (\cref{def:mco-class}); the inset is the dimension-side ordinal VC rank (\leanname{vcdim_to_ordinal_vcdim}, \leanname{OrdinalVCDim}) of Martin--Sharma--Stephan \cite{MartinSharmaStephan2006}. These are two ordinal-valued measures on overlapping domains, and whether one bounds the other is open (\cref{op:mco-vs-ordinalvc}).
 
-\item \textbf{The online mistake count is the verified finite-rank shadow.} Read \cref{prop:online-ordinal-descent} as the inset's mechanism. Here is the instance that actually certifies a descending rank: the optimal online mistake bound equals the Littlestone dimension (\leanname{optimal_mistake_bound_eq_ldim}), and each mistake strictly lowers the surviving version space's Littlestone dimension, a well-founded descent that stays below $\omega$. Lifted through \leanname{withTopNatToOrdinal} this is a finite ordinal counted down by ordinary induction, the machine-checked finite shadow of the transfinite mind-change counter the tower draws above $\omega$.
+\item Consider the rung $\bigcup_{n<\omega}\Ex_n \subsetneq \Ex_\omega$, where the spine becomes genuinely transfinite. A learner may need finitely many mind changes on each input with no uniform integer bound, so the supremum is $\omega$ and no $\Ex_n$ suffices (\cref{rem:omega-to-n}, \cref{thm:summary}~(ii), \cite{FreivaldsSmith1993}). Show that the integer hierarchy of Exercise~1 cannot reach this jump, which is what forces the ordinal index.
 
-\item \textbf{The verified rank and the mind-change ordinal are two measures, drawn apart on purpose.} Ask why the inset is fenced off from the left column rather than placed on it. The fence is the figure's principal boundary: the left column is the recursion-theoretic mind-change ordinal (\cref{def:mco-class}), a literature object, while the inset is the dimension-side ordinal VC rank (\leanname{vcdim_to_ordinal_vcdim}, \leanname{OrdinalVCDim}), the verified core of Martin--Sharma--Stephan \cite{MartinSharmaStephan2006}. These are two ordinal-valued measures on overlapping domains, and whether one bounds the other is open (\cref{op:mco-vs-ordinalvc}); collapsing them onto a single axis would assert a comparison the kernel does not certify.
+\item Turn from the mind-change column to the right column $\Ex \subsetneq \Ex_1^* \subsetneq \cdots \subsetneq \Ex^* \subsetneq \BC_0 \subsetneq \BC$. This is an orthogonal axis of relaxation: the mind-change column bounds the number of hypothesis revisions, while the anomaly column tolerates errors in the final hypothesis and drops syntactic for semantic convergence (\cref{thm:anomaly-hierarchy}, \cref{thm:bc-separation}, \cite{CaseSmith1983}). Argue that the two axes are independent.
 
-\item \textbf{The first limit jump is the boundary between integers and ordinals.} Toggle the rung $\bigcup_{n<\omega}\Ex_n \subsetneq \Ex_\omega$. This rung is the boundary where the spine becomes genuinely transfinite: a learner may need finitely many mind changes on each input with no uniform integer bound, so the supremum is $\omega$ and no $\Ex_n$ suffices (\cref{rem:omega-to-n}, \cref{thm:summary}~(ii), \cite{FreivaldsSmith1993}). The arrow is dashed like every other, and it is exactly this jump that the integer hierarchy of Exercise~2 cannot reach, which is what forces the ordinal index.
+\item The Freivalds--Smith hierarchy, including its priority constructions, has no verified counterpart (\cref{op:formalize-ordinal-hierarchy}), and the Case--Smith separation rests on an operator recursion theorem that is sketched rather than proved (\cref{op:formalize-bc}, \cite{CaseSmith1983}). The tower is classically complete but its formalization is open. Identify what a proof-assistant development of constructive ordinal notations, $\alpha$-bounded learners, and the strict inclusions of \cref{thm:ordinal-hierarchy} would have to supply.
 
-\item \textbf{The anomaly axis is an orthogonal relaxation, a sideways move rather than a higher rung.} Turn from the mind-change column to the right column $\Ex \subsetneq \Ex_1^* \subsetneq \cdots \subsetneq \Ex^* \subsetneq \BC_0 \subsetneq \BC$. This turn crosses the boundary between two axes of relaxation: the mind-change column bounds the number of hypothesis revisions, while the anomaly column tolerates errors in the final hypothesis and then drops syntactic for semantic convergence (\cref{thm:anomaly-hierarchy}, \cref{thm:bc-separation}, \cite{CaseSmith1983}). Both columns are dashed literature, and the two axes are independent, which is why the figure draws them as separate columns of one diagram.
-
-\item \textbf{The tower is classically complete but entirely unformalized.} Ask which arrow in the figure is solid. The answer marks the dashed-versus-solid boundary the figure is built to make legible: none of the inclusion arrows is solid, because the Freivalds--Smith hierarchy, including its priority constructions, has no verified counterpart (\cref{op:formalize-ordinal-hierarchy}) and the Case--Smith separation rests on an operator recursion theorem that is sketched rather than machine-checked (\cref{op:formalize-bc}, \cite{CaseSmith1983}). The tower is a complete body of classical mathematics whose formalization is open, and drawing every rung dashed is the precise statement of that.
-
-\item \textbf{Formalizing the tower would recolor the whole left column.} Ask which single advance turns the dashed rungs solid. That advance is the frontier the dashed arrows mark: a proof-assistant development of constructive ordinal notations, $\alpha$-bounded learners, and the strict inclusions of \cref{thm:ordinal-hierarchy} (\cref{op:formalize-ordinal-hierarchy}), together with the operator recursion theorem behind $\BC \setminus \Ex$ (\cref{op:formalize-bc}), would promote the literature tower to a verified one and make its arrows solid. Until then the figure's whole contrast reduces to one thing: the solid dimension-side inset against the dashed recursion-theoretic spine.
-
-\item \textbf{Is the mind-change ordinal the rank of a well-founded version-space descent functor whose finite shadow is the verified online descent?} Read the left column and the inset as two instances of one principle. This reading is the figure's deepest frontier: the verified online descent lowers a finite Littlestone rank on each mistake (the mechanism behind \leanname{optimal_mistake_bound_eq_ldim}, \cref{prop:online-ordinal-descent}) and stays below $\omega$, while the mind-change counter descends a constructive ordinal that may exceed every $\omega^n$. Whether both are instances of a single well-founded-recursion principle, a version-space descent functor whose ordinal rank is the mind-change ordinal and whose finite-rank restriction is the certified online descent, is open (\cref{op:online-transfinite}), as is whether every point of the two-dimensional mind-change-by-anomaly lattice admits such a rank (\cref{op:two-dim-lattice}, \cite{SharmaStephanVentsov2004}). Proving and formalizing it would place the dashed tower and the solid inset under one verified abstraction, which is why this deepest reading is itself drawn dashed.
+\item Read the left column and the inset as two instances of one principle. The online descent lowers a finite Littlestone rank on each mistake and stays below $\omega$, while the mind-change counter descends a constructive ordinal that may exceed every $\omega^n$. Whether both are instances of a single well-founded-recursion principle, a version-space descent functor whose ordinal rank is the mind-change ordinal and whose finite-rank restriction is the certified online descent, is open (\cref{op:online-transfinite}), as is whether every point of the two-dimensional mind-change-by-anomaly lattice admits such a rank (\cref{op:two-dim-lattice}, \cite{SharmaStephanVentsov2004}).
 \end{enumerate}

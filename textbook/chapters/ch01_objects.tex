@@ -13,7 +13,7 @@ Every learning problem begins with the same question: given data drawn from an u
 
 The vocabulary divides into three groups of unequal importance. The first group, domain, label, concept, hypothesis, is atomic: these are the sets and functions from which everything else is built. They require only brief definitions. The second group, concept class, hypothesis space, version space, inductive bias, carries genuine mathematical content, because the relationships between these objects determine what is learnable; we prove the load-bearing facts in full. The third group, Bayesian inference, minimum description length, minimum message length, appears to be vocabulary but is actually a network of near-miss analogies, each encoding a different answer to the same question about model selection.
 
-Every typed object in this chapter has a counterpart in a machine-checked Lean~4 development, and every theorem whose proof we give is mirrored there. Where a result has a verified companion we name it in a footnote; where one does not exist, we cite the literature instead.
+Every typed object in this chapter has a machine-checked counterpart, named where one exists.
 
 \section{Atomic Vocabulary}
 \label{sec:atoms}
@@ -44,7 +44,7 @@ An \emph{alphabet} $\Sigma$ is a finite symbol set; it appears only in the forma
 These definitions are unremarkable individually. The mathematical content begins when we ask how they compose.
 
 % ================================================================
-% CONCEPT CLASS: Hub Node — Profile G (Framework Bridge)
+% CONCEPT CLASS: Hub Node, Profile G (Framework Bridge)
 % Centerpiece: the node everything measures
 % ================================================================
 
@@ -116,7 +116,7 @@ This definition is simple. Its importance is not. The concept class is the singl
   \textcolor{edgeorange!85!black}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~literature / open \quad
   \textcolor{onlineblue!75!black}{\rule[0.45ex]{0.5cm}{0.8pt}}~strict one-way};
 \end{tikzpicture}
-\caption[The concept class as the vertex of an equivalence]{\textbf{The concept class as the vertex of an equivalence.} Several apparently different demands one might place on a class of concepts (learnability from few examples; finite shattering; reconstructibility of every consistent labelling from a bounded subsample with a little side information; vanishing correlation with random noise; sub-exponential growth of its labellings; a finite sufficient sample) are one property wearing several faces, and the class is the one object on which they coincide. The figure draws that coincidence as a wheel whose hub is the dimension counting shatterable points and whose spokes are two-way bridges, each checked in full by a proof assistant; the wheel as a whole is one assembled theorem, so the picture is the abstract shape those machine-checked equivalences instantiate. A tighter wheel sits inside, online learning with mistakes counted as they occur, joined by a single one-way bridge, since the online demand implies the statistical one but not conversely. The wheel rests on a measurability gate that a smoothed attention head passes but a hard, argmax-routed one does not; and a dashed frontier marks the same coincidence expected but not yet verified here (many-valued labels, agnostic learning, compression without side information), with one edge known to break for partial concepts, where finite dimension and learnability come apart.}
+\caption[The concept class as the vertex of an equivalence]{\textbf{The concept class as the vertex of an equivalence.} Several demands on a class of concepts (PAC learnability, finite shattering, bounded compression, vanishing Rademacher correlation, sub-exponential growth, finite sample complexity) are one property wearing several faces, and the class is the object on which they coincide. A tighter wheel for online learning sits inside, joined by a one-way bridge since the online demand implies the statistical one but not conversely; the whole rests on a measurability gate, and a dashed frontier marks coincidences expected but not yet verified, with the edge for partial concepts known to break.}
 \label{fig:concept-class-hub}
 \end{figure}
 
@@ -130,7 +130,7 @@ Each measure asks a different question about the same object:
 \item \textbf{Rademacher complexity} asks: how well can $\mathcal{C}$ correlate with random noise? (Controls generalization bounds.)
 \end{itemize}
 
-These 13 measures are not independent. Many of them are related by \rel{upper\_bounds}, \rel{lower\_bounds}, and \rel{characterizes} edges in the graph. But none of them is reducible to another. Each captures a genuine aspect of $\mathcal{C}$'s complexity that the others miss. The fact that a single mathematical object (a set of functions) supports 13 inequivalent complexity measures is one of the structural surprises of the field.
+These 13 measures are not independent: many are related by \rel{upper\_bounds}, \rel{lower\_bounds}, and \rel{characterizes} edges in the graph. But none is reducible to another; each captures an aspect of $\mathcal{C}$'s complexity the others miss. That a single set of functions supports 13 inequivalent complexity measures is one of the structural surprises of the field.
 
 A single theorem is what installs the concept class as the hub, in the place a paradigm or a measure might naively be expected to occupy. To state it we need the first of the measures.
 
@@ -235,10 +235,10 @@ Given a hypothesis space $\mathcal{H}$ and a sample $S = \{(x_i, y_i)\}_{i=1}^m$
 \[
 \mathrm{VS}_{\mathcal{H},S} = \{h \in \mathcal{H} : h(x_i) = y_i \text{ for all } i\},
 \]
-the set of hypotheses consistent with all observed data.\formal{FLT_Proofs.Complexity.GameInfra.versionSpace} The verified development carries both this operational form and a bundled structure $\leanname{VersionSpace}$ packaging $\mathcal{H}$, the data, and the consistency proof obligations together.\formal{FLT_Proofs.Basic.VersionSpace}
+the set of hypotheses consistent with all observed data.\formal{FLT_Proofs.Complexity.GameInfra.versionSpace} The verified development carries a bundled $\leanname{VersionSpace}$ structure packaging $\mathcal{H}$, the data, and the consistency obligations.\formal{FLT_Proofs.Basic.VersionSpace}
 \end{defn}
 
-Version-space elimination (returning any element of $\mathrm{VS}_{\mathcal{H},S}$) is perhaps the most natural learning algorithm imaginable. Its basic behavior is captured by four propositions, each a one-line consequence of the definition, and each the prototype for the convergence arguments of \Cref{ch:gold}.
+Version-space elimination (returning any element of $\mathrm{VS}_{\mathcal{H},S}$) is among the most natural learning algorithms. Its basic behavior is captured by four propositions, each a one-line consequence of the definition and each a prototype for the convergence arguments of \Cref{ch:gold}.
 
 \begin{prop}[Soundness, persistence, and monotonicity of the version space]
 \label{prop:version-space}
@@ -448,7 +448,7 @@ These three methods are usually treated as one idea. The deeper structure, made 
   \textcolor{edgeorange!85!black}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~literature \quad
   \textcolor{thmred!75!black}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~open};
 \end{tikzpicture}
-\caption[The compression core of model selection]{\textbf{The compression core of model selection.} Three principles for preferring a simpler hypothesis (Bayesian inference, minimum description length, minimum message length) are usually treated as one idea. This figure separates them around the single structural fact the chapter actually proves: a class can be learned exactly when its data admit a bounded summary that reconstructs every consistent labelling from a short list of the examples together with a finite tag. That equivalence between learnability and bounded compression is the spine, drawn as a machine-checked two-way relationship. The three principles hang off it as approximations, each a way of scoring simplicity. Exactly two of the surrounding links rise to theorems, and the figure draws those two solid: the bound tying a prior-weighted complexity to generalization, and the quantitative limit a tag-free summary already forces on a class. Every link among the three principles is dashed, because the verified library contains no proof of their equivalence and the figure does not pretend otherwise. One qualification stays visible: the proven equivalence permits a finite auxiliary tag, and whether that tag can always be removed while keeping the summary short is open, shown as a dashed frontier.}
+\caption[The compression core of model selection]{\textbf{The compression core of model selection.} Bayesian inference, minimum description length, and minimum message length are usually treated as one idea. The figure separates them around the fact the chapter proves: a class is learnable exactly when its data admit a bounded summary reconstructing every consistent labelling. That equivalence is the spine; the three principles hang off it as approximations, with every link among them unproven. Whether the auxiliary tag can be removed while keeping the summary short is open (\cref{op:compression-objects}).}
 \label{fig:model-selection-triangle}
 \end{figure}
 
@@ -468,7 +468,7 @@ These three methods are usually treated as one idea. The deeper structure, made 
 
 That three different formalizations of ``prefer the simpler hypothesis'' are \emph{not} equivalent, and that the reasons for non-equivalence are themselves different (missing witness, missing witness, and type mismatch), is a structural feature of learning theory that no single definition can convey. It is visible only in the graph.
 
-One bridge across this network is an actual theorem. The preference score of a Bayesian or MDL learner does control generalization, through the PAC-Bayes bound: for any prior fixed before seeing the data and any posterior, the expected risk is bounded by the empirical risk plus a complexity term governed by the $\KL$ divergence from prior to posterior~\cite{McAllester1999}. The bound is proved for finite hypothesis spaces in the verified development.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite} The obstruction boxes concern the three \emph{procedures}, which are not interchangeable; PAC-Bayes concerns the \emph{quantity} they share, a prior-weighted complexity, and shows it bounds error.
+One bridge across this network is an actual theorem. The preference score of a Bayesian or MDL learner controls generalization through the PAC-Bayes bound: for any prior fixed before seeing the data and any posterior, the expected risk is bounded by the empirical risk plus a complexity term governed by the $\KL$ divergence from prior to posterior~\cite{McAllester1999}, proved here for finite hypothesis spaces.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite} The obstruction boxes concern the three \emph{procedures}, which are not interchangeable; PAC-Bayes concerns the \emph{quantity} they share, a prior-weighted complexity, and shows it bounds error.
 
 \subsection{Compression, Occam, and the Fundamental Theorem}
 
@@ -482,7 +482,7 @@ A concept class has finite VC dimension if and only if it admits a sample compre
 \]\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression}
 \end{thm}
 
-We prove this in \Cref{ch:compression}; here it closes the circle. Through \cref{thm:vc-char,thm:compression-char}, ``prefer the hypothesis that compresses'' and ``prefer the learnable hypothesis'' are the same condition on the class. The qualification ``with side information'' carries weight: whether every class of VC dimension $d$ admits a compression scheme of size $O(d)$ \emph{without} side information is the Littlestone--Warmuth conjecture, still open, and isolated as such in the verified development (\cref{op:compression-objects}).\formal{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening}
+We prove this in \Cref{ch:compression}; here it closes the circle. Through \cref{thm:vc-char,thm:compression-char}, ``prefer the hypothesis that compresses'' and ``prefer the learnable hypothesis'' are the same condition on the class. The qualification ``with side information'' carries weight: whether every class of VC dimension $d$ admits a compression scheme of size $O(d)$ \emph{without} side information is the Littlestone--Warmuth conjecture, still open (\cref{op:compression-objects}).\formal{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening}
 
 \subsection{Structural Risk Minimization}
 
@@ -525,7 +525,7 @@ These patterns recur throughout the book: hub nodes, negative results as content
 \section{The Objects of a Transformer}
 \label{sec:ch1-transformer}
 
-The vocabulary of this chapter is not confined to the classical examples. A single softmax-attention head, read as a binary predictor, is a concept in the exact sense of \cref{def:domain-label-concept}, a function $X \to \{0,1\}$, and letting its parameters vary produces a concept class in the sense of \cref{def:concept-class}. The question the chapter has asked of every object now returns with a sharp answer for the central object of modern machine learning: \emph{is the attention class a legitimate concept class, one to which the VC characterization applies?} Answering it requires exactly the measurability that \cref{thm:vc-char} deferred to \Cref{ch:generalization}, and that is where this section earns its place: it is the first point in the book where those ``mild measurability conditions'' are made concrete, and shown to be non-vacuous.
+The vocabulary of this chapter is not confined to the classical examples. A single softmax-attention head, read as a binary predictor, is a concept in the sense of \cref{def:domain-label-concept}, a function $X \to \{0,1\}$, and letting its parameters vary produces a concept class in the sense of \cref{def:concept-class}. The question returns with a sharp answer for the central object of modern machine learning: \emph{is the attention class a legitimate concept class, one to which the VC characterization applies?} Answering it requires exactly the measurability that \cref{thm:vc-char} deferred to \Cref{ch:generalization}; this section makes those ``mild measurability conditions'' concrete and shows them non-vacuous.
 
 \begin{defn}[The softmax-attention concept class]
 \label{def:attention-concept-class}
@@ -536,7 +536,7 @@ Fix an embedding dimension $d$ and a context of $n_K$ key--value pairs.  Take th
 The \emph{softmax-attention concept class} is $\mathcal{A}_{d,n_K} = \{\, c_{K,V} : K, V \,\}$, the range of the parametrized family.\formal{TLT.Bridge.softAttentionConcept}
 \end{defn}
 
-So far this is only a particular concept class among many.  Its first non-trivial property is that it is a \emph{well-behaved} object: the measurability hypothesis that \cref{thm:vc-char} quietly assumes is satisfied, machine-checked.
+So far this is only a particular concept class among many. Its first non-trivial property is that it is a \emph{well-behaved} object: the measurability hypothesis that \cref{thm:vc-char} assumes is satisfied.
 
 \begin{prop}[Attention is a well-behaved object]
 \label{prop:attention-wellbehaved}
@@ -566,7 +566,7 @@ The first conjunct is \cref{prop:attention-wellbehaved}.  For the second, replac
 \section{Exercises and Open Problems}
 \label{sec:ch1-open}
 
-The following thirteen problems are research-grade. Each is anchored to a concept introduced above and tagged by its epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated question awaiting an answer; an \emph{unknown known} (\textsc{uk}) is a regularity present in the verified development or the literature that the surrounding theory has not yet absorbed into a clean statement. Where a verified handle exists, it is named.
+The following thirteen problems are research-grade, each anchored to a concept introduced above and tagged by its epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated question awaiting an answer; an \emph{unknown known} (\textsc{uk}) is a regularity in the development or literature not yet absorbed into a clean statement.
 
 \begin{openprob}[Sample compression conjecture, \textsc{ku}]
 \label{op:compression-objects}
@@ -633,36 +633,18 @@ The coding theorem $K(x) = -\log M(x) + O(1)$ (\cref{def:alg-prob}) hides an add
 \Cref{fig:concept-class-hub} measures the concept class with thirteen instruments.  Compute, for the softmax-attention class, the values of as many of them as possible (VC dimension, Littlestone dimension, Rademacher complexity, compression size) and determine which instruments agree and which diverge on this single modern object.  The well-behavedness of \cref{prop:attention-wellbehaved} guarantees the measures are defined; whether attention is a place where they coincide or a place where they pull apart is open.
 \end{openprob}
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:concept-class-hub}}
+\subsection*{Counterfactual exercises}
 
-The wheel of \Cref{fig:concept-class-hub} claims that the listed conditions coincide, and most of its spokes are machine-checked. Each exercise below nudges the claim sideways and asks where the nudged version lands. Three landing zones recur: a perturbation that stays on a verified face or spoke is an \emph{instance}; one that comes to rest on the measurability gate is a \emph{boundary}; one that ends on a dashed, still-unverified edge is a \emph{frontier}. For each, identify the zone and name the verified handle or literature result that pins it there. The interest lies in how few of these land back on solid ground.
-
-\begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{Infinite label space.} Let the labels range over many classes, so the hub measure becomes the DS dimension and the criterion becomes multiclass PAC learnability. This lands on the frontier: the kernel carries the Natarajan and strong-shattering definitions and the inequality \leanname{strongShatteringDim_le_NatarajanDim}, but it stops short of the Brukhim et al.\ (2022) equivalence, leaving the edge dashed.
-\item \textbf{Real-valued labels.} Replace shattering by $\gamma$-shattering at a scale. The wheel keeps its shape once the shattering relation is re-parametrized by scale, while the proof status lags behind: pseudodimension and fat-shattering are defined in the kernel yet carry no equivalence theorem, so they sit on the dashed frontier (Alon--Ben-David--Cesa-Bianchi--Haussler 1997).
-\item \textbf{Improper learner.} Let the learner output hypotheses outside the class. The wheel is invariant here: the hub reads the VC dimension of the \emph{target} class alone, so the learner's enlarged hypothesis space is a quantity the loop never consults; the perturbation only shifts cost, a satellite of the diagram.
-\item \textbf{Learnable without uniform convergence.} Inside the verified wheel this cannot happen, since uniform convergence and learnability are one face (\leanname{uc_imp_pac}, \leanname{vcdim_finite_imp_uc'}). The counterfactual is the very act of stepping off the loop, out into the partial-concept or improper-agnostic region where the two come apart.
-\item \textbf{Online learnability.} This is the nested inner wheel (\leanname{littlestone_characterization}), joined to the outer one by the single one-way bridge \leanname{online_strictly_stronger_pac}: the online demand implies the statistical one, and the implication runs in that direction only, with threshold rules standing at the gap.
-\item \textbf{Label noise.} Drop realizability and measure success against the best rule in the class. This sits on a frontier face: \leanname{AgnosticPACLearnable} is defined in the kernel but carries no equivalence theorem, so the classical agnostic characterization (Vapnik 1998) enters by citation alone and awaits a verified companion.
-\item \textbf{Partial concepts.} Allow partially-defined concepts. This is the one frontier edge that actually \emph{breaks}: there are partial classes learnable with infinite VC dimension (Alon--Hanneke--Holzman--Moran 2021), so the VC-to-learnability face fails outright and the figure must mark its own central edge as false here.
-\item \textbf{Drop measurability.} Remove the well-behavedness side-condition. This swings the gate open: there is a class, a hard argmax-routed attention head, whose failure event escapes measurability (\leanname{soft_vs_hard_attention_measurabilitySeparation}), so uniform convergence cannot even be stated and the wheel dissolves.
-\item \textbf{Compression without side information.} Demand a scheme of size linear in the dimension with no side bits. This traces the open dashed edge running parallel to the verified with-information compression face: the Littlestone--Warmuth conjecture, isolated as \leanname{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening} and still unproven.
-\item \textbf{Constructive necessity.} Ask the necessity direction to exhibit an explicit hard distribution. This perturbs an edge's \emph{character} while leaving the node set fixed: the sufficiency spokes are constructive (they build an empirical risk minimizer), the necessity spoke is existential, and whether it can be made constructive is open.
-\end{enumerate}
-
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:model-selection-triangle}}
-
-\Cref{fig:model-selection-triangle} has a single load-bearing element: the compression-to-VC spine, the one part of the picture that is actually proved. The three model-selection principles hang off it as approximations, and side information runs as an explicit axis beside it. Each exercise below disturbs some part of that arrangement; the task is to say where the disturbance settles. A perturbation that comes to rest on a node or a solid edge is an \emph{instance}; one caught by the size bound or the realizability guard is a \emph{boundary}; one that ends on a dashed or open edge is a \emph{frontier}. Note throughout how robust the spine is and how fragile the three principles around it remain.
+Each exercise perturbs the wheel of \Cref{fig:concept-class-hub} or the compression spine of \Cref{fig:model-selection-triangle} and asks where the perturbed claim lands. State for each whether the listed conditions still coincide, and name the result that settles it.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{Unbounded description length.} Remove the size bound on the summary. This is a boundary case: the spine's left node is \emph{bounded} compression, and releasing the bound makes every class trivially compressible, so the equivalence fails exactly there. The guard that catches it is the size field of \leanname{CompressionScheme}.
-\item \textbf{Two-part versus one-part codes.} Compare a transmit-then-correct code with a single mixture code. Both reduce to the same instance of the side-information node: the side tag is precisely the part-selector, so the part count stays invisible to the spine (\leanname{CompressionSchemeWithInfo}).
-\item \textbf{Non-computable prior.} Replace the prior by one that is not lower-semicomputable. This breaks the Bayesian instance edge (\leanname{bayesianToBatch}) alone while leaving the spine intact, since the spine never mentions a prior; it is a frontier perturbation confined to one approximation, with the verified core untouched.
-\item \textbf{PAC-Bayes as the bridge.} This is the one solid cross-edge in the figure: \leanname{pac_bayes_finite} bounds the Gibbs risk by empirical risk plus a prior-weighted complexity term, so the shared quantity the three principles confuse is itself a theorem about generalization.
-\item \textbf{Kolmogorov and Solomonoff limit.} Send description length to Kolmogorov complexity and the prior to the universal distribution. This belongs to the frontier: both objects are defined (\leanname{KolmogorovComplexity}, \leanname{AlgorithmicProbability}) but the coding theorem fusing them is unproven, so the ideal-MDL-equals-ideal-Bayes identity stays a dashed limit the instance edges approach without reaching.
-\item \textbf{Improper learner.} Let the reconstructed hypothesis lie outside the class. The spine is invariant: the scheme reconstructs an arbitrary labelling function, with no membership requirement on the output, so improperness changes nothing in the equivalence.
-\item \textbf{No-side-information $O(d)$ compression.} Demand a summary of size linear in the dimension with no tag. This is the open frontier edge: the reverse direction (a tag-free summary already forces finite VC) is verified (\leanname{compression_bounds_vcdim}), while the forward strengthening is the Littlestone--Warmuth conjecture (\leanname{FLT_Proofs.Complexity.Structures.Open_NoInfoCompressionStrengthening}); this asymmetry is the very reason the side-information axis is drawn.
-\item \textbf{Agnostic model selection.} Drop realizability. This is the boundary at which the scheme's realizability guard is released, carrying the picture off the verified realizable spine and into agnostic theory.
-\item \textbf{Structural risk minimization.} Choose a nested hierarchy and let the data pick the level. This is the operational instance that realizes the spine's finite-VC restriction constructively (\leanname{SRM}), though no SRM-optimality theorem is yet formalized.
-\item \textbf{Bias and variance.} Re-read the whole figure as a bias-variance tradeoff. This is a relabeling of the existing nodes with no node added: the spine's complexity side is the variance-controlling quantity, and PAC-Bayes exhibits the tradeoff explicitly as fit plus complexity.
+\item \textbf{Infinite label space.} Let labels range over many classes, so the hub measure becomes the DS dimension and the criterion multiclass PAC learnability. Show that finiteness of the Natarajan dimension no longer suffices, and that the characterizing quantity is the DS dimension: a class is multiclass PAC learnable iff its DS dimension is finite (Brukhim et al., 2022).
+\item \textbf{Online learnability.} This is the nested inner wheel (\leanname{littlestone_characterization}), joined to the outer one by a one-way bridge \leanname{online_strictly_stronger_pac}: the online demand implies the statistical one and not conversely, with threshold rules standing at the gap.
+\item \textbf{Label noise.} Drop realizability and measure success against the best rule in the class. \leanname{AgnosticPACLearnable} is defined but carries no equivalence theorem, so the classical agnostic characterization (Vapnik 1998) enters by citation.
+\item \textbf{Partial concepts.} Allow partially-defined concepts. Here the central edge \emph{breaks}: there are partial classes learnable with infinite VC dimension (Alon--Hanneke--Holzman--Moran 2021), so the VC-to-learnability face fails outright.
+\item \textbf{Drop measurability.} Remove the well-behavedness side-condition. A hard argmax-routed attention head has a failure event that escapes measurability (\leanname{soft_vs_hard_attention_measurabilitySeparation}), so uniform convergence cannot even be stated.
+\item \textbf{Constructive necessity.} Ask the necessity direction to exhibit an explicit hard distribution. The sufficiency direction builds an empirical risk minimizer; the necessity direction is existential, and whether it can be made constructive is open (\cref{op:asymmetry}).
+\item \textbf{Non-computable prior.} Replace the prior by one that is not lower-semicomputable. This breaks the Bayesian approximation edge (\leanname{bayesianToBatch}) while leaving the compression spine intact, since the spine never mentions a prior.
+\item \textbf{Compression without side information.} Demand a summary of size linear in the dimension with no tag. The reverse direction is verified (\leanname{compression_bounds_vcdim}); the forward strengthening is the open Littlestone--Warmuth conjecture (\cref{op:compression-objects}).
+\item \textbf{PAC-Bayes bridge.} \leanname{pac_bayes_finite} bounds the Gibbs risk by empirical risk plus a prior-weighted complexity term, so the quantity the three model-selection principles share is itself a generalization theorem.
 \end{enumerate}

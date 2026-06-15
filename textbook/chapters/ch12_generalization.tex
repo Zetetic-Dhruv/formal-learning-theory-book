@@ -253,7 +253,7 @@ convergence bound gives: with probability $\geq 1 - \delta$,
   \leq \sqrt{\frac{8(d+1)\log(2em/(d+1)) + 8\log(4/\delta)}{m}}.
 \]
 For $d = 10$ and $m = 10{,}000$, this gives a bound of approximately
-$0.12$, a nontrivial and meaningful result.  For a two-layer neural network
+$0.12$, a meaningful result.  For a two-layer neural network
 with $p = 10^6$ parameters (where naive VC bounds give
 $\VC \approx O(p \log p)$), the same formula gives a bound exceeding~$1$:
 the uniform convergence bound is \emph{vacuous}.
@@ -373,9 +373,8 @@ For any binary hypothesis class $\mathcal{H} \subseteq \{0,1\}^X$ with
 $\VC(\mathcal{H}) = d$:
 \[
   \mathcal{R}_m(\mathcal{H})
-  \;\leq\; \sqrt{\frac{2d \log(em/d)}{m}}.
+  \;\leq\; \sqrt{\frac{2d \log(em/d)}{m}}.\formal{FLT_Proofs.Complexity.Rademacher.vcdim_bounds_rademacher_quantitative}
 \]
-This quantitative bound is machine-checked.\formal{FLT_Proofs.Complexity.Rademacher.vcdim_bounds_rademacher_quantitative}
 \end{prop}
 
 \begin{proof}
@@ -492,8 +491,8 @@ simultaneously,
   \risk_D(\rho) \leq \emprisk_S(\rho)
     + \sqrt{\frac{\KL(\rho \| \pi) + \log(2\sqrt{m}/\delta)}{2m}}.
 \]
-For finite~$\mathcal{H}$, the bound (with a cross-entropy complexity term in
-place of $\KL(\rho\|\pi)$) is machine-checked.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite}
+For finite~$\mathcal{H}$, the complexity term $\KL(\rho\|\pi)$ becomes a
+cross-entropy.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite}
 \end{thm}
 
 \begin{proof}
@@ -554,12 +553,11 @@ $\lambda = \sqrt{8m(\KL(\rho\|\pi) + \log(1/\delta))}$ yields
   \risk_D(\rho) - \emprisk_S(\rho)
   \leq \sqrt{\frac{2(\KL(\rho \| \pi) + \log(1/\delta))}{m}}.
 \]
-The displayed change-of-measure argument yields the constant
-$\sqrt{2(\KL(\rho\|\pi) + \log(1/\delta))/m}$.  The sharper form stated in
+This change-of-measure argument yields the constant
+$\sqrt{2(\KL(\rho\|\pi) + \log(1/\delta))/m}$.  The sharper form of
 \Cref{thm:pac-bayes} (with $1/(2m)$ rather than $2/m$ under the root) requires
 either Catoni's thermodynamic refinement~\cite{Catoni2007} or, for
-finite~$\mathcal{H}$, the direct union bound over hypotheses that the
-machine-checked companion follows; we do not reproduce either sharpening here.
+finite~$\mathcal{H}$, a direct union bound over hypotheses.
 \end{proof}
 
 
@@ -680,7 +678,7 @@ Srebro, and Sridharan~\cite{ShalevShwartzShamir2010}: beyond binary
 classification with 0--1 loss, \emph{learnability is equivalent to the
 existence of a stable empirical risk minimizer}.  In this more general
 setting (for instance, certain convex stochastic optimization
-problems); uniform convergence provably fails to characterize learnability,
+problems), uniform convergence provably fails to characterize learnability,
 yet stability succeeds.  We state this without proof; the construction
 separating learnability from uniform convergence is the technical core of
 the cited paper.
@@ -896,9 +894,9 @@ them along five axes.
 
 \begin{table}[ht]
 \centering\small
-\caption{Five generalization-bound frameworks compared.  Each row
-describes what the framework measures, what it bounds, where it is
-tightest, and where it fails.}
+\caption[Five generalization-bound frameworks compared.]{Five
+generalization-bound frameworks compared: what each measures, what it
+bounds, where it is tightest, and where it fails.}
 \label{tab:five-frameworks}
 \renewcommand{\arraystretch}{1.4}
 \begin{tabularx}{\textwidth}{>{\bfseries\small}l X X X X}
@@ -998,21 +996,13 @@ algorithm onto a different axis.
   \node[font=\scriptsize, anchor=west] at (8.85,-0.52) {literature-only};
 \end{scope}
 \end{tikzpicture}
-\caption[Six generalization frameworks graded by evidence: one risk gap, many certificates.]{The
-six frameworks all bound the \emph{same} quantity, the gap between true and empirical risk, but
-each reads a different slice of the data--class--algorithm interaction.  The kernel machine-checks
-the bounds for the class-based frameworks: VC uniform convergence (\leanname{finite_massart_lemma}),
-Rademacher complexity (\leanname{EmpiricalRademacherComplexity}), and PAC-Bayes
-(\leanname{pac_bayes_finite}); these three nodes are drawn solid.  The one machine-checked
-cross-framework bridge is that Rademacher complexity is controlled by VC dimension through
-Sauer--Shelah (\leanname{vcdim_bounds_rademacher_quantitative}), the single solid edge.  The
-remaining links are literature, proved on paper but not verified (margin specializes Rademacher,
-stability implies an information bound, PAC-Bayes and the information bound are dual views), or
-conceptual, argued rather than proved (information and Rademacher are orthogonal because one reads
-the algorithm and the other the class; stability and PAC-Bayes are a type mismatch between
-algorithm space and distribution space).  Solid marks a kernel-verified bound or bridge, a lighter
-dashed style a cited literature result, and a dotted style a conceptual orthogonality that is
-argued rather than proved.}
+\caption[Six generalization frameworks: one risk gap, many certificates.]{The
+six frameworks all bound the same quantity, the gap between true and empirical risk, but each
+reads a different slice of the data, class, and algorithm interaction.  The class-based bounds
+(VC, Rademacher, PAC-Bayes) are kernel-verified; the single verified cross-framework bridge is
+that VC dimension controls Rademacher complexity through Sauer--Shelah
+(\leanname{vcdim_bounds_rademacher_quantitative}).  The remaining links are literature
+implications or conceptual orthogonalities between the algorithm-based and class-based readings.}
 \label{fig:five-frameworks}
 \end{figure}
 
@@ -1113,19 +1103,12 @@ and obstruction relationships connect them:
 \end{scope}
 \end{tikzpicture}
 \caption[Generalization is read from three sources: data, class, or algorithm.]{Every
-generalization bound reads one of three sources of information, the data, the hypothesis
-class, or the algorithm, drawn here as the three corners of a triangle, so the choice of
-framework is the choice of which source one can measure.  The class-based bounds sit at the
-class corner and are machine-checked: VC uniform convergence (\leanname{finite_massart_lemma})
-and Rademacher complexity (\leanname{EmpiricalRademacherComplexity}), drawn solid.  PAC-Bayes
-(\leanname{pac_bayes_finite}) reads the posterior over the class induced by the algorithm and
-is also machine-checked, so it sits on the algorithm--class edge and is drawn solid as well.
-Stability reads the algorithm--data edge, information reads the data-to-output channel in the
-interior, and margin reads the class geometry; these three are proved in the literature but
-not verified, and are drawn lighter and dashed.  The obstructions of the companion
-\Cref{fig:five-frameworks} are exactly these projections landing on different corners:
-information and Rademacher read opposite sources, and stability and PAC-Bayes read different
-edges, so the two figures are spatial complements of one another.}
+generalization bound reads one of three sources, the data, the hypothesis class, or the
+algorithm, drawn here as the corners of a triangle, so the choice of framework is the choice
+of which source one can measure.  VC and Rademacher sit at the class corner and PAC-Bayes on
+the algorithm--class edge; stability, information, and margin read the algorithm and class
+geometry from the edges and interior.  The obstructions of \Cref{fig:five-frameworks} reappear
+here as projections landing on different corners, making the two figures spatial complements.}
 \label{fig:triangle}
 \end{figure}
 
@@ -1226,9 +1209,9 @@ but also worse training performance.
 
 The five frameworks are theorems about hypothesis classes and algorithms in
 the abstract.  For one concrete modern architecture, a softmax-attention
-head, the pipeline of \Cref{sec:uniform-convergence,sec:rademacher} has been
-carried out inside a proof assistant, producing a generalization guarantee
-that is machine-checked down to the floating-point execution of the head.
+head, the pipeline of \Cref{sec:uniform-convergence,sec:rademacher} yields a
+generalization guarantee verified down to the floating-point execution of the
+head.
 
 \begin{prop}[Certified generalization for an attention head]
 \label{prop:certified-attention}
@@ -1263,34 +1246,31 @@ controls the covering numbers, and the integral $\int_0^{2b}\sqrt{\log
 radius-$R$ ball in $\R^p$ has metric entropy $O(p\log(1/\eta))$.  The
 high-probability lift is the bounded-differences (McDiarmid) step of
 \Cref{thm:rademacher-bound}, with per-example increment $2b/m$.  The one new
-ingredient is the rounding term: the verified statement bounds the
-\emph{executed}, finite-precision head, so it carries an explicit envelope
+ingredient is the rounding term: the bound is on the \emph{executed},
+finite-precision head, so it carries an explicit envelope
 $\mathrm{env}(f_\theta)$ separating the idealized map from its floating-point
-realization.  The full derivation is
-formalized.\formal{TLT.attnHead_certified_generalization}
+realization.\formal{TLT.attnHead_certified_generalization}
 \end{proof}
 
 The construction lifts from one head to a depth-graded multi-head encoder
 stack: the budget becomes the Dudley capacity of the depth-replicated block,
 growing through the per-layer perturbation envelope with depth and head
 count, and the resulting predicate (true risk exceeds empirical risk plus
-budget plus rounding only on a $\delta$-event) is discharged for the stack
+budget plus rounding only on a $\delta$-event) holds for the stack
 indexed by its architectural
-configuration.\formal{TLT.config_capacity_law}  That predicate is itself the
-machine-checked definition of a generalization
+configuration.\formal{TLT.config_capacity_law}  That predicate is the
+definition of a generalization
 certificate.\formal{TLT.CertifiedGeneralization}
 
 \begin{remark}[What the certificate settles, and what it does not]
 \label{rmk:certified-attention}
-\Cref{prop:certified-attention} is an end-to-end verified generalization
-bound for a transformer component: the abstract theory of this chapter,
-instantiated and checked for attention.  It does \emph{not} resolve
+\Cref{prop:certified-attention} is the abstract theory of this chapter
+instantiated for a transformer component.  It does \emph{not} resolve
 \Cref{op:deep-margins}.  The Dudley budget still grows with the parameter
 radius~$R$, the depth, and the head count, so on a large pretrained model the
-certificate is correct but loose, exactly as the classical bounds are.
-What it adds is a different axis of progress: a \emph{trustworthy} bound,
-whose constants and finite-precision corrections have been audited by a
-kernel rather than estimated by hand.
+certificate is correct but loose, exactly as the classical bounds are.  What
+it adds is a bound whose constants and finite-precision corrections are
+verified rather than estimated by hand.
 \end{remark}
 
 
@@ -1302,21 +1282,17 @@ kernel rather than estimated by hand.
 \label{sec:generalization-open}
 
 The deep-network gap of \Cref{op:deep-margins} is the headline question, but
-the chapter's five frameworks and their machine-checked fragments open a
-wider frontier.  Each problem below is tagged as a \emph{known unknown} (KU),
-sharply posed but unresolved, or an \emph{unknown known} (UK), where the
-right invariant or formal object is still missing; a design-lab or literature
-anchor is named where one exists.
+the chapter's five frameworks and their verified fragments open a wider
+frontier.
 
 \begin{openprob}[Formalizing the data-dependent Rademacher bound]
 \label{op:formalize-rademacher}
 The empirical Rademacher complexity, the Massart finite lemma, and the VC
-bound $\mathcal{R}_m \leq \sqrt{2d\log(em/d)/m}$ are machine-checked
+bound $\mathcal{R}_m \leq \sqrt{2d\log(em/d)/m}$ are verified
 (\Cref{def:rademacher,prop:rad-vc}), but the assembled high-probability bound
 of \Cref{thm:rademacher-bound} (symmetrization plus the two McDiarmid
-applications) is so far only a placeholder in the companion development.  Can
-the full data-dependent bound be formalized end to end?  A known unknown:
-classical on paper~\cite{BartlettMendelson2002}, open as a verified artifact.
+applications) is not.  Can the full data-dependent bound, classical on
+paper~\cite{BartlettMendelson2002}, be formalized end to end?
 \end{openprob}
 
 \begin{openprob}[A non-vacuous certified bound for attention]
@@ -1324,9 +1300,8 @@ classical on paper~\cite{BartlettMendelson2002}, open as a verified artifact.
 The certificate of \Cref{prop:certified-attention} is correct but its Dudley
 budget grows with the parameter radius, depth, and head count
 (\leanname{config_capacity_law}).  Can one machine-check a bound for a
-realistic attention stack that is also \emph{non-vacuous} on a benchmark: a
-verified analogue of the PAC-Bayes results for deep networks?  A known
-unknown, and the verified counterpart of \Cref{op:deep-margins}.
+realistic attention stack that is also \emph{non-vacuous} on a benchmark, the
+verified counterpart of \Cref{op:deep-margins}?
 \end{openprob}
 
 \begin{openprob}[Discharging the expressivity leg]
@@ -1335,9 +1310,8 @@ The transformer design law assembles a certified capacity bound but states an
 \emph{expressivity} obligation as an open hypothesis: that the stack can
 realize a target risk at all.  Can the expressivity leg be discharged with
 explicit width/depth, turning the design law into an unconditional
-generalization-and-approximation guarantee?  An unknown known: the
-approximation invariant for the certified stack is not yet
-formalized~\cite{XuRaginsky2017}.
+generalization-and-approximation guarantee?  The approximation invariant for
+the certified stack is not yet formalized~\cite{XuRaginsky2017}.
 \end{openprob}
 
 \begin{openprob}[Making the CMI unification precise]
@@ -1345,8 +1319,8 @@ formalized~\cite{XuRaginsky2017}.
 The conditional-mutual-information framework (\Cref{rmk:cmi}) is said to
 unify PAC-Bayes, VC, and stability bounds.  Is there a single CMI inequality
 from which all three are recovered as corollaries, with explicit constants?
-An unknown known: the unification is asserted but no master theorem with the
-three recoveries written out exists~\cite{SteinkeZakynthinou2020}.
+The unification is asserted, but no master theorem with the three recoveries
+written out exists~\cite{SteinkeZakynthinou2020}.
 \end{openprob}
 
 \begin{openprob}[When is uniform convergence necessary?]
@@ -1354,8 +1328,8 @@ three recoveries written out exists~\cite{SteinkeZakynthinou2020}.
 Shalev-Shwartz et al.\ show that beyond binary classification, learnability
 can hold without uniform convergence (\Cref{rmk:stability-beyond}).  Exactly
 which loss/hypothesis structures force uniform convergence to be necessary,
-not merely sufficient?  A known unknown: the boundary between the two regimes
-is uncharted~\cite{ShalevShwartzShamir2010}.
+not merely sufficient?  The boundary between the two regimes is
+uncharted~\cite{ShalevShwartzShamir2010}.
 \end{openprob}
 
 \begin{openprob}[Generalization of interpolators]
@@ -1364,7 +1338,7 @@ Modern networks interpolate the training data ($\emprisk_S = 0$) yet
 generalize, contradicting the intuition behind every bound in this chapter.
 Is there a complexity measure that is small precisely for the interpolators
 that generalize (benign overfitting) and large for those that do not (the
-double-descent peak)?  A known unknown driving current theory.
+double-descent peak)?
 \end{openprob}
 
 \begin{openprob}[Optimal data-dependent priors]
@@ -1372,8 +1346,8 @@ double-descent peak)?  A known unknown driving current theory.
 PAC-Bayes is tightest with a prior close to the learned posterior, but the
 prior must be data-independent.  Is there a principled, optimal way to build
 a data-dependent prior (via data splitting or differential privacy) that
-provably minimizes the bound?  A known unknown opened by the non-vacuous
-deep-network results~\cite{DziugaiteRoy2017}.
+provably minimizes the bound?  The non-vacuous deep-network results opened
+this question~\cite{DziugaiteRoy2017}.
 \end{openprob}
 
 \begin{openprob}[A formal margin bound for attention]
@@ -1382,8 +1356,8 @@ The spectral-norm margin bound for deep networks (\Cref{ex:neural-margin})
 has no verified counterpart for attention.  Can one machine-check a
 margin-based bound for a softmax-attention class, with the product of
 query/key/value operator norms in place of the layer spectral
-norms~\cite{BartlettFosterTelgarsky2017}?  A known unknown on the transformer
-side, complementary to \Cref{prop:certified-attention}.
+norms~\cite{BartlettFosterTelgarsky2017}?  This complements
+\Cref{prop:certified-attention}.
 \end{openprob}
 
 \begin{openprob}[Rademacher lower bounds]
@@ -1391,8 +1365,8 @@ side, complementary to \Cref{prop:certified-attention}.
 Every bound here is an upper bound on the generalization gap.  For which
 classes is the Rademacher complexity also a \emph{lower} bound on the
 worst-case gap, so that $\mathcal{R}_m$ exactly captures learnability rather
-than merely bounding it?  An unknown known: a matching lower-bound invariant
-is missing for general classes.
+than merely bounding it?  A matching lower-bound invariant is missing for
+general classes.
 \end{openprob}
 
 \begin{openprob}[Non-vacuous information bounds for deterministic learners]
@@ -1400,8 +1374,7 @@ is missing for general classes.
 The Xu--Raginsky bound is vacuous when $W = A(S)$ is deterministic, since
 $I(S;W) = H(W)$ (\Cref{rmk:cmi}).  Apart from the CMI construction, is there a
 generalization bound for deterministic algorithms phrased in genuinely
-information-theoretic quantities that stays finite?  A known unknown at the
-frontier of the information-theoretic tradition.
+information-theoretic quantities that stays finite?
 \end{openprob}
 
 
@@ -1466,54 +1439,26 @@ full picture, and the obstructions between frameworks (\Cref{fig:five-frameworks
 are as informative as the implications.
 \end{remark}
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:five-frameworks}}
+\subsection*{Counterfactual exercises}
 
-The parallax of \Cref{fig:five-frameworks} is unusually lopsided as figures in this book go: most of its content is a frontier.  Of six framework nodes only three are drawn solid (VC uniform convergence \leanname{finite_massart_lemma}, Rademacher complexity \leanname{EmpiricalRademacherComplexity}, and PAC-Bayes \leanname{pac_bayes_finite}, all class-based); the other three (stability, information, margin) are literature.  Of six cross-framework links exactly one is solid, the Sauer--Shelah bridge by which VC dimension controls Rademacher complexity \leanname{vcdim_bounds_rademacher_quantitative}; the rest are either literature implications (margin specializing Rademacher, stability implying an information bound, PAC-Bayes and information being dual) or merely-argued conceptual edges (the algorithm-versus-class orthogonality and the stability-versus-PAC-Bayes type mismatch).  So when each exercise below perturbs the picture, ask which of three things the perturbation produces: an \emph{instance} that the one verified core or a single graded edge already exhibits, a \emph{boundary} where toggling one node sort, edge grade, or information axis flips the evidence grade or the direction, or a \emph{frontier} where a literature or conceptual edge still waits to be promoted to verified.  Most of these land on the frontier, which is the true shape of the subject.
-
-\begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The three solid nodes are exactly the class-based bounds the kernel checks.} The figure's three solid borders are a claim about evidence, and this is the defining verified instance of the whole diagram: VC uniform convergence, Rademacher complexity, and PAC-Bayes are the frameworks whose bounds are machine-checked (\cref{thm:vc-uniform}, \leanname{finite_massart_lemma}; \cref{def:rademacher}, \leanname{EmpiricalRademacherComplexity}; \cref{thm:pac-bayes}, \leanname{pac_bayes_finite}), so a solid border asserts exactly \emph{that the bound is a kernel theorem}. The three lighter-bordered nodes, stability, information, and margin, are drawn weaker precisely because their bounds (\cref{thm:stability-bound}, \cref{thm:xu-raginsky}, \cref{thm:margin-bound}) are literature with no verified handle.
-
-\item \textbf{The one solid edge is the only machine-checked cross-framework bridge.} Take the single solid arrow between Rademacher and VC on its own. It is the lone settled link in the diagram: Rademacher complexity is bounded by VC dimension through Sauer--Shelah, $\mathcal{R}_m(\mathcal{H}) \le \sqrt{2\VC(\mathcal{H})\log(em/\VC(\mathcal{H}))/m}$ (\cref{prop:rad-vc}, \leanname{vcdim_bounds_rademacher_quantitative}), the one cross-framework relationship the kernel certifies. The old figure's separate ``refines'' arrow and dotted ``Sauer--Shelah'' arrow named the \emph{same} fact, which is why the re-graded figure collapses them into one solid edge and leaves nothing else solid between frameworks. This is the figure's instance.
-
-\item \textbf{The parallax is one risk-gap quantity seen from six sides.} Read the whole figure as six projections of one object rather than six theories, and it becomes the organizing instance: every framework bounds the single quantity $|\risk - \emprisk|$ (or its expectation), and the rows of \cref{tab:five-frameworks} differ only in the \emph{key quantity} each reads (noise correlation, posterior--prior divergence, one-sample sensitivity, mutual information, margin). The diagram is the abstract witness that generalization is one quantity admitting many certificates, three of them, the class-based ones, machine-checked, and the rest borrowed from the literature.
-
-\item \textbf{PAC-Bayes is the verified bound that lives in distribution space.} The PAC-Bayes node anchors the posterior axis: the McAllester finite bound on the Gibbs risk is machine-checked (\cref{thm:pac-bayes}, \leanname{pac_bayes_finite}, with \leanname{gibbsError} the verified mean error of the posterior-sampled predictor), so PAC-Bayes joins VC and Rademacher among the solid nodes even though it reads the \emph{posterior} rather than the class. That same kernel handle is what keeps the conceptual stability-to-PAC-Bayes edge a type relation and not a theorem, since stability reads the algorithm and PAC-Bayes the distribution it induces. This is the instance that fixes the posterior reading.
-
-\item \textbf{The two obstructions are orthogonal information sources, not separations.} Toggle the figure's reading of the conceptual obstructions from ``proved gap'' to ``different information axis,'' and the figure's principal boundary appears: information-theoretic bounds depend on the \emph{algorithm} and Rademacher bounds on the \emph{class}, so a deterministic ERM can carry $I(S;W)=H(W)$ on a class of small Rademacher complexity (\cref{sec:comparison}), and stability lives in algorithm space while PAC-Bayes lives in distribution space. Neither obstruction is a separation theorem nor even a formal literature separation, so both are drawn in the conceptual style, argued not proved, and reversing either direction does not turn it into a verified edge.
-
-\item \textbf{Margin is a Rademacher specialization, and that specialization is literature.} The margin-to-Rademacher edge is the boundary that fixes the edge's grade: the margin bound is \emph{derived from} Rademacher complexity applied to the ramp loss (\cref{thm:margin-bound}), so the arrow points from margin into Rademacher as a specialization, yet because thm:margin-bound is not machine-checked the edge is drawn lighter than the solid rad--vc bridge. Promoting it would require a verified ramp-loss contraction, exactly the kind of step still missing for the assembled bounds.
-
-\item \textbf{The stability-to-information edge is one direction only, and unverified.} Follow the stability-to-information arrow and ask whether the reverse is drawn; it is not, and that asymmetry is the boundary between a literature implication and an absent one. A $\beta$-uniformly stable randomized algorithm satisfies $I(S;W)=O(m\beta^2)$ (\cref{sec:comparison}, \cref{thm:stability-bound}), a one-way implication with no kernel handle, so the figure draws stability into information in the literature style and leaves the converse undrawn. Both endpoints are lighter-bordered nodes, which confirms that an edge between two unverified frameworks cannot be solid even when the implication is classical.
-
-\item \textbf{The Rademacher generalization bound is the figure's nearest open frontier.} Ask what it would take to draw a \emph{second} solid edge out of the Rademacher node, the full generalization bound rather than the VC bridge: this is the figure's nearest verification frontier. The empirical Rademacher complexity, the Massart lemma, and the VC bound are machine-checked, but the assembled high-probability bound of \cref{thm:rademacher-bound} (symmetrization plus the two McDiarmid steps) is still a placeholder (\cref{op:formalize-rademacher}, \cite{BartlettMendelson2002}), so the Rademacher node is solid for its \emph{complexity measure} while its generalization \emph{guarantee} stays literature. Closing this would promote Rademacher's own bound to solid, alongside its already-solid bridge to VC.
-
-\item \textbf{Formalizing stability and information would flip two lighter nodes to solid.} Which perturbation promotes the algorithm-based frameworks? Here is the frontier that the conceptual obstructions hide: the stability bound (\cref{thm:stability-bound}) and the Xu--Raginsky information bound (\cref{thm:xu-raginsky}, \cite{XuRaginsky2017}) have no verified handle, and a single conditional-mutual-information master inequality is conjectured to recover VC, PAC-Bayes, and stability at once (\cref{op:cmi-unification}, \cite{SteinkeZakynthinou2020}). Proving and formalizing it would recolor the stability and information nodes solid and replace the stability-to-information literature edge by a verified one, leaving only the genuinely orthogonal algorithm-versus-class edge conceptual.
-
-\item \textbf{Is every framework a section of one risk-gap functor over its own fibration?} Read ``one quantity, many certificates'' as a universal property, and you reach the figure's deepest frontier. Each framework would be a section of a single risk-gap functor over a different fibration of the learning problem, the class for VC and Rademacher, the algorithm for stability and information, the posterior for PAC-Bayes, the operator norms for margin, so the verified core would read ``the functor admits a section over the class fibration'' (the three solid nodes) and the conceptual obstructions would read ``the class and algorithm fibrations do not refine one another,'' explaining the orthogonality as a fact about base categories rather than a separation. Whether such a single generalization-certificate object exists, of which the certified attention bound (\cref{prop:certified-attention}, \leanname{CertifiedGeneralization}) is a sixth, algorithm-specific section, or the fibrations are provably non-unifiable, is open (\cref{op:cmi-unification}, \cref{op:tighten-certified-attention}), so this reading is drawn dashed.
-\end{enumerate}
-
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:triangle}}
-
-Where \Cref{fig:five-frameworks} graded the links, \Cref{fig:triangle} grades the geometry.  Its grammar is the placement: generalization information has three sources, the data, the hypothesis class, and the algorithm, set at the corners of a triangle, and every bound is a projection that reads one corner or one edge.  Three framework nodes are solid because their bounds are machine-checked (VC and Rademacher at the class corner, \leanname{finite_massart_lemma} and \leanname{EmpiricalRademacherComplexity}; PAC-Bayes on the algorithm--class edge, \leanname{pac_bayes_finite}); three are lighter and dashed because their bounds are literature (stability on the algorithm--data edge, information in the interior channel, margin on the class geometry).  No edge here is a theorem; the figure is pure projection, and the only verified content it carries is the grade of each node.  The obstructions of \Cref{fig:five-frameworks} reappear here as projections that simply land on different corners.  So as each exercise below perturbs the projection, classify what it yields: an \emph{instance} whose corner placement the verified core or the literature already exhibits, a \emph{boundary} where toggling one node grade or information source flips the evidence grade or the source being read, or a \emph{frontier} where a literature reading still waits to be promoted to a verified source.
+Figures~\ref{fig:five-frameworks} and~\ref{fig:triangle} present the six frameworks as projections of one risk-gap quantity: the first grades the cross-framework links, the second the geometry of the three information sources.  The following exercises push on that structure.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The class corner carries both verified bounds.} Take the two solid nodes at the class corner together and you have the figure's defining verified instance: VC uniform convergence and Rademacher complexity both read the hypothesis class and nothing else, and both have machine-checked bounds (\cref{thm:vc-uniform}, \leanname{finite_massart_lemma} and \leanname{sauer_shelah_exp_bound}; \cref{def:rademacher}, \leanname{EmpiricalRademacherComplexity} and \leanname{vcdim_bounds_rademacher_quantitative}). The class corner is therefore the most fully certified source in the diagram, and the solid border at that corner asserts exactly that the class-source reading is a kernel theorem.
+\item The three class-based frameworks have kernel-verified bounds: VC uniform convergence (\cref{thm:vc-uniform}), Rademacher complexity (\cref{def:rademacher}), and PAC-Bayes (\cref{thm:pac-bayes}).  The other three (stability, information, margin) are literature results (\cref{thm:stability-bound}, \cref{thm:xu-raginsky}, \cref{thm:margin-bound}).  Explain why the verified frameworks are exactly the ones whose complexity measure is intrinsic to the class.
 
-\item \textbf{PAC-Bayes is the verified reading on the algorithm--class edge.} Why is the PAC-Bayes node solid yet off the class corner? This is the instance that anchors the posterior reading: the McAllester finite bound on the Gibbs risk is machine-checked (\cref{thm:pac-bayes}, \leanname{pac_bayes_finite}, with \leanname{gibbsError} the verified mean error of the posterior-sampled predictor), and PAC-Bayes reads the posterior over the class \emph{induced by the algorithm}, so its node sits on the edge joining the algorithm and class corners, solid like VC and Rademacher but reading two sources at once.
+\item The one verified cross-framework relationship is that VC dimension controls Rademacher complexity via Sauer--Shelah, $\mathcal{R}_m(\mathcal{H}) \le \sqrt{2\VC(\mathcal{H})\log(em/\VC(\mathcal{H}))/m}$ (\cref{prop:rad-vc}).  Show that this single inequality is what lets the VC bound be recovered from the Rademacher bound, so the two are not independent frameworks.
 
-\item \textbf{One problem read from three corners is the three-bounds example.} \Cref{ex:three-bounds} is a tour of the triangle, and so the figure's organizing instance: linear classification with bounded norm admits a VC bound (class corner, $\VC=d+1$), a Rademacher bound (class corner, $\Rad_S\le 1/\sqrt{m}$), and a margin bound (class geometry), all on the \emph{same} problem. The diagram is the abstract witness that a single learning problem is bounded by reading whichever corner one can measure, and the three numbers in the example differ only because they project different sources.
+\item Every framework bounds the same quantity $|\risk - \emprisk|$ (or its expectation); the rows of \cref{tab:five-frameworks} differ only in the key quantity each reads (noise correlation, posterior--prior divergence, one-sample sensitivity, mutual information, margin).  Argue that generalization is one quantity admitting many certificates rather than six distinct theories.
 
-\item \textbf{Which framework when is a corner-selection rule.} The ``Which Framework When?'' guide is a map back onto the triangle, which makes it the instance that names the figure's use: knowing the class but not the algorithm selects the class corner (Rademacher or margin), knowing the algorithm but not the class selects the algorithm readings (stability or information), and being able to choose a prior selects the algorithm--class edge (PAC-Bayes). The choice of framework is literally the choice of which corner of \cref{fig:triangle} one can measure.
+\item Information-theoretic bounds depend on the algorithm and Rademacher bounds on the class: a deterministic ERM can carry $I(S;W)=H(W)$ on a class of small Rademacher complexity (\cref{sec:comparison}).  Show that this is an orthogonality of information sources, not a separation theorem, and that reversing either direction does not produce a new bound.
 
-\item \textbf{The obstructions are different-corner projections, not separations.} Toggle the companion figure's two conceptual edges onto this triangle and the figure's principal boundary appears: information reads the data-to-output channel in the interior while Rademacher reads the class corner, so the \cref{fig:five-frameworks} ``orthogonal'' edge is just these two nodes sitting at different places (\cref{sec:comparison}), and stability reads the algorithm--data edge while PAC-Bayes reads the algorithm--class edge, so the ``type mismatch'' edge is two nodes on different edges sharing only the algorithm corner. Neither is a separation theorem, which is why both figures draw them without a verified arrow.
+\item A $\beta$-uniformly stable randomized algorithm satisfies $I(S;W)=O(m\beta^2)$ (\cref{thm:stability-bound}), so stability implies an information bound.  Show that the converse fails, and explain why an edge between two algorithm-based frameworks is harder to certify than the class-based Sauer--Shelah bridge.
 
-\item \textbf{Stability and information read the algorithm, not the class.} Why are the two interior or algorithm-edge nodes dashed? This is the boundary that fixes their grade: stability measures the algorithm's sensitivity to one data point (\cref{thm:stability-bound}) and information measures the mutual information $I(S;W)$ between the sample and the algorithm's output (\cref{thm:xu-raginsky}, \cite{XuRaginsky2017}), so both read the algorithm rather than the class and neither has a verified handle, hence both nodes are drawn lighter. A deterministic ERM can carry $I(S;W)=H(W)$ on a class of small Rademacher complexity, which confirms the interior reading is genuinely a different source from the class corner.
+\item The empirical Rademacher complexity, the Massart lemma, and the VC bound are verified, but the assembled high-probability bound of \cref{thm:rademacher-bound} (symmetrization plus the two McDiarmid steps) is not yet formalized (\cref{op:formalize-rademacher}, \cite{BartlettMendelson2002}).  Identify which step of the proof is the obstruction to a verified end-to-end Rademacher bound.
 
-\item \textbf{Margin reads class geometry, and that reading is literature.} The margin node near the class--algorithm side marks the boundary between a class-adjacent reading and a verified one: the margin bound is derived from Rademacher complexity applied to the ramp loss (\cref{thm:margin-bound}), so it reads the class geometry together with the predictor's margin, yet because thm:margin-bound is not machine-checked the node is drawn dashed even though it sits beside the solid class corner. Promoting it would require a verified ramp-loss contraction, the same step missing for the assembled Rademacher bound.
+\item \Cref{ex:three-bounds} bounds one linear-classification problem three ways: a VC bound ($\VC=d+1$), a Rademacher bound ($\Rad_S\le 1/\sqrt{m}$), and a margin bound.  Compute all three for $d=1000$, $m=5000$ and explain why they differ only through which source each reads.
 
-\item \textbf{Formalizing the algorithm readings would recolor the interior.} Which perturbation turns the dashed interior and algorithm-edge nodes solid? Here is the frontier the dashed nodes mark: the stability bound (\cref{thm:stability-bound}) and the Xu--Raginsky information bound (\cref{thm:xu-raginsky}, \cite{XuRaginsky2017}) have no verified handle, and the Rademacher node is solid for its complexity measure while its assembled high-probability \emph{guarantee} (\cref{thm:rademacher-bound}) is still a placeholder (\cref{op:formalize-rademacher}, \cite{BartlettMendelson2002}). Formalizing these would recolor the algorithm-reading and interior nodes solid and certify sources beyond the class corner.
+\item A conditional-mutual-information master inequality is conjectured to recover VC, PAC-Bayes, and stability at once (\cref{op:cmi-unification}, \cite{SteinkeZakynthinou2020}).  Sketch what such an inequality would have to say, and which of the six frameworks it would leave outside its scope.
 
-\item \textbf{Is there a single bound that reads all three corners at once?} Could one certificate project the whole triangle rather than one corner or edge? That is the figure's unifying frontier: a single conditional-mutual-information master inequality is conjectured to recover VC, PAC-Bayes, and stability simultaneously (\cref{op:cmi-unification}, \cite{SteinkeZakynthinou2020}), which would be one bound reading the class, the algorithm, and the posterior together, collapsing the three solid-and-dashed readings into a single source-spanning certificate. Until it is proved and formalized the corners remain separate projections.
-
-\item \textbf{Is the triangle the base of a fibration with each framework a section?} Read ``three sources, many projections'' as a universal property and you reach the figure's deepest frontier. Each framework would be a section of one risk-gap functor over a different face of the learning problem, the class face for VC and Rademacher, the algorithm face for stability and information, the posterior for PAC-Bayes, the operator norms for margin, so the verified core would read ``a section exists over the class face'' (the solid corner) and the obstructions would read ``the class and algorithm faces do not refine one another,'' explaining the orthogonality as a fact about base faces rather than a separation. Whether such a single generalization-certificate object exists, of which the certified attention bound (\cref{prop:certified-attention}, \leanname{CertifiedGeneralization}) is an algorithm-face section, or the faces are provably non-unifiable, is open (\cref{op:cmi-unification}, \cref{op:tighten-certified-attention}), so this reading is drawn dashed.
+\item Read ``one quantity, many certificates'' as a universal property: each framework is a section of a single risk-gap functor over a different fibration of the learning problem (the class for VC and Rademacher, the algorithm for stability and information, the posterior for PAC-Bayes).  Decide whether the certified attention bound (\cref{prop:certified-attention}) is a further algorithm-specific section, and whether the fibrations can be unified (\cref{op:cmi-unification}, \cref{op:tighten-certified-attention}).
 \end{enumerate}

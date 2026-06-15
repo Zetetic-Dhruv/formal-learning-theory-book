@@ -48,7 +48,7 @@ Let $L \subseteq \Sigma^*$ be a language.
 \end{itemize}
 \end{defn}
 
-Text presents only positive examples; informant presents both positive and negative examples. This distinction matters enormously: Gold showed that informant is strictly more powerful than text. We focus on text, which is the harder and more interesting case.
+Text presents only positive examples; informant presents both positive and negative examples. Gold showed that informant is strictly more powerful than text. We focus on text, the harder case.
 
 After seeing the first $n$ data points $(t_0, \ldots, t_{n-1})$, the learner outputs a hypothesis $h_n$. The hypothesis is an \emph{index}, a natural number naming a program that computes a language. The learner has no deadline, no accuracy target, and no probability distribution on targets. It simply sees more and more of $L$ and must eventually guess correctly.
 
@@ -147,7 +147,7 @@ $\FIN$ is the strongest identification criterion: the learner must produce the c
 A learner $M$ \emph{$\BC$-identifies} a language $L$ from text if, for every text $t$ for $L$, there exists a time $n_0$ such that $W_{M(t_0, \ldots, t_n)} = L$ for all $n \geq n_0$. That is, from time $n_0$ onward, every hypothesis the learner outputs is \emph{extensionally correct} (computes the right language), but the indices may keep changing.\formal{FLT_Proofs.Criterion.Gold.BCLearnable}
 \end{defn}
 
-The distinction between $\Ex$ and $\BC$ is subtle but consequential. $\Ex$ requires \emph{syntactic} convergence: the index stabilizes. $\BC$ requires only \emph{semantic} convergence: the computed language stabilizes, even if the learner keeps switching between different programs that all compute the same language. At first glance, this seems like a minor relaxation. It is not.
+$\Ex$ requires \emph{syntactic} convergence: the index stabilizes. $\BC$ requires only \emph{semantic} convergence: the computed language stabilizes, even if the learner keeps switching between programs that all compute the same language. This relaxation is not minor.
 
 \begin{thm}[Case--Smith {\cite{CaseSmith1983}}]
 \label{thm:bc-strictly-stronger}
@@ -203,26 +203,18 @@ The essential point is that $\BC$-identification does not require the \emph{inde
 \draw[weak] (vac) -- node[witlabel, above right, xshift=-3pt]{\rel{restricts}} (bc);
 \draw[weak] (bc) -- node[witlabel, above right, xshift=-3pt]{$\Delta^0_2$\\(Putnam--Gold)} (trial);
 \end{tikzpicture}
-\caption[The identification hierarchy as a chain of separations]{The identification hierarchy, read as a
-chain of strict separations refined by a lattice of single-constraint relaxations. Each spine node
-($\FIN$, $\Ex$, $\BC$) is a success criterion; each spine edge is a separation theorem, a class one
-criterion learns and the other cannot, not a more liberal definition. The bottom rung
-$\FIN\subsetneq\Ex$ is verified in the kernel (\leanname{ex_strictly_stronger_finite}), drawn solid;
-the witness is the class of all finite languages, which is $\Ex$-identifiable but not
-$\FIN$-identifiable. The upper rung $\Ex\subsetneq\BC$ is the Case--Smith separation, where $\Ex$
-demands the index converge (syntactic) and $\BC$ demands only the language converge (semantic); it is
-established in the literature and not yet in the kernel, so it is drawn dashed and cited. The side nodes
-are single-constraint relaxations of $\Ex$: anomalous $\Ex^*$ removes the zero-error constraint and so
-extends $\Ex$; monotonic $\mathrm{Mon}\Ex$ adds a no-retraction constraint and so restricts $\Ex$;
-vacillatory $\mathrm{Vex}$ allows finitely many final hypotheses and sits strictly between $\Ex$ and
-$\BC$; trial-and-error learning pins the limit-computable predicates to the $\Delta^0_2$ level. Every
-branch and the $\Delta^0_2$ link are literature, not kernel theorems, hence dashed.}
+\caption[The identification hierarchy as a chain of separations]{The identification hierarchy:
+the spine $\FIN\subsetneq\Ex\subsetneq\BC$ of success criteria, refined by single-constraint
+relaxations of $\Ex$ (anomalous, monotonic, vacillatory, trial-and-error). Each spine edge is a
+separation theorem witnessed by a class one criterion learns and the next cannot; the bottom rung
+$\FIN\subsetneq\Ex$ is witnessed by the class of all finite languages
+(\leanname{ex_strictly_stronger_finite}).}
 \label{fig:identification-hierarchy}
 \end{figure}
 
 \begin{traversal}
 \textbf{Path:} $\nde{fin\_learning} \xrightarrow{\rel{strictly\_stronger}} \nde{ex\_learning} \xrightarrow{\rel{strictly\_stronger}} \nde{bc\_learning}$.\\[3pt]
-Each arrow is witnessed by an explicit separation, recorded as a \rel{strictly\_stronger} relation that carries its separating class along with it. Every step in the chain is a \emph{theorem}, proved by constructing a class that one criterion can learn and the other cannot; the increasingly liberal definitions are only the surface reading.
+Each arrow is a theorem, witnessed by a class one criterion learns and the other cannot.
 \end{traversal}
 
 % ================================================================
@@ -242,7 +234,7 @@ The $\FIN$--$\Ex$--$\BC$ chain is the spine of the hierarchy. Several natural re
 A learner \emph{$\Ex^*$-identifies} a language $L$ if it $\Ex$-converges to an index $e$ such that $W_e$ differs from $L$ on at most finitely many strings. That is, the final hypothesis may contain finitely many errors: finitely many strings incorrectly included or excluded.\formal{FLT_Proofs.Criterion.Gold.AnomalousLearnable}
 \end{defn}
 
-Anomalous learning relaxes $\Ex$ by removing the requirement of exact correctness, replacing it with correctness up to a finite set. In graph terms, this is a \rel{restricts} edge from $\nde{anomalous\_learning}$ to $\nde{ex\_learning}$: the constraint (zero anomalies) is removed, and no new grammatical structure is introduced. The class of $\Ex^*$-identifiable families strictly contains the class of $\Ex$-identifiable families~\cite{CaseSmith1983}.
+Anomalous learning relaxes $\Ex$ by replacing exact correctness with correctness up to a finite set. The class of $\Ex^*$-identifiable families strictly contains the $\Ex$-identifiable families~\cite{CaseSmith1983}.
 
 \subsection{Monotonic Learning}
 \label{sec:monotonic}
@@ -252,7 +244,7 @@ Anomalous learning relaxes $\Ex$ by removing the requirement of exact correctnes
 A learner \emph{monotonically} $\Ex$-identifies $L$ if it $\Ex$-identifies $L$ and, whenever it changes its hypothesis from $e$ to $e'$, the new hypothesis is at least as inclusive on the data seen so far: $W_e \cap \{t_0, \ldots, t_n\} \subseteq W_{e'} \cap \{t_0, \ldots, t_n\}$. Once a datum is correctly classified, that classification is never retracted.\formal{FLT_Proofs.Criterion.Gold.MonotonicLearnable}
 \end{defn}
 
-Monotonic learning \emph{strengthens} $\Ex$ by adding a constraint. The class of $\mathrm{Mon}\Ex$-identifiable families is a strict subset of $\Ex$-identifiable families. In the graph, $\nde{monotonic\_learning} \xrightarrow{\rel{restricts}} \nde{ex\_learning}$.
+Monotonic learning \emph{strengthens} $\Ex$ by adding a constraint. The class of $\mathrm{Mon}\Ex$-identifiable families is a strict subset of the $\Ex$-identifiable families.
 
 \subsection{Vacillatory Learning}
 \label{sec:vacillatory}
@@ -272,7 +264,7 @@ Vacillatory learning sits between $\Ex$ (which requires convergence to a single 
 A \emph{trial-and-error} predicate for a set $A \subseteq \N$ is a computable function $f : \N \to \{0, 1\}$ such that $\lim_{s \to \infty} f_s(n)$ exists for all $n$ and equals the characteristic function of $A$. The learner may ``retract'' previous outputs: it learns by making mistakes and correcting them.\formal{FLT_Proofs.Criterion.Gold.TrialAndErrorLearnable}
 \end{defn}
 
-Trial-and-error learning connects identification in the limit to the arithmetical hierarchy. A set $A$ is trial-and-error learnable if and only if $A \in \Delta^0_2$, the class of sets that are both $\Sigma^0_2$ and $\Pi^0_2$. This is the precise recursion-theoretic characterization, due to Putnam~\cite{Gold1965} and Gold: the limit-computable functions are exactly the $\Delta^0_2$ functions.\formal{FLT_Proofs.Computation.Delta02Class} This connection places Gold-style learning firmly within the landscape of classical recursion theory.
+Trial-and-error learning connects identification in the limit to the arithmetical hierarchy. A set $A$ is trial-and-error learnable if and only if $A \in \Delta^0_2$, the class of sets that are both $\Sigma^0_2$ and $\Pi^0_2$; equivalently, the limit-computable functions are exactly the $\Delta^0_2$ functions (Putnam and Gold,~\cite{Gold1965}).\formal{FLT_Proofs.Computation.Delta02Class}
 
 % ================================================================
 % SECTION 5: Mind-Change Complexity and Ordinals
@@ -290,7 +282,7 @@ A \emph{mind change} occurs at time $n$ if the learner's output satisfies $M(t_0
 
 For finite mind-change bounds, the theory is straightforward: we say that $M$ identifies $\mathcal{L}$ with at most $k$ mind changes if, on every text for every $L \in \mathcal{L}$, the mind-change count is at most $k$. The class of all finite languages is identifiable with 0 mind changes after the first hypothesis (the learner in \Cref{ex:finite-languages} changes its mind every time a new element appears, but a more careful learner can be designed with bounded mind changes for restricted subclasses).
 
-The surprise (genuinely unexpected for readers coming from PAC theory) is that integer-valued bounds are \emph{not sufficient} to characterize the full landscape.
+Integer-valued bounds are \emph{not sufficient} to characterize the full landscape.
 
 \begin{thm}[Freivalds--Smith {\cite{FreivaldsSmith1993}}]
 \label{thm:mind-change-ordinal}
@@ -313,7 +305,7 @@ The appearance of transfinite ordinals in learning theory is a genuine structura
 
 \begin{traversal}
 \textbf{Path:} $\nde{mind\_change\_characterization} \xrightarrow{\rel{measures}} \nde{ex\_learning}$.\\[3pt]
-The mind-change ordinal is a complexity measure on $\Ex$-identifiable classes, analogous to the VC dimension for PAC-learnable classes. But where VC dimension is a single integer, mind-change complexity is an ordinal, potentially transfinite. This is a \rel{measures} edge of a qualitatively different kind than $\nde{vc\_dimension} \xrightarrow{\rel{measures}} \nde{concept\_class}$.
+The mind-change ordinal measures $\Ex$-identifiable classes as VC dimension measures PAC-learnable ones, but where VC dimension is an integer this measure is a potentially transfinite ordinal.
 \end{traversal}
 
 % ================================================================
@@ -341,15 +333,15 @@ The proposition turns a practical question (does in-context learning ``converge'
 
 We now have three learning paradigms: PAC (\Cref{ch:pac}), online (\Cref{ch:online}), and Gold. Each defines ``learnable'' differently. The question is: what is the relationship?
 
-The answer is a partial order with one genuine comparability in it, so the three paradigms are not an antichain. Online learnability is \emph{strictly contained} in PAC learnability: every online-learnable class is PAC-learnable, and the converse fails, so the two are comparable. Gold-style identification, by contrast, is incomparable to both: it identifies classes of unbounded VC and Littlestone dimension that no statistical learner can handle, while it fails on classes with no convergence signal that PAC and online learners handle easily. The deep structural fact is that statistical capacity (PAC and online) and convergence in the limit (Gold) are orthogonal axes, and that adaptivity, the only thing separating online from PAC, buys nothing here: a finite Littlestone dimension forces a finite VC dimension, so online sits properly inside PAC.
+The answer is a partial order, not an antichain. Online learnability is \emph{strictly contained} in PAC learnability: every online-learnable class is PAC-learnable, and the converse fails. Gold-style identification is incomparable to both: it identifies classes of unbounded VC and Littlestone dimension that no statistical learner handles, while it fails on classes with no convergence signal that PAC and online learners handle easily. Statistical capacity (PAC and online) and convergence in the limit (Gold) are orthogonal axes; a finite Littlestone dimension forces a finite VC dimension, so online sits properly inside PAC.
 
 \begin{separation}
-\textbf{Theorem} (PAC, online, and Gold).\formal{FLT_Proofs.Theorem.Separation.online_pac_gold_separation} \textit{Online learnability is strictly contained in PAC learnability, so the two are comparable; Gold-style identification is incomparable to both. The machine-checked statement establishes the threshold separation (PAC but not online) and separation (a) below (the finite languages, $\Ex$ but not PAC); the remaining separations (b)--(d) are classical:}
+\textbf{Theorem} (PAC, online, and Gold).\formal{FLT_Proofs.Theorem.Separation.online_pac_gold_separation} \textit{Online learnability is strictly contained in PAC learnability; Gold-style identification is incomparable to both. Separation (a) below and the threshold separation are verified; separations (b)--(d) are classical:}
 
 \begin{enumerate}[label=(\alph*),leftmargin=*,itemsep=4pt]
 \item \textbf{$\Ex$-learnable but not PAC-learnable.} The class $\mathcal{L}_{\mathrm{fin}}$ of all finite subsets of $\N$ is $\Ex$-identifiable from text (\Cref{ex:finite-languages}). But the associated concept class has infinite VC dimension (any finite set of points can be shattered), so it is not PAC-learnable.
 
-The witness exploits the fundamental difference in how the two paradigms treat ``all finite subsets.'' $\Ex$-identification succeeds because on any \emph{fixed} finite set, the learner eventually sees all elements. PAC fails because the learner must handle \emph{all} finite sets simultaneously with bounded sample complexity, and the VC dimension is infinite.
+$\Ex$-identification succeeds because on any \emph{fixed} finite set the learner eventually sees all elements; PAC fails because the learner must handle \emph{all} finite sets simultaneously with bounded sample complexity, and the VC dimension is infinite.
 
 \item \textbf{PAC-learnable but not $\Ex$-identifiable.} The class of threshold functions $\mathcal{C} = \{x \mapsto \ind[x \geq \theta] : \theta \in \R\}$ over $\R$ is PAC-learnable ($\VC = 1$). But it is not $\Ex$-identifiable from text, because a text for a threshold language $\{\theta, \theta+1, \theta+2, \ldots\}$ reveals the threshold only in the limit, and the class of all such languages together with all finite languages triggers Gold's impossibility theorem.
 
@@ -394,18 +386,11 @@ The witness exploits the fundamental difference in how the two paradigms treat `
 \draw[sepl] (6.0,-1.4) -- (1.95,-1.4);
 \node[wit, fill=white] at (4.3,-1.4) {patterns: $\Ex$ yes, Online no\\{\tiny\cite{Angluin1980}}};
 \end{tikzpicture}
-\caption[The three paradigms: online strictly inside PAC, Gold incomparable to both]{The relationship
-among the three paradigms, corrected to the verified structure: it is a partial order carrying one genuine comparability.
-Online learnability is strictly contained in PAC learnability: every online-learnable class is PAC-learnable
-(\leanname{online_imp_pac}, solid), and the containment is strict because the threshold class over $\R$ is
-PAC-learnable but has infinite Littlestone dimension, hence is not online-learnable
-(\leanname{pac_not_implies_online}); so the Online region sits inside the PAC region. There is no class that
-is online-learnable but not PAC-learnable, and none with finite Littlestone but infinite VC dimension, since
-$\VC\le\Ldim$. Gold-style identification is incomparable to both: it identifies the finite languages, which
-have infinite VC dimension and so escape every statistical learner (\leanname{ex_not_implies_pac}, solid),
-while it cannot identify classes with no convergence signal that PAC and online learners handle (thresholds,
-singletons with the empty set; dashed, \cite{Gold1967}), and pattern languages give the reverse (dashed,
-\cite{Angluin1980}). Solid arrows are kernel theorems; dashed arrows are literature.}
+\caption[The three paradigms: online strictly inside PAC, Gold incomparable to both]{The three paradigms
+form a partial order, not an antichain. Online learnability is strictly contained in PAC learnability
+(\leanname{online_imp_pac}; strict via the threshold class), so the Online region sits inside the PAC
+region. Gold-style identification is incomparable to both: it identifies the finite languages, which
+have infinite VC dimension, yet fails on classes with no convergence signal.}
 \label{fig:three-paradigm}
 \end{figure}
 
@@ -554,54 +539,26 @@ The three-paradigm separation produces its witnesses existentially.  Give a sing
 \end{openprob}
 
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:identification-hierarchy}}
+\subsection*{Counterfactual exercises}
 
-The hierarchy of \Cref{fig:identification-hierarchy} has an unusual evidence profile for this book: it is almost entirely dashed. Exactly one rung, $\FIN \subsetneq \Ex$, is certified in the kernel; everything above and around it is cited or open. The exercises below trade on that asymmetry. Each perturbation lands in one of three places. Some recover an edge whose separation is already pinned down (an \emph{instance}). Some toggle a single constraint on the success notion and watch the learnable class grow or shrink by a determined amount (a \emph{boundary}). Some reach a dashed edge, literature-only or genuinely open (a \emph{frontier}), where the figure draws a line it cannot yet prove. Throughout, read line style as evidence grade: solid means the kernel has the theorem, dashed means it does not.
-
-\begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The one verified rung.} Read the bottom edge $\FIN \to \Ex$ as a theorem with a witness class, with the containment of definitions as merely its shadow. This is the figure's only solid instance. The kernel proves $\FIN$-learnability implies $\Ex$-learnability by dropping the no-mind-change conjunct (\leanname{ex_strictly_stronger_finite}), and the class of all finite languages supplies the separation (\Cref{ex:finite-languages}), so this rung alone is certified rather than cited.
-
-\item \textbf{Syntactic versus semantic convergence is the whole gap.} Replace the labels $\Ex$ and $\BC$ by their quantifier skeletons and the upper rung reveals itself as a boundary. $\Ex$ requires the index to satisfy $h = c$ (\leanname{EXLearnable}) while $\BC$ requires only $\forall x,\ h\,x = c\,x$ (\leanname{BCLearnable}): one clause toggled from equality of programs to equality of extensions, and that single toggle is exactly what the Case--Smith class exploits.
-
-\item \textbf{Why the upper rung is dashed.} Ask the kernel for the $\Ex \subsetneq \BC$ separation and you reach the figure's principal frontier. The criteria are typed (\leanname{EXLearnable}, \leanname{BCLearnable}) but no theorem separates them, so the edge is drawn dashed and cited (\cite{CaseSmith1983}, \cref{op:bc-ex-formal}). Set this beside the solid rung of Exercise~1: line style here is a record of evidence grade, doing real work that decoration never would.
-
-\item \textbf{Anomalous learning extends.} Toggle the exactness clause of $\Ex$ from $h = c$ to ``$h$ errs on at most $a$ strings'', and the result is a boundary on the larger side. Removing a constraint can only enlarge the learnable class, so $\Ex^*$ \rel{extends} $\Ex$ (\leanname{AnomalousLearnable}); the separation is strict but literature-only (\cite{CaseSmith1983}, \cref{op:anomalous-icl}), so the $\Ex^* \to \Ex$ edge is dashed and oriented as an extension.
-
-\item \textbf{Monotonic learning restricts.} Conjoin to $\Ex$ the no-retraction clause $h\,\mathrm{data}\,x = \mathrm{true} \Rightarrow h\,(\mathrm{data}\,{+}{+}\,[xy])\,x = \mathrm{true}$. This is the boundary on the smaller side, the mirror image of Exercise~4: adding a constraint can only shrink the class, so $\mathrm{Mon}\Ex$ \rel{restricts} $\Ex$ (\leanname{MonotonicLearnable}); the strictness is literature (\cite{OshersonStobWeinstein1986}, \cref{op:monotonic-icl}), so the edge is dashed and oriented as a restriction.
-
-\item \textbf{Vacillation is two toggles at once.} Replace the single final index by membership in a finite set of correct indices, and the branch lands as an instance between the two spine nodes. Relaxing $\Ex$'s one index to finitely many extends $\Ex$; restricting $\BC$'s arbitrarily many indices to finitely many is the dual restriction of $\BC$; so $\mathrm{Vex}$ (\leanname{VacillatoryLearnable}) lies strictly between them, with both legs dashed and cited (\cite{CaseSmith1983}, \cref{op:vex-hierarchy}).
-
-\item \textbf{The arithmetical anchor.} Read the $\Delta^0_2$ tag on the trial-and-error node as a full characterization: an exact equality of classes, stronger than the containment it might be mistaken for. This is a frontier that re-types the value. Trial-and-error learnability is pointwise convergence (\leanname{TrialAndErrorLearnable}) and equals membership in $\Delta^0_2$ (\leanname{Delta02Class}) by the Putnam--Gold theorem, but the kernel carries the class as a definition and not the iff, so the characterization edge is dashed and cited (\cite{Putnam1965}).
-
-\item \textbf{Gold's theorem is the pressure behind the chain.} Ask why the hierarchy branches at $\Ex$ at all, and you find the instance that motivates every edge. Gold's impossibility (\leanname{gold_theorem}) proves $\neg\,\Ex$-identifiability for any class with all finite languages and one infinite language, so strengthening to $\FIN$ and weakening to $\BC$ are the two escape routes the figure draws, and the chain exists because $\Ex$ is provably bounded.
-
-\item \textbf{Mind changes turn the spine into an ordinal.} Refine the $\FIN$-to-$\Ex$ gap by counting retractions rather than forbidding them, and the bottom rung becomes a graded frontier. $\FIN$ is zero mind changes and $\Ex$ is finitely many, and the kernel types the intermediate measure (\leanname{MindChangeOrdinal}); but the strictness of the transfinite hierarchy between them is only cited (\cite{FreivaldsSmith1993}, \cref{op:fs-ordinal}), with no kernel proof, so the graded edge is dashed.
-
-\item \textbf{Is the lattice one graded criterion?} Ask whether all seven nodes are evaluations of a single success criterion parameterized by four toggles: error budget, retraction flag, index cardinality, and convergence mode (syntactic or semantic). This is the figure's most general open frontier. It would present the hierarchy as one criterion space with the four constraints as a basis, collapsing the fixed chain plus branches into coordinates on that space; yet the kernel formalizes the seven criteria separately with no graded predicate unifying them, so the meta-edge is dashed over an otherwise typed lattice.
-\end{enumerate}
-
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:three-paradigm}}
-
-\Cref{fig:three-paradigm} is the chapter's correction of a tempting wrong picture: the three paradigms look like an antichain of three incomparable territories, and they are not. The geometry is a containment (Online inside PAC) with Gold off to one side, and the exercises below keep testing that geometry against the eye's expectation of a symmetric triangle. A perturbation that recovers a settled edge, direction and evidence grade both fixed, is an \emph{instance}. One that toggles a single constraint and watches the learnable class strictly grow or shrink is a \emph{boundary}. One that reaches a dashed edge, literature-only or open, is a \emph{frontier}. Two edges here are solid kernel theorems and the rest are dashed; one expected edge turns out to be no edge at all.
+Each exercise perturbs one of the chapter's two figures and asks what the corresponding separation, relaxation, or limit becomes.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The picture is an order.} Read the three paradigms as nodes of a partial order under ``strictly more powerful than'', a richer reading than three incomparable territories. This is the figure's organizing instance: online learnability implies PAC learnability (\leanname{online_imp_pac}) and the converse fails (\leanname{pac_not_implies_online}), so the Online and PAC nodes are \emph{comparable} and the whole picture is a containment plus an incomparable Gold. The symmetric triangle of six arrows the eye expects never materializes.
+\item \textbf{The verified rung.} Read $\FIN \subsetneq \Ex$ as a theorem rather than a containment of definitions. $\FIN$-learnability implies $\Ex$-learnability by dropping the no-mind-change conjunct (\leanname{ex_strictly_stronger_finite}), and the class of all finite languages supplies the strict separation (\Cref{ex:finite-languages}).
 
-\item \textbf{The impossible witness.} Try to draw the edge ``some class is online-learnable but not PAC-learnable'', certified by ``finite Littlestone dimension, infinite VC dimension''. This is the frontier that does not exist: $\VC \le \Ldim$ (\leanname{BranchWiseLittlestoneDim_ge_VCDim}) makes the certificate ``$\Ldim<\infty$ and $\VC=\infty$'' an empty predicate, and \leanname{online_imp_pac} makes ``online but not PAC'' an empty class, so this edge is removed rather than dashed. A separation drawn with an impossible witness is no edge at all, weaker even than a weak one.
+\item \textbf{Syntactic versus semantic convergence.} $\Ex$ requires the index to satisfy $h = c$ while $\BC$ requires only $\forall x,\ h\,x = c\,x$: one clause toggled from equality of programs to equality of extensions. Show that this single toggle is exactly what the Case--Smith class exploits to separate $\Ex \subsetneq \BC$ (\cite{CaseSmith1983}, \cref{op:bc-ex-formal}).
 
-\item \textbf{Strictness is the threshold class.} Read the strictness of $\text{Online}\subsetneq\mathrm{PAC}$ as a theorem with a witness, the kind of object that fills what would otherwise read as a gap. This is the boundary on the larger side: the threshold class over $\N$ is PAC-learnable yet has $\Ldim=\infty$, hence is not online-learnable (\leanname{pac_not_implies_online}), so toggling from ``i.i.d.\ sample'' to ``adversarial order'' strictly shrinks the class, and this single witness is what makes the Online region sit \emph{properly} inside PAC.
+\item \textbf{Two relaxations of $\Ex$.} Toggling the exactness clause of $\Ex$ from $h = c$ to ``$h$ errs on at most $a$ strings'' enlarges the class ($\Ex^* \supsetneq \Ex$); conjoining the no-retraction clause $h\,\mathrm{data}\,x = \mathrm{true} \Rightarrow h\,(\mathrm{data} {+}{+} [xy])\,x = \mathrm{true}$ shrinks it ($\mathrm{Mon}\Ex \subsetneq \Ex$). Verify both strictness directions (\cite{CaseSmith1983,OshersonStobWeinstein1986}).
 
-\item \textbf{One solid arrow certifies two separations.} Ask the kernel only for $\Ex\not\Rightarrow\mathrm{PAC}$, and that one instance does double duty. The finite-languages witness is $\Ex$-identifiable but has $\VC=\infty$ (\leanname{ex_not_implies_pac}), and because Online lies inside PAC, the same class is a fortiori not online-learnable, so the lone solid arrow $\Ex\not\Rightarrow\mathrm{PAC}$ simultaneously certifies $\Ex\not\Rightarrow\text{Online}$, and the cluster $\{\mathrm{PAC},\text{Online}\}$ needs no separate Gold-escapes-Online theorem.
+\item \textbf{The arithmetical anchor.} Read the $\Delta^0_2$ tag on the trial-and-error node as a full characterization, an equality of classes rather than a containment. Trial-and-error learnability is pointwise convergence and equals membership in $\Delta^0_2$ by the Putnam--Gold theorem (\cite{Putnam1965}); state the equality precisely and identify which direction is the harder one.
 
-\item \textbf{What the three-way theorem actually says.} Unfold \leanname{online_pac_gold_separation}, and it names the figure's solid content exactly, a frontier with a precise boundary. It is the conjunction $(\exists\,\mathrm{PAC}\wedge\neg\,\text{Online})\wedge(\exists\,\Ex\wedge\neg\,\mathrm{PAC})$, that is \leanname{pac_not_implies_online} and \leanname{ex_not_implies_pac} and \emph{nothing else}, so any sixth ``mutual'' edge the eye expects from a triangle falls outside the theorem and must be drawn dashed or omitted.
+\item \textbf{Gold's theorem as the pressure behind the chain.} Gold's impossibility (\leanname{gold_theorem}) rules out $\Ex$-identification for any class with all finite languages and one infinite language. Show that strengthening to $\FIN$ and weakening to $\BC$ are the two escape routes from this bound, so the chain exists because $\Ex$ is provably limited.
 
-\item \textbf{Gold's incomparability is a different axis.} Ask why Gold escapes PAC ``upward'' (unbounded VC) yet is escaped by PAC ``downward'' (thresholds), and the boundary that separates two axes appears. $\Ex\not\Rightarrow\mathrm{PAC}$ is a statistical-capacity fact certified in the kernel (\leanname{ex_not_implies_pac}), while $\mathrm{PAC}\not\Rightarrow\Ex$ is a convergence-signal fact that is literature only (\cite{Gold1967}), so the two legs at the Gold node measure capacity and convergence respectively. What looks like one symmetric ``incomparability'' is really two independent measurements.
+\item \textbf{Mind changes grade the bottom rung.} Refine the $\FIN$-to-$\Ex$ gap by counting retractions rather than forbidding them: $\FIN$ is zero mind changes, $\Ex$ is finitely many, and the intermediate measure is ordinal-valued (\leanname{MindChangeOrdinal}). State the transfinite strictness (\cite{FreivaldsSmith1993}, \cref{op:fs-ordinal}) that the integer counts cannot capture.
 
-\item \textbf{Why three of the legs are dashed.} Ask the kernel for $\mathrm{PAC}\not\Rightarrow\Ex$, $\text{Online}\not\Rightarrow\Ex$, and $\Ex\not\Rightarrow\text{Online}$, and you reach the figure's principal frontier. The paradigms are typed (\leanname{PACLearnable}, \leanname{OnlineLearnable}, \leanname{EXLearnable}) but no theorem in the kernel separates them in these directions, so all three edges are drawn dashed and cited (\cite{Gold1967} for the first two, \cite{Angluin1980} for the third). Set these beside the solid legs of Exercises~3 and~4 and the line style reads off as evidence grade.
+\item \textbf{An edge that does not exist.} Try to draw ``online-learnable but not PAC-learnable'', certified by ``finite Littlestone, infinite VC''. Show that $\VC \le \Ldim$ (\leanname{BranchWiseLittlestoneDim_ge_VCDim}) makes that certificate an empty predicate and \leanname{online_imp_pac} makes the class empty, so the edge is removed, not merely unproven.
 
-\item \textbf{Pattern languages are the reverse witness.} Toggle the Gold-versus-Online comparison to the other direction, and the boundary that fills the $\Ex\not\Rightarrow\text{Online}$ leg appears. The class of pattern languages is $\Ex$-identifiable from positive data yet has infinite Littlestone dimension (\cite{Angluin1980}), so it is a class Gold learns that no online learner can, the mirror of the singletons-with-empty-set class that online learns and Gold cannot.
+\item \textbf{One arrow certifies two separations.} The finite-languages class is $\Ex$-identifiable but has $\VC = \infty$ (\leanname{ex_not_implies_pac}). Show that because Online lies inside PAC, the same class is a fortiori not online-learnable, so $\Ex \not\Rightarrow \mathrm{PAC}$ alone certifies $\Ex \not\Rightarrow \text{Online}$ with no separate theorem.
 
-\item \textbf{Singletons sit inside PAC but outside Gold.} Locate the singletons-with-empty-set class on the corrected picture, the instance that tests the geometry. The class has $\Ldim=1$ so it is online-learnable, hence (by \leanname{online_imp_pac}) it lies in both the Online and PAC regions, yet it is not $\Ex$-identifiable from text (\cite{Gold1967}), so it is a single class witnessing membership in the nested $\{\text{Online}\subset\mathrm{PAC}\}$ region together with exclusion from the Gold region.
-
-\item \textbf{Is the order one graded measure?} Ask whether the VC dimension, the Littlestone dimension, and the mind-change ordinal are three readings of a single parameterized complexity measure under one data-model parameter. This is the figure's most general open frontier. The kernel proves the comparabilities it can ($\VC\le\Ldim$ via \leanname{BranchWiseLittlestoneDim_ge_VCDim}, $\text{Online}\Rightarrow\mathrm{PAC}$ via \leanname{online_imp_pac}) but carries the three invariants as separate definitions with no graded predicate unifying them (\cref{op:meta-measure}, \cref{op:effective-three-paradigm}), so the meta-edge collapsing the order into one measure is dashed over an otherwise typed lattice.
+\item \textbf{Is the order one graded measure?} Ask whether the VC dimension, the Littlestone dimension, and the mind-change ordinal are three readings of a single parameterized complexity measure under one data-model parameter. The kernel proves $\VC \le \Ldim$ and $\text{Online} \Rightarrow \mathrm{PAC}$ but carries the three invariants separately; decide whether they unify or are provably non-unifiable (\cref{op:meta-measure}, \cref{op:effective-three-paradigm}).
 \end{enumerate}

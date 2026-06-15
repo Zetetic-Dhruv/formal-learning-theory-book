@@ -20,14 +20,12 @@ makes the analogy plausible.
 a theorem, classified by \emph{type}.
 \end{enumerate}
 
-The key insight of this chapter is that the obstruction type is more
-informative than the analogy itself. Two analogies may look superficially
-similar (``X is like Y because both measure complexity'') but fail for
-entirely different reasons: one because the objects live in different
-type systems, another because a conjectured equivalence remains unproved.
-The obstruction type tells you \emph{why} the analogy fails, and this
-``why'' determines whether the analogy might become a theorem in the
-future, or is structurally blocked.
+The obstruction type is more informative than the analogy itself. Two
+analogies may look similar (``X is like Y because both measure complexity'')
+but fail for entirely different reasons: one because the objects live in
+different type systems, another because a conjectured equivalence remains
+unproved. The obstruction type tells you \emph{why} the analogy fails, and
+this determines whether it can become a theorem or is structurally blocked.
 
 The 32 analogy edges distribute across six obstruction types:
 
@@ -46,11 +44,10 @@ Success criterion mismatch & Different optimization objectives & 1 \\
 \end{tabular}
 \end{center}
 
-The distribution is itself revealing. The plurality of obstructions
-are type mismatches: analogies that fail because the mathematical
-objects being compared belong to different formal categories. The second
-largest group, missing equivalence witnesses, represents the frontier:
-analogies that \emph{might} become theorems if someone proves the right
+The plurality of obstructions are type mismatches: analogies that fail
+because the objects being compared belong to different formal categories.
+The second largest group, missing equivalence witnesses, represents the
+frontier: analogies that become theorems if someone proves the right
 conjecture.
 
 
@@ -159,16 +156,13 @@ examples to reconstruct $h$). The notion of shortness differs. \\
 \end{tabularx}
 \end{table}
 
-The pattern across these 12 edges is consistent: the analogy identifies
-a genuine structural parallel, but the source and target live in
-different parts of the type system. Making the analogy formal would
-require a bridging theorem that relates the two types. We conjecture that
-most of these gaps are structural rather than temporary, but this remains a
-judgment with the force of a hunch, no more: no impossibility result rules out a
-bridge for any individual pair, and at least one (information-theoretic bounds
-versus PAC-Bayes) already has partial bridges~\cite{HellstromDurisi2020}. The
-classification records where bridges are currently absent. Where they are
-provably impossible is a stronger claim the chapter nowhere makes.
+Across these 12 edges the analogy identifies a genuine structural parallel,
+but source and target live in different parts of the type system, and making
+the analogy formal would require a bridging theorem relating the two types.
+No impossibility result rules out such a bridge for any individual pair, and
+one (information-theoretic bounds versus PAC-Bayes) already has partial
+bridges~\cite{HellstromDurisi2020}. The classification records where bridges
+are currently absent, not where they are provably impossible.
 
 
 % ================================================================
@@ -178,21 +172,17 @@ provably impossible is a stronger claim the chapter nowhere makes.
 \section{Missing Equivalence Witness}
 \label{sec:missing-equiv}
 
-A missing equivalence witness obstruction marks the most interesting
-class of analogies: those where a formal equivalence is plausible but
-unproved. Some of these may become theorems; others may eventually be
-disproved. They represent the active frontier of the field.
+A missing equivalence witness obstruction marks analogies where a formal
+equivalence is plausible but unproved. These represent the active frontier
+of the field.
 
-A caveat on membership: not all nine edges are genuinely open.  Three are
-settled, and appear here only because the analogy is \emph{commonly drawn}
-as an equivalence.  The mistake-bound/Littlestone pair \emph{is} an
-equivalence (Littlestone's theorem, below); the Rademacher/VC and
-label-complexity/sample-complexity pairs are established
-\emph{non}-equivalences (the separations below are known, not
-conjectural).  For these three the missing witness is not a proof of
-equivalence but the recognition that the naive equivalence is false, or
-holds only in limited scope.  The genuinely open conjectures are
-compression/VC and the two MML edges.
+Not all nine edges are genuinely open. Three are settled and appear here
+only because the analogy is commonly drawn as an equivalence: the
+mistake-bound/Littlestone pair \emph{is} an equivalence (Littlestone's
+theorem, below), and the Rademacher/VC and label-complexity/sample-complexity
+pairs are established \emph{non}-equivalences (the separations below are
+known, not conjectural). The genuinely open conjectures are compression/VC
+and the two MML edges.
 
 \begin{obstbox}
 \textbf{Compression $\leftrightarrow$ VC dimension.}
@@ -206,9 +196,7 @@ exponential in $d$), establishing one
 direction.\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression} The conjecture that
 compression size is $O(d)$ remains open. If proved, this would upgrade
 the analogy to an equivalence; if disproved, it would become a
-separation.
-
-This is arguably the most important open problem connected to the
+separation. It is the most important open problem connected to the
 analogy edges in the graph.
 \end{obstbox}
 
@@ -551,8 +539,7 @@ answer different questions about the same sequential data.
 
 \Cref{fig:obstruction-map} displays all 32 analogy edges, colored by
 obstruction type, with a filled dot marking the five edges that carry a
-verified kernel handle. The visual pattern reveals the structure of the
-field's unresolved connections: a taxonomy of why analogies fail, and the
+verified bridge. The pattern is a taxonomy of why analogies fail, and the
 short list of places where formalization has bridged one anyway.
 
 \begin{figure}[ht]
@@ -674,21 +661,11 @@ short list of places where formalization has bridged one anyway.
 \end{tikzpicture}
 
 \caption[The obstruction map: thirty-two analogies, six failure types, five
-verified bridges]{The obstruction map. The field is connected by thirty-two
-cross-paradigm analogies, none of them a theorem; they fail for six
-classifiable reasons, shown by color and line style (the key below). Most
-obstructions are the book's conceptual analysis of why the analogy breaks; a
-filled dot marks the five edges where the kernel has proved a one-way bridge
-or an equivalence: the mistake bound equals the Littlestone dimension
-(\leanname{optimal_mistake_bound_eq_ldim}), the VC dimension lies below it
-with no reverse (\leanname{vcdim_le_of_mistake_bounded}), finite VC dimension
-yields some finite compression (\leanname{fundamental_vc_compression}, the
-size $O(d)$ still open), sample complexity is characterized by VC dimension
-(\leanname{fundamental_theorem}), and covering numbers follow from VC
-dimension (\leanname{sauer_shelah_exp_bound}). The distribution of colors is
-the lesson, that analogy-failure is taxonomic; the marked edges are where
-formalization currently reaches. The graph is disconnected, so each cluster
-is drawn in its own region. Key:
+verified bridges]{The obstruction map. Thirty-two cross-paradigm analogies,
+none of them a theorem, fail for six classifiable reasons shown by color and
+line style. A filled dot marks the five edges where formalization has proved a
+one-way bridge or an equivalence (\leanname{fundamental_theorem}). The
+distribution of colors is the lesson: analogy-failure is taxonomic. Key:
 \textcolor{edgeorange}{\rule[0.4ex]{1.1em}{0.9pt}} type mismatch (12);
 \textcolor{defblue}{\textbf{-\,-\,-}} missing equivalence witness (9);
 \textcolor{sepgreen}{\textbf{$\cdots$}} one-way theorem (4);
@@ -719,11 +696,11 @@ open frontier. The sample compression conjecture (compression
 $\leftrightarrow$ VC dimension) is the most prominent, but the
 Rademacher--VC relationship and the characterization-theorem parallel
 (VC $\leftrightarrow$ Littlestone) are equally fundamental. Progress on
-any of these would restructure the analogy map, converting a dashed blue
-edge into a solid theorem edge.
+any of these would restructure the analogy map, converting a conjectured
+edge into a theorem.
 
 \emph{Third}, the 4 one-way theorems show where the asymmetry is built into
-the objects, an artifact of nothing but the formalism itself. Covering numbers bound Rademacher complexity
+the objects. Covering numbers bound Rademacher complexity
 (Dudley) and are bounded by VC dimension (Sauer--Shelah), but these
 bounds flow in one direction only. The asymmetry reflects the
 generality hierarchy: covering numbers apply to metric spaces,
@@ -731,11 +708,9 @@ Rademacher to function classes, VC dimension to binary classes. Each
 step downward in generality tightens the bound but loses applicability.
 
 Together, the 32 analogy edges and their obstructions form a map of what
-formal learning theory does \emph{not yet} know how to unify. Many of the
-obstructions appear to be structural features of the landscape rather than
-removable obstacles, though, as noted above, that is a working judgment
-rather than a proven impossibility. Understanding why an analogy fails is,
-in this field, as valuable as understanding why a theorem holds.
+formal learning theory does \emph{not yet} know how to unify. Understanding
+why an analogy fails is, in this field, as valuable as understanding why a
+theorem holds.
 
 
 % ================================================================
@@ -745,10 +720,8 @@ in this field, as valuable as understanding why a theorem holds.
 \section{When the Analogy Is a Theorem}
 \label{sec:realized-analogies}
 
-The obstruction taxonomy earns its keep only because the alternative is
-real: some analogies carry no obstruction at all. They began as loose
-parallels and were discharged into theorems, and the cleanest of them is
-now machine-checked.
+Some analogies carry no obstruction at all. They began as loose parallels
+and were discharged into theorems, and the cleanest is now machine-checked.
 
 The flagship is the correspondence \emph{online learning
 $\leftrightarrow$ zero-sum games}. A learner facing an adversary and a row
@@ -785,7 +758,7 @@ This realized analogy has a transformer face. The multiplicative-weights
 distribution is a softmax over accumulated scores, exactly the operation
 a softmax-attention head performs over its key scores. Attention is, in
 this precise sense, one step of the Hedge update, and the head's induced
-concept class is machine-checked to be
+concept class is
 well-behaved.\formal{TLT.Bridge.softAttention_wellBehaved} The
 online$\,\leftrightarrow\,$game analogy thus reaches into the architecture
 of \Cref{ch:generalization}: the potential argument that solves a matrix
@@ -794,11 +767,10 @@ game is the same normalization that sits inside every attention layer.
 \begin{remark}[Why the realized case matters]
 \label{rem:realized-matters}
 A taxonomy of obstructions would be vacuous if every analogy were blocked.
-\Cref{thm:mwu-minimax} is the existence proof that the frontier of
-\Cref{sec:missing-equiv} is worth pushing: an analogy that looked like a
-metaphor (``learning against an adversary is like playing a game'') is a
-theorem, machine-checked, with a softmax at its center. The obstruction
-types classify only the analogies not yet so discharged.
+\Cref{thm:mwu-minimax} shows the frontier of \Cref{sec:missing-equiv} is
+worth pushing: an analogy that looked like a metaphor (``learning against an
+adversary is like playing a game'') is a theorem, with a softmax at its
+center. The obstruction types classify only the analogies not yet discharged.
 \end{remark}
 
 
@@ -813,8 +785,7 @@ An analogy chapter's open problems are of two kinds: \emph{discharge} a
 parallel into a theorem, or \emph{prove} that no such theorem can exist.
 Each problem below is tagged a \emph{known unknown} (KU), sharply posed but
 unresolved, or an \emph{unknown known} (UK), where the right bridging
-object is still missing; a design-lab or literature anchor is named where
-one exists.
+object is still missing.
 
 \begin{openprob}[The sample compression conjecture]
 \label{op:compression-vc-analogy}
@@ -904,154 +875,66 @@ prediction game?  An unknown known on the transformer side
 (\leanname{softAttention_wellBehaved}).
 \end{openprob}
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:obstruction-map}}
+\subsection*{Counterfactual exercises}
 
-The obstruction map is the rare figure that says two things at once about every
-edge, so the exercises below pull on one code at a time and watch the other hold
-still.  Every edge is an \rel{analogy} that fails, and it wears two independent
-markings.  Its \emph{color and line style} record the obstruction type, the
-book's account of \emph{why} the analogy is not a theorem, drawn from six
-values: type mismatch, missing equivalence witness, one-way theorem only,
-data-model mismatch, proof-method mismatch, and success-criterion mismatch.  Its
-\emph{filled dot} records the evidence, appearing on exactly the five edges
-where the kernel certifies a one-way bridge or an equivalence sorry-free.  Three
-kinds of reading recur.  An \emph{instance} reading takes an edge, a color
-class, or a dotted handle the map already draws and shows the perturbed picture
-contains it.  A \emph{boundary} reading toggles one code, direction, or evidence
-grade, so an edge changes color, gains or loses its dot, or turns out to be
-settled where the eye read it as open.  A \emph{frontier} reading lands on an
-undotted edge, open or backed only by the literature, whose formalization or
-whose missing meta-level definition is the next move.  The chapter's care
-lives in the gap between the two codes, so watch where color and dot disagree.
+Each edge carries two codes: color and line style record the obstruction type
+(why the analogy is not a theorem), and a filled dot marks the five edges
+backed by a verified bridge. The exercises probe one code at a time, especially
+where the two disagree.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The whole lesson lives in the distribution of colors.}
-Read the figure by counting colors and ignoring node identities.  This is the
-map's defining instance: thirty-two analogies fail across only six obstruction
-types, with type mismatch the plurality (twelve), so ``why does this analogy
-fail?'' has a finite-codomain answer rather than a case-by-case story.  The
-figure is the abstract witness that analogy-failure in learning theory is
-taxonomic, and the colour histogram, twelve type mismatches dominating, carries
-the chapter's central claim that the field's most common bridges break for the
-most basic reason of all, that the objects compared are different kinds of
-thing.
+\item Count colors and ignore node identities. Thirty-two analogies fail across
+only six obstruction types, with type mismatch the plurality (twelve), so ``why
+does this analogy fail?'' has a finite-codomain answer rather than a
+case-by-case story. Argue that this taxonomic structure is the figure's central
+claim.
 
-\item \textbf{The five dotted edges are the formalization frontier, and they
-are a minority.}  Read only the edges carrying a filled dot.  This instance
-exposes where the kernel reaches into the analogy web: exactly
-five of the thirty-two edges carry a verified one-way handle
-(\leanname{optimal_mistake_bound_eq_ldim}, \leanname{vcdim_le_of_mistake_bounded},
-\leanname{fundamental_vc_compression}, \leanname{fundamental_theorem},
-\leanname{sauer_shelah_exp_bound}), and they cluster on the complexity-measure
-side of the graph, so the dotted subgraph is the machine-checked fragment of
-the analogy structure while the roughly two dozen undotted edges are the
-book's conceptual analysis or open conjecture.  The dot count is small
-precisely because formalization has so far bridged only a few of the field's
-analogies.
+\item Read only the edges carrying a filled dot. Exactly five of the
+thirty-two edges carry a verified bridge, and they cluster on the
+complexity-measure side of the graph. Explain why this small dotted subgraph is
+the machine-checked fragment while the rest is conceptual analysis or open
+conjecture.
 
-\item \textbf{The twelve type-mismatch edges are the conceptual majority, and
-none is a theorem.}  Read only the orange strokes.  This instance
-anchors the discipline of the two-code scheme: every type-mismatch edge
-(\Cref{sec:type-mismatch}) is an argument that source and target live in
-different formal categories, claiming neither a proved impossibility nor a
-verified bridge, which is why every last orange edge runs dotless.  Drawing
-color (a conceptual classification) and the dot (a verified handle) as separate
-axes is exactly what stops the reader from mistaking the book's analysis of
-\emph{why} an
-analogy fails for a kernel theorem that it fails.
+\item The pair \nde{mistake\_bound}--\nde{littlestone\_dimension} \emph{is} a
+verified equivalence (\leanname{optimal_mistake_bound_eq_ldim}, hence the dot),
+yet the edge is blue. Show that the ``missing witness'' names a distinct fact:
+as complexity measures in their own right the two diverge when extended to
+bandit or partial-monitoring feedback (\Cref{sec:missing-equiv}). Why does the
+diagram need both codes here?
 
-\item \textbf{The mistake bound and Littlestone dimension are equal, yet the
-edge is blue.}  Read the dotted blue edge between \nde{mistake\_bound} and
-\nde{littlestone\_dimension}.  This edge is where the obstruction type and the
-evidence come apart: the pair \emph{is} a verified equivalence
-(\leanname{optimal_mistake_bound_eq_ldim}, hence the dot), so the ``missing
-witness'' names the stand-alone-measures distinction, the fact that as
-complexity measures in their own right the two diverge when extended to bandit
-or partial-monitoring feedback (\Cref{sec:missing-equiv}).  The proof of
-equivalence is in hand; what is missing is any reason to treat the two extended
-measures as one.  The edge is blue because the naive ``these are
-the same object'' reading fails even though the equivalence theorem holds,
-which is why the color and the dot genuinely disagree on this edge and the
-diagram needs both.
+\item On \nde{compression\_scheme}--\nde{vc\_dimension}, the dot marks
+\leanname{fundamental_vc_compression} (finite VC dimension implies \emph{some}
+finite compression scheme, exponential in $d$), but the edge stays blue dashed
+because the $O(d)$ sample compression conjecture is open
+(\Cref{op:compression-vc-analogy}). Explain how one edge can carry a verified
+direction and an open equivalence at once.
 
-\item \textbf{Finite VC gives some compression, but the dot does not certify
-$O(d)$.}  Read the dotted blue edge between \nde{compression\_scheme} and
-\nde{vc\_dimension}.  Here a verified \emph{direction} and an open
-\emph{equivalence} meet on one edge: the dot marks
-\leanname{fundamental_vc_compression}, finite VC dimension implies \emph{some}
-finite compression scheme (of size exponential in $d$), but the sample
-compression conjecture, that the size is $O(d)$, is the prominent missing
-witness (\Cref{op:compression-vc-analogy}).  The dot certifies one half of the
-analogy while the edge stays blue dashed because the equivalence that would
-discharge it is unproved, and promoting the edge to a solid theorem edge is
-exactly the content of the open problem.
+\item The edges \nde{rademacher\_complexity}--\nde{vc\_dimension} and
+\nde{label\_complexity}--\nde{sample\_complexity} are blue but carry no dot.
+These are \emph{established} non-equivalences (Rademacher complexity can fall
+far below the VC bound; label complexity can be exponentially smaller than
+sample complexity, \Cref{op:active-passive}), not open conjectures. Explain how
+the absence of a dot plus the prose distinguishes a known separation from a
+live conjecture inside the same color class.
 
-\item \textbf{Rademacher versus VC and label versus sample are already-settled
-non-equivalences wearing the open class's color.}  Read the two blue edges
-\nde{rademacher\_complexity}--\nde{vc\_dimension} and
-\nde{label\_complexity}--\nde{sample\_complexity}, which carry no dot.  This is
-the boundary the chapter's caveat draws inside the blue class: both edges are
-\emph{established} non-equivalences with the separation already in hand
-(Rademacher complexity is data-dependent and can fall far below the VC bound;
-label complexity can be exponentially smaller than sample complexity, the
-content of active learning, \Cref{op:active-passive}), so the ``missing
-witness'' here is the recognition that the naive equivalence is false, a verdict
-delivered rather than a gap left to close.  The blue color groups them with the
-genuinely open MML edges, while the absence of a dot together with the prose
-distinguishes a known separation from a live conjecture.
+\item Both \nde{covering\_number}--\nde{vc\_dimension} and
+\nde{covering\_number}--\nde{rademacher\_complexity} are green ``one-way
+theorem'' edges, but only the first carries a dot
+(\leanname{sauer_shelah_exp_bound}); the second is Dudley's entropy integral,
+stated classically (\Cref{sec:one-way}). Show how the evidence code splits one
+obstruction type into a verified bridge and a literature bridge.
 
-\item \textbf{One green edge is verified and one is only classical, and the
-dot tells them apart.}  Read the two green dotted edges
-\nde{covering\_number}--\nde{vc\_dimension} and
-\nde{covering\_number}--\nde{rademacher\_complexity}.  These two edges are the
-boundary where a shared color hides a split in the evidence: covering numbers are
-bounded by VC dimension via Sauer--Shelah, which is machine-checked
-(\leanname{sauer_shelah_exp_bound}, hence the dot), whereas covering numbers
-bound Rademacher complexity via Dudley's entropy integral, a classical result
-the chapter states with no kernel handle (\Cref{sec:one-way}), so the second
-edge is the same green ``one-way theorem only'' color but carries no dot.  The
-evidence axis splits a single obstruction type into a verified bridge and a
-literature bridge, which a one-code figure could not express.
+\item On \nde{sample\_complexity}--\nde{vc\_dimension} the dot marks
+\leanname{fundamental_theorem}, the equivalence between finite VC dimension and
+finite sample complexity. The analogy is usually stated as an identity
+(``sample complexity just \emph{is} VC dimension''), which erases the two
+directions proved by different arguments (\Cref{sec:one-way}). Explain why the
+dot guards a two-directional theorem against being read as a definition.
 
-\item \textbf{The fundamental theorem is two-directional, and the dot warns
-against collapsing it.}  Read the dotted green edge between
-\nde{sample\_complexity} and \nde{vc\_dimension}.  This edge sits on the line
-between a theorem and a definition: the dot marks \leanname{fundamental_theorem},
-the equivalence between finite VC dimension and finite sample complexity, while
-the analogy is usually stated as an identity (``sample complexity just
-\emph{is} VC dimension''), which erases the content of the theorem, an
-explicit upper bound one way and a matching lower bound the other, proved by
-different arguments (\Cref{sec:one-way}).  The dot says the bridge is verified
-\emph{as a theorem}, something earned by proof rather than granted by
-definition, so the marker here guards a two-directional result against being
-read as a tautology.
-
-\item \textbf{Close the compression conjecture, or formalize the taxonomy, and
-the figure gains structure.}  Pick either the $O(d)$ compression direction or
-the meta-level classification.  Either is a frontier the figure marks but
-cannot yet draw: proving compression size $O(d)$ would upgrade the
-\nde{compression\_scheme}--\nde{vc\_dimension} edge from a half-verified blue
-dash to a full equivalence (\Cref{op:compression-vc-analogy}), and separately,
-making ``type mismatch,'' ``one-way theorem,'' and the other obstruction types
-precise would turn the assignment of a color to each of the thirty-two edges
-from an expert judgment into a theorem (\Cref{op:formalize-taxonomy}).  The
-first frontier adds a dot; the second would make the entire color code itself
-a proved classification rather than a census, and likewise the MML--MDL
-relationship still awaits any witness in either direction
-(\Cref{op:mml-mdl}).
-
-\item \textbf{Is analogy-failure provably six-typed, a completeness theorem for
-the obstruction map?}  Ask whether the six colors are exhaustive, that every
-cross-paradigm analogy must fail for one of exactly these reasons and no
-seventh is possible.  This is the figure's deepest frontier: the diagram
-exhibits six obstruction types as an expert classification, but whether six is
-a proved invariant of the analogy graph, a completeness theorem stating that
-the failure modes are exactly these and that, for instance, a specific type
-mismatch is \emph{permanently} un-bridgeable rather than merely currently
-un-bridged, is open and couples two problems, defining the types formally
+\item Ask whether the six obstruction types are exhaustive: must every
+cross-paradigm analogy fail for one of exactly these reasons? A completeness
+theorem would require defining the types formally
 (\Cref{op:formalize-taxonomy}) and proving the permanence of a single mismatch
-(\Cref{op:type-mismatch-impossibility}).  Until both land, the color count six
-and the dot count five are a census of the present state of knowledge, not
-invariants of the field, so this reading of the map, that analogy-failure is a
-small finite invariant, is itself drawn dashed.
+(\Cref{op:type-mismatch-impossibility}). Until both are settled, the counts six
+and five are a census, not an invariant of the field.
 \end{enumerate}

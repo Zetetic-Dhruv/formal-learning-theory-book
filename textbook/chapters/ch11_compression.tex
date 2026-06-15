@@ -208,12 +208,11 @@ asks for the converse of \Cref{thm:compression-pac}: if a class is learnable
 (which, by the Fundamental Theorem, is equivalent to finite VC dimension $d$),
 can the learner always compress its evidence to $O(d)$ points?
 
-Four decades.  The statement is clean, the motivation is immediate, and
-every natural proof strategy fails.  Topological arguments reach $2^{O(d)}$
-but not $O(d)$.  Algebraic approaches founder on classes with no linear
-structure.  The gap between what compression \emph{exists} and what the
-conjecture \emph{demands} has not narrowed since the question was posed.
-It is not known whether the obstacle is technical or fundamental.
+Four decades on, the statement is clean, the motivation immediate, and every
+natural proof strategy fails.  Topological arguments reach $2^{O(d)}$ but not
+$O(d)$.  Algebraic approaches founder on classes with no linear structure.  The
+gap between what compression \emph{exists} and what the conjecture \emph{demands}
+has not narrowed since the question was posed.
 
 \begin{thm}[Exponential compression exists {\cite{MoranYehudayoff2016}}]
 \label{thm:moran-yehudayoff}
@@ -221,14 +220,12 @@ Every concept class $\mathcal{H}$ with $\VC(\mathcal{H}) = d$ admits a sample
 compression scheme of size $2^{O(d)}$.\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression}
 \end{thm}
 
-This landmark result of Moran and Yehudayoff~\cite{MoranYehudayoff2016}
+This result of Moran and Yehudayoff~\cite{MoranYehudayoff2016}
 established that compression schemes \emph{exist} for every learnable class, a
-fact that was itself unknown before 2016.  The exponential bound $2^{O(d)}$ is,
-however, vastly larger than the conjectured $O(d)$.  The machine-checked form of
-the existence statement is the equivalence ``finite VC dimension iff a finite
-compression scheme \emph{with side information} exists''; whether the side
-information can be removed, and whether the size can be brought to $O(d)$, are
-the open strengthenings (\cref{op:compression}).
+fact unknown before 2016.  The exponential bound $2^{O(d)}$ is vastly larger
+than the conjectured $O(d)$.  The scheme it produces carries side information;
+whether the side bits can be removed, and whether the size can be brought to
+$O(d)$, are the open strengthenings (\cref{op:compression}).
 
 \begin{proof}[Proof sketch]
 The proof uses a topological argument.  By a result of
@@ -430,42 +427,39 @@ $2^{O(\VC(\mathcal{A}_{d,n_K}))}$.
 \begin{proof}
 The readout map
 $(K, V, x) \mapsto \sum_i \mathrm{softmax}(\langle x,k_i\rangle)_i\, v_i$ is
-jointly continuous, hence Borel measurable, so the bad-event sets that the
-uniform-convergence argument quantifies over are measurable rather than merely
-analytic.  This is exactly the ``well-behaved measurable VC target''
-condition,\formal{TLT.Bridge.softAttention_wellBehaved} and it certifies that
-$\mathcal{A}_{d,n_K}$ is a bona fide VC class: the empirical process indexed by
-$\mathcal{A}_{d,n_K}$ converges uniformly, so the class has finite VC dimension.
-Finite VC dimension is precisely the hypothesis of the existence
-theorem,\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression} which then
-supplies a compression scheme (with side information) whose size is exponential
-in the VC dimension.
+jointly continuous, hence Borel measurable, so the bad-event sets the
+uniform-convergence argument quantifies over are measurable.  This is the
+well-behaved measurable VC target
+condition,\formal{TLT.Bridge.softAttention_wellBehaved} so the empirical process
+indexed by $\mathcal{A}_{d,n_K}$ converges uniformly and the class has finite VC
+dimension.  Finite VC dimension is the hypothesis of the existence
+theorem,\formal{FLT_Proofs.Theorem.PAC.fundamental_vc_compression} which supplies
+a compression scheme of size exponential in the VC dimension.
 \end{proof}
 
-The exponential bound is, as for general classes, almost certainly far from
-tight, and the argmax (hard-attention) router suggests why.  When the softmax is
-sharpened to a top-$1$ selection, the head's output on a query $x$ is determined
-entirely by the single key whose score is largest, and the routing rule that
-selects this key is again well-behaved,\formal{TLT_Proofs.Routing.MeasurableScoreRouting.multiHeadArgmax_wellBehaved}
+The exponential bound is, as for general classes, far from tight, and the argmax
+(hard-attention) router suggests why.  When the softmax is sharpened to a top-$1$
+selection, the head's output on a query $x$ is determined by the single key whose
+score is largest, and the routing rule that selects this key is again
+well-behaved,\formal{TLT_Proofs.Routing.MeasurableScoreRouting.multiHeadArgmax_wellBehaved}
 partitioning the query space into finitely many Borel cells.  A query's label
-depends only on \emph{which cell it lands in}, and each cell is pinned down by a
-bounded number of ``support keys'' (the attention analogue of the support
-vectors of \Cref{ex:svm-compression}).  This picture predicts a compression of
-size $O(n_K)$, linear in the context length.  But turning the heuristic into a
-theorem runs into exactly the obstacle of \Cref{op:compression}: the support-key
-set is selected with knowledge of the whole sample, and pulling it back to a
-labeled subsample of size $O(\VC)$ is the open problem, now wearing the costume
-of an attention layer.
+depends only on which cell it lands in, and each cell is pinned down by a bounded
+number of support keys (the attention analogue of the support vectors of
+\Cref{ex:svm-compression}).  This predicts a compression of size $O(n_K)$, linear
+in the context length.  Turning the heuristic into a theorem runs into the
+obstacle of \Cref{op:compression}: the support-key set is selected with knowledge
+of the whole sample, and pulling it back to a labeled subsample of size $O(\VC)$
+is the open problem.
 
 \begin{remark}[The conjecture, modernized]
 \label{rmk:attention-compression}
-\Cref{prop:attention-compression} places attention classes squarely inside the
-landscape of \Cref{fig:compression-landscape}: they sit at the ``compression
-size $2^{O(d)}$'' node, with the arrow down to ``size $O(d)$'' still dashed.
-The Littlestone--Warmuth conjecture is thus load-bearing for contemporary
-architectures.  A positive resolution would bound how few training examples an
-attention head must retain to reproduce its behavior; a negative one would
-exhibit a learnable attention class that is, in a precise sense, incompressible.
+\Cref{prop:attention-compression} places attention classes inside the landscape
+of \Cref{fig:compression-landscape} at the compression-size $2^{O(d)}$ node, with
+the descent to size $O(d)$ open.  The Littlestone--Warmuth conjecture is thus
+load-bearing for contemporary architectures.  A positive resolution would bound
+how few training examples an attention head must retain to reproduce its
+behavior; a negative one would exhibit a learnable attention class that is
+incompressible.
 \end{remark}
 
 
@@ -561,9 +555,8 @@ that cannot be recovered from the point locations.
 \begin{remark}
 The failure of unlabeled compression makes the labeled compression conjecture
 (\Cref{op:compression}) more subtle than it first appears: labels are
-\emph{necessary} for compression to work, doing real work rather than
-serving as a convenience, and the conjecture concerns the labeled case
-specifically.
+\emph{necessary} for bounded-size compression, and the conjecture concerns the
+labeled case specifically.
 \end{remark}
 
 
@@ -808,21 +801,12 @@ The landscape of this chapter is dominated by the compression conjecture.
   \node[font=\scriptsize, anchor=west] at (0.72,-1.5) {refuted};
 \end{scope}
 \end{tikzpicture}
-\caption[Compression and learnability: line style is evidence grade.]{Compression and
-  learnability, with each arrow drawn by the strength of its evidence.  The unifying claim
-  is that learnability is the existence of a short summary of the data.  The machine-checked
-  core is purely qualitative: a class is PAC learnable if and only if its VC dimension is
-  finite if and only if it admits a finite compression scheme with side information
-  (\leanname{fundamental_vc_compression}, \leanname{compression_imp_vcdim_finite}), drawn
-  solid.  How short that summary can be is the open frontier: an exponential bound of size
-  $2^{O(d)}$ is known (Moran--Yehudayoff 2016, the lighter literature style), while the
-  conjectured $O(d)$ and even $\mathrm{poly}(d)$ remain open, and removing the side
-  information is a further open strengthening, stated but not proved
-  (\leanname{Open_NoInfoCompressionStrengthening} is a conjecture, not a theorem).  Occam's
-  razor reaches the same qualitative conclusion by another route, and unlabeled compression
-  of bounded size is impossible in general, the one refuted edge in red.  Solid marks what
-  is machine-checked, the lighter style what is proved in the literature, dashed what is
-  open; descending the ladder strengthens the claim.}
+\caption[Compression and learnability.]{The qualitative core: a class is PAC learnable
+  if and only if its VC dimension is finite if and only if it admits a finite compression
+  scheme with side information (\leanname{fundamental_vc_compression}). How short the summary
+  can be is the open frontier: a bound of size $2^{O(d)}$ is known, while $O(d)$ and even
+  $\mathrm{poly}(d)$ remain open. Unlabeled compression of bounded size is impossible in
+  general (the red edge).}
 \label{fig:compression-landscape}
 \end{figure}
 
@@ -868,20 +852,18 @@ us \emph{that} a short summary exists; the compression conjecture asks
 \label{sec:compression-open}
 
 The $O(d)$ conjecture (\Cref{op:compression}) is the gravitational center, but
-the frontier it anchors is wider.  The following ten problems branch off it.
-Each is tagged as a \emph{known unknown} (KU): sharply posed, the obstruction
-articulated but unresolved; or an \emph{unknown known} (UK), where even the
-right invariant or vocabulary is still missing.  Where a machine-checked
-statement or a literature anchor exists, it is named.
+the frontier it anchors is wider.  The following ten problems branch off it,
+some sharply posed with the obstruction articulated, others still missing the
+right invariant or vocabulary.
 
 \begin{openprob}[Compression without side information]
 \label{op:side-info}
-The machine-checked existence theorem produces a compression scheme \emph{with}
-side information: the reconstruction is handed $O(d)$ extra bits beyond the
-subsample.  Does every class of VC dimension $d$ admit a scheme of size
-$2^{O(d)}$ with \emph{no} side bits at all?  This is a known unknown; its
-formalized statement is \leanname{Open_NoInfoCompressionStrengthening}, and a
-positive answer is the first step toward \Cref{op:compression}~\cite{MoranYehudayoff2016}.
+The existence theorem produces a compression scheme \emph{with} side
+information: the reconstruction is handed $O(d)$ extra bits beyond the subsample.
+Does every class of VC dimension $d$ admit a scheme of size $2^{O(d)}$ with
+\emph{no} side bits at all (\leanname{Open_NoInfoCompressionStrengthening})?  A
+positive answer is the first step toward
+\Cref{op:compression}~\cite{MoranYehudayoff2016}.
 \end{openprob}
 
 \begin{openprob}[Orientations of non-maximum graphs]
@@ -890,8 +872,8 @@ positive answer is the first step toward \Cref{op:compression}~\cite{MoranYehuda
 \emph{maximum} class with in-degree $\leq d$.  Does every (non-maximum) class of
 VC dimension $d$ admit an orientation of in-degree $\mathrm{poly}(d)$?  An
 affirmative answer would yield polynomial compression.  No orientation theorem
-is known off the maximum case; this is an unknown known: the combinatorial object is in
-hand, the extremal lever that tames it is not~\cite{KuzminWarmuth2007}.
+is known off the maximum case: the combinatorial object is in hand, the extremal
+lever that tames it is not~\cite{KuzminWarmuth2007}.
 \end{openprob}
 
 \begin{openprob}[Agnostic compression]
@@ -900,7 +882,7 @@ The schemes of this chapter are realizable: they reconstruct a hypothesis
 \emph{consistent} with the sample.  Does every VC-$d$ class admit an
 \emph{agnostic} compression scheme of size $O(d)$, one whose reconstruction has
 error at most $\mathrm{opt} + \varepsilon$ when no consistent hypothesis
-exists?  A known unknown, sharpened by David, Moran, and
+exists?  Sharpened by David, Moran, and
 Yehudayoff~\cite{DavidMoranYehudayoff2016}.
 \end{openprob}
 
@@ -909,20 +891,18 @@ Yehudayoff~\cite{DavidMoranYehudayoff2016}.
 \Cref{prop:attention-compression} certifies that the softmax-attention class
 $\mathcal{A}_{d,n_K}$ is compressible at size $2^{O(d)}$
 (\leanname{softAttention_wellBehaved}), and the support-key heuristic predicts
-$O(n_K)$.  Does $\mathcal{A}_{d,n_K}$ in fact admit a compression scheme of size
+$O(n_K)$.  Does $\mathcal{A}_{d,n_K}$ admit a compression scheme of size
 $O(n_K)$, or even $O(\VC)$?  This is \Cref{op:compression} instantiated for a
-contemporary architecture: part known unknown (the target is precise), part
-unknown known (no compression invariant specific to attention yet
-exists)~\cite{MoranYehudayoff2016}.
+contemporary architecture, with no compression invariant specific to attention
+yet known~\cite{MoranYehudayoff2016}.
 \end{openprob}
 
 \begin{openprob}[Compression and recursive teaching]
 \label{op:rtd}
 The recursive teaching dimension $\mathrm{RTD}(\mathcal{H})$ is sandwiched with
 the VC dimension but the two can differ.  Is the optimal compression size
-$\Theta(\mathrm{RTD})$ rather than $\Theta(\VC)$?  A known unknown that would
-re-route the entire conjecture through teaching rather than
-shattering~\cite{SimonZilles2015}.
+$\Theta(\mathrm{RTD})$ rather than $\Theta(\VC)$?  This would re-route the
+conjecture through teaching rather than shattering~\cite{SimonZilles2015}.
 \end{openprob}
 
 \begin{openprob}[Stable and replicable compression]
@@ -931,8 +911,8 @@ Does every VC class admit a compression scheme that is \emph{stable} under
 resampling, such that changing one training example changes $O(1)$ of the selected
 indices?  Stability would link compression to differential privacy and
 replicability, where an equivalence with online learnability is already
-known~\cite{BunLivniMoran2020}.  An unknown known: the stability invariant for
-compression has no accepted definition yet.
+known~\cite{BunLivniMoran2020}.  The stability invariant for compression has no
+accepted definition yet.
 \end{openprob}
 
 \begin{openprob}[List compression and the DS dimension]
@@ -940,8 +920,8 @@ compression has no accepted definition yet.
 In multiclass learning, finite Daniely--Shalev-Shwartz (DS) dimension
 characterizes learnability.  Is finite DS dimension equivalent to a bounded
 \emph{list} compression scheme, where reconstruction outputs a short list of
-hypotheses containing a consistent one?  An unknown known, as the multiclass
-compression vocabulary is still being built~\cite{BrukhimCarmonDinurMoranYehudayoff2022}.
+hypotheses containing a consistent one?  The multiclass compression vocabulary
+is still being built~\cite{BrukhimCarmonDinurMoranYehudayoff2022}.
 \end{openprob}
 
 \begin{openprob}[Fat-shattering compression]
@@ -949,9 +929,9 @@ compression vocabulary is still being built~\cite{BrukhimCarmonDinurMoranYehuday
 For $[0,1]$-valued function classes, learnability is governed by the
 fat-shattering dimension $\mathrm{fat}_\gamma$.  Does finite $\mathrm{fat}_\gamma$
 imply a real-valued compression scheme of size $\mathrm{poly}(\mathrm{fat}_\gamma)$?
-A known unknown: the Boolean machinery does not transfer verbatim, and the
-scale parameter $\gamma$ has no settled role in the compressed object (Alon,
-Ben-David, Cesa-Bianchi, and Haussler).
+The Boolean machinery does not transfer verbatim, and the scale parameter
+$\gamma$ has no settled role in the compressed object (Alon, Ben-David,
+Cesa-Bianchi, and Haussler).
 \end{openprob}
 
 \begin{openprob}[Super-linear lower bounds]
@@ -959,8 +939,7 @@ Ben-David, Cesa-Bianchi, and Haussler).
 Every known VC-$d$ class compresses to $O(d)$ points; the obstruction to the
 conjecture is constructing schemes, not ruling them out.  Is there a VC-$d$
 class provably \emph{requiring} compression size $\omega(d)$?  No super-linear
-lower bound is known; this is a known unknown on the negative side of the ledger, and
-its resolution either way would be decisive.
+lower bound is known, and a resolution either way would be decisive.
 \end{openprob}
 
 \begin{openprob}[Boosting weak compression]
@@ -968,8 +947,8 @@ its resolution either way would be decisive.
 Call a scheme \emph{weak} if its reconstruction is correct on a
 $\tfrac{1}{2}+\gamma$ fraction of relabelings of the sample.  Does weak
 compression boost to full compression with only $O(\log(1/\gamma))$ overhead in
-size, mirroring the boosting of weak PAC learners?  An unknown known: a boosting
-operator on compression schemes has not been formulated~\cite{MoranYehudayoff2016}.
+size, mirroring the boosting of weak PAC learners?  A boosting operator on
+compression schemes has not been formulated~\cite{MoranYehudayoff2016}.
 \end{openprob}
 
 
@@ -1039,42 +1018,25 @@ operator on compression schemes has not been formulated~\cite{MoranYehudayoff201
 
 \end{enumerate}
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:compression-landscape}}
+\subsection*{Counterfactual exercises}
 
-The compression landscape is lopsided on purpose.  Its top row is a single
-solid rung: PAC learnability, finite VC dimension, and the existence of \emph{some}
-finite compression scheme with side information are one three-way equivalence that
-the kernel certifies (\leanname{fundamental_vc_compression} and the easy direction
-\leanname{compression_imp_vcdim_finite}, with \leanname{vc_characterization} carrying
-the learnability leg).  Everything below that rung is conjecture: a vertical size
-ladder finite $\to 2^{O(d)} \to \mathrm{poly}(d) \to O(d)$ on which each step down is a
-strictly stronger claim, a side-information axis running off to the right, and one edge,
-the unlabeled node, drawn in red because its answer is settled in the negative.  The
-literature style (lighter stroke) marks what is proved but not machine-checked; dashes
-mark what is open.  The exercises below probe this asymmetry.  Each perturbs the picture
-and asks where the perturbation lands: at an \emph{instance} a class or claim the solid
-spine or one rung already exhibits, at a \emph{boundary} where toggling one axis,
-qualifier, or sign changes a rung's evidence grade or direction, or out on a
-\emph{frontier} where the edge is dashed, open, or literature-only.
+Each exercise below perturbs \Cref{fig:compression-landscape} and asks where the
+perturbation lands on the verified core, on a known rung, or out on the open frontier.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The solid core is the qualitative equivalence, and only the qualitative one.} Read the top row as a single machine-checked biconditional, with its three nodes as the three faces of one fact. This is the figure's defining verified instance: PAC learnability, finite VC dimension, and the existence of \emph{some} finite compression scheme with side information are one three-way equivalence (\cref{thm:fundamental}, \leanname{fundamental_vc_compression}, \leanname{vc_characterization}), so the solid spine asserts exactly \emph{that} a short summary exists and asserts nothing about its length. The kernel's witness is a finite $k$ with no rate attached, which is why every numbered rung below the core is drawn in a weaker style.
+\item \textbf{The qualitative core.} Show that the top row is a single three-way equivalence: PAC learnability, finite VC dimension, and the existence of \emph{some} finite compression scheme with side information (\cref{thm:fundamental}, \leanname{fundamental_vc_compression}). Explain why this asserts \emph{that} a short summary exists but says nothing about its length.
 
-\item \textbf{Compression implies finite VC is the easy half, and it is verified.} Isolate the upward arrow from the compression node to the VC node. This single arrow is the settled direction, an instance of a verified rung in its own right: any finite compression scheme forces finite VC dimension (\cref{thm:compression-pac}, \leanname{compression_imp_vcdim_finite}), with the explicit bound $\VC(\mathcal{H}) \le 2(k+1)^2-1$, so this half of the equivalence is a genuine kernel theorem and is drawn solid. The converse direction, finite VC implying \emph{small} compression, is the one that splinters into the literature bound and the open conjectures.
+\item \textbf{The easy half.} Prove that any finite compression scheme forces finite VC dimension, with the explicit bound $\VC(\mathcal{H}) \le 2(k+1)^2-1$ (\cref{thm:compression-pac}, \leanname{compression_imp_vcdim_finite}). Contrast this settled direction with the converse, finite VC implying \emph{small} compression, which splinters into the literature bound and the open conjectures.
 
-\item \textbf{Halfspaces realize the bottom rung with equality.} Replace the abstract class by halfspaces in $\R^d$ and the conjectured rung is suddenly attained, not conjectured: the maximum-margin hyperplane is determined by at most $d+1$ support vectors (\cref{ex:svm-compression}), so halfspaces compress to size $d+1$ and sit at $\VC=d+1$ (row ``Halfspaces in $\R^d$'' of \cref{tab:compression-bounds}), an instance that hits the $O(d)$ target exactly for this family. The conjecture's difficulty is that this support-vector picture has no known analogue for an arbitrary VC class, so the bottom rung is open in general yet solid-by-example here.
+\item \textbf{Halfspaces hit the target.} For halfspaces in $\R^d$, the maximum-margin hyperplane is determined by at most $d+1$ support vectors (\cref{ex:svm-compression}), so the family compresses to size $d+1$ at $\VC=d+1$, attaining the $O(d)$ target. Argue that this support-vector mechanism has no known analogue for an arbitrary VC class.
 
-\item \textbf{Maximum classes collapse the ladder to a single point.} Restrict to maximum classes, where the growth function meets the Sauer--Shelah bound with equality, and the whole size ladder degenerates. A maximum class of VC dimension $d$ compresses to exactly $d$ points (rows ``Maximum classes'' and ``Intersection-closed'' of \cref{tab:compression-bounds}), so for this family the literature rung $2^{O(d)}$, the open rung $\mathrm{poly}(d)$, and the open rung $O(d)$ all coincide at $d$. The instance is instructive precisely because the figure's vertical separation between rungs is a statement about \emph{arbitrary} classes and vanishes on the maximum case.
+\item \textbf{Maximum classes collapse the ladder.} For a maximum class of VC dimension $d$ (growth function meeting Sauer--Shelah with equality), show that compression to exactly $d$ points exists, so the rungs $2^{O(d)}$, $\mathrm{poly}(d)$, and $O(d)$ coincide. The vertical separation between rungs is a statement about \emph{arbitrary} classes; explain why it vanishes here.
 
-\item \textbf{Side information is a real axis, verified on one side and open on the other.} Read the qualifier ``with side information'' on the solid core, then follow the branch that drops it. Here is the figure's principal boundary: what is machine-checked is the existence of a scheme \emph{with} side information (\leanname{fundamental_vc_compression}, whose witness carries extra bits beyond the subsample), whereas whether the side bits can be removed at the same size is open (\cref{op:side-info}, \leanname{Open_NoInfoCompressionStrengthening}). The two endpoints of this axis differ by a structural qualifier alone, the size held fixed, so toggling ``with'' to ``without'' moves the edge from solid to dashed without touching any number on the ladder.
+\item \textbf{The side-information axis.} The existence theorem produces a scheme \emph{with} side information (\leanname{fundamental_vc_compression}); whether the side bits can be removed at the same size is open (\cref{op:side-info}, \leanname{Open_NoInfoCompressionStrengthening}). Show that the two endpoints differ by a structural qualifier alone, the size held fixed.
 
-\item \textbf{The exponential gap is the distance between two rungs.} Measure the vertical span from the literature rung to the bottom rung; that span is the boundary that measures the conjecture. The best known bound is $2^{O(d)}$ while the conjecture demands $O(d)$ (\cref{rmk:compression-gap}), a gap from roughly $10^6$ to roughly $20$ at $d=20$, so the figure's two rungs stand an exponential apart, separated by far more than a refinement. The lighter stroke on $2^{O(d)}$ records that even this enormous bound (\cref{thm:moran-yehudayoff}, \cite{MoranYehudayoff2016}) was unknown before 2016 and lives in the literature, one grade short of the kernel.
+\item \textbf{The exponential gap.} The best known bound is $2^{O(d)}$ while the conjecture demands $O(d)$ (\cref{rmk:compression-gap}): at $d=20$ this is a gap from $\sim 10^6$ to $\sim 20$. Explain why the $2^{O(d)}$ bound (\cref{thm:moran-yehudayoff}, \cite{MoranYehudayoff2016}), unknown before 2016, is a literature result rather than a refinement of the conjecture.
 
-\item \textbf{The unlabeled node is the one refuted edge.} Find the red node where size $f(d)$ is crossed out, the figure's lone negative boundary. Dropping the labels from the compressed subsample makes bounded-size compression provably impossible in general (\cref{def:unlabeled-compression}, \cref{thm:unlabeled-fails}, \cite{MoranYehudayoff2016}, \cite{CheriayanMoranShpilka2022}), so this is the one edge whose answer is settled in the negative while every other open edge stays dashed. It marks precisely where compressibility ends, a boundary the positive rungs cannot reach.
+\item \textbf{The one refuted edge.} Dropping labels from the compressed subsample makes bounded-size compression impossible in general (\cref{def:unlabeled-compression}, \cref{thm:unlabeled-fails}). Show this is the lone edge settled in the negative, and explain what it tells you about where compressibility ends.
 
-\item \textbf{Occam reaches the same qualitative conclusion by another route.} Follow the side branch through the Occam node, a boundary where two roads meet at one destination. An Occam algorithm (one that returns a short, consistent hypothesis) implies PAC learnability (\cref{thm:occam}, \cite{BlumerEhrenfeuchtHausslerWarmuth1987}), so the figure reaches the learnable vertex both through the compression core and through Occam, yet both deliver only the \emph{qualitative} conclusion. The Occam branch is drawn in the literature style because the kernel reaches only as far as the VC--compression equivalence, leaving the Occam implication to the literature, even though the two routes meet at the same node.
-
-\item \textbf{Closing the ladder is the forty-year frontier.} Ask what it would take to draw the bottom rungs solid, and you arrive at the figure's central open frontier. Proving that every VC-$d$ class compresses to $\mathrm{poly}(d)$ (\cref{op:poly-compression}) or to $O(d)$ (\cref{op:compression}) would promote those rungs from dashed to verified and collapse the exponential gap. One concrete route runs through orienting the one-inclusion graph of a non-maximum class with small in-degree (\cref{thm:one-inclusion-orientation}, \cref{op:oig-orientation}), since an in-degree-$\mathrm{poly}(d)$ orientation would yield polynomial compression, but no orientation theorem is known off the maximum case.
-
-\item \textbf{Is compression a section of an evidence functor whose rank is VC?} Read ``the smallest summary that reconstructs the data'' as a universal property, and the figure dissolves into its deepest frontier. The optimal compression size would be the minimal size of a generating section of a representable evidence-functor on finite samples whose \emph{rank} is the VC dimension, so the verified core would read ``the functor's rank is finite'' and the conjecture would read ``its minimal generating set has size $O(\mathrm{rank})$'', unifying the size ladder, the side-information qualifier, and the alternative dimensions (recursive teaching, the DS dimension) as one object specialized by a data-model. Whether such a single dimension functor exists, with compression size as its generating rank, or the notions are provably non-unifiable, is open (\cref{op:dimension-functor}, \cref{op:rtd}), so this reading of the landscape is drawn dashed.
+\item \textbf{Compression as a dimension functor.} Read ``the smallest summary that reconstructs the data'' as a universal property: the optimal compression size as the minimal generating section of an evidence-functor on finite samples whose rank is the VC dimension. Discuss whether such a single dimension functor exists, unifying the size ladder, the side-information qualifier, and the alternative dimensions (recursive teaching, DS), or whether the notions are provably non-unifiable (\cref{op:dimension-functor}, \cref{op:rtd}).
 \end{enumerate}

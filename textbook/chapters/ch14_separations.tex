@@ -17,8 +17,7 @@ A separation result has two components. The \emph{statement} asserts
 that some implication $A \Rightarrow B$ does not hold. The
 \emph{witness} is a concrete mathematical object (a concept class,
 a dimension pair, a computational reduction) that demonstrates the
-failure. The witness is the mathematics; the statement is merely its
-summary. Throughout this chapter, we privilege the construction over the
+failure. Throughout this chapter we privilege the construction over the
 claim.
 
 We organize the chapter's 13 edges into two groups: 9
@@ -35,24 +34,18 @@ lattice} of formal learning theory.
 \label{sec:sep-lattice}
 
 \Cref{fig:separation-lattice} displays all 13 edges as a single
-diagram, using two independent codes.  \emph{Color} marks the
-relationship type: red arrows denote \rel{does\_not\_imply} edges (the
-source does \emph{not} entail the target, and the label names the
-witness); blue arrows denote \rel{strictly\_stronger} edges (the source
-strictly contains the target as a special case, with the witness
-demonstrating the gap).  \emph{Line style} marks the evidence grade:
-solid arrows are machine-checked in the kernel, dashed arrows are
-classical results not yet formalized.  Four of the thirteen edges are
-machine-checked and form a small connected core around PAC, Ex, online,
-and FIN learning; the rest are classical.
+diagram, using two independent codes. \emph{Color} marks the
+relationship type: red arrows denote \rel{does\_not\_imply} edges, with
+the label naming the witness; blue arrows denote \rel{strictly\_stronger}
+edges. \emph{Line style} marks the evidence grade: solid for
+machine-checked, dashed for classical.
 
-The first observation is structural: the lattice is \emph{sparse}.
-Thirteen edges connect concepts drawn from six paradigms and a dozen
-complexity measures. Most paradigm pairs are simply incomparable: they
-neither imply nor contradict each other, because they operate on
-different mathematical objects. The sparsity is itself informative:
-learning theory is a partially ordered collection of largely independent
-formalisms, with no single axis from weak to strong threading them all.
+The lattice is \emph{sparse}. Thirteen edges connect concepts drawn from
+six paradigms and a dozen complexity measures, and most paradigm pairs
+are simply incomparable, because they operate on different mathematical
+objects. Learning theory is a partially ordered collection of largely
+independent formalisms, with no single axis from weak to strong threading
+them all.
 
 \begin{figure}[ht]
 \centering
@@ -124,24 +117,12 @@ formalisms, with no single axis from weak to strong threading them all.
 \end{scope}
 \end{tikzpicture}
 
-\caption[The separation lattice: learning theory as a sparse partial order, color for type and line for evidence.]{The
-separation lattice.  The relationships among six learning paradigms and a dozen complexity
-measures form a sparse partial order rather than any single weak-to-strong line: thirteen
-witnessed edges among
-seventeen concepts, with most pairs incomparable because they measure different mathematical
-objects.  Color marks the relationship type: red means the source does not imply the target,
-and the label names the witness; blue means the source strictly contains the target.  Line
-style marks the evidence: solid edges are machine-checked in the kernel, dashed edges are
-classical results not yet formalized.  Four relationships are machine-checked and form a small
-connected core around PAC, Ex, online, and FIN learning: PAC learning does not imply
-mistake-bounded learning (\leanname{pac_not_implies_online}) and Ex-learning does not imply PAC
-(\leanname{ex_not_implies_pac}), while Ex strictly contains FIN
-(\leanname{ex_strictly_stronger_finite}) and online learning strictly contains PAC
-(\leanname{online_strictly_stronger_pac}).  The remaining nine, including the dimension-theoretic
-separations and the strict containments of DS over Natarajan and universal over PAC, are
-classical and drawn dashed.  The sparsity is the lesson (\Cref{thm:sparsity}): far fewer edges
-than the $\binom{k}{2}$ a priori possible, and whether the unwitnessed pairs are provably
-incomparable is itself open (\Cref{op:lattice-completeness}).}
+\caption[The separation lattice: learning theory as a sparse partial order.]{The
+separation lattice: thirteen witnessed edges among seventeen concepts, color marking
+relationship type (red for non-implication, blue for strict containment) and line style
+marking evidence (solid kernel-checked, dashed classical). The order is sparse, far below the
+$\binom{k}{2}$ pairs a priori possible (\Cref{thm:sparsity}), because most paradigms measure
+different mathematical objects and admit no implication to witness.}
 \label{fig:separation-lattice}
 \end{figure}
 
@@ -419,32 +400,25 @@ characterization.}
 \emph{Witness.}
 The Fundamental Theorem of Statistical Learning (\Cref{ch:pac}) ties
 together VC dimension, uniform convergence, and PAC learnability into a
-single equivalence.  Nine conditions, all the same condition.  That
-theorem is the crown jewel of binary classification.
-
-It does not survive contact with real-valued loss.
+single nine-way equivalence for binary classification. It does not
+survive real-valued loss.
 
 Shalev-Shwartz et al.~\cite{ShalevShwartzShamir2010} construct a
 learning problem (arbitrary loss, multi-valued output) that is
-learnable, yet for which uniform convergence fails outright.  The
-nine-way equivalence collapses.  In its place they prove a different
-characterization: in the general learning setting, a problem is learnable
-if and only if it admits a \emph{stable}, asymptotically
-empirical-risk-minimizing learner.  Uniform convergence is demoted from
-characterization to a sufficient condition.
+learnable yet for which uniform convergence fails outright. In its place
+they prove a different characterization: in the general learning setting,
+a problem is learnable if and only if it admits a \emph{stable},
+asymptotically empirical-risk-minimizing learner. Uniform convergence is
+demoted from characterization to a sufficient condition.
 
 \medskip\noindent
 \emph{What the witness exploits.}
 The symmetrization argument at the heart of the Fundamental Theorem's
-proof requires the loss to take finitely many values.  Specifically:
-two.  That assumption is invisible in the binary setting: it looks like
-a harmless feature of the problem.  Make the loss real-valued and
-symmetrization breaks.  Uniform convergence stops characterizing
-learnability; the stable-AERM condition takes over as the
-characterization, indifferent to the cardinality of the loss.
-
-The Fundamental Theorem is not wrong.  It is \emph{local}: an artifact
-of the 0-1 loss that does not announce itself as such.
+proof requires the loss to take two values. Make the loss real-valued and
+symmetrization breaks: uniform convergence stops characterizing
+learnability, and the stable-AERM condition takes over as the
+characterization, indifferent to the cardinality of the loss. The
+Fundamental Theorem is \emph{local} to the 0-1 loss.
 
 \hfill\cite{ShalevShwartzShamir2010}
 \end{separation}
@@ -612,35 +586,28 @@ can now state explicitly.
 This chapter establishes thirteen edges with explicit witnesses among the
 major learning paradigms and complexity measures of
 \Cref{fig:separation-lattice}, far fewer than the $\binom{k}{2}$ relations
-that $k$ such concepts could \emph{a priori} exhibit.  We do not claim a
-complete census of the lattice; the point is that the witnessed edges are
-scarce, and that many remaining pairs appear unrelated: they operate on
+that $k$ such concepts could \emph{a priori} exhibit. The witnessed edges
+are scarce, and many remaining pairs are unrelated: they operate on
 different mathematical types, or are connected only by non-implicational
 relations (analogy, measurement, assumption) rather than by an implication
 that could be witnessed or refuted.
 \end{remark}
 
 This scarcity is structural, and it would persist even if every open
-census in the chapter were settled tomorrow.  Many of
-the major paradigms operate on different mathematical types: PAC learning
-and Gold-style identification take different data models (i.i.d.\ samples
-versus infinite enumerations); online and exact learning use different
-interaction protocols (adversarial instances versus query access); VC and
-SQ dimension measure different properties (combinatorial shattering versus
-correlation structure).  Between such concepts a clean implication is often
-not even the right question.  Where we \emph{can} ask it, this chapter
-witnesses one direction (Gold identification does not imply PAC learning,
-say), while establishing the reverse non-implication is, in several cases, a
-separate open problem rather than a settled fact.
+census in the chapter were settled tomorrow. PAC learning and Gold-style
+identification take different data models (i.i.d.\ samples versus infinite
+enumerations); online and exact learning use different interaction
+protocols (adversarial instances versus query access); VC and SQ dimension
+measure different properties (combinatorial shattering versus correlation
+structure). Between such concepts a clean implication is often not even the
+right question. Where we \emph{can} ask it, this chapter witnesses one
+direction, while the reverse non-implication is in several cases a separate
+open problem.
 
-The witnesses in this chapter make the incomparability concrete.
-Thresholds on $\R$ separate PAC from online learning. All finite subsets
-of $\N$ separate Gold identification from PAC learning. Parities
-separate VC dimension from SQ dimension. Each witness exploits a specific
-structural mismatch in the data model, the success criterion, the
-adversarial model, or the computational model; and these mismatches are
-not removable by clever proof techniques. They are features of the
-mathematical landscape.
+Each witness exploits a specific structural mismatch in the data model,
+the success criterion, the adversarial model, or the computational model,
+and these mismatches are not removable by clever proof techniques. They
+are features of the mathematical landscape.
 
 The four strict strength edges, taken together, form two chains:
 \[
@@ -653,32 +620,25 @@ learnability requirements. The second orders two dimensions by their
 sensitivity to multiclass structure. In both cases, the strict
 containment is proved by a single, explicit construction.
 
-These are the theorems that textbooks usually omit. They deserve
-their chapter.
-
 
 \subsection{Where Attention Sits}
 \label{sec:attention-lattice}
 
 A separation lattice is a map, and it is natural to ask where a modern
 hypothesis class lands on it. The softmax-attention concept class of
-\Cref{ch:generalization} is machine-checked to be
-well-behaved,\formal{TLT.Bridge.softAttention_wellBehaved} and with
-norm-bounded parameters it has finite capacity
-(\Cref{prop:certified-attention}); it therefore sits on the PAC node: it
+\Cref{ch:generalization} is well-behaved\formal{TLT.Bridge.softAttention_wellBehaved}
+and with norm-bounded parameters has finite capacity
+(\Cref{prop:certified-attention}); it therefore sits on the PAC node, and
 is PAC learnable.
 
-Its position relative to the \emph{online} node is open.  The
-witness for Separation~1 was a class of finite VC dimension and infinite
-Littlestone dimension (thresholds on~$\R$).  Attention compares query--key
-scores, and threshold behavior on a score is exactly the structure that
-sends the Littlestone dimension to infinity while the VC dimension stays
-finite.  It is therefore possible that the softmax-attention class is its
-\emph{own} witness for $\text{PAC} \not\Rightarrow \text{online}$, joining
-thresholds on that dashed red edge.  Whether it is so is
-\Cref{op:attention-littlestone}; the machine-checked
-separation~\leanname{pac_not_implies_online} already supplies the template
-a proof would instantiate.
+Its position relative to the \emph{online} node is open. The witness for
+Separation~1 was a class of finite VC dimension and infinite Littlestone
+dimension (thresholds on~$\R$). Attention compares query--key scores, and
+threshold behavior on a score is exactly the structure that sends the
+Littlestone dimension to infinity while the VC dimension stays finite. So
+the softmax-attention class may be its \emph{own} witness for
+$\text{PAC} \not\Rightarrow \text{online}$, joining thresholds on that red
+edge; whether it is is \Cref{op:attention-littlestone}.
 
 
 % ================================================================
@@ -690,10 +650,10 @@ a proof would instantiate.
 
 A separation chapter generates two kinds of open problem: the missing
 \emph{reverse} of a one-sided non-implication, and the missing
-\emph{formal proof} of a separation so far only cited.  Each problem below
-is tagged a \emph{known unknown} (KU), sharply posed but unresolved, or an
+\emph{formal proof} of a separation so far only cited. Each is tagged a
+\emph{known unknown} (KU), sharply posed but unresolved, or an
 \emph{unknown known} (UK), where the right object or invariant is still
-missing; a design-lab or literature anchor is named where one exists.
+missing.
 
 \begin{openprob}[The Littlestone dimension of attention]
 \label{op:attention-littlestone}
@@ -716,11 +676,10 @@ one-sidedly separated?  A known unknown.
 
 \begin{openprob}[Formalizing the DS/Natarajan gap]
 \label{op:formalize-ds-natarajan}
-The pseudo-manifold witness with $\Ndim = 1$ and $\DSdim = \infty$ is cited
-from Brukhim et al., not derived.  Can the construction, and the
-non-learnability it implies, be machine-checked?  An unknown known: the
-oriented-hypergraph combinatorics has no formal
-home~\cite{BrukhimCarmonDinurMoranYehudayoff2022}.
+The pseudo-manifold witness with $\Ndim = 1$ and $\DSdim = \infty$ is from
+Brukhim et al. Can the construction, and the non-learnability it implies,
+be machine-checked? An unknown
+known~\cite{BrukhimCarmonDinurMoranYehudayoff2022}.
 \end{openprob}
 
 \begin{openprob}[Formalizing the universal-learning trichotomy]
@@ -783,28 +742,24 @@ transformer side (\leanname{softAttention_wellBehaved}).
 \end{openprob}
 
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:separation-lattice}}
+\subsection*{Counterfactual exercises}
 
-The separation lattice is almost all frontier.  Of its thirteen edges, four are solid kernel-checked rungs and nine are dashed classical results, so most of what follows tests the dashed periphery rather than the verified core.  Each exercise below nudges one feature of the diagram and asks where the nudge lands.  Read every edge as carrying two independent codes.  \emph{Color} records the relationship: red marks a source that does not imply its target, with the witness named on the arrow, and blue marks a source that strictly contains its target.  \emph{Line style} records the evidence: solid means the kernel certifies the edge sorry-free, dashed means the result is classical literature.  The four solid edges cluster tightly, the two red separations PAC \emph{not} implying mistake-bounded learning (\leanname{pac_not_implies_online}) and Ex-learning \emph{not} implying PAC (\leanname{ex_not_implies_pac}) together with the two blue containments Ex over FIN (\leanname{ex_strictly_stronger_finite}) and online over PAC (\leanname{online_strictly_stronger_pac}), all touching the PAC, Ex, online, FIN cluster; the remaining nine, the dimension-theoretic and crypto-conditional separations and the containments of DS over Natarajan and universal over PAC, are dashed.  For each perturbation, locate the perturbed picture against the concrete one along the lattice's three roles: an \emph{instance} the diagram already exhibits (a class, an edge, a verified sub-order), a \emph{boundary} where toggling one code flips an edge's color, style, or direction, or a \emph{frontier} where a dashed edge waits on the formalization that would draw it solid.
+Each exercise perturbs one feature of \Cref{fig:separation-lattice} and asks where the perturbation lands. The references point to the relevant separation, open problem, or verified result.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The four solid edges are the machine-checked core, and they form a connected sub-lattice.} Read only the solid strokes and ignore the dashed ones. This is the verified instance the figure is built around: the four edges the kernel certifies sorry-free all touch the cluster $\{\text{PAC}, \text{Ex}, \text{online}, \text{FIN}\}$, namely the two red separations (\leanname{pac_not_implies_online}, \leanname{ex_not_implies_pac}) and the two blue containments (\leanname{ex_strictly_stronger_finite}, \leanname{online_strictly_stronger_pac}), so the solid sub-graph is connected and is exactly the machine-checked fragment of the partial order; the dashed periphery is everything the kernel has not yet reached, which is why removing the dashed edges leaves a single small component rather than four isolated facts.
+\item Verify that the four machine-checked edges form a single connected component touching the cluster $\{\text{PAC}, \text{Ex}, \text{online}, \text{FIN}\}$: the separations \leanname{pac_not_implies_online} and \leanname{ex_not_implies_pac} and the containments \leanname{ex_strictly_stronger_finite} and \leanname{online_strictly_stronger_pac}. Why does deleting the classical edges leave one small component rather than four isolated facts?
 
-\item \textbf{PAC is the hub, and its incident edges are mostly dashed.} Read the PAC node together with the edges that touch it. One vertex exposes the whole formalization frontier as an instance: of PAC's incident edges, only two are solid (the verified separation \leanname{pac_not_implies_online} and the verified containment \leanname{online_strictly_stronger_pac}), while the rest, PAC not implying exact (\cite{Angluin1988, PittValiant1988}), Ex not implying PAC (\leanname{ex_not_implies_pac}, solid the other way), Natarajan not implying PAC (\cite{BrukhimCarmonDinurMoranYehudayoff2022}), and universal strictly containing PAC (\cite{BousquetHannekeMoranVanHandelYehudayoff2021}), carry the literature or mixed grades; even the most-studied paradigm in the book, then, sits on edges that are mostly classical, with only that one solid pair reaching the kernel.
+\item Take the PAC node and list its incident edges. Only the separation \leanname{pac_not_implies_online} and the containment \leanname{online_strictly_stronger_pac} are kernel-verified; PAC$\,\not\Rightarrow\,$exact (\cite{Angluin1988, PittValiant1988}), Natarajan$\,\not\Rightarrow\,$PAC (\cite{BrukhimCarmonDinurMoranYehudayoff2022}), and universal$\,\supsetneq\,$PAC (\cite{BousquetHannekeMoranVanHandelYehudayoff2021}) are classical. Even the most-studied paradigm sits mostly on classical edges.
 
-\item \textbf{Sparsity is the meta-theorem, and it is informal.} Count the edges against the possible pairs. The count is itself an instance, the one that states the figure's lesson: thirteen witnessed edges among seventeen concepts is far below the $\binom{k}{2}$ relations $k$ concepts could a priori exhibit (\Cref{thm:sparsity}), and the scarcity is structural, surviving any amount of future study, because most pairs operate on different mathematical types and admit no implication to witness or refute; the figure asserts \emph{that} the order is sparse, while turning the informal census into a theorem, deciding which unwitnessed pairs are provably incomparable, is left open (\Cref{op:lattice-completeness}).
+\item For the containment $\DSdim \supsetneq \Ndim$, the witness is a hyperbolic pseudo-manifold with $\Ndim = 1$ and $\DSdim = \infty$ (\cite{BrukhimCarmonDinurMoranYehudayoff2022}), yet the kernel proves only the reverse inequality $\Ndim \le \DSdim$. Identify what remains to formalize (\Cref{op:formalize-ds-natarajan}).
 
-\item \textbf{DS over Natarajan is a containment drawn dashed because it is literature.} Read the blue edge from DS dimension down to Natarajan dimension. Here the color and the evidence grade come apart, and the figure's sharpest boundary opens between them: the strict containment $\DSdim \supsetneq \Ndim$ is witnessed by a hyperbolic pseudo-manifold with $\Ndim = 1$ and $\DSdim = \infty$ (\cite{BrukhimCarmonDinurMoranYehudayoff2022}), but the kernel proves only the \emph{reverse} inequality $\Ndim \le \DSdim$ and the deep oriented-hypergraph combinatorics has no formal home (\Cref{op:formalize-ds-natarajan}), so the edge is blue (a genuine strict containment) yet dashed (cited, not machine-checked); drawing it solid like the verified containments would overstate what the kernel knows.
+\item For universal$\,\supsetneq\,$PAC, the forward implication (every PAC-learnable class is universally learnable) is verified, but the strictness rides the Bousquet et al.\ trichotomy (\cite{BousquetHannekeMoranVanHandelYehudayoff2021}). Show that closing this edge requires the hard strictness direction, not the easy implication (\Cref{op:formalize-trichotomy}).
 
-\item \textbf{Universal over PAC is a containment drawn dashed because only its forward half is verified.} Read the blue edge from universal learning down to PAC. A second, subtler evidence boundary runs through this edge: the forward direction, every PAC-learnable class is universally learnable, is machine-checked, but the \emph{strictness} that makes the containment proper rides the trichotomy of Bousquet, Hanneke, Moran, van Handel, and Yehudayoff (\cite{BousquetHannekeMoranVanHandelYehudayoff2021}), which is not formalized (\Cref{op:formalize-trichotomy}); the edge is therefore blue and dashed, and the toggle here moves the line rather than the color, since promoting it to solid means closing the hard strictness direction once the easy implication is already in hand.
+\item The verified \leanname{ex_not_implies_pac} certifies that Gold identification does not imply PAC learning, witnessed by all finite subsets of $\N$ ($\VC = \infty$). Argue that PAC and Gold become genuinely incomparable only once the reverse non-implication is also established, which is open (\Cref{op:reverse-pac-ex}).
 
-\item \textbf{A verified separation encodes one direction, and falls short of an antichain.} Read the solid red edge from Ex-learning to PAC and ask what it does \emph{not} say. The boundary that separates a separation from an incomparability runs right through this arrow: \leanname{ex_not_implies_pac} certifies that Gold identification does not imply PAC learning, witnessed by all finite subsets of $\N$ ($\VC = \infty$), but the reverse, whether some PAC-learnable class fails to be Ex-learnable, is a separate open problem (\Cref{op:reverse-pac-ex}); so the single arrow encodes one direction only, and the pair PAC and Gold is genuinely incomparable only once both arrows are established, which the figure does not yet claim.
+\item The two separations out of the VC node, $\VC\,\not\Rightarrow\,$tractability (\cite{KearnsValiant1994}, under a cryptographic assumption) and $\VC\,\not\Rightarrow\,$low SQ dimension (parities, \cite{BlumFurstJacksonKearnsMansourRudich1994}), separate computational learnability from the sample-complexity characterization. Explain why no $\binom{k}{2}$ count absorbs them: the hardness layer is orthogonal to the VC layer.
 
-\item \textbf{The crypto separations are red but conditional, and live in a different layer.} Read the two dashed red edges out of the VC node, to computational hardness and toward the SQ node. These two edges mark the boundary where the information-theoretic layer ends and the computational one begins: finite VC dimension fails to imply computational tractability only under a cryptographic assumption (\cite{KearnsValiant1994}), and fails to imply low SQ dimension via parities under the uniform distribution (\cite{BlumFurstJacksonKearnsMansourRudich1994}), so these edges separate \emph{computational} learnability from the sample-complexity characterization the kernel verifies; they are red separations but dashed and conditional, and no $\binom{k}{2}$-style count can absorb them because the hardness layer is orthogonal to the VC layer the solid core inhabits.
+\item Formalizing the parity separation ($\VC = n$, $\SQdim = 2^n$) or the P\'alv\"olgyi--Tardos $\VC = 2$ compression separation would each promote one classical edge to verified status (\Cref{op:sq-vc-quantitative}, \Cref{op:formalize-compression-sep}). State what construction each formalization needs.
 
-\item \textbf{Formalize a dimension-theoretic separation and one dashed edge turns solid.} Pick the parity separation, $\VC = n$ yet $\SQdim = 2^n$, and ask what machine-checking it would change. This is a frontier the figure can mark but not yet draw solid: the exact relationship between VC and SQ dimension across all distributions is open (\Cref{op:sq-vc-quantitative}), and the labeled-versus-unlabeled compression separation is likewise only cited, its $\VC = 2$ witness still to be constructed in the kernel (\Cref{op:formalize-compression-sep}, \cite{PalvolgyiTardos2020}); each such formalization would promote one dashed red edge to solid, growing the connected verified core outward from the PAC cluster into the dimension-theoretic periphery.
-
-\item \textbf{Complete the lattice and the partial order becomes a theorem.} Ask, for every pair of paradigms with no drawn edge, whether the pair is provably incomparable or merely unstudied. The figure's central frontier is exactly this empty space: a full census distinguishing genuine incomparability from undiscovered implications would turn the informal sparsity of \Cref{thm:sparsity} into a proved structural theorem (\Cref{op:lattice-completeness}), replacing the absence of an edge with a positive proof that none can exist; until then the white space in the diagram is itself ignorance, and the thirteen edges are a lower bound on a partial order whose true Hasse diagram is unknown.
-
-\item \textbf{Is the lattice the Hasse diagram of one reducibility order whose verified fragment is a sub-order?} Read every edge, separation and containment alike, as an instance of a single ``$A$ reduces to $B$'' relation. The deepest frontier of all is whether the diagram is secretly one object: the separations and strict containments would be the covering relations of one partial order of learning problems under a uniform notion of reduction, with the four solid edges its machine-checked sub-order and the nine dashed edges its classical completion, so the diagram would read ``this is the Hasse diagram of a reducibility order, and the kernel has verified a connected sub-order of it''; whether such a single reducibility order exists, recovering the separations and containments as one relation, or whether the paradigms are provably non-unifiable under any one reduction, is open (\Cref{op:lattice-completeness}), so this reading of the lattice is drawn dashed.
+\item Read every edge, separation and containment alike, as a single ``$A$ reduces to $B$'' relation, so the diagram becomes the Hasse diagram of one reducibility order. Decide whether such a uniform reduction recovering all thirteen edges exists, or whether the paradigms are provably non-unifiable (\Cref{op:lattice-completeness}).
 \end{enumerate}

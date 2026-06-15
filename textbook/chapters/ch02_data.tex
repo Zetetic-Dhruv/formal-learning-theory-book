@@ -43,7 +43,7 @@ Classification noise does not change the landscape of what is learnable.
 For every fixed rate $\eta < 1/2$, a concept class is PAC learnable from clean data if and only if it is PAC learnable under classification noise at rate $\eta$. The sample complexity increases by a factor $O\!\left(1/(1-2\eta)^2\right)$, but the family of learnable classes is identical.
 \end{thm}
 
-The forward direction is the substance: a clean learner is recovered from a noisy one by estimating each label's majority vote, the variance of which is controlled by $(1-2\eta)^{-2}$. This robustness is special to the i.i.d.\ model; it fails for adversarial noise in the online setting, which requires different techniques. The equivalence is not yet part of the verified development, which carries the noise \emph{model} but not the reduction (\cref{op:noise}).
+The forward direction is the substance: a clean learner is recovered from a noisy one by estimating each label's majority vote, the variance of which is controlled by $(1-2\eta)^{-2}$. This robustness is special to the i.i.d.\ model; it fails for adversarial noise in the online setting, which requires different techniques (\cref{op:noise}).
 
 \medskip
 
@@ -176,7 +176,7 @@ The separation shows that negative data does a qualitatively different job: it p
 \end{remark}
 
 \begin{historical}
-Gold's 1967 paper~\cite{Gold1967} introduced both data models and proved the separation for language identification. It predates PAC learning by 17 years and online learning by 21, making it one of the earliest impossibility results in computational learning theory. The framework remains the standard model for inductive inference and underlies the mind-change hierarchy of Freivalds--Smith and Case--Smith (\Cref{ch:ordinals}); the verified development types the full criterion hierarchy: finite, explanatory, behaviorally correct, vacillatory, and anomalous identification.\formal{FLT_Proofs.Criterion.Gold.BCLearnable}
+Gold's 1967 paper~\cite{Gold1967} introduced both data models and proved the separation for language identification. It predates PAC learning by 17 years and online learning by 21, making it one of the earliest impossibility results in computational learning theory. The framework remains the standard model for inductive inference and underlies the mind-change hierarchy of Freivalds--Smith and Case--Smith (\Cref{ch:ordinals}), with its criterion hierarchy of finite, explanatory, behaviorally correct, vacillatory, and anomalous identification.\formal{FLT_Proofs.Criterion.Gold.BCLearnable}
 \end{historical}
 
 % ================================================================
@@ -223,7 +223,7 @@ Under standard cryptographic assumptions, DFAs are not efficiently PAC-learnable
 
 \begin{remark}[Queries as paradigm shift]
 \label{rmk:queries-paradigm}
-The DFA example witnesses a genuine paradigm separation: the same class is computationally intractable under passive, distributional data and efficiently learnable under interactive, worst-case queries. Membership queries let the learner \emph{explore} the target's structure; equivalence queries deliver \emph{directed} negative information at the learner's current frontier. The graph records a separation between \nde{pac\_learning} and \nde{exact\_learning} in both directions: some classes are PAC-learnable but not efficiently exactly learnable (equivalence queries can be costly to simulate), and DFAs go the other way.
+The DFA example witnesses a genuine paradigm separation: the same class is computationally intractable under passive, distributional data and efficiently learnable under interactive, worst-case queries. Membership queries let the learner \emph{explore} the target's structure; equivalence queries deliver \emph{directed} negative information at the learner's current frontier. The separation runs in both directions: some classes are PAC-learnable but not efficiently exactly learnable (equivalence queries can be costly to simulate), and DFAs go the other way.
 \end{remark}
 
 \subsection{Neither oracle suffices alone}
@@ -337,7 +337,7 @@ The preceding sections developed each data model individually. The four stand in
   \textcolor{thmred}{\rule[0.45ex]{0.5cm}{0.9pt}}~$\not\Rightarrow$ strict separation (verified) \quad
   \textcolor{notegray}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~literature / open};
 \end{tikzpicture}
-\caption[The data models, their characterizing dimensions, and the proven separations]{\textbf{The four data models, the dimension that pins each one's learnability, and the proven separations between them.} Each model is shown with the single combinatorial quantity that decides what it can learn: independent samples by the Vapnik--Chervonenkis dimension, adversarial streams by the Littlestone dimension, enumerative texts by the mind-change ordinal, and interactive queries by query complexity. The first three pairings are exact characterizations, each verified end to end in the companion development as an equivalence between learnability and finiteness of the dimension; the query pairing is class-specific and drawn provisionally. The arrows are the chapter's principal content. A blue arrow records a verified containment (every stream-learnable class is also sample-learnable); a red arrow records a verified strict separation, each carrying the witness class the formal proof exhibits. The thresholds are the sharpest case: one class with the smallest possible sample dimension and unbounded stream dimension, so the same class receives two complexities under two presentations. That is the chapter's lesson: a complexity measure belongs to a class together with a data model, the class alone fixing no complexity at all. Dashed arrows mark relationships known in the literature but not yet inside the kernel: on automata, exact learning with queries does not imply efficient PAC learning, a one-directional separation witnessed by deterministic finite automata and conditional on cryptographic assumptions (Kearns--Valiant, 1994), whose reverse is open (\cref{op:reverse-separation}); and the measurability caveat under which a prompt-style presentation can push the relevant event out of reach.}
+\caption[The four data models, their characterizing dimensions, and the proven separations]{The four data models, each paired with the combinatorial quantity that decides its learnability: i.i.d.\ samples with the VC dimension, adversarial streams with the Littlestone dimension, enumerative texts with the mind-change ordinal, and interactive queries with query complexity. The chapter's lesson is the thresholds case, where one class has VC dimension one yet Littlestone dimension infinite: a complexity measure belongs to a class together with a data model, not to the class alone.}
 \label{fig:data-taxonomy}
 \end{figure}
 
@@ -346,7 +346,7 @@ The preceding sections developed each data model individually. The four stand in
 \begin{table}[ht]
 \centering
 \small
-\caption{How the choice of data model determines the theory. Each row is a paradigm; each column a structural feature. The complexity measure, the characterization theorem, and the impossibility results all co-vary with the data model.}
+\caption{How the choice of data model determines the theory. Each row is a paradigm: the complexity measure, the characterization theorem, and the impossibility result all co-vary with the data model.}
 \label{tab:data-comparison}
 \begin{tabularx}{\textwidth}{>{\bfseries\small}l X X X X}
 \toprule
@@ -423,7 +423,7 @@ Chapters~\ref{ch:pac}--\ref{ch:universal} develop each paradigm in full. The pre
 \section{The Data of a Transformer}
 \label{sec:ch2-transformer}
 
-This chapter has been about how data reaches a learner; it has left the learner itself implicit.  The consistent learner of \cref{thm:uc-pac} was defined inline (``output any $h \in \mathcal{H}$ agreeing with $S$'') with no $\sigma$-algebra on $\mathcal{H}$ and no requirement that the map $S \mapsto L(S)$ be measurable.  For the simplest classes that omission is harmless.  For a parametric attention model it is exactly the structure that must be supplied, and supplying it, machine-checked, exposes two data-axes the classical model suppresses: the \emph{measurability} of the data-to-hypothesis map, and the \emph{finite precision} in which data is actually read.
+This chapter has been about how data reaches a learner; it has left the learner itself implicit.  The consistent learner of \cref{thm:uc-pac} was defined inline (``output any $h \in \mathcal{H}$ agreeing with $S$'') with no $\sigma$-algebra on $\mathcal{H}$ and no requirement that the map $S \mapsto L(S)$ be measurable.  For the simplest classes that omission is harmless.  For a parametric attention model it is the structure that must be supplied, and supplying it exposes two data-axes the classical model suppresses: the \emph{measurability} of the data-to-hypothesis map, and the \emph{finite precision} in which data is actually read.
 
 \begin{prop}[Attention routing is a measurable partition]
 \label{prop:attention-measurable-routing}
@@ -431,7 +431,7 @@ The data-dependent routing of a multi-head attention model (the partition of the
 \end{prop}
 
 \begin{proof}
-Fix the parameters and a query~$x$.  The routing decision is the $\arg\max$ over keys of the scores $\langle x, k_i\rangle$, so the set of queries routed to key~$i$ is the intersection of the half-spaces $\{x : \langle x, k_i - k_j\rangle \geq 0\}$ over $j \neq i$, which is a Borel set.  The routing map $(\text{parameters}, x) \mapsto (\text{winning key})$ is therefore measurable, and the head's prediction is a measurable function of parameters and query.  A parametrized family of concepts with this joint measurability is by definition a well-behaved VC-measurability target, and the learner's selection $S \mapsto L(S)$ inherits measurability from it.  This is precisely \leanname{LearnEvalMeasurable}: the property that, for every sample size~$m$, the evaluation $(S, x) \mapsto L(S)(x)$ is measurable: this is the condition under which the uniform-convergence argument of \cref{thm:uc-pac} is rigorous rather than merely formal.
+Fix the parameters and a query~$x$.  The routing decision is the $\arg\max$ over keys of the scores $\langle x, k_i\rangle$, so the set of queries routed to key~$i$ is the intersection of the half-spaces $\{x : \langle x, k_i - k_j\rangle \geq 0\}$ over $j \neq i$, which is a Borel set.  The routing map $(\text{parameters}, x) \mapsto (\text{winning key})$ is therefore measurable, and the head's prediction is a measurable function of parameters and query.  A parametrized family of concepts with this joint measurability is by definition a well-behaved VC-measurability target, and the learner's selection $S \mapsto L(S)$ inherits measurability from it.  This is the condition \leanname{LearnEvalMeasurable}: for every sample size~$m$, the evaluation $(S, x) \mapsto L(S)(x)$ is measurable, which is what the uniform-convergence argument of \cref{thm:uc-pac} requires.
 \end{proof}
 
 The second axis is invisible in the real-valued data model of \cref{def:iid-sample} and unavoidable in practice: the learner does not read real numbers.
@@ -446,32 +446,32 @@ and the executed IEEE-754 fold obeys an analogous accumulated-error envelope.\fo
 \end{prop}
 
 \begin{proof}[Proof idea]
-Each addition in the fold commits a relative rounding error of at most the unit roundoff $2^{-24}$; propagating these through the $m$ summations and bounding by the total magnitude~$S$ gives the stated linear-in-$m$ envelope, a machine-checked instance of backward-error analysis.  What matters is that such a constant exists at all: the map from data to prediction that actually runs is the idealized one perturbed by a controlled, certified amount.
+Each addition in the fold commits a relative rounding error of at most the unit roundoff $2^{-24}$; propagating these through the $m$ summations and bounding by the total magnitude~$S$ gives the stated linear-in-$m$ envelope by backward-error analysis.  What matters is that such a constant exists at all: the map from data to prediction that actually runs is the idealized one perturbed by a bounded amount.
 \end{proof}
 
 \begin{remark}[A third coordinate of the data model]
 \label{rmk:attention-data-model}
-\Cref{rmk:vc-jurisdiction} held that a complexity measure is a property of the class \emph{together with} a data model.  Attention adds a coordinate that the four classical models share but never expose: the \emph{precision} in which the data is represented.  The i.i.d.\ jurisdiction is where the measurable routing of \cref{prop:attention-measurable-routing} lets the VC machinery apply at all; the float32 envelope of \cref{prop:attention-fp32} is the certified cost of executing that machinery on data a real machine can hold.  The classical theory idealizes both axes away: it assumes the learner measurable and the arithmetic exact, and a transformer is where neither assumption is free.
+\Cref{rmk:vc-jurisdiction} held that a complexity measure is a property of the class \emph{together with} a data model.  Attention adds a coordinate that the four classical models share but never expose: the \emph{precision} in which the data is represented.  The i.i.d.\ jurisdiction is where the measurable routing of \cref{prop:attention-measurable-routing} lets the VC machinery apply at all; the float32 envelope of \cref{prop:attention-fp32} is the cost of executing that machinery on data a real machine can hold.  The classical theory idealizes both axes away: it assumes the learner measurable and the arithmetic exact, and a transformer is where neither assumption is free.
 \end{remark}
 
 \section{Exercises and Open Problems}
 \label{sec:ch2-open}
 
-Each problem is anchored to a concept above and tagged by epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result present in the literature or the verified development but not yet absorbed into a clean general statement. Verified handles are named where they exist.
+Each problem is anchored to a concept above and tagged by epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result present in the literature but not yet absorbed into a clean general statement.
 
 \begin{openprob}[Formalizing noise robustness, \textsc{uk}]
 \label{op:noise}
-\Cref{thm:noise-robust} (Angluin--Laird) is stated but not verified; the development carries the noise model \leanname{FLT_Proofs.Data.NoisyDataStream} without the reduction. Formalize the equivalence ``PAC under classification noise at rate $\eta < 1/2$ $\Leftrightarrow$ clean PAC'' with the explicit $O(1/(1-2\eta)^2)$ overhead, and identify the exact threshold behavior as $\eta \to 1/2$.
+Formalize \cref{thm:noise-robust} (Angluin--Laird), the equivalence ``PAC under classification noise at rate $\eta < 1/2$ $\Leftrightarrow$ clean PAC'' with the explicit $O(1/(1-2\eta)^2)$ overhead, and identify the exact threshold behavior as $\eta \to 1/2$.
 \end{openprob}
 
 \begin{openprob}[The optimal uniform-convergence constant, \textsc{ku}]
 \label{op:uc-constant}
-\Cref{thm:uc-vc} gives $m_0 = O((d + \log(1/\delta))/\varepsilon^2)$. Determine the exact leading constant for VC classes: symmetrization, chaining, and the Dudley entropy integral give different bounds, and which is tight for general classes of dimension $d$ is open (the development records this as the question of the sharpest \leanname{FLT_Proofs.Complexity.Generalization.QuantitativeUC}).
+\Cref{thm:uc-vc} gives $m_0 = O((d + \log(1/\delta))/\varepsilon^2)$. Determine the exact leading constant for VC classes: symmetrization, chaining, and the Dudley entropy integral give different bounds, and which is tight for general classes of dimension $d$ is open.
 \end{openprob}
 
 \begin{openprob}[A characterization of identifiability from text, \textsc{uk}]
 \label{op:text-char}
-\Cref{thm:text-informant} shows $\mathcal{C}_{\mathrm{fin}} \cup \{\N\}$ is not text-identifiable. Angluin's telltale condition characterizes which classes are: a class is text-identifiable iff every language has a finite ``telltale'' subset distinguishing it from its sublanguages in the class. Formalize this characterization on top of the typed criterion hierarchy (\leanname{FLT_Proofs.Criterion.Gold.EXLearnable}); the development types the criteria but not yet the telltale theorem.
+\Cref{thm:text-informant} shows $\mathcal{C}_{\mathrm{fin}} \cup \{\N\}$ is not text-identifiable. Angluin's telltale condition characterizes which classes are: a class is text-identifiable iff every language has a finite ``telltale'' subset distinguishing it from its sublanguages in the class. Formalize this characterization on top of the typed criterion hierarchy (\leanname{FLT_Proofs.Criterion.Gold.EXLearnable}).
 \end{openprob}
 
 \begin{openprob}[Closing the VC--Littlestone gap, \textsc{ku}]
@@ -511,12 +511,12 @@ The PAC/online/Gold separation is verified (\leanname{FLT_Proofs.Theorem.Separat
 
 \begin{openprob}[The measurable attention learner, \textsc{uk}]
 \label{op:attention-measurable}
-\Cref{prop:attention-measurable-routing} shows the attention learner is measurable, the condition \leanname{LearnEvalMeasurable} that \cref{thm:uc-pac} left implicit, with the routing well-behavedness as witness (\leanname{multiHeadArgmax_wellBehaved}).  Assemble these into a single verified statement: a parametric softmax-attention learner over i.i.d.\ data is PAC, with the measurability discharged rather than assumed.  The pieces are machine-checked; their composition into an end-to-end PAC guarantee for attention is not.
+\Cref{prop:attention-measurable-routing} shows the attention learner is measurable, the condition \leanname{LearnEvalMeasurable} that \cref{thm:uc-pac} left implicit, with the routing well-behavedness as witness (\leanname{multiHeadArgmax_wellBehaved}).  Assemble these into a single statement: a parametric softmax-attention learner over i.i.d.\ data is PAC, with the measurability discharged rather than assumed.
 \end{openprob}
 
 \begin{openprob}[Does PAC survive finite precision? \textsc{ku}]
 \label{op:attention-fp32-pac}
-\Cref{prop:attention-fp32} bounds the gap between the executed float32 attention learner and its idealized real-valued counterpart (\leanname{fp32Foldl_error_le_of_sum_bound}).  Does the PAC guarantee transfer to the executed learner, and at what cost: is there a sample-complexity penalty that scales with the precision (the unit roundoff $2^{-24}$), so that learnability degrades gracefully as arithmetic coarsens?  A known unknown joining the statistical and numerical error budgets.
+\Cref{prop:attention-fp32} bounds the gap between the executed float32 attention learner and its idealized real-valued counterpart (\leanname{fp32Foldl_error_le_of_sum_bound}).  Does the PAC guarantee transfer to the executed learner, and at what cost: is there a sample-complexity penalty that scales with the precision (the unit roundoff $2^{-24}$), so that learnability degrades gracefully as arithmetic coarsens?
 \end{openprob}
 
 \begin{openprob}[Attention under the other data models, \textsc{ku}]
@@ -524,19 +524,17 @@ The PAC/online/Gold separation is verified (\leanname{FLT_Proofs.Theorem.Separat
 The mapping of \cref{sec:ch2-transformer} is i.i.d.\ (batch).  Where does attention sit under the other three data models of this chapter: is there an online (streaming) attention learner with a finite mistake bound, or a query-driven (active) one, and does the measurable-routing well-behavedness (\leanname{finiteCellRouter_wellBehaved}) transfer to those presentations, or does the data model change attention's learnability as it changes thresholds'?
 \end{openprob}
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:data-taxonomy}}
+\subsection*{Counterfactual exercises}
 
-Figure~\ref{fig:data-taxonomy} is mostly settled ground: three of its pairings (sample/VC, stream/Littlestone, text/mind-change) are exact characterizations verified end to end, and its two strict separations carry the witness classes their proofs exhibit. Only the dashed edges (the DFA query separation, the in-context measurability caveat) and one or two dashed nodes are still open. Each exercise below nudges one data model and asks where the perturbation lands on this map. Three landing zones are available. A perturbation that leaves a node's characterizing dimension untouched is an \emph{instance}: it sits on a node or edge already drawn. One that slides along an existing edge or trips a side-condition is a \emph{boundary}. One that opens a genuinely new question the diagram already marks dashed is a \emph{frontier}. Locate each in the figure's own grammar and justify the placement.
+Each exercise perturbs one data model and asks how the perturbation changes the characterizing dimension and the learnability it decides.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{Noisy oracle.} Corrupt labels at a rate below one half. This lands squarely inside the i.i.d.\ node: the characterizing VC dimension is invariant under the noise, so the perturbation is a stabilizer arrow that returns to where it started (\cref{thm:noise-robust}, Angluin--Laird 1988). Argue the invariance and identify the instance.
-\item \textbf{Semi-supervised text.} Add a few labels to a positive-only text. The result interpolates the verified text-to-sample gap, so it is a boundary point on that edge, learnable exactly when the added labels supply the exclusion information the finite-support witness needs. Pin down the condition under which the boundary tips to learnable.
-\item \textbf{Active versus passive.} Let the learner choose its queries. This is the passive-to-exact edge itself, an instance already drawn: the label-complexity measure exists (\leanname{LabelComplexity}), though the characterization remains class-specific (Angluin's $L^\ast$). Trace the edge and note why no single dimension labels it.
-\item \textbf{Stream with bounded memory.} Cap the learner's state. The cap lives inside the online node's basin, since it can only raise the mistake bound above the Littlestone dimension, yet its own characterizing dimension is open. That makes it a frontier, one of the diagram's dashed nodes; explain why the bound can only worsen and why the dimension stays unknown.
-\item \textbf{Distribution shift.} Let the data be non-stationary. The Littlestone mistake bound holds against \emph{any} sequence, so a drifting distribution is just one more adversarial order the online node already dominates: an instance, not a new region (\leanname{optimal_mistake_bound_eq_ldim}). Show the bound covers the shifted sequence verbatim.
-\item \textbf{Equivalence-query budget.} Cap the number of equivalence queries. The budget places the learner at a boundary on the exact node, a point on the segment between the two verified endpoints: equivalence queries alone learn finite classes, while membership queries alone cannot certify. Locate the cap on that segment and say what it costs.
-\item \textbf{Partial labels.} Let the oracle abstain. Abstention weakens the exclusion an informant would give, placing the model on the boundary between text and informant, learnable exactly when the surviving labels recover enough exclusion to defeat the Gold diagonalization (\leanname{gold_theorem}). Identify the abstention rate at which the boundary tips.
-\item \textbf{Adversarial versus stochastic order.} Switch the sample order from random to adversarial. This is the diagram's spine, its primary verified separation (\leanname{online_strictly_stronger_pac}): stochastic order makes VC govern, adversarial order makes Littlestone govern, and thresholds are the one class realizing VC one and Littlestone infinite. Walk the spine from one regime to the other and name the witness that forces the gap.
-\item \textbf{Privacy constraint.} Require a differentially private learner. Under pure privacy the characterizing quantity is a representation dimension distinct from VC, and the kernel carries no privacy infrastructure, so this hangs off the i.i.d.\ node as a dashed, open frontier. Argue that the governing dimension departs from VC and explain why the diagram must draw the node dashed.
-\item \textbf{In-context presentation.} Let the data arrive as a prompt consumed by an attention learner. This sits on a boundary carrying a measurability side-condition: a hard attention head's failure event can be analytic while failing to be Borel (\leanname{attention_nonBorel_badEvent}), so the characterizations apply only under the well-behavedness the four classical nodes silently assume. Exhibit the side-condition and say which node it qualifies.
+\item \textbf{Noisy oracle.} Corrupt labels at a rate below one half. Show that the VC dimension is invariant under the noise, so PAC learnability is preserved (\cref{thm:noise-robust}).
+\item \textbf{Semi-supervised text.} Add a few labels to a positive-only text. Pin down the condition on the added labels under which the class becomes identifiable, that is, when they supply the exclusion information the finite-support witness needs.
+\item \textbf{Stream with bounded memory.} Cap the learner's state. Explain why this can only raise the mistake bound above the Littlestone dimension, and why no characterizing dimension is known for the memory-bounded model.
+\item \textbf{Distribution shift.} Let the data be non-stationary. Show that the Littlestone mistake bound covers a drifting distribution verbatim, since it holds against any sequence (\leanname{optimal_mistake_bound_eq_ldim}).
+\item \textbf{Partial labels.} Let the oracle abstain. Identify the abstention rate at which the surviving labels recover enough exclusion to defeat the Gold diagonalization (\leanname{gold_theorem}), tipping the model from text-like to informant-like.
+\item \textbf{Adversarial versus stochastic order.} Switch the sample order from random to adversarial. Stochastic order makes VC govern, adversarial order makes Littlestone govern; name the witness (thresholds, VC one, Littlestone infinite) that forces the gap (\leanname{online_strictly_stronger_pac}).
+\item \textbf{Privacy constraint.} Require a differentially private learner. Argue that under pure privacy the governing quantity is a representation dimension distinct from VC, so the i.i.d.\ characterization no longer applies.
+\item \textbf{In-context presentation.} Let the data arrive as a prompt consumed by an attention learner. A hard attention head's failure event can be analytic while failing to be Borel (\leanname{attention_nonBorel_badEvent}); exhibit the measurability side-condition under which the VC characterization still applies.
 \end{enumerate}

@@ -1,5 +1,5 @@
 % Chapter 16: Computational vs. Information-Theoretic Learnability
-% Centerpiece: the Kearns-Valiant 1994 gap — classes with finite VC dim
+% Centerpiece: the Kearns-Valiant 1994 gap: classes with finite VC dim
 % that are NOT efficiently learnable (under cryptographic assumptions).
 % Concepts: computational_hardness, proper_improper_separation, requires_assumption edges.
 % SHORT chapter (~3-4 pages).
@@ -79,14 +79,11 @@ cryptographic assumption.
 \begin{remark}[The structure of the reduction]
 \label{rmk:kv-reduction}
 The Kearns--Valiant reduction runs from a cryptographic primitive to a learning
-problem.  Its source is that primitive, with all its average-case structure,
-and so the reduction sidesteps the worst-case starting point one might expect.
-The learner is given random examples
+problem.  The learner is given random examples
 $(x, c(x))$ where $x$ is drawn from a distribution and $c$ is the target
-concept.  If the learner succeeds in learning, it implicitly solves the
-cryptographic problem on random instances.  This is why the hardness lives in
-the \emph{average-case} world, over random instances rather than adversarial
-ones.
+concept; if the learner succeeds, it implicitly solves the cryptographic
+problem on random instances.  The hardness therefore lives in the
+\emph{average-case} world, over random instances rather than adversarial ones.
 \end{remark}
 
 \subsection{Why P $\neq$ NP Does Not Suffice}
@@ -112,7 +109,7 @@ settings, provably impossible via relativizing techniques.
 \subsection{The Necessary Assumptions}
 
 The assumptions used in the literature fall into three families, in
-roughly increasing order of generality:
+increasing order of generality:
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{Factoring and RSA.}  The original Kearns--Valiant result
@@ -134,16 +131,13 @@ roughly increasing order of generality:
 
 \begin{obstbox}
 The information--computation gap is an \emph{obstruction} in the concept
-graph.  The claim that VC dimension characterizes PAC learnability is
-information-theoretically valid, but no analogous computational characterization is known.
-Whether \emph{any} combinatorial dimension characterizes efficient PAC
-learnability is open; no such dimension has been found, and no proof rules
-one out.  What \emph{is} settled, and machine-checked, is a sharper local
-fact: finite VC dimension does not control the statistical-query dimension.
-Singleton indicators on $\N$ have $\VC = 1$ yet infinite SQ
-dimension,\formal{FLT_Proofs.Theorem.Extended.vcdim_not_implies_hardness} so
-VC dimension already fails to capture hardness in the SQ model, one concrete
-instance of the gap, even though its full extent is unknown.
+graph.  VC dimension characterizes PAC learnability information-theoretically,
+but no analogous computational characterization is known, and whether \emph{any}
+combinatorial dimension characterizes efficient PAC learnability is open.  A
+sharper local fact is settled: finite VC dimension does not control the
+statistical-query dimension.  Singleton indicators on $\N$ have $\VC = 1$ yet
+infinite SQ dimension,\formal{FLT_Proofs.Theorem.Extended.vcdim_not_implies_hardness}
+one concrete instance of the gap in the SQ model.
 \end{obstbox}
 
 
@@ -181,9 +175,8 @@ The canonical example is the class of $3$-term DNF formulae.  Finding a
 consistent $3$-term DNF is $\mathrm{NP}$-hard~\cite{PittValiant1988}, but the
 class of $3$-term DNFs is contained in the class of $3$-CNF formulae, which
 \emph{is} efficiently learnable.  An improper learner simply outputs a $3$-CNF
-formula that is consistent with the data.  That hypothesis is a CNF wearing
-none of the target's DNF clothing, and it classifies every example correctly
-all the same.
+formula that is consistent with the data.  That hypothesis is a CNF, not the
+target's DNF, yet it classifies every example correctly.
 
 Information-theoretically, a proper learner always exists: any class of finite
 VC dimension is learned by proper empirical risk minimization, which returns a
@@ -215,13 +208,11 @@ which has type \texttt{separation} and connects to
 \label{sec:attention-gap}
 
 The information--computation gap is the daily working condition of deep
-learning, alive in every training run rather than shelved as a theorist's
-curiosity.  A softmax-attention head induces a concept class
-that is machine-checked to be well-behaved, hence of finite VC dimension and
-information-theoretically PAC
+learning.  A softmax-attention head induces a well-behaved concept class, of
+finite VC dimension and information-theoretically PAC
 learnable.\formal{TLT.Bridge.softAttention_wellBehaved} A proper learner for
 it therefore exists in principle.  Whether that learner runs in polynomial
-time is the open, and widely doubted, question: hardness-of-learning results
+time is open: hardness-of-learning results
 for neural networks under LWE~\cite{Daniely2021} place architectures of this
 kind on the conjecturally efficient-unlearnable side of
 \Cref{thm:kearns-valiant}.
@@ -231,8 +222,8 @@ the exact parameters of a target attention head, which is proper learning, is th
 regime where hardness bites. Gradient descent does something improper
 instead: it returns \emph{a} network that predicts well and lets the target
 network stay hidden, exactly as the $3$-CNF learner returns a CNF where the
-target was a DNF. The gap of this chapter is, in this sense, the precise reason that
-training large models is an improper-learning enterprise.
+target was a DNF. The gap of this chapter is the precise reason that training
+large models is an improper-learning enterprise.
 
 
 % ================================================================
@@ -260,12 +251,10 @@ The principal instances in the graph are:
 \item \nde{computational\_hardness} requires \nde{cryptographic\_hardness}.
   The information--computation gap of \Cref{thm:kearns-valiant} holds only
   under cryptographic assumptions (hardness of factoring, or LWE).  Without
-  them it remains conceivable, though it would be a startling
-  collapse, that every class of finite VC dimension is efficiently learnable.
-  The assumption is genuinely cryptographic: it asserts the hardness of a
-  specific computational problem, a fact about factoring or LWE that sits
-  entirely outside any constraint one might place on the learner's hypothesis
-  space.
+  them it remains conceivable that every class of finite VC dimension is
+  efficiently learnable.  The assumption asserts the hardness of a specific
+  computational problem (factoring or LWE), independent of any constraint on
+  the learner's hypothesis space.
 
 \item \nde{posterior\_consistency} requires \nde{bayesian\_inference}.
   Posterior consistency (\Cref{ch:agents}, \Cref{sec:bayesian-pac}) holds under
@@ -296,43 +285,38 @@ that pervades computational learning theory.
 
 The computational layer is where formal learning theory is least complete:
 its central hardness results are conditional, and its central
-characterization question is open.  Each problem below is tagged a
-\emph{known unknown} (KU), sharply posed but unresolved, or an \emph{unknown
-known} (UK), where the right object is still missing; a design-lab or
-literature anchor is named where one exists.
+characterization question is open.
 
 \begin{openprob}[A dimension for efficient learnability]
 \label{op:efficient-dimension}
 Is there \emph{any} combinatorial parameter whose finiteness characterizes
 efficient (polynomial-time) PAC learnability, as VC dimension characterizes
-the information-theoretic case?  None is known, and none is ruled out.  A
-known unknown, the central question of the computational layer.
+the information-theoretic case?  None is known, and none is ruled out.  This
+is the central open question of the computational layer.
 \end{openprob}
 
 \begin{openprob}[Formalizing the cryptographic gap]
 \label{op:formalize-kv}
-The information-theoretic side of \Cref{thm:kearns-valiant} is machine-checked
-(\leanname{vcdim_finite_imp_proper_finite_support_learner}); the cryptographic
-hardness side is not.  Can a Kearns--Valiant-style hardness result, a finite-VC
-class with no efficient learner under LWE, be formalized in a proof
-assistant?  An unknown known~\cite{KearnsValiant1994,Daniely2021}.
+Can a Kearns--Valiant-style hardness result, a finite-VC class with no
+efficient learner under LWE, be formalized in a proof
+assistant?~\cite{KearnsValiant1994,Daniely2021}
 \end{openprob}
 
 \begin{openprob}[Distribution-free SQ hardness, verified]
 \label{op:sq-distribution-free}
-The machine-checked separation finite-VC$\,\not\Rightarrow\,$finite-SQ uses a
+The known separation finite-VC$\,\not\Rightarrow\,$finite-SQ uses a
 fixed witness distribution (\leanname{vcdim_not_implies_hardness}).  Can one
 verify a finite-VC class whose SQ dimension is super-polynomial under
 \emph{every} distribution, matching the parities lower
-bound~\cite{BlumFurstJacksonKearnsMansourRudich1994}?  A known unknown.
+bound~\cite{BlumFurstJacksonKearnsMansourRudich1994}?
 \end{openprob}
 
 \begin{openprob}[Is attention efficiently learnable?]
 \label{op:attention-efficient}
 A softmax-attention class is information-theoretically learnable
 (\leanname{softAttention_wellBehaved}).  Is it efficiently PAC learnable, or
-does learning attention reduce to a cryptographic problem?  A known unknown on
-the transformer side, and the modern instance of \Cref{thm:kearns-valiant}.
+does learning attention reduce to a cryptographic problem?  This is the modern
+instance of \Cref{thm:kearns-valiant}.
 \end{openprob}
 
 \begin{openprob}[Past the black-box barrier]
@@ -340,15 +324,15 @@ the transformer side, and the modern instance of \Cref{thm:kearns-valiant}.
 Applebaum--Barak--Xiao rule out \emph{black-box} reductions from
 $\mathrm{NP}$-hardness to learning hardness.  Is there a non-black-box route
 that bases hardness of learning on a worst-case assumption such as
-$\mathrm{P} \neq \mathrm{NP}$?  A known unknown~\cite{ApplebaumBarakXiao2008}.
+$\mathrm{P} \neq \mathrm{NP}$?~\cite{ApplebaumBarakXiao2008}
 \end{openprob}
 
 \begin{openprob}[Characterizing improper learnability]
 \label{op:improper-characterization}
 Efficient \emph{improper} learning can be strictly easier than proper learning
 (\Cref{thm:proper-improper}).  Is there a structural characterization of the
-classes that are efficiently improperly learnable?  An unknown known: no
-combinatorial handle on improper efficiency is known.
+classes that are efficiently improperly learnable?  No combinatorial handle on
+improper efficiency is known.
 \end{openprob}
 
 \begin{openprob}[Minimal assumptions for hardness]
@@ -356,23 +340,22 @@ combinatorial handle on improper efficiency is known.
 Hardness-of-learning currently rests on strong primitives (factoring, LWE).
 Is some cryptographic assumption \emph{necessary} for the
 information--computation gap: does an efficient learner for every finite-VC
-class imply the collapse of one-way functions?  A known
-unknown~\cite{Daniely2021}.
+class imply the collapse of one-way functions?~\cite{Daniely2021}
 \end{openprob}
 
 \begin{openprob}[Learning implies cryptography?]
 \label{op:learning-to-crypto}
 The Kearns--Valiant reduction builds hardness \emph{from} cryptography. Does
 the converse hold: does the hardness of learning a natural concept class
-\emph{yield} a cryptographic primitive?  An unknown known: a generic
-learning-to-cryptography transformation is not established.
+\emph{yield} a cryptographic primitive?  A generic learning-to-cryptography
+transformation is not established.
 \end{openprob}
 
 \begin{openprob}[Size of the proper/improper gap]
 \label{op:proper-improper-size}
 For \Cref{thm:proper-improper}, how large can the separation be: how much
 harder is proper than improper learning across natural classes, measured in
-running time?  A known unknown~\cite{PittValiant1988}.
+running time?~\cite{PittValiant1988}
 \end{openprob}
 
 \begin{openprob}[A proper/improper gap for attention]
@@ -380,18 +363,14 @@ running time?  A known unknown~\cite{PittValiant1988}.
 Does an attention class exhibit a proper/improper gap: is there an efficient
 improper learner (a surrogate model) even where recovering the target head is
 intractable, formalizing the intuition that gradient descent learns
-improperly?  A known unknown on the transformer side
-(\leanname{softAttention_wellBehaved},
-\leanname{vcdim_finite_imp_proper_finite_support_learner}).
+improperly?  (\leanname{softAttention_wellBehaved},
+\leanname{vcdim_finite_imp_proper_finite_support_learner})
 \end{openprob}
 
 \bigskip
 
-This chapter has established the structural gap between
-information-theoretic and computational learnability.  The gap is real: it
-produces classes that are provably learnable but (conditionally) not
-efficiently learnable.  And no combinatorial dimension is yet known to
-characterize efficient PAC learnability; whether one can exist is itself an
-open problem.  The next chapter examines a different kind of gap: the distance
-between binary classification and the richer learning settings that require
-new mathematical primitives.
+The structural gap between information-theoretic and computational
+learnability is real: it produces classes that are provably learnable but
+(conditionally) not efficiently learnable.  The next chapter examines a
+different kind of gap: the distance between binary classification and the
+richer learning settings that require new mathematical primitives.

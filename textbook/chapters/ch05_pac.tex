@@ -15,9 +15,7 @@ learning, Gold-style identification, universal learning) will be understood
 partly by how it resembles and partly by how it differs from what is
 established here.  The chapter builds toward a single destination: the
 Fundamental Theorem of Statistical Learning, which characterizes PAC
-learnability through a web of nine equivalent conditions.  The path there is
-the content.  Each lemma is a foothold; the VC characterization is the summit;
-the full equivalence web is the view from the top.
+learnability through a web of nine equivalent conditions.
 
 \medskip
 
@@ -31,8 +29,7 @@ The chapter is organized as an ascent.
   learnable, built in four stages through Sauer--Shelah, uniform convergence,
   ERM analysis, and the converse.
 \item \textbf{The Fundamental Theorem} (\Cref{sec:fundamental}): all nine
-  equivalent conditions, the equivalence web, and the directions we proved versus
-  those we cited.
+  equivalent conditions and the equivalence web.
 \item \textbf{The agnostic setting} (\Cref{sec:agnostic}): why dropping the
   realizability assumption changes sample complexity from $\Theta(d/\varepsilon)$
   to $\Theta(d/\varepsilon^2)$, and why this gap is not an artifact.
@@ -206,12 +203,11 @@ Moreover, if $d = \VC(\mathcal{H}) < \infty$, then $\mathcal{H}$ is PAC
 learnable with sample complexity
 \[
   m_\mathcal{H}(\varepsilon, \delta)
-  = O\!\left(\frac{d + \log(1/\delta)}{\varepsilon}\right).
+  = O\!\left(\frac{d \log(d/\varepsilon) + \log(1/\delta)}{\varepsilon}\right).
 \]
 \end{thm}
 
-The proof proceeds in four stages.  Each stage is a separate lemma,
-and each lemma is a foothold on the ascent.
+The proof proceeds in four stages, each a separate lemma.
 
 \bigskip
 \noindent\textbf{Stage 1:} Finite VC dimension $\Longrightarrow$ polynomial
@@ -583,21 +579,11 @@ equivalence web: this is where the PAC--online separation begins.
   \draw[spstrict] (4.0,-0.34) -- (4.4,-0.34); \node[anchor=west, inner sep=1pt] at (4.45,-0.34) {strict, one-way};
 \end{scope}
 \end{tikzpicture}
-\caption[The equivalence web of the Fundamental Theorem: VC dimension as the hub]{The Fundamental
-Theorem as a confluence: several a priori unrelated descriptions of ``learnable'' collapse into one
-equivalence class, with finite VC dimension as the central hub that represents the class. Each solid
-spoke is an equivalence the verified kernel certifies: PAC learnability (\leanname{vc_characterization}),
-the uniform convergence property, finite Rademacher complexity (\leanname{fundamental_rademacher}), the
-polynomial growth bound, and finite sample compression with side information
-(\leanname{fundamental_vc_compression}, Moran--Yehudayoff); the two-sided sample complexity bound on the
-core spoke is \leanname{pac_sample_complexity_sandwich}, and the whole bundle is
-\leanname{fundamental_theorem}. Dashed spokes are classical but outside the present kernel: agnostic PAC
-learnability, ERM as a PAC learner, and the finiteness lifting
-(\cite{BlumerEhrenfeuchtHausslerWarmuth1989,ShalevShwartzBenDavid2014}). The single outside node, finite
-Littlestone dimension, is joined by one dashed strict edge: it implies finite VC dimension, hence PAC
-learnability, but the converse fails (thresholds on $\R$ have $\VC=1$ and $\Ldim=\infty$;
-\leanname{online_strictly_stronger_pac}), the one place where the equivalence breaks into the online
-separation of \Cref{ch:separations}.}
+\caption[The equivalence web of the Fundamental Theorem: VC dimension as the hub]{Several a priori
+unrelated descriptions of ``learnable'' collapse into one equivalence class, with finite VC dimension as
+the central hub (\leanname{fundamental_theorem}). The single outside node, finite Littlestone dimension,
+implies PAC learnability but the converse fails (thresholds on $\R$ have $\VC=1$ and $\Ldim=\infty$), the
+one place where the equivalence breaks into the online separation of \Cref{ch:separations}.}
 \label{fig:equivalence-web}
 \end{figure}
 
@@ -761,9 +747,9 @@ achieve $o(d/\varepsilon^2)$ in the agnostic setting, and no algorithm needs
 $\omega(d/\varepsilon)$ in the realizable setting.
 \end{thm}
 
-Where does the gap come from?  It is tempting to blame the proof technique; perhaps a
-cleverer argument could recover $1/\varepsilon$ in the agnostic case.  It
-cannot.  The gap is fundamental, and the reason is information-theoretic.
+Where does the gap come from?  It is not an artifact of the proof technique:
+no argument recovers $1/\varepsilon$ in the agnostic case.  The reason is
+information-theoretic.
 
 \begin{proof}[Proof sketch of the agnostic lower bound]
 Consider the class of threshold functions on $[0,1]$ (VC dimension 1, so
@@ -793,9 +779,8 @@ statistical learning theory that cannot be anticipated from finite-class
 arguments.  For finite $|\mathcal{H}|$, both realizable and agnostic sample
 complexities have the same dependence on $\varepsilon$ (up to the
 $\log|\mathcal{H}|$ factor).  The gap emerges only when $\mathcal{H}$ is
-infinite and VC dimension replaces $\log|\mathcal{H}|$.  Realizability does
-real work here beyond easing the bookkeeping: it changes the information
-structure qualitatively, which is what lets the realizable rate outrun the
+infinite and VC dimension replaces $\log|\mathcal{H}|$.  Realizability changes
+the information structure, which is what lets the realizable rate outrun the
 agnostic one for an infinite class.
 \end{remark}
 
@@ -1135,28 +1120,24 @@ The optimal expected-error predictor in the realizable case is the one-inclusion
 \end{openprob}
 
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:equivalence-web}}
+\subsection*{Counterfactual exercises}
 
-Figure~\ref{fig:equivalence-web} is a hub with a mostly solid rim: one central object stands for the class, and the spokes that join the equivalence class are, by and large, theorems the verified kernel already certifies (solid), with a minority borrowed from the literature or genuinely one-way (dashed). Each exercise below adds, replaces, or refines a spoke. Working in that grammar, place the result in one of three roles: an \emph{instance} (a further face that joins the verified class), a \emph{boundary} (a place where the equivalence turns strict or a constant gets pinned), or a \emph{frontier} (a dashed edge where the kernel stops and the open problem begins). The interesting fact about this particular web is how few of the second and third kind there are: the hub is solid almost the whole way around, and the open work sits at three or four named edges.
+Each exercise adds, replaces, or refines one spoke of the equivalence web in \Cref{fig:equivalence-web}.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The Rademacher face.} Add finite Rademacher complexity as a satellite of the hub. This enters as an instance, and a solid one: PAC learnability and the uniform vanishing of Rademacher complexity are equivalent in the kernel (\leanname{fundamental_rademacher}), so the new spoke is drawn solid from the start.
+\item \textbf{The Rademacher face.} Add finite Rademacher complexity as a satellite of the hub, and show it is equivalent to PAC learnability: PAC learnability and uniform vanishing of the Rademacher complexity coincide (\leanname{fundamental_rademacher}).
 
-\item \textbf{The compression face.} Add finite sample compression with side information as a satellite. Argue that it too joins as an instance. The deep direction, finite VC dimension yields a compression scheme, is the Moran--Yehudayoff theorem and is verified (\leanname{fundamental_vc_compression}), so the whole spoke is solid even though its proof is the hardest in the web.
+\item \textbf{The compression face.} Add finite sample compression with side information as a satellite and show it joins the equivalence class. The deep direction, that finite VC dimension yields a compression scheme, is the Moran--Yehudayoff theorem (\leanname{fundamental_vc_compression}).
 
-\item \textbf{The quantitative ring.} Replace the qualitative hub edge by the two-sided sample complexity bound. This is a boundary, and it sharpens the hub rather than extending it: the kernel pins both an upper bound from any PAC witness and a lower bound from VC dimension (\leanname{pac_sample_complexity_sandwich}), so the spoke now carries a rate where before it carried only an equivalence.
+\item \textbf{The quantitative ring.} Replace the qualitative hub equivalence by the two-sided sample complexity bound, which pins both an upper bound from any PAC witness and a lower bound from VC dimension (\leanname{pac_sample_complexity_sandwich}). Show the spoke now carries a rate where before it carried only an equivalence.
 
-\item \textbf{The agnostic price.} Move from realizable to agnostic PAC and ask for the sample complexity. Here the boundary lands on a dashed face: the equivalence to realizable PAC is classical and drawn dashed (\cite{ShalevShwartzBenDavid2014}, outside the kernel), and the line it draws is the $\varepsilon^{2}$ price, whose exact constant is open (\cref{op:sample-constant}).
+\item \textbf{The agnostic price.} Move from realizable to agnostic PAC. The equivalence to realizable PAC is classical (\cite{ShalevShwartzBenDavid2014}); show that the sample complexity nonetheless carries the $\varepsilon^{2}$ price, whose exact constant is open (\cref{op:sample-constant}).
 
-\item \textbf{The Littlestone strict edge.} Replace the outside node's dashed edge by an attempted equivalence. This is the web's principal boundary, and it refuses to close: finite Littlestone dimension implies PAC learnability but the converse fails, witnessed by thresholds on $\R$ with $\VC=1$ and $\Ldim=\infty$ (\leanname{online_strictly_stronger_pac}, \leanname{pac_not_implies_online}), so the edge stays dashed and one-way.
+\item \textbf{The Littlestone strict edge.} Attempt to upgrade the outside node to an equivalence. Show it refuses to close: finite Littlestone dimension implies PAC learnability but the converse fails, witnessed by thresholds on $\R$ with $\VC=1$ and $\Ldim=\infty$ (\leanname{online_strictly_stronger_pac}).
 
-\item \textbf{The growth-function rung.} Insert ``$\growth_{\mathcal H}(m)<2^{m}$ for some $m$'' as a satellite. Read this as an instance whose inner curve is dashed: the equivalence to finite VC dimension is a verified conjunct of the bundle (\leanname{fundamental_theorem}), but the quantitative Sauer--Shelah envelope $(em/d)^{d}$ it rides on is classical (\cite{Sauer1972,Shelah1972,VapnikChervonenkis1971}). The spoke is solid; only its shape annotation stays dashed.
+\item \textbf{The compression size gap.} Refine the compression face from $2^{O(d)}$ to $O(d)$. The finiteness direction and a quadratic reverse bound $\VC \le 2(k+1)^{2}-1$ are known (\leanname{compression_bounds_vcdim}); the Littlestone--Warmuth $O(d)$ conjecture and the removal of side information are open (\cref{op:compression-od}).
 
-\item \textbf{The compression size gap.} Refine the compression face from $2^{O(d)}$ to $O(d)$. Now the spoke runs out into a frontier: the kernel proves only the finiteness direction and a quadratic reverse bound, $\VC \le 2(k+1)^{2}-1$ (\leanname{compression_bounds_vcdim}), so the Littlestone--Warmuth $O(d)$ conjecture and the removal of side information remain a dashed open spoke (\cref{op:compression-od}).
+\item \textbf{The multiclass web.} Redraw the figure for multiclass or real-valued hypotheses with the DS dimension as hub. No multiclass fundamental theorem is known (\cref{op:multiclass-fundamental}); determine which of the nine equivalences survive the change of dimension.
 
-\item \textbf{The ERM face.} Add ``empirical risk minimization is a PAC learner'' as a satellite. This one is a frontier on the algorithmic side: the kernel types and proves the realizable-ERM machinery (\leanname{ermLearn_in_H}, \leanname{erm_consistent_realizable}), but there is no named ERM-is-PAC equivalence theorem, so the spoke is drawn dashed and cited (\cite{ShalevShwartzBenDavid2014}) pending promotion to a bundle conjunct.
-
-\item \textbf{The multiclass web.} Redraw the whole figure for multiclass or real-valued hypotheses with the DS dimension as hub. This is a frontier of a more violent kind, one that re-types every spoke at once: no multiclass fundamental theorem is in the kernel (\cref{op:multiclass-fundamental}), so the entire generalized star would be drawn dashed, an open analogue of the binary confluence.
-
-\item \textbf{One representing object.} Replace the several solid spokes by a single claim that the conditions are evaluations of one representable predicate with VC dimension as its representing object. This is the most general frontier the web has, and it is open: the kernel has assembled the faces as one bundle (\leanname{fundamental_theorem}) but proves no universal property unifying them, so the meta-edge that all spokes are one functor is the figure's single dashed frontier over an otherwise solid hub.
+\item \textbf{One representing object.} Replace the several spokes by a single claim that the conditions are evaluations of one representable predicate with VC dimension as its representing object. The faces are assembled as one bundle (\leanname{fundamental_theorem}); state the universal property that would unify them, which is open.
 \end{enumerate}

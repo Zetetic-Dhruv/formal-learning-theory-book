@@ -162,7 +162,7 @@ realized by a halfplane.  Hence $\VC(\mathcal{H}) = 3$.
       {No four points are shattered: the inner point lies in the hull of the others, so the\\labeling isolating it is unrealizable by a halfplane (Radon). Hence $\VC<4$, so $\VC=3$.};
   \end{scope}
 \end{tikzpicture}
-\caption[Shattering three points: each of the eight labelings realized by a separating halfplane, and no four points shattered, so the VC dimension is three.]{The eight labelings of three non-collinear points, each drawn with a separating halfplane that realizes it: the boundary splits the label-one points (red) from the label-zero points (blue), and the label-one side is lightly shaded.  A witness line in every cell means the restriction of the halfplane class to these three points is the full set of eight labelings, so the points are shattered (\leanname{Shatters}) and the VC dimension is at least three.  The lower panel shows why no four points are shattered: one of any four lies in the convex hull of the others, and the labeling isolating it is unrealizable by a halfplane (Radon), so the VC dimension (\leanname{VCDim}) equals three, which is $d+1$ for halfspaces in $d$ dimensions.  The shattering and VC-dimension concepts are the verified definitions; the value three and the four-point obstruction are classical.}
+\caption[Three points shattered by halfplanes; no four are, so the VC dimension is three.]{Each of the eight labelings of three non-collinear points is realized by a separating halfplane, so the points are shattered (\leanname{Shatters}) and $\VC \ge 3$. The lower panel shows that no four points can be shattered, since one always lies in the convex hull of the others (Radon), giving $\VC = 3 = d+1$ for halfspaces in $d$ dimensions.}
 \label{fig:shatter-halfplane}
 \end{figure}
 
@@ -359,20 +359,11 @@ Frankl.
 \end{axis}
 \end{tikzpicture}
 \caption[The growth function: exponential while the class shatters, then polynomial of degree~$\VC$.]{The
-growth function $\growth_\mathcal{H}(n)$ (\leanname{GrowthFunction}) counts the most
-distinct labelings a class can produce on any $n$ points.  It never exceeds $2^n$ (the
-dashed ray) and equals $2^n$ exactly while the class still shatters a set of that size,
-that is for $n \leq d = \VC(\mathcal{H})$.  The solid curve is the largest a class of VC
-dimension three can grow, the Sauer--Shelah bound $\sum_{i=0}^{3}\binom{n}{i}$
-(\leanname{sauer_shelah_quantitative}): it rides the $2^n$ ray through $n=3$, then at
-$n = d+1 = 4$ peels permanently away into a polynomial arc whose degree is the VC
-dimension.  The drop is immediate and there is no intermediate growth rate.  On the
-logarithmic vertical axis the exponential $2^n$ is a straight line and the polynomial
-bends below it, so the widening gap is the exponential saving a finite VC dimension buys.
-This collapse is the combinatorial step the Fundamental Theorem turns into PAC
-learnability, since the growth function is the quantity a uniform-convergence bound
-controls.  The definition and the bound are both verified; the asymptotic form
-$(en/d)^d$ and the no-middle-regime reading are classical.}
+growth function $\growth_\mathcal{H}(n)$ (\leanname{GrowthFunction}) equals $2^n$ (the dashed ray)
+exactly while the class shatters a set of that size, $n \le d = \VC(\mathcal{H})$. At $n = d+1$
+it peels permanently into the Sauer--Shelah bound $\sum_{i=0}^{d}\binom{n}{i}$
+(\leanname{sauer_shelah_quantitative}), a polynomial of degree~$\VC$; the drop is immediate.
+This collapse is the combinatorial step the Fundamental Theorem turns into PAC learnability.}
 \label{fig:growth-function}
 \end{figure}
 
@@ -431,11 +422,10 @@ the same depth.
 \end{proof}
 
 The converse fails: threshold classifiers on $\R$ have $\VC = 1$ but
-$\Ldim = \infty$ (\Cref{ch:separations}).  Intuitively, the Littlestone
-dimension is larger because it accounts for adaptive adversaries: the
-adversary in the online game chooses instances sequentially, seeing the
-learner's responses, while the VC dimension considers all labelings of a
-fixed set simultaneously.
+$\Ldim = \infty$ (\Cref{ch:separations}).  The Littlestone dimension is larger
+because it accounts for adaptive adversaries: the adversary in the online game
+chooses instances sequentially, seeing the learner's responses, while the VC
+dimension considers all labelings of a fixed set simultaneously.
 
 
 % ================================================================
@@ -529,10 +519,9 @@ Binary classification has a clean answer: a class $\mathcal{H} \subseteq
 \{0,1\}^X$ is PAC learnable if and only if $\VC(\mathcal{H}) < \infty$.
 What is the corresponding answer when the label set $Y$ has $k \geq 3$
 elements?  This question, first posed in the 1980s, was open for thirty
-years.  Its resolution demanded a fundamentally new combinatorial dimension,
-because the obvious candidate turned out to be wrong: a new proof technique
-alone was never going to be enough when the quantity being measured was itself
-the wrong one.
+years.  Its resolution demanded a new combinatorial dimension, because the
+obvious candidate, the Natarajan dimension, turned out not to characterize
+learnability.
 
 
 \subsection{The Natarajan Dimension: The Obvious Candidate}
@@ -572,22 +561,17 @@ It was wrong.
 \subsection{The Counterexample: When the Obvious Fails}
 
 \begin{thm}[Failure of Natarajan Dimension
-  {\cite{DanielyShalevShwartz2014}}]
+  {\cite{BrukhimCarmonDinurMoranYehudayoff2022}}]
 \label{thm:natarajan-failure}
 There exists a hypothesis class $\mathcal{H} \subseteq Y^X$ with
 $\Ndim(\mathcal{H}) = 1$ that is \emph{not} PAC learnable.
 \end{thm}
 
-This is a dramatic failure: the Natarajan dimension can be as small as
-possible (just one) and still the class can be unlearnable.  The problem lies
-in the label set: the construction uses $|Y| = \infty$, and the Natarajan
-dimension, which examines only pairs of opposing functions, fails to capture
-the combinatorial explosion that arises when the label set is large.
-
-The witness is a class constructed via a combinatorial argument.  The key
-insight is that the Natarajan dimension constrains the number of ``binary
-slices'' through the labeling space but does not constrain the total
-complexity when the label set grows without bound.
+The Natarajan dimension can be as small as one and the class still
+unlearnable.  The witness uses $|Y| = \infty$: the Natarajan dimension
+examines only pairs of opposing functions, so it constrains the binary slices
+of the labeling space but not the total complexity once the label set grows
+without bound.
 
 \begin{separation}
 \textbf{Natarajan vs.\ PAC learnability.}  The Natarajan dimension does not
@@ -621,7 +605,7 @@ A \emph{pseudo-cube of dimension $d$} in $G_\mathcal{H}$ is a subhypergraph
 isomorphic to the complete $d$-dimensional hypercube graph $\{0,1\}^d$.
 
 The DS dimension $\DSdim(\mathcal{H})$ is the supremum over all finite
-$S \subseteq X$ of the maximum dimension of a pseudo-cube in $G_\mathcal{H}$.\footnote{The genuine DS dimension is not machine-checked. The kernel types a related but distinct notion: the \emph{all-labelings} (strong shattering) dimension \leanname{FLT_Proofs.Complexity.Structures.StrongShatteringDim}, the largest $S$ on which every $f \colon S \to Y$ is realizable, whose value is at most $\Ndim$, the reverse of the genuine DS relationship $\Ndim \le \DSdim$. Formalizing the pseudo-cube DS dimension is \cref{op:ds-formal}.}
+$S \subseteq X$ of the maximum dimension of a pseudo-cube in $G_\mathcal{H}$.
 \end{defn}
 
 \begin{thm}[Multiclass Characterization
@@ -637,21 +621,14 @@ multiclass analogue of the Fundamental Theorem: the DS dimension plays
 exactly the role that the VC dimension plays for binary classification.
 
 \begin{historical}
-\textbf{Why the Natarajan dimension fails and the DS dimension succeeds.}
-The Natarajan dimension examines the labeling structure of $\mathcal{H}$ by
-projecting onto pairs of opposing functions, a fundamentally binary lens
-applied to a multiclass problem.  The DS dimension, by contrast, examines
-the full combinatorial structure of the one-inclusion hypergraph, which
-encodes all the ways hypotheses can disagree on single points.
-
+\textbf{The one-inclusion hypergraph.}
 The one-inclusion hypergraph is not new: Haussler, Littlestone, and Warmuth
 introduced it in 1994 for binary classification, where it yields an optimal
-PAC learner (the one-inclusion algorithm).  What Brukhim et al.\ discovered
-is that the right way to measure the complexity of a multiclass hypothesis
-class is to look for high-dimensional pseudo-cubes inside this hypergraph.
-Pseudo-cubes are the multiclass analogue of shattered sets: they represent
-configurations where the labeling structure is rich enough to prevent
-learning.
+PAC learner (the one-inclusion algorithm).  Brukhim et al.\ found that the
+complexity of a multiclass class is measured by the high-dimensional
+pseudo-cubes inside this hypergraph.  Pseudo-cubes are the multiclass analogue
+of shattered sets: configurations whose labeling structure is rich enough to
+prevent learning.
 \end{historical}
 
 The dimension hierarchy for multiclass problems is:
@@ -704,25 +681,12 @@ The dimension hierarchy for multiclass problems is:
     \node[font=\scriptsize, anchor=west] at (5.95,0) {literature / not yet formalized};
   \end{scope}
 \end{tikzpicture}
-\caption[The multiclass dimension ladder: verified rungs versus literature.]{The
-multiclass dimension ladder, drawn at its evidence grade.  For binary classes
-($|Y|=2$) the VC dimension characterizes PAC learnability completely: a class is
-learnable if and only if its VC dimension is finite, and this equivalence is
-machine-checked (solid).  The obvious generalization to $k \ge 3$ labels is the
-Natarajan dimension (\leanname{NatarajanDim}), which equals the VC dimension when
-$|Y|=2$; but finite Natarajan dimension does \emph{not} imply learnability
-(Daniely--Shalev-Shwartz 2014, with a witness of Natarajan dimension one over an
-infinite label set), so the obvious dimension fails to characterize the multiclass
-regime.  The genuine characterization is the DS dimension, defined through
-pseudo-cubes in the one-inclusion hypergraph (Brukhim et al.\ 2022); it is correct
-but not yet formalized, so it and its equivalence are drawn dashed.  In its place the
-kernel verifies the all-labelings strong-shattering dimension
-(\leanname{StrongShatteringDim}) and the inequality
-\leanname{strongShatteringDim_le_NatarajanDim}, which is the \emph{reverse} of the
-genuine relationship $\Ndim \le \DSdim$.  Hence the full ladder
-$\mathrm{StrongShattering} \le \Ndim \le \DSdim$ has only its lower rung
-machine-checked: solid edges are kernel-verified, dashed edges are literature or not
-yet formalized.}
+\caption[The multiclass dimension ladder $\mathrm{StrongShattering} \le \Ndim \le \DSdim$.]{The
+multiclass dimension ladder. For binary classes ($|Y|=2$) the VC dimension characterizes PAC
+learnability: a class is learnable iff its VC dimension is finite. The obvious generalization to
+$k \ge 3$ labels, the Natarajan dimension (\leanname{NatarajanDim}), fails: a class of Natarajan
+dimension one over an infinite label set is not learnable (Brukhim et al.\ 2022). The genuine
+characterization is the DS dimension, defined through pseudo-cubes in the one-inclusion hypergraph.}
 \label{fig:dimension-hierarchy}
 \end{figure}
 
@@ -845,7 +809,7 @@ A fixed-architecture soft-attention class has finite VC dimension, so the Sauer-
 The class is a well-behaved VC-measurable target (\cref{prop:attention-pac}), and its concepts are cut out by a bounded number of smooth inequalities in finitely many parameters; such parametric families shatter no arbitrarily large set, so $\VC(\mathcal{A}_{d,n_K}) < \infty$.  Sauer--Shelah then bounds $\growth_{\mathcal{A}}(n) \leq (en/\VC)^{\VC}$.
 \end{proof}
 
-The other dimensions of this chapter then read off the rest of the attention class's profile.  Its \emph{Littlestone} dimension (finite or infinite) decides whether the class is online learnable and whether its universal rate is exponential or linear (\Cref{ch:universal}); finiteness is open (\cref{op:attention-dim-profile}).  Its \emph{star number} governs how cheaply an active learner can extract the head's behaviour by querying, the methodology of \Cref{ch:exact}.  And when attention routes over a label set of size $n_K \geq 3$ (a genuine multiclass head), its \emph{DS} dimension, not its Natarajan dimension, is what decides learnability, by the same thirty-year correction told above.  The single architecture is thus a point in every one of this chapter's dimension spaces at once, and the spaces disagree about it in exactly the ways the separation results of \Cref{ch:separations} predict.
+The other dimensions of this chapter then read off the rest of the attention class's profile.  Its \emph{Littlestone} dimension decides whether the class is online learnable and whether its universal rate is exponential or linear (\Cref{ch:universal}); finiteness is open (\cref{op:attention-dim-profile}).  Its \emph{star number} governs how cheaply an active learner can extract the head's behaviour by querying, the methodology of \Cref{ch:exact}.  And when attention routes over a label set of size $n_K \geq 3$ (a genuine multiclass head), its \emph{DS} dimension, not its Natarajan dimension, is what decides learnability, by the same thirty-year correction told above.  The single architecture is thus a point in every one of this chapter's dimension spaces at once, and the spaces disagree about it in exactly the ways the separation results of \Cref{ch:separations} predict.
 
 \section{Open Problems}
 \label{sec:ch10-open}
@@ -864,7 +828,7 @@ The Sauer--Shelah lemma (\cref{lem:sauer-shelah}) converts finite VC dimension i
 
 \begin{openprob}[A combinatorial proof that DS characterizes multiclass learning, \textsc{uk}]
 \label{op:ds-formal}
-The DS characterization (\cref{thm:ds-char}) is cited, not verified.  The development types the Natarajan dimension and an \emph{all-labelings} shattering dimension (\leanname{StrongShatteringDim}, whose value is at most $\Ndim$) but \emph{not} the genuine Daniely--Shalev-Shwartz DS dimension, whose pseudo-cube definition gives the reverse bound $\Ndim \le \DSdim$.  Formalize the true DS dimension and the Brukhim et al.\ proof that $\DSdim(\mathcal{H}) < \infty$ iff $\mathcal{H}$ is multiclass PAC learnable.
+Formalize the DS dimension, defined through pseudo-cubes in the one-inclusion hypergraph (a default labeling perturbed by single-coordinate deviations), together with its order relation $\Ndim \le \DSdim$ and the Brukhim et al.\ proof that $\DSdim(\mathcal{H}) < \infty$ iff $\mathcal{H}$ is multiclass PAC learnable.
 \end{openprob}
 
 \begin{openprob}[Closing the Natarajan--DS gap quantitatively, \textsc{ku}]
@@ -902,80 +866,26 @@ The chapter catalogs a dozen dimensions, each governing one paradigm.  Determine
 The development types the dual class and proves a dual-to-primal shattering transfer (\leanname{FLT_Proofs.Complexity.DualVC.dual_shatters_imp_original_shatters}).  Interpret the dual VC dimension of an attention class (shattering by the \emph{keys} rather than the inputs) and determine what it measures about a transformer's routing capacity.
 \end{openprob}
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:shatter-halfplane}}
+\subsection*{Counterfactual exercises}
 
-Figure~\ref{fig:shatter-halfplane} is best read as a grid: a $2^d$-cell array, one cell per labeling of a fixed $d$-point set, each cell holding the separating halfplane that realizes its labeling.  Fill every cell with a witness and the grid \emph{is} the restriction $\mathcal{H}|_S$ exhibited as the full cube $\{0,1\}^d$.  The figure is explicit about its two evidence grades: the \emph{concept} it draws is verified (the definitions \leanname{Shatters} and \leanname{VCDim}, and the deep role \leanname{vc_characterization}), so those parts are solid; the particular \emph{numbers} it shows are classical and cited, not proved here (the value $\VC=3$, its generalization $\VC=d+1$, and the Radon four-point obstruction), so those are dashed.  Each exercise below perturbs the grid and asks where the perturbed picture sits relative to the concrete one: as an \emph{instance}, where some class's largest fillable grid is the object on display; as a \emph{boundary}, where toggling one labeling or one point empties a cell; or as a \emph{frontier}, a dashed edge that is open or literature-only.
-
-\begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The grid is the definition of shattering, not a fact about the plane.} Read each filled cell as one element of the restriction; the colored triangle is incidental. This is the figure's defining instance of the verified concept: a witness in every cell says exactly $\mathcal{H}|_S = \{0,1\}^{|S|}$, which is the definition of shattering (\cref{def:shattering}, \leanname{Shatters}), so the eight halfplanes are the constructive content of ``$S$ is shattered'', and removing any one of them would leave the statement unproved. The picture certifies \leanname{Shatters} cell by cell rather than asserting it.
-
-\item \textbf{The value three is the largest fillable grid, and it is literature.} Read the whole figure as a single number. This is the instance that names the second object: $\VC(\mathcal{H})$ is the largest $|S|$ for which the grid fills (\cref{def:vc-dim}, \leanname{VCDim}), so the figure exhibits $\VC(\mathcal{H}) \ge 3$ by construction, but the matching upper bound $\VC = 3$ is the classical value (\cite{VapnikChervonenkis1971}, \cite{BlumerEhrenfeuchtHausslerWarmuth1989}), drawn dashed because the kernel types \leanname{VCDim} without proving the halfplane value; the concept is verified, the number is cited.
-
-\item \textbf{The fourth point empties a cell.} Add a fourth point inside the convex hull of the other three and ask for the labeling that flips it against the rest. Here the figure's principal boundary appears: that single cell of the $2^4$ grid can never carry a separating line, because one point in the hull of the others forbids the opposite-label halfplane (Radon, \Cref{ex:halfplanes-shatter}), so the grid for $d=4$ has a permanently empty cell and $\VC = 3$; the obstruction is convex-geometric and classical, with no kernel theorem, so it is drawn dashed.
-
-\item \textbf{Why filling the grid is what makes the class learnable.} Ask why the largest-fillable-grid number governs anything. This is the frontier that gives the figure its weight: the very finiteness the grid measures is what the Fundamental Theorem turns into PAC learnability, since $\mathcal{H}$ is PAC learnable if and only if $\VC(\mathcal{H}) < \infty$ (\cref{thm:fundamental}, \leanname{vc_characterization}, \leanname{fundamental_theorem}); the halfplane class, with its grid stalling at $d=4$, is therefore learnable, and this if-and-only-if is the one solidly verified edge attached to the picture.
-
-\item \textbf{Shrink to intervals on the line.} Replace halfplanes in $\R^2$ by halflines, or by intervals, on $\R$. This is the same grid one dimension down: a single threshold shatters one point but not two of the right pattern, so the largest fillable grid is the $2^1$ grid and $\VC = 1$ for halflines, while intervals fill the $2^2$ grid and $\VC = 2$; both values instantiate the same \leanname{VCDim} definition and are the classical geometric values (\cite{BlumerEhrenfeuchtHausslerWarmuth1989}), so the picture's $d$ is a free parameter, not fixed at three.
-
-\item \textbf{Grow to axis-aligned rectangles.} Replace halfplanes by axis-aligned rectangles in $\R^2$. This instance raises the number without touching the grammar: four points placed as the extreme north, south, east, and west witnesses fill the $2^4$ grid, while no five points do, so $\VC = 4$ for rectangles (\cite{BlumerEhrenfeuchtHausslerWarmuth1989}); the figure's $2^d$ grid is unchanged, only the witness shape (a rectangle in each cell instead of a line) and the largest fillable $d$ differ, both still instances of \leanname{VCDim}.
-
-\item \textbf{Climb to halfspaces in $d$ dimensions.} Replace the plane by $\R^d$ and halfplanes by halfspaces. This is the instance that states the figure's general value: $d+1$ points in general position fill the $2^{d+1}$ grid and no $d+2$ do, so $\VC = d+1$ for halfspaces (\cite{BlumerEhrenfeuchtHausslerWarmuth1989}), with the $d=2$ picture as the case $\VC = 3$; the value $d+1$ is classical and not in the kernel (there is no halfspace dimension theorem), so it is dashed, and formalizing it together with the Radon upper bound is open.
-
-\item \textbf{The grid never reaches the Littlestone grid.} Ask whether filling the static $2^d$ grid is the same as winning the adaptive online game. This is the boundary between two dimensions: shattering a set is non-adaptive (one fixed $S$, all labelings at once), so $\VC(\mathcal{H}) \le \Ldim(\mathcal{H})$ always (\cref{prop:vc-leq-ldim-dim}, \leanname{BranchWiseLittlestoneDim_ge_VCDim}), and the gap is infinite for thresholds, whose static grid fills only to $d=1$ yet whose adaptive mistake tree is unbounded; the figure draws the static witness, and the adaptive refinement is a strictly larger object certified by the same kernel.
-
-\item \textbf{Swap the points and the halfplanes.} Read the figure with roles reversed: let the eight labelings shatter the family rather than the three points shatter the cube. This opens the frontier of the dual view: the one-inclusion and dual-shattering reading swaps inputs for hypotheses, and the kernel types the dual class with a dual-to-primal shattering transfer (\cref{op:dual-vc-attention}, \leanname{FLT_Proofs.Complexity.DualVC.dual_shatters_imp_original_shatters}), but the self-dual value $\VC = d+1$ under this swap is not drawn and not formalized, so the dual reading of the grid is a dashed, literature-and-open edge.
-
-\item \textbf{Is the grid the rank of a functor?} Read ``the largest finite set on which $\mathcal{H}$ realizes every labeling'' as a universal property. This is the figure's deepest frontier: $\VC$ would be the rank of a representable functor on finite sets, the largest free object (full cube) the class can hit, and the chapter's other dimensions (Littlestone, Natarajan \leanname{NatarajanDim}, fat-shattering) would be the same functor specialized by a data-model and a scale; whether a single such dimension functor exists, recovering all of them, or whether the dimensions are provably non-unifiable, is open (\cref{op:dimension-functor}), so this reading of the grid is drawn dashed.
-\end{enumerate}
-
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:growth-function}}
-
-Figure~\ref{fig:growth-function} is, unusually for this chapter, almost all solid.  Its single curve $\growth_\mathcal{H}(n)$ rides the $2^n$ reference ray exactly while the class still shatters a set of that size, $n \le d = \VC(\mathcal{H})$, then peels permanently into the degree-$d$ polynomial $\sum_{i=0}^{d}\binom{n}{i}$ once $n$ passes $d$.  Both objects the curve traces are machine-checked: the definition \leanname{GrowthFunction} and the bound \leanname{sauer_shelah_quantitative} are genuine kernel theorems, so the curve and its bend are verified.  Only two annotations are cited rather than proved, the closed asymptotic form $(en/d)^d$ and the reading that the drop is immediate and permanent, and those hang off the curve as dashed labels.  This is the chapter's one mostly-verified hub; the exercises mostly relocate the bend rather than challenge it.  Each takes the concrete $d=3$ curve as a special case of a wider family: an \emph{instance}, where some class's curve bends at its own $\VC$; a \emph{boundary}, where toggling a regime, point, or label moves or erases the transition; or a \emph{frontier}, a dashed edge open or literature-only.
+Each exercise takes the concrete halfplane, growth-function, or multiclass-ladder picture as a special case of a wider family and asks you to supply the general statement.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The peeling curve is the growth function.} Read the solid curve as the quantity itself; it is the function, not a bound someone drew around the class afterward. This is the figure's defining instance of the verified object: the curve plots $\growth_\mathcal{H}(n) = \max_{|S|=n}|\mathcal{H}|_S|$ for a maximum class of VC dimension three (\cref{def:growth-function}, \leanname{GrowthFunction}), so its coincidence with $2^n$ up to $n=d$ and its descent afterward are the behavior of a single defined function, and the figure certifies \leanname{GrowthFunction} value by value rather than asserting two disconnected ceilings.
+\item \textbf{Shattering is a full cube.} A separating halfplane in every cell of the $2^3$ grid says exactly $\mathcal{H}|_S = \{0,1\}^{|S|}$, which is the definition of shattering (\cref{def:shattering}, \leanname{Shatters}). Show that the eight halfplanes are the constructive content of ``$S$ is shattered'', so removing any one leaves the statement unproved.
 
-\item \textbf{The bend is the bound, and the bound is verified.} Read the moment the curve leaves the $2^n$ ray. That moment names the second object: for $n > d$ the curve follows the Sauer--Shelah bound $\sum_{i=0}^{d}\binom{n}{i}$ (\cref{lem:sauer-shelah}, \leanname{sauer_shelah_quantitative}), a genuine kernel theorem and not the legacy existential bound, so this peeling edge of the figure is solidly verified, while the closed form $(en/d)^d$ named beside it is the classical simplification (\cite{Sauer1972}, \cite{Shelah1972}), drawn as annotation because no kernel declaration proves that form.
+\item \textbf{Radon caps the halfplane class at three.} Add a fourth point inside the convex hull of the other three and request the labeling that flips it against the rest. Show that this cell can never carry a separating line, so $\VC = 3$ for halfplanes in $\R^2$ (\Cref{ex:halfplanes-shatter}).
 
-\item \textbf{Thresholds bend at $d=1$: a line.} Replace the $d=3$ class by halflines on $\R$. The same curve one degree down: a single threshold shatters one point but not two, so $\VC = 1$, the curve rides $2^n$ only at $n \le 1$ and then follows the degree-one polynomial $\sum_{i=0}^{1}\binom{n}{i} = 1+n$, a straight line, peeling from $2^n$ at $n=2$; the same \leanname{GrowthFunction} and \leanname{sauer_shelah_quantitative} apply with $d=1$, so the figure's bend-degree is a free parameter, not fixed at three (\cite{BlumerEhrenfeuchtHausslerWarmuth1989}).
+\item \textbf{Finiteness is learnability.} The finiteness the grid measures is what the Fundamental Theorem converts into PAC learnability: $\mathcal{H}$ is PAC learnable iff $\VC(\mathcal{H}) < \infty$ (\cref{thm:fundamental}, \leanname{vc_characterization}). Conclude that the halfplane class is learnable, and identify which edge of the picture is the verified equivalence.
 
-\item \textbf{Rectangles bend at $d=4$.} Replace the class by axis-aligned rectangles in $\R^2$. This instance raises the degree without changing the grammar: four extreme witnesses fill the $2^4$ grid and no five do, so $\VC = 4$, the curve coincides with $2^n$ through $n=4$ and peels into a quartic $\sum_{i=0}^{4}\binom{n}{i}$ for $n>4$; only the transition point ($n=d+1=5$) and the terminal slope (degree four) move, both still instances of \leanname{sauer_shelah_quantitative} (\cite{BlumerEhrenfeuchtHausslerWarmuth1989}).
+\item \textbf{The same grid at every dimension.} Compute the VC dimension as the witness shape changes: $\VC = 1$ for halflines and $2$ for intervals on $\R$, $\VC = 4$ for axis-aligned rectangles in $\R^2$, and $\VC = d+1$ for halfspaces in $\R^d$ (\cite{BlumerEhrenfeuchtHausslerWarmuth1989}). Each instantiates \leanname{VCDim} with a different largest fillable $d$.
 
-\item \textbf{A finite class flattens to a constant.} Replace the class by a finite $\mathcal{H}$ with $|\mathcal{H}| = N$. The degenerate instance: $\growth_\mathcal{H}(n) \le \min(2^n, N)$, so the curve rides $2^n$ until $2^n$ exceeds $N$ and is then pinned flat at $N$, the polynomial of degree $\VC \le \log_2 N$ collapsing to a constant ceiling; the same \leanname{GrowthFunction} bounds it, and the bend is here a hard horizontal cap rather than a polynomial arc, the smallest nontrivial case of the dichotomy.
+\item \textbf{Static shattering versus the adaptive game.} Shattering fixes one set $S$ and asks for all labelings at once, so $\VC(\mathcal{H}) \le \Ldim(\mathcal{H})$ (\cref{prop:vc-leq-ldim-dim}, \leanname{BranchWiseLittlestoneDim_ge_VCDim}). Show the gap is infinite for thresholds, whose static grid fills only to $d=1$ while their mistake tree is unbounded.
 
-\item \textbf{Infinite VC: the ray that never bends.} Take a class that shatters arbitrarily large sets ($\VC = \infty$), for instance all finite and cofinite subsets of $\N$. This is the principal boundary: $\growth_\mathcal{H}(n) = 2^n$ for every $n$, so the curve is the straight $2^n$ ray with no peel, the Sauer--Shelah hypothesis $\VC = d$ never holds for any finite $d$, and \cref{lem:sauer-shelah} simply does not apply; this is the case the Fundamental Theorem excludes, since $\mathcal{H}$ is not PAC learnable when $\VC = \infty$ (\cref{thm:fundamental}, \leanname{vc_characterization}).
+\item \textbf{Where the growth function bends.} The growth function rides $2^n$ exactly while a size-$n$ set is shattered, then at $n=d+1$ peels into $\sum_{i=0}^{d}\binom{n}{i}$ (\cref{def:growth-function}, \cref{lem:sauer-shelah}, \leanname{sauer_shelah_quantitative}). Verify the drop is immediate and permanent, with no $n$ of intermediate growth, and relocate the bend by recomputing $\VC$ for the classes of exercise~4.
 
-\item \textbf{The transition sits exactly at $n=d+1$.} Ask where the bound first constrains the curve below $2^n$. This boundary locates the phase change: at $n=d$ a set can still be shattered so $\growth$ may equal $2^d$, but at $n=d+1$ the side condition $d \le m$ of \leanname{sauer_shelah_quantitative} fires and $\sum_{i=0}^{d}\binom{n}{i} < 2^n$ for the first time, forcing the peel; the drop is immediate, with no $n$ of intermediate growth, and permanent, which is the classical content (\cite{Sauer1972}, \cite{Shelah1972}) the marker makes visible.
+\item \textbf{The ray that never bends.} For a class shattering arbitrarily large sets ($\VC = \infty$), such as all finite and cofinite subsets of $\N$, show $\growth_\mathcal{H}(n) = 2^n$ for every $n$, so Sauer--Shelah does not apply and the class is not PAC learnable (\cref{thm:fundamental}, \leanname{vc_characterization}).
 
-\item \textbf{$\growth = 2^n$ is the definition of shattering, read on the curve.} Ask why the curve equals $2^n$ exactly on $n \le d$ and not by approximation. This is the definitional edge: $\growth_\mathcal{H}(n) = 2^n$ holds iff $\mathcal{H}$ shatters some size-$n$ set (\cref{def:shattering}, \leanname{Shatters}), so the on-the-ray portion of the curve is the literal statement that $\mathcal{H}|_S = \{0,1\}^n$ for some $S$, an equality rather than a bound that happens to be nearly tight; the coincidence with $2^n$ is a definition unfolding, not a theorem, and the figure shows shattering and its failure as one continuous picture.
+\item \textbf{Why the Natarajan dimension fails.} Exhibit the regime where the obvious multiclass lift breaks: there is a class with $\Ndim(\mathcal{H}) = 1$ over an infinite label set that is not PAC learnable (\cref{thm:natarajan-failure}, \cite{BrukhimCarmonDinurMoranYehudayoff2022}). Explain why $|Y| = \infty$ is required, given that $\Ndim$ reads only pairs of opposing functions.
 
-\item \textbf{Is the bound tight from below?} Ask whether every class of VC dimension three grows as fast as the solid curve, or can stay strictly below it. This is the figure's tightness frontier: the kernel certifies only the upper bound (\leanname{sauer_shelah_quantitative}) and the solid curve plots a maximum class that attains it, but no declaration proves a matching lower bound, so whether a given class's growth reaches $\Theta(n^d)$ or drops further is classical for the extremal witness classes (\cite{Sauer1972}) and unformalized in general; this tightness is a dashed, open edge, and the degree it pins is what an optimal compression scheme of size $O(d)$ would also measure (\cref{op:od-compression-dim}).
-
-\item \textbf{Is the bend-degree the rank of a graded object?} Read ``the polynomial that bounds $\growth$ has degree $\VC$'' as a statement about a graded structure. This is the figure's deepest frontier: the growth function would be the Hilbert or Poincar\'e series of a graded object attached to $\mathcal{H}$ whose dimension is $\VC$, so ``polynomial of degree $d$'' becomes ``the representable functor has rank $d$'', recovering the chapter's other dimensions (Littlestone, Natarajan \leanname{NatarajanDim}, fat-shattering) as the same series specialized by a data-model and a scale; whether one such dimension functor exists, with the bend-slope as its rank, or the dimensions are provably non-unifiable, is open (\cref{op:dimension-functor}), so this reading of the curve is drawn dashed.
-\end{enumerate}
-
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:dimension-hierarchy}}
-
-Figure~\ref{fig:dimension-hierarchy} is the chapter's most open picture: a magnitude ladder $\mathrm{StrongShattering} \le \Ndim \le \DSdim$ with the VC dimension hanging off $\Ndim$ as its binary specialization, and most of it drawn dashed.  What the kernel certifies is a thin floor: the definitions \leanname{VCDim}, \leanname{NatarajanDim}, \leanname{StrongShatteringDim}, the single verified rung \leanname{strongShatteringDim_le_NatarajanDim}, and the binary characterization \leanname{vc_characterization}.  Everything that makes the multiclass story interesting sits above that floor and is literature, cited not proved: the genuine DS dimension, the upper rung $\Ndim \le \DSdim$, the multiclass characterization, and the Natarajan failure itself.  So read these exercises as a tour of a ladder that is mostly aspiration.  Each places the concrete ladder inside a wider claim, either as an \emph{instance}, a label-set regime or class on which a rung collapses or is attained; a \emph{boundary}, where one label-set size or one inequality toggles so a rung reverses or a characterization breaks; or a \emph{frontier}, a dashed edge that is open or literature-only.
-
-\begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{Two labels collapse the ladder to the Fundamental Theorem.} Set $|Y| = 2$ and read the whole ladder. This is the figure's defining instance of the binary regime: when the label set has two elements the Natarajan dimension equals the VC dimension exactly (\cref{def:natarajan}, \leanname{NatarajanDim}), the strong-shattering dimension equals both, and the three rungs degenerate to the single binary characterization $\VC(\mathcal{H}) < \infty \Leftrightarrow \mathcal{H}$ is PAC learnable (\cref{thm:fundamental}, \leanname{vc_characterization}, \leanname{fundamental_theorem}); the ladder is the multiclass refinement of one verified equivalence, and the $|Y|=2$ slice is the only place the entire figure is solid.
-
-\item \textbf{The lower rung is the figure's only solid multiclass edge.} Read the bottom inequality alone. This instance names the verified handle: from any set on which every labeling is realizable one builds a two-colouring Natarajan witness, so $\mathrm{StrongShatteringDim}(\mathcal{H}) \le \Ndim(\mathcal{H})$ for $|Y| \ge 2$ (\leanname{strongShatteringDim_le_NatarajanDim}), a genuine kernel theorem proved by exhibiting the witness, not asserted; this is the single machine-checked rung of the multiclass ladder, and the figure draws it solid while everything above it is cited.
-
-\item \textbf{The Natarajan dimension is the obvious lift, and it equals VC at the base.} Read the $\Ndim$ node as the natural generalization. This is the instance that states the figure's central object: the Natarajan dimension replaces ``all $2^d$ binary labelings'' by ``all $2^d$ labelings drawn from two opposing functions'' (\cref{def:natarajan}, \leanname{NatarajanDim}), which is exactly the VC dimension when $|Y|=2$ and a strict generalization otherwise; the figure draws it solid as a verified definition, leaving open only whether finiteness of it suffices for learning, which the next exercise denies.
-
-\item \textbf{Finite Natarajan dimension does not imply learnability.} Toggle the question from ``is $\Ndim$ defined'' to ``does $\Ndim < \infty$ characterize learning''. Here is the figure's principal boundary, the red dashed failure: there is a class with $\Ndim(\mathcal{H}) = 1$ that is not PAC learnable (\cref{thm:natarajan-failure}, \cite{DanielyShalevShwartz2014}), so the obvious dimension can be as small as possible and still miss unlearnability; the implication $\Ndim < \infty \Rightarrow$ learnable is drawn dashed red because it is false, the one edge the figure refutes rather than asserts.
-
-\item \textbf{An infinite label set is where the obvious dimension fails.} Ask where the witness of the previous exercise lives. This is the boundary in the label-set sweep: the $\Ndim = 1$ unlearnable class requires $|Y| = \infty$ (\cref{thm:natarajan-failure}), because the Natarajan dimension reads only pairs of opposing functions and cannot see the combinatorial explosion of an unbounded label set; the gap is label-set-driven, opened by the size of $Y$ rather than by any deficit of information, and quantifying how large the DS dimension grows as a function of $|Y|$ when $\Ndim$ stays finite is open (\cref{op:natarajan-ds-gap}).
-
-\item \textbf{The DS dimension is the correct characterization, and it is literature.} Replace the failed rung by the true one. This instance names the third object: a class is PAC learnable if and only if its DS dimension is finite (\cref{thm:ds-char}, \cite{BrukhimCarmonDinurMoranYehudayoff2022}), the multiclass analogue of the Fundamental Theorem, with the DS dimension defined via pseudo-cubes in the one-inclusion hypergraph (\cref{def:ds-dim}); both the dimension and its equivalence are drawn dashed because the genuine pseudo-cube notion is not machine-checked, so the figure cites the characterization rather than verifying it.
-
-\item \textbf{The kernel's handle is the reverse inequality, not the DS dimension.} Read the bottom rung against the top one. This boundary separates the verified object from the literature object: the kernel proves $\mathrm{StrongShatteringDim} \le \Ndim$ (\leanname{strongShatteringDim_le_NatarajanDim}), whereas the genuine DS relationship is $\Ndim \le \DSdim$, the \emph{opposite} direction, and the DS dimension can be infinite while the Natarajan dimension is finite so no $\DSdim \le \Ndim$ bound can hold; the all-labelings strong-shattering dimension is therefore \emph{not} the DS dimension, and the figure must show the kernel's actual handle rather than silently substitute it for $\DSdim$.
-
-\item \textbf{The full ladder has a verified floor and a literature ceiling.} Read all three rungs as one chain. This is the boundary between evidence grades: the complete ladder is $\mathrm{StrongShattering} \le \Ndim \le \DSdim$, of which only the left inequality is kernel-verified (\leanname{strongShatteringDim_le_NatarajanDim}) while the right inequality $\Ndim \le \DSdim$ is literature (\cite{BrukhimCarmonDinurMoranYehudayoff2022}); the line-style is the statement that multiclass learnability is currently half machine-checked, the binary characterization and the lower rung solid, the multiclass characterization and the upper rung dashed.
-
-\item \textbf{Formalize the genuine DS dimension and its characterization.} Ask what it would take to make the dashed ceiling solid. This is the figure's headline frontier: formalizing the pseudo-cube DS dimension and the Brukhim et al.\ proof that $\DSdim(\mathcal{H}) < \infty$ iff $\mathcal{H}$ is multiclass PAC learnable would turn the dashed top rung and the dashed characterization into verified edges (\cref{op:ds-formal}), supplying the multiclass analogue of \leanname{vc_characterization}; until then the one-inclusion hypergraph and its pseudo-cubes (\cref{def:ds-dim}) are a typed-but-unproved target, and this is the chapter's principal open formalization.
-
-\item \textbf{Is there a single dimension functor under the whole ladder?} Read the three dimensions as one object specialized three ways. This is the figure's deepest frontier: the VC, Natarajan, and DS dimensions would be values of a single functor from concept classes (with label-preserving maps) to ordinals, recovered by specializing a data-model and a label-set, with the one-inclusion hypergraph as the representable structure whose pseudo-cube rank is the learnability dimension; whether one such dimension functor exists, recovering all rungs of the ladder, or the dimensions are provably non-unifiable, is open (\cref{op:dimension-functor}), so this reading of the ladder is drawn dashed.
+\item \textbf{The correct characterization.} A class is multiclass PAC learnable iff its DS dimension is finite (\cref{thm:ds-char}, \cite{BrukhimCarmonDinurMoranYehudayoff2022}), with $\Ndim \le \DSdim$. Construct the pseudo-cube definition of $\DSdim$ explicitly, verify $\Ndim \le \DSdim$ on the class with $\Ndim = 1$ and $\DSdim = \infty$, and state what formalizing this dimension in Lean would require (\cref{op:ds-formal}).
 \end{enumerate}

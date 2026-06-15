@@ -15,7 +15,7 @@
 
 Chapters~\ref{ch:objects} and~\ref{ch:data} established what is learned (concept classes) and how data arrives (i.i.d.\ samples, texts, queries, streams). This chapter introduces the agents that do the learning and, in some settings, the agents that provide the data.
 
-Much of the vocabulary here is taxonomic: a learner is a function from data to hypotheses, and the field has named a dozen variants distinguished by which constraints they satisfy. These are best presented as a table. The chapter's genuine mathematical content lies in three places: the type mismatch between Bayesian posteriors and PAC hypotheses, resolved by the Gibbs posterior, whose optimality we prove in full; the surprising power of team learning; and the teacher models that connect to the teaching dimension and to Angluin's $L^\ast$. The learner abstraction and its constraints are typed in the verified development, and we close the opening section with a concrete modern instance, a finite-head attention learner, shown to satisfy the measurability condition that the PAC theory requires.
+Much of the vocabulary here is taxonomic: a learner is a function from data to hypotheses, and the field has named a dozen variants distinguished by which constraints they satisfy. These are best presented as a table. The chapter's mathematical content lies in three places: the type mismatch between Bayesian posteriors and PAC hypotheses, resolved by the Gibbs posterior, whose optimality we prove; the power of team learning; and the teacher models that connect to the teaching dimension and to Angluin's $L^\ast$. We close the opening section with a modern instance, a finite-head attention learner, that satisfies the measurability condition the PAC theory requires.
 
 % ================================================================
 % SECTION 1: The Learner Abstraction
@@ -33,7 +33,7 @@ L \colon \bigcup_{m=0}^{\infty} (X \times Y)^m \;\to\; \mathcal{H}
 mapping a finite data sequence to a hypothesis: having observed $S_t = ((x_1, y_1), \ldots, (x_t, y_t))$, it outputs $h_t = L(S_t) \in \mathcal{H}$. The verified development splits this single abstraction into the three paradigm-specific carriers: a \emph{batch learner} maps a whole sample to a hypothesis,\formal{FLT_Proofs.Learner.Core.BatchLearner} an \emph{online learner} carries a state updated example by example,\formal{FLT_Proofs.Learner.Core.OnlineLearner} and a \emph{Gold learner} conjectures from the data seen so far.\formal{FLT_Proofs.Learner.Core.GoldLearner}
 \end{defn}
 
-This definition is deliberately minimal. It says nothing about how $h_t$ is selected: whether the learner stores the full history or only its previous guess, whether it uses randomness, whether it may choose which $x$ to query. Each constraint yields a named variant (Figure~\ref{fig:learner-taxonomy} and Table~\ref{tab:learner-types}). One further condition is invisible at the level of types but indispensable for the statistical theory.
+This definition is minimal. It says nothing about how $h_t$ is selected: whether the learner stores the full history or only its previous guess, whether it uses randomness, whether it may choose which $x$ to query. Each constraint yields a named variant (Figure~\ref{fig:learner-taxonomy} and Table~\ref{tab:learner-types}). One further condition is invisible at the level of types but indispensable for the statistical theory.
 
 \begin{defn}[Measurable batch learner]
 \label{def:measurable-learner}
@@ -56,7 +56,7 @@ Fix $k \geq 1$. A \emph{$k$-head attention learner} is given by a standard-Borel
 The argmax router partitions the input space into the cells $\{x : i = \arg\max_j s_\theta(x)_j\}$, each a finite intersection of the measurable score-comparison sets $\{x : s_\theta(x)_i \geq s_\theta(x)_j\}$; hence the routing map $(\theta, x) \mapsto \mathrm{route}_\theta(x)$ is measurable.\formal{TLT_Proofs.Routing.MeasurableScoreRouting.FiniteScoreRouterCode.route_measurable} Composing the measurable router with the measurable experts gives a jointly measurable evaluation $(\theta, x) \mapsto e_\theta(x)_{\mathrm{route}_\theta(x)}$. Precomposing with the measurable selection $S \mapsto \theta(S)$ in the first coordinate preserves joint measurability, so $(S,x) \mapsto L(S)(x)$ is measurable, which is exactly \cref{def:measurable-learner}. The whole construction is a parametric learner family, and every parametric family with a measurable evaluation and selection is a measurable batch learner.\formal{TLT_Proofs.Learner.MeasurableParametricAttentionLearner.ParametricLearnerFamily.instMeasurableBatchLearner}
 \end{proof}
 
-The same well-behavedness holds for the softmax-top-1 and multi-head argmax routers, and for the scaled dot-product attention of a full transformer.\formal{TLT_Proofs.Routing.ScaledDotProductScoreRouter.attentionRouting_wellBehaved} The abstract learner of \cref{def:learner} therefore covers the architectures that dominate modern practice, and covers them inside the measurable sub-class on which the entire PAC apparatus operates. We return to the measurability boundary itself (where attention routing \emph{fails} to be Borel) in \Cref{ch:separations}.
+The same holds for the softmax-top-1 and multi-head argmax routers, and for the scaled dot-product attention of a full transformer.\formal{TLT_Proofs.Routing.ScaledDotProductScoreRouter.attentionRouting_wellBehaved} The abstract learner of \cref{def:learner} therefore covers the dominant modern architectures, and places them in the measurable sub-class on which the PAC apparatus operates. We return to the measurability boundary, where attention routing \emph{fails} to be Borel, in \Cref{ch:separations}.
 
 % ================================================================
 % SECTION 2: Taxonomy Table
@@ -115,20 +115,12 @@ The same well-behavedness holds for the softmax-top-1 and multi-head argmax rout
    Boxes: verified predicates.};
 \end{tikzpicture}
 \caption[Lattice of learner constraints: free in PAC, biting in Gold]{The learner taxonomy as a
-lattice of typed constraints, drawn so that each constraint's bite is paradigm-relative. The four
-leaves (consistent, conservative, set-driven, iterative) are typed predicates on the base learner of
-\cref{def:learner}, verified definitions in the development, so each is a real, solid node; their
-conjunctions are meets in the lattice (a conservative, set-driven learner sits below two). The same
-predicate reads two ways. In PAC the constraints are free (green, solid): every PAC-learnable class is
-learnable by a consistent, proper empirical-risk minimizer (\leanname{erm_consistent_realizable}), and
-because the i.i.d.\ assumption makes example order irrelevant the set-driven and iterative distinctions
-collapse with it. In Gold's framework the same predicates bite (orange, dashed): some classes are
-identifiable by a conservative learner from an informant but not from text, and a set-driven class can
-force unbounded memory on any iterative learner. The Gold edges are dashed because they are results in
-the inductive-inference literature (Gold; Angluin; K\"otzing and Palenta), not yet theorems of the
-kernel, while every PAC-collapse edge is solid because the development proves it. The taxonomy has its
-sharpest teeth in Gold and online, and none in PAC. The named data-access and randomness variants are
-catalogued in \cref{tab:learner-types}.}
+lattice of typed constraints on the base learner of \cref{def:learner}. The same four predicates read
+two ways: in PAC they are free, since every PAC-learnable class is learnable by a consistent, proper
+empirical-risk minimizer (\leanname{erm_consistent_realizable}) and the i.i.d.\ assumption makes order
+irrelevant; in Gold's framework they bite, separating conservative from text-only learners and forcing
+unbounded memory on iterative ones. The named data-access and randomness variants are in
+\cref{tab:learner-types}.}
 \label{fig:learner-taxonomy}
 \end{figure}
 
@@ -257,7 +249,7 @@ Substituting $\pi(h)\,e^{-\lambda \emprisk_S(h)} = Z_\lambda\,Q_\lambda(h)$ and 
 By Gibbs' inequality $\KL(Q \,\|\, Q_\lambda) \geq 0$, with equality if and only if $Q = Q_\lambda$. Hence $F_\lambda(Q) \geq -\ln Z_\lambda$, with equality exactly at $Q = Q_\lambda$.
 \end{proof}
 
-The PAC-Bayes bound's right-hand side is, up to the monotone square root and constants, an instance of $F_\lambda$: minimizing the complexity-penalized empirical risk over posteriors yields $Q_\lambda$. This is what makes the bound actionable: it hands the learner the exact posterior to use, $Q_\lambda$ by name, where a pure existence theorem would leave one searching, and it is the precise sense in which the Gibbs posterior converts a Bayesian learner into a PAC learner.\formal{FLT_Proofs.Theorem.PACBayes.gibbs_bound_of_pointwise}
+The PAC-Bayes bound's right-hand side is, up to the monotone square root and constants, an instance of $F_\lambda$: minimizing the complexity-penalized empirical risk over posteriors yields $Q_\lambda$. The bound thus names the exact posterior to use, which is the precise sense in which the Gibbs posterior converts a Bayesian learner into a PAC learner.\formal{FLT_Proofs.Theorem.PACBayes.gibbs_bound_of_pointwise}
 
 \begin{remark}[Gibbs $\neq$ MAP]
 \label{rmk:gibbs-vs-map}
@@ -287,7 +279,7 @@ A \emph{team} of size $k$ is a tuple of learners $(L_1, \ldots, L_k)$. The team 
 There exist concept classes identifiable by a team of size~2 but by no single learner.
 \end{thm}
 
-The increase in power is surprising on two counts. The team members receive the \emph{same} data; they neither partition the instance space nor communicate, so the power comes from the disjunctive success criterion alone: ``at least one succeeds'' is a weaker demand than ``the one learner succeeds,'' and the weaker demand enlarges the learnable classes. And the separation lives inside Gold's standard framework, with ordinary recursively enumerable languages as the witnesses, no exotic hypothesis space required. The proof builds a class on which any single learner is forced into infinitely many mind changes by diagonalization (as in the text/informant separation of \Cref{ch:data}), while two learners with complementary strategies (one guessing large languages, one guessing small) guarantee that one converges. The argument appears in \Cref{ch:separations}.
+The team members receive the \emph{same} data; they neither partition the instance space nor communicate, so the power comes from the disjunctive success criterion alone: ``at least one succeeds'' is a weaker demand than ``the one learner succeeds,'' and the weaker demand enlarges the learnable classes. The separation lives inside Gold's standard framework, with ordinary recursively enumerable languages as the witnesses. The proof builds a class on which any single learner is forced into infinitely many mind changes by diagonalization (as in the text/informant separation of \Cref{ch:data}), while two learners with complementary strategies (one guessing large languages, one guessing small) guarantee that one converges. The argument appears in \Cref{ch:separations}.
 
 \begin{remark}[Teams and probabilistic learners]
 \label{rmk:team-prob}
@@ -449,28 +441,24 @@ In the PAC setting the set-driven/iterative distinction collapses because exampl
 Combine \cref{thm:team-power,prop:attention-mbl}: does a team of finite-head attention learners (a mixture-of-experts ensemble selected by the disjunctive criterion) identify classes that no single attention learner can, and is the resulting team itself a measurable batch learner? This connects the team hierarchy to the routed-expert architectures of modern practice.
 \end{openprob}
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:learner-taxonomy}}
+\subsection*{Counterfactual exercises}
 
-Figure~\ref{fig:learner-taxonomy} is built around one asymmetry, and the exercises below probe it from every side. The same typed predicate sits at a node and runs two edges out of it: a green solid edge into the PAC collapse (a kernel theorem backs it) and an orange dashed edge into Gold (the inductive-inference literature backs it, or it is open). One lane is a verified hub; the other is a frontier the figure can only annotate. Each exercise drops a new constraint onto the lattice and asks where its two edges land. Three landing zones recur: an \emph{instance} re-uses an edge already drawn (a constraint shown free in PAC or biting in Gold); a \emph{boundary} is where one predicate's bite flips between the lanes, or where a paradigm has to break a tie; a \emph{frontier} is a dashed edge with no theorem under it, present in the picture only as an open annotation. Place each perturbation in one of the three.
+Each exercise imposes a constraint from Figure~\ref{fig:learner-taxonomy} on the base learner and asks how its effect differs between the PAC and Gold paradigms.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{Consistency is free in PAC.} Impose consistency (\leanname{FLT_Proofs.Learner.Properties.IsConsistent}) on the PAC learner. This lands on the green lane as the collapse instance: every PAC-learnable class is learnable by a consistent, proper empirical-risk minimizer, so the constraint costs nothing in learnable-ness. Trace the edge through its verified backing, \leanname{erm_consistent_realizable} resting on \leanname{empError_zero_iff_consistent} and closed by \leanname{fundamental_theorem}, and confirm it carries no gap.
+\item Impose consistency (\leanname{FLT_Proofs.Learner.Properties.IsConsistent}) on a PAC learner. Show it costs nothing: every PAC-learnable class is learnable by a consistent, proper empirical-risk minimizer. Trace the result through \leanname{erm_consistent_realizable}, \leanname{empError_zero_iff_consistent}, and \leanname{fundamental_theorem}.
 
-\item \textbf{Properness rides with consistency.} Require additionally that the learner output a hypothesis from the class. No fresh edge appears; the perturbation collapses back onto the green instance already drawn, because the ERM witness already lies in $\mathcal{H}$ (\leanname{ermLearn_in_H}). Proper plus consistent is the \emph{same} collapse node, and the meet of the two constraints in the lattice is free in PAC for the same reason.
+\item Read conservativeness (\leanname{FLT_Proofs.Learner.Properties.IsConservative}) in the Gold setting. Some classes a conservative learner identifies from an informant it cannot identify from text (\cite{Angluin1980,Gold1967,CaseSmith1983}). Reconstruct the separation.
 
-\item \textbf{Conservativeness bites in Gold.} Read conservativeness (\leanname{FLT_Proofs.Learner.Properties.IsConservative}) on the Gold lane. Here the constraint genuinely separates: some classes a conservative learner identifies from an informant escape it from text, a result in the inductive-inference literature (\cite{Angluin1980,Gold1967,CaseSmith1983}) with no constraint-level theorem in the kernel. The figure must draw this instance orange and dashed.
+\item Take consistency alone in both paradigms. It is free in PAC (\leanname{erm_consistent_realizable}) yet in Gold can force a learner into infinitely many mind changes. Exhibit a class realizing the Gold side, and explain why the i.i.d.\ assumption removes the cost in PAC.
 
-\item \textbf{The same predicate, two lanes.} Take consistency alone and ask where it sits. This is the boundary the whole figure is organized around: consistency is free in PAC (green, solid, \leanname{erm_consistent_realizable}) yet in Gold a consistent learner can be forced into infinitely many mind changes, so the one predicate carries a green edge in one paradigm and an orange edge in another. That split is precisely the paradigm-relativity the lattice exists to display.
+\item Compare set-drivenness (\leanname{FLT_Proofs.Learner.Properties.IsSetDriven}) with iterativeness (\leanname{FLT_Proofs.Learner.Properties.IsIterative}) in Gold and online learning. A set-driven class can force unbounded memory on any iterative learner (\cite{KotzingPalenta2016,Gold1967}); this separation is open in the kernel, recorded as \cref{op:order-sensitivity}. Move the same pair into PAC and show the distinction collapses because example order is irrelevant.
 
-\item \textbf{Set-driven against iterative memory.} Compare set-drivenness (\leanname{FLT_Proofs.Learner.Properties.IsSetDriven}) with iterativeness (\leanname{FLT_Proofs.Learner.Properties.IsIterative}) in the Gold and online settings. A set-driven class can force unbounded memory on any iterative learner (\cite{KotzingPalenta2016,Gold1967}); this is another dashed separation instance, an edge the kernel does not yet prove, recorded open as \cref{op:order-sensitivity}.
+\item Read properness under cryptographic hardness, where the spent resource is computation time, not information. Properness preserves the finite-VC PAC class yet can cost strictly more computation (\cite{PittValiant1988}). Identify which axis the separation lives on.
 
-\item \textbf{Order-sensitivity collapses under i.i.d.} Now move the set-driven versus iterative pair into PAC. Watch the same edge flip lanes: because the i.i.d.\ assumption makes example order irrelevant, the distinction that bites in Gold vanishes, the orange dashed Gold edge turning into the green collapse edge that runs into the same ERM node. This is the other face of the boundary, the bite switching off as the paradigm changes.
+\item Add internal randomness, the probabilistic variant (\leanname{FLT_Proofs.Learner.Properties.ProbabilisticLearner}). In PAC randomness derandomizes at no asymptotic cost; in the Gold limit probabilistic identification is a distinct success notion. Contrast the two.
 
-\item \textbf{A constraint that bites only computationally.} Keep properness, but now read it under cryptographic hardness, where the resource being spent is computation time and not information. The landing is a frontier boundary: properness preserves the finite-VC PAC class (green on statistical grounds, \leanname{fundamental_theorem} is silent on computation) yet can cost strictly more computation, a separation on the resource axis the kernel does not carry, so the edge is dashed and cited to \cite{PittValiant1988}.
+\item Replace a single learner by a team (\leanname{FLT_Proofs.Learner.Properties.TeamLearner}). Unlike consistency, the team relaxation keeps its bite in Gold, where two learners identify classes no single learner can (\cref{thm:team-power}), and survives the move to PAC uncollapsed. Connect this to the team hierarchy of \cref{op:team-hierarchy}.
 
-\item \textbf{The probabilistic constraint.} Add internal randomness, the probabilistic variant (\leanname{FLT_Proofs.Learner.Properties.ProbabilisticLearner}). This is a tie each paradigm settles its own way: in PAC randomness can be derandomized at no asymptotic cost so the constraint is free (green), while in the Gold limit a probabilistic identification criterion is a genuinely distinct success notion. The figure places the node and lets the paradigm label decide the lane, dashed where the kernel has only the structure and no separation.
-
-\item \textbf{Teams as a constraint that always bites.} Replace a single learner by a team (\leanname{FLT_Proofs.Learner.Properties.TeamLearner}). The separation here is robust across both paradigms: two learners identify Gold classes no single learner can (\cref{thm:team-power}) through the disjunctive-success mechanism, so unlike consistency the team relaxation keeps its bite in Gold and survives the move to PAC uncollapsed. Annotate the edge with the team hierarchy of \cref{op:team-hierarchy}.
-
-\item \textbf{Is collapse a closure operator?} Ask whether ``impose consistency and properness'' is a reflector onto a subcategory: a closure operator under which PAC learnability is invariant and idempotent, so that a constraint is free exactly when it lies below the closure's fixed points and biting otherwise. This is the deepest frontier the figure opens onto: such a closure would re-type both lanes as one Galois-style law classifying which constraints collapse in which paradigm. No such adjunction is defined in the development, so the meta-edge stays dashed and is recorded as a known unknown alongside \cref{op:order-sensitivity}.
+\item Ask whether ``impose consistency and properness'' is a closure operator under which PAC learnability is invariant and idempotent, so that a constraint is free exactly when it lies below the closure's fixed points. Such a closure would classify, by one Galois-style law, which constraints collapse in which paradigm. No such adjunction is defined; record what a definition would have to supply.
 \end{enumerate}

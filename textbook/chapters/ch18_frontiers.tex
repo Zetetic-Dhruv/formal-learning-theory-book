@@ -15,16 +15,11 @@ chapter presents none of these.  Its subject is the boundary of what we know,
 and its organizing principle is the open question rather than the proven
 theorem.
 
-The shift in profile is deliberate.  Chapters~1--17 follow six pedagogical
-profiles: foundational definition, canonical proof, separation witness,
-analogy analysis, computational illustration, and framework bridge.  This
-chapter follows a seventh: the \emph{open frontier}.  Each section leads with
-a question to which no complete answer is known, presents the best partial
-results, identifies the precise gap between what is known and what is
-conjectured, and speculates, cautiously, on what kind of argument might
-close the gap.
+Each section leads with a question to which no complete answer is known,
+presents the best partial results, identifies the precise gap between what is
+known and what is conjectured, and asks what kind of argument might close it.
 
-No pretense of completeness is made.  The problems chosen are those that
+The problems chosen are those that
 connect most tightly to the concept graph of this book: the compression
 conjecture (Chapter~\ref{ch:compression}), deep network generalization
 (Chapter~\ref{ch:generalization}), universal learning beyond countable classes
@@ -69,8 +64,8 @@ Does there exist a sample compression scheme for $\mathcal{H}$ of size
 $O(d)$?
 \end{openprob}
 
-This conjecture, stated by Littlestone and Warmuth in 1986, is arguably the
-oldest major open problem in computational learning theory.  It asks whether
+This conjecture, stated by Littlestone and Warmuth in 1986, is among the
+oldest major open problems in computational learning theory.  It asks whether
 the sample complexity of PAC learning (which is $\Theta(d/\varepsilon)$) is
 explained by compression: whether every learnable class can be learned by
 storing only $O(d)$ examples from the training set and reconstructing a
@@ -84,17 +79,15 @@ The positive direction is settled in a weak sense.
 \item \textbf{Exponential compression exists.}
   Moran and Yehudayoff~\cite{MoranYehudayoff2016} proved that every class
   with $\VC(\mathcal{H}) = d$ admits a compression scheme of size
-  $2^{O(d)}$.  The proof uses a beautiful argument involving the
-  Radon partition structure of finite VC classes, but the bound is
-  exponentially larger than the conjecture predicts.
+  $2^{O(d)}$.  The proof uses the Radon partition structure of finite VC
+  classes, but the bound is exponentially larger than the conjecture predicts.
 
 \item \textbf{Special cases are resolved.}  Maximum classes (those achieving
   the Sauer--Shelah bound $\growth_\mathcal{H}(n) = \binom{n}{\leq d}$)
   admit compression of size exactly $d$, as shown by Floyd and
   Warmuth~\cite{FloydWarmuth1995}.  Intersection-closed classes admit
   compression of size $d$~\cite{Helmbold2018}, and classes of small recursive
-  teaching dimension compress to that dimension; these are the established
-  families, and the list is illustrative rather than exhaustive.
+  teaching dimension compress to that dimension.
 
 \item \textbf{Compression implies learning.}  The converse direction is
   established: a compression scheme of size $k$ yields PAC learning with
@@ -112,10 +105,8 @@ Blumer, Ehrenfeucht, Haussler, and Warmuth~\cite{BlumerEhrenfeuchtHausslerWarmut
 completed the characterization of PAC learnability through VC dimension.
 The conjecture was motivated by the observation that specific learnable
 classes (halfspaces, rectangles, decision lists) all admit small compression
-schemes, and the belief that this regularity was structural: a property of
-finite-VC classes as such, which would make those three examples instances of
-a general law rather than a lucky coincidence.  Four
-decades later, the general case remains open.
+schemes, and the belief that this regularity was a property of finite-VC
+classes as such.  Four decades later, the general case remains open.
 \end{historical}
 
 \subsection{Where the Gap Is}
@@ -188,7 +179,7 @@ Why does the trained network generalize, i.e., why is $\risk(\hat{h})
 \approx \emprisk(\hat{h})$, despite $\VC(\mathcal{H}) \geq p$?
 \end{openprob}
 
-This is perhaps the most practically urgent open problem in learning theory.
+This is among the most practically urgent open problems in learning theory.
 Classical generalization bounds predict that a model with more parameters than
 training examples should overfit catastrophically.  Deep networks routinely
 violate this prediction.
@@ -233,17 +224,13 @@ Several partial explanations exist, none fully satisfactory.
 
 \item \textbf{Machine-checked certificates.}  For the specific function class
   of a multi-head attention block, the generalization certificate of
-  \Cref{ch:generalization} has been formalized: a proof assistant verifies
-  that the executed (finite-precision) network's true risk exceeds its
-  empirical risk by more than an explicit Dudley-capacity budget only on a
-  sample event of probability at most~$\delta$.\formal{TLT.CertifiedGeneralization}
-  The budget is discharged from the layer norms and depth of the
-  stack,\formal{TLT.config_capacity_law} so the bound is correct by
-  construction.  Like its hand-proved cousins, however, it grows with depth and
-  norm and is not yet non-vacuous on large models: it advances
-  \Cref{op:deep-gen} along the axis of \emph{trust}, supplying a
-  kernel-audited guarantee, while leaving \emph{tightness} where it found it,
-  the same Dudley budget now merely certified rather than shrunk.
+  \Cref{ch:generalization} has been formalized: the executed
+  (finite-precision) network's true risk exceeds its empirical risk by more
+  than an explicit Dudley-capacity budget only on a sample event of
+  probability at most~$\delta$.\formal{TLT.CertifiedGeneralization}  The budget
+  is discharged from the layer norms and depth of the
+  stack.\formal{TLT.config_capacity_law}  Like its hand-proved cousins, it
+  grows with depth and norm and is not yet non-vacuous on large models.
 \end{itemize}
 
 \begin{computational}
@@ -260,9 +247,8 @@ The double descent phenomenon is observed across several model families
 The classical complexity-based bounds (VC, Rademacher, and the parameter-count
 bounds of \Cref{ch:generalization}) are monotone in model complexity and so
 cannot predict the second descent; whether \emph{some} data-dependent bound can
-is itself part of \Cref{op:deep-gen}.  The phenomenon suggests that the
-relevant notion of complexity for overparameterized models is not a simple
-function of parameter count.
+is itself part of \Cref{op:deep-gen}.  The relevant notion of complexity for
+overparameterized models is not a simple function of parameter count.
 \end{computational}
 
 \subsection{Where the Gap Is}
@@ -292,13 +278,8 @@ The gap has three aspects.
 
 \subsection{What Would Close the Gap}
 
-The field appears to need a complexity measure that simultaneously accounts
-for:
-\begin{itemize}[leftmargin=*]
-\item the architecture, with the function class alone left underdetermined,
-\item the full optimization trajectory, the endpoint by itself being silent,
-\item the data distribution, which worst-case analysis discards.
-\end{itemize}
+The field needs a complexity measure that simultaneously accounts for the
+architecture, the full optimization trajectory, and the data distribution.
 
 Possible directions include:
 \begin{itemize}[leftmargin=*]
@@ -557,21 +538,18 @@ between algorithmic information theory and learning.
   $K(h)/n$, where $K(h)$ is the Kolmogorov complexity of $h$ and $n$
   is the sample size.
 
-\item \textbf{Algorithmic probability and universal learning.}  The
-  connection between Solomonoff's prior and the universal learning
-  framework of Chapter~\ref{ch:universal} is suggestive but not formal.
-  Universal learning allows distribution-dependent rates; Solomonoff's
-  prior achieves distribution-dependent convergence.  But the universal
-  learning framework is information-theoretic (it asks only about sample
-  complexity), while Solomonoff's prior is algorithmic (it asks about
-  description complexity).  The precise relationship between these two
-  notions of universality is open.
+\item \textbf{Algorithmic probability and universal learning.}  Universal
+  learning allows distribution-dependent rates; Solomonoff's prior achieves
+  distribution-dependent convergence.  But the universal learning framework is
+  information-theoretic (it asks only about sample complexity), while
+  Solomonoff's prior is algorithmic (it asks about description complexity).
+  The precise relationship between these two notions of universality is open.
 \end{itemize}
 
 \begin{historical}
 Solomonoff's 1964 paper~\cite{Solomonoff1964} predates Gold's 1967
 formalization of identification in the limit and Valiant's 1984
-introduction of PAC learning.  It is arguably the first formal proposal
+introduction of PAC learning.  It is among the first formal proposals
 for a universal learning algorithm, though it was formulated in the language
 of algorithmic information theory rather than learning theory.  The
 intellectual genealogy runs:
@@ -643,10 +621,9 @@ good generalization) holds at the tightest possible quantitative level.
 \label{sec:further-frontiers}
 
 The five problems above are those most tightly connected to the conceptual
-framework of this book.  We briefly note several other directions where the
-theory is actively expanding.  Each lies at the boundary of the framework
-developed in Chapters~1--17 and involves mathematical structures that do
-not reduce to the types established there.
+framework of this book.  We note several other directions where the theory is
+actively expanding, each involving mathematical structures that do not reduce
+to the types established in Chapters~1--17.
 
 \begin{openprob}[Private agnostic learning]
 \label{op:private}
@@ -707,8 +684,7 @@ of learning.
 certificate already exists for an attention block
 (\leanname{config_capacity_law}), but its Dudley budget grows with depth and
 norm.  Can a generalization bound for a realistic transformer be \emph{both}
-machine-checked and non-vacuous on a benchmark, thereby closing \Cref{op:deep-gen} on
-the trust and tightness axes at once?  A known unknown on the transformer side.
+machine-checked and non-vacuous on a benchmark, thereby closing \Cref{op:deep-gen}?
 \end{openprob}
 
 \bigskip
@@ -726,15 +702,12 @@ lottery tickets), to margin theory (through spectral bounds), and to
 algorithmic stability (through SGD analysis).  Universal learning connects
 to the Littlestone dimension and therefore to private learning.
 
-This interconnection is not coincidental.  The open problems persist
-\emph{because} they are entangled: a resolution of the compression
-conjecture would likely yield insight into generalization bounds; a
-combinatorial characterization of efficient learnability would likely
-require new structural theorems about VC classes; a computable approximation
-to Solomonoff induction would likely connect to both compression and
-universal learning.  The frontier of formal learning theory is a single,
-tightly coupled surface; the problems on it are entries into one shared
-geometry, and resolving any one would deform the rest.
+This interconnection is not coincidental.  A resolution of the compression
+conjecture would yield insight into generalization bounds; a combinatorial
+characterization of efficient learnability would require new structural
+theorems about VC classes; a computable approximation to Solomonoff induction
+would connect to both compression and universal learning.  Resolving any one
+of these problems would reshape the others.
 \end{computational}
 
 \bigskip
@@ -743,6 +716,5 @@ This chapter has surveyed what we do not know.  The theory developed in
 Chapters~1--17 provides a rigorous, interconnected framework for what we do
 know: characterization theorems, tight bounds, separation results, and
 structural analogies.  The open problems of this chapter mark the places
-where that framework reaches its current limits.  They are invitations: each
-section leads with one and ends by asking what argument would close it, which
-is the form a frontier takes when it is read as work to be done.
+where that framework reaches its current limits, and where the next results
+will be found.

@@ -8,7 +8,7 @@
 
 The previous chapters study learners that receive data passively: drawn from a distribution (PAC), or presented by an adversary (online), or enumerated by nature (Gold). This chapter studies what happens when the learner can \emph{ask questions}.
 
-The exact learning model, introduced by Angluin~\cite{Angluin1987}, equips the learner with two oracles: a membership query oracle and an equivalence query oracle. The learner's goal is \emph{exact identification}: the game ends when the learner proposes a hypothesis the equivalence oracle accepts, with approximate generalization no longer enough to win. The central result of this chapter is that DFAs, computationally intractable under passive data~\cite{KearnsValiant1994}, become efficiently learnable with query access. This gap between passive and active learning is one of the sharpest structural results in the field.
+The exact learning model, introduced by Angluin~\cite{Angluin1987}, equips the learner with two oracles: a membership query oracle and an equivalence query oracle. The learner's goal is \emph{exact identification}: the game ends when the learner proposes a hypothesis the equivalence oracle accepts; approximate generalization is no longer enough to win. The central result of this chapter is that DFAs, computationally intractable under passive data~\cite{KearnsValiant1994}, become efficiently learnable with query access. This gap between passive and active learning is one of the sharpest structural results in the field.
 
 % ================================================================
 % SECTION 1: THE EXACT LEARNING FRAMEWORK
@@ -116,20 +116,12 @@ Closedness ensures that every one-step extension of a state representative is eq
 \node[lit, text width=3.5cm, anchor=north] at (7.9,-2.9)
    {\textbf{Correctness \& the $n-1$ bound:} converges to the minimal DFA in $\le n-1$ equivalence queries ($n=$ Myhill--Nerode index). Angluin 1987 (\cref{thm:lstar-complexity}); open in the kernel (\cref{op:lstar-formal}).};
 \end{tikzpicture}
-\caption[The $L^*$ exact-learning loop and its Myhill--Nerode reading]{The $L^*$ protocol as the
-exact-learning-via-a-MAT loop. A learner and a minimally adequate teacher cooperate to identify the
-minimal DFA for an unknown regular language. The observation table $(S,E,T)$ is a finite approximation of
-the Myhill--Nerode right-congruence of the target: its distinct rows are the equivalence classes
-discovered so far. Membership queries fill the table cell by cell; an equivalence query returns a
-counterexample that forces a new state class, splitting the current approximation. Closedness and
-consistency are exactly the conditions under which the table induces a well-defined DFA, and termination
-in at most $n-1$ equivalence queries is the index of the congruence ($n$ states in the minimal DFA). The
-data-types are verified scaffolding: the membership and equivalence oracles
-(\leanname{MembershipOracle}, \leanname{EquivalenceOracle}), the teacher
-(\leanname{MinimallyAdequateTeacher}), the algorithm object (\leanname{LStar}), the conjecture type
-(\leanname{DFA'}), and the success criterion (\leanname{ExactLearnable}). The correctness of the loop and
-the $n-1$ bound are Angluin's theorem (\cite{Angluin1987}), cited and not yet kernel-proved
-(\cref{op:lstar-formal}); they are drawn dashed.}
+\caption[The $L^*$ exact-learning loop]{The $L^*$ protocol: a learner and a minimally adequate teacher
+(\leanname{MinimallyAdequateTeacher}) cooperate to identify the minimal DFA for an unknown regular
+language. The observation table $(S,E,T)$ is a finite approximation of the target's Myhill--Nerode
+right-congruence; membership queries fill it cell by cell, and each equivalence query returns a
+counterexample that forces a new state class. Termination in at most $n-1$ equivalence queries is the
+index of the congruence (Angluin's theorem, \cref{thm:lstar-complexity}).}
 \label{fig:lstar-protocol}
 \end{figure}
 
@@ -204,14 +196,14 @@ The proof reduces the problem of breaking a cryptographic primitive to the probl
 \item \textbf{Active learning succeeds.} $L^*$ exactly identifies any $n$-state DFA using $O(n^2 |\Sigma| m)$ membership queries and $n - 1$ equivalence queries (\Cref{thm:lstar-complexity}).
 \item \textbf{Passive learning fails.} Under cryptographic assumptions, no polynomial-time algorithm PAC-learns DFAs from random examples (\Cref{thm:dfa-pac-hard}).
 \end{itemize}
-The gap is \emph{qualitative}: no amount of passive data suffices for efficient learning, while a polynomial number of queries does. More random examples never close it, because the obstruction is one of kind. The mechanism is clear: membership queries let the learner probe the target's transition structure at chosen points, and equivalence queries provide directed feedback at the learner's current frontier of error. Random examples provide neither capability.
+The gap is \emph{qualitative}: no amount of passive data suffices for efficient learning, while a polynomial number of queries does. Membership queries let the learner probe the target's transition structure at chosen points, and equivalence queries provide directed feedback at the learner's current frontier of error; random examples provide neither capability.
 \end{separation}
 
-This separation witnesses one established edge in the concept graph: $\nde{exact\_learning} \not\Rightarrow \nde{pac\_learning}$, exact learnability does not imply efficient PAC learnability, witnessed by DFAs. The witness is a literature result rather than a kernel theorem, and it is conditional: the hardness leg holds only under cryptographic assumptions (\cref{rmk:crypto-assumption}). The reverse direction, a class efficiently PAC-learnable but not efficiently exactly learnable, is \emph{not} established here; it is an open problem (\cref{op:reverse-separation}). One would expect simulating an equivalence oracle in the PAC setting to be intractable for some classes, since it requires enumerating hypotheses and checking consistency, but exhibiting such a class precisely is exactly what remains open. So the two paradigms sit in an asymmetric relation rather than a symmetric antichain: the active-helps direction is established and conditional, and the reverse is unresolved.
+This separation witnesses one edge in the concept graph: $\nde{exact\_learning} \not\Rightarrow \nde{pac\_learning}$, exact learnability does not imply efficient PAC learnability, witnessed by DFAs. The hardness leg holds only under cryptographic assumptions (\cref{rmk:crypto-assumption}). The reverse direction, a class efficiently PAC-learnable but not efficiently exactly learnable, is open (\cref{op:reverse-separation}): simulating an equivalence oracle in the PAC setting requires enumerating hypotheses and checking consistency, but exhibiting a class for which this is provably intractable remains open.
 
 \begin{remark}[The role of the cryptographic assumption]
 \label{rmk:crypto-assumption}
-The Kearns--Valiant result is \emph{conditional}: it assumes that certain cryptographic primitives are hard to break. Without this assumption, the PAC-hardness of DFAs is open. This is typical of computational hardness results in learning theory: unconditional lower bounds for PAC learning remain rare, and most known hardness results reduce from cryptography or from $\mathsf{NP}$-hardness assumptions. The exact learning model sidesteps computational hardness entirely; query access changes the information-theoretic landscape so fundamentally that the cryptographic barrier does not apply.
+The Kearns--Valiant result is \emph{conditional}: it assumes that certain cryptographic primitives are hard to break. Without this assumption, the PAC-hardness of DFAs is open. This is typical of computational hardness results in learning theory: unconditional lower bounds for PAC learning remain rare, and most known hardness results reduce from cryptography or from $\mathsf{NP}$-hardness assumptions. The exact learning model sidesteps this barrier entirely, because query access changes the information available to the learner.
 \end{remark}
 
 \begin{figure}[ht]
@@ -248,20 +240,12 @@ The Kearns--Valiant result is \emph{conditional}: it assumes that certain crypto
 \node[font=\tiny, text=notegray, align=center, anchor=north] at (4.1,-1.05)
    {DFAs have finite VC (\leanname{vc_characterization}): the gap is computational, not information-theoretic};
 \end{tikzpicture}
-\caption[The passive--active gap on DFAs: one established direction, one open]{The passive--active gap,
-corrected to a single established direction plus an open reverse. Exact learning with membership and
-equivalence queries does not imply efficient PAC learning from random examples: the class of DFAs witnesses
-it, being exactly identifiable by Angluin's $L^*$ in polynomially many queries yet not efficiently
-PAC-learnable under cryptographic assumptions (Kearns--Valiant). This is a conditional literature
-separation, not a kernel theorem: the $L^*$ correctness bound and the DFA hardness reduction are both
-cited, and the hardness holds only under the hardness of RSA or factoring (\cref{rmk:crypto-assumption}).
-The reverse direction, a class efficiently PAC-learnable but not efficiently exactly learnable, is an open
-problem (\cref{op:reverse-separation}), so the two paradigms are not a symmetric antichain: one leg is
-established and conditional, the other unresolved. The established gap is computational, never
-information-theoretic: DFAs have finite VC dimension, hence are PAC-learnable with polynomially many
-samples in principle, only the efficient computation is blocked. The three boxes name verified types; the
-separation arrows are dashed because they are literature, and the reverse arrow carries a question mark
-because it is open.}
+\caption[The passive--active gap on DFAs]{The passive--active gap. Exact learning with membership and
+equivalence queries does not imply efficient PAC learning from random examples: DFAs witness it, being
+exactly identifiable by $L^*$ in polynomially many queries yet not efficiently PAC-learnable under the
+hardness of RSA or factoring (Kearns--Valiant, \cref{rmk:crypto-assumption}). The gap is computational,
+not information-theoretic, since DFAs have finite VC dimension; the reverse direction is open
+(\cref{op:reverse-separation}).}
 \label{fig:passive-active-gap}
 \end{figure}
 
@@ -280,10 +264,10 @@ Let $f$ be the binary string function computed by a trained attention model.  An
 \end{prop}
 
 \begin{proof}
-The membership oracle $\mathrm{MQ}(s) = f(s)$ is total and truthful: a forward pass computes $f(s)$ exactly up to the bounded finite-precision forward error of the attention layer.\formal{TLT.Fp32AttnLit.attnLiteralForwardError} The equivalence oracle is approximate: it certifies $L(M) = f$ on a sampled test set rather than on all strings, so the conjecture is exact on the queries made and probably-approximately correct off them; with an exact equivalence oracle $L^*$ returns the minimal DFA for $f$ by \cref{thm:lstar-complexity}.  Either way the model is a legitimate $L^*$ teacher.
+The membership oracle $\mathrm{MQ}(s) = f(s)$ is total and truthful: a forward pass computes $f(s)$ up to the bounded finite-precision forward error of the attention layer.\formal{TLT.Fp32AttnLit.attnLiteralForwardError} The equivalence oracle is approximate: it certifies $L(M) = f$ on a sampled test set rather than on all strings, so the conjecture is exact on the queries made and probably approximately correct off them; with an exact equivalence oracle $L^*$ returns the minimal DFA for $f$ by \cref{thm:lstar-complexity}. Either way the model is a legitimate $L^*$ teacher.
 \end{proof}
 
-This is how Weiss, Goldberg, and Yahav~\cite{WeissGoldbergYahav2018} extract interpretable automata from recurrent networks, and the construction applies to attention models verbatim.  It turns the passive--active gap into a methodology: a model opaque under passive inspection becomes a queryable teacher, and $L^*$ distills its regular core into a DFA one can read.  The caveat is the one above: the equivalence oracle is only approximate, so extraction is sound on the queries and heuristic beyond them, and whether a transformer's string function even \emph{has} a finite regular core is itself open (\cref{op:transformer-regular}).
+This is how Weiss, Goldberg, and Yahav~\cite{WeissGoldbergYahav2018} extract interpretable automata from recurrent networks, and the construction applies to attention models verbatim. A model opaque under passive inspection becomes a queryable teacher, and $L^*$ distills its regular core into a readable DFA. Because the equivalence oracle is only approximate, extraction is sound on the queries and heuristic beyond them, and whether a transformer's string function even has a finite regular core is open (\cref{op:transformer-regular}).
 
 \section{Query Complexity}
 \label{sec:query-complexity}
@@ -319,7 +303,7 @@ The exact learning framework connects to \emph{certificate complexity} in Boolea
 
 \item \textbf{The $L^*$ algorithm.} Angluin's algorithm learns the minimal DFA for any regular language using polynomially many queries. The observation table approximates the Myhill--Nerode equivalence relation; each counterexample refines it by introducing a new state distinction.
 
-\item \textbf{The passive--active gap.} DFAs are exactly learnable with MQ~+~EQ (Angluin, 1987) but not efficiently PAC-learnable under cryptographic assumptions (Kearns--Valiant, 1994), a conditional separation in one direction. This gap is qualitative: query access changes the complexity landscape fundamentally, so the divide is one of kind and no quantity of random examples bridges it. The reverse direction, a class efficiently PAC-learnable but not efficiently exactly learnable, is open (\cref{op:reverse-separation}).
+\item \textbf{The passive--active gap.} DFAs are exactly learnable with MQ~+~EQ (Angluin, 1987) but not efficiently PAC-learnable under cryptographic assumptions (Kearns--Valiant, 1994), a conditional separation in one direction. The gap is qualitative: query access changes the complexity landscape, and no quantity of random examples bridges it. The reverse direction, a class efficiently PAC-learnable but not efficiently exactly learnable, is open (\cref{op:reverse-separation}).
 
 \item \textbf{Query complexity.} The number of queries required to exactly learn a class is the natural complexity measure, analogous to sample complexity in PAC learning.
 \end{enumerate}
@@ -329,7 +313,7 @@ The gap between passive and active learning demonstrated by DFAs is not an isola
 \section{Open Problems}
 \label{sec:ch8-open}
 
-Each problem is anchored to a result above and tagged: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result in the literature or the verified development not yet absorbed into a clean statement.  Verified handles are named where they exist.
+Each problem is anchored to a result above and tagged: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a literature or development result not yet absorbed into a clean statement.
 
 \begin{openprob}[The regular core of a transformer, \textsc{uk}]
 \label{op:transformer-regular}
@@ -382,54 +366,26 @@ The development types an LLM critic as a teacher (\leanname{FLT_Proofs.Learner.A
 \end{openprob}
 
 
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:lstar-protocol}}
+\subsection*{Counterfactual exercises}
 
-Figure~\ref{fig:lstar-protocol} draws one loop: a learner sharpening a finite slice of the target's Myhill--Nerode right-congruence by membership queries, jolted forward by each counterexample the equivalence oracle hands back, with nodes solid where a verified data-type certifies the object and the correctness-and-termination arc dashed because it rests on Angluin's theorem rather than the kernel. The loop is mostly a verified scaffold around one cited claim, so the exercises below mostly probe how robust that scaffold is. Each one tweaks a single piece of the protocol and asks where the tweaked picture sits relative to the drawn one: an \emph{instance} reruns the loop on a fixed target, a \emph{boundary} toggles one teacher capability or one table condition and watches the learnable class jump, and a \emph{frontier} lands on a dashed edge that is open or literature-only.
-
-\begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The table is the right congruence.} Read the observation table as the object being learned, rather than as the algorithm's scratch space. This is the figure's defining instance. Two access strings share a row exactly when they are indistinguishable by the suffixes in $E$, a finite slice of the Myhill--Nerode relation $s_1 \sim s_2 \iff (\forall w,\ s_1 w \in L \Leftrightarrow s_2 w \in L)$ (\cref{rmk:table-intuition}), so the distinct rows \emph{are} the equivalence classes discovered so far and the conjecture DFA is their quotient; the row map is typed by the truthful membership oracle (\leanname{FLT_Proofs.Data.MembershipOracle}).
-
-\item \textbf{Closedness and consistency are the quotient's well-definedness.} Toggle off closedness: let some $\mathrm{row}(s\cdot a)$ match no representative in $S$. The conjecture immediately becomes illegal, which is the boundary this perturbation marks. Without closedness the transition $\delta(\mathrm{row}(s),a)=\mathrm{row}(s\cdot a)$ has no target state, and without consistency it depends on the chosen representative (\cref{def:closed-consistent}); the two conditions are precisely what licenses the quotient automaton (\leanname{FLT_Proofs.Computation.DFA'}), so they are well-definedness constraints; dropping one does not merely slow the learner, it leaves the conjecture without a legal transition function.
-
-\item \textbf{A counterexample is a new-class witness.} Replace the teacher's \textsc{yes}/counterexample reply by a bare bit ``correct or not''. Refinement now stalls, the boundary this exercise crosses. The equivalence oracle's counterexample carries the contract that $z$ is a point where the conjecture and target disagree (\leanname{FLT_Proofs.Data.EquivalenceOracle}; the witness is typed by \leanname{FLT_Proofs.Data.Counterexample}), and adding $z$ with its prefixes forces at least one new distinct row, i.e.\ splits a Myhill--Nerode class; a bare bit removes the witness and the loop can no longer discover the missing state.
-
-\item \textbf{The $n-1$ bound is the index of the congruence.} Read ``at most $n-1$ equivalence queries'' as a structural identity rather than a mere runtime figure. Here termination meets the chapter's frontier. The minimal DFA has $n$ states, hence the congruence has index $n$ (\cref{rmk:table-intuition}, uniqueness by \cite{RabinScott1959}), the table starts at one class and gains at least one per counterexample, so termination after $\le n-1$ rounds \emph{is} the finiteness of the index (\cref{thm:lstar-complexity}); the bound is a literature theorem (\cite{Angluin1987}), not yet kernel-proved (\cref{op:lstar-formal}), so the termination annotation is drawn dashed.
-
-\item \textbf{The whole loop is cited, not verified.} Ask the kernel for the statement ``$L^*$ converges to the minimal DFA''. This request lands on the figure's principal frontier. The nodes are verified types ($L^*$ itself is the structure \leanname{LStar} with fields \texttt{teacher}, \texttt{numStates}, \texttt{result}, all sorry-free, but with no method and no correctness lemma), so the objects are solid while the convergence-and-termination edges are dashed and carry \cite{Angluin1987}; closing this gap on top of the typed teacher (\leanname{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}) and \leanname{FLT_Proofs.Computation.DFA'} is exactly \cref{op:lstar-formal}.
-
-\item \textbf{The teacher is the only source of state-splits.} Read the minimally adequate teacher as the entire interface between learner and target. This is the instance that names the model. A MAT is a membership oracle and an equivalence oracle answering about one shared target (\leanname{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}, field \texttt{consistent} forcing $\texttt{mq.target}=\texttt{eq.target}$; \cref{def:mat}), and nothing else, so every state the learner discovers is forced by a query, never by distributional luck; this is what makes exact identification (\leanname{FLT_Proofs.Criterion.PAC.ExactLearnable}, \cref{def:exact-learning-formal}) attainable here.
-
-\item \textbf{Drop membership queries and the loop blows up.} Run the same cycle with equivalence queries alone. The discovery rate collapses at this boundary. Without membership queries the learner cannot place a string in its Myhill--Nerode class, so each equivalence query removes only one candidate from the version space and an $N$-concept class costs $N-1$ queries in the worst case (\cref{prop:eq-lower}, \cite{Angluin1988}), whereas membership queries supply the structural bit that collapses an exponential count to the linear $n-1$ of \cref{thm:lstar-complexity}.
-
-\item \textbf{Passive data cannot drive the loop at all.} Replace the active teacher with random labelled examples drawn from a distribution. This is the frontier separating the two paradigms. The same target class (DFAs) is exactly learnable by this loop (\cref{thm:lstar-complexity}) yet not PAC-learnable under cryptographic assumptions (\cref{thm:dfa-pac-hard}, \cite{KearnsValiant1994}), so the passive--active edge is qualitative, and the reverse direction (PAC-easy yet exact-hard) is itself open (\cref{op:reverse-separation}).
-
-\item \textbf{The counterexample length is a hidden cost on the arrows.} Refine the $z$-arrow by asking how long $z$ may be. This opens a frontier on the membership budget. The equivalence oracle may return an adversarially long counterexample (\cref{rmk:counterexample-length}), so the membership-query count carries a factor $m$ (\cref{thm:lstar-complexity}); whether a learner can binary-search the counterexample to remove the linear dependence on $m$ is open (\cref{op:counterexample-length}, \cite{RivestSchapire1993}).
-
-\item \textbf{Any queryable function is an $L^*$ target.} Replace the unknown regular language by the binary string function of a trained attention model, answering membership by a forward pass and equivalence by sampling. This is the figure's most general instance. The model is a legitimate minimally adequate teacher (\cref{prop:transformer-extraction}, \cite{WeissGoldbergYahav2018}), so the same state-discovery loop extracts a DFA exact on the queried strings; whether the model's function even has a finite Myhill--Nerode index (a genuine regular core) so that extraction is exact rather than heuristic is open (\cref{op:transformer-regular}), and so is the soundness of an unreliable oracle such as an LLM critic (\cref{op:llm-teacher}).
-\end{enumerate}
-
-\subsection*{Counterfactual exercises: generalizing Figure~\ref{fig:passive-active-gap}}
-
-Figure~\ref{fig:passive-active-gap} is deliberately lopsided. Two learnability criteria sit in solid boxes wherever a verified type backs them; the separation between them is dashed because it is Angluin's and Kearns--Valiant's theorems rather than the kernel's; and one direction wears a question mark because the chapter leaves it open. The accurate reading is an \emph{asymmetric, evidence-graded} pair, one established conditional separation and one open reverse, with the symmetric antichain a tempting but false picture of the same two paradigms. The exercises below test that asymmetry from both sides. An \emph{instance} reads the gap on a fixed class, a \emph{boundary} toggles one capability or one assumption and watches the established direction shift, and a \emph{frontier} lands on a dashed literature-only or open edge.
+These exercises perturb the $L^*$ loop (Figure~\ref{fig:lstar-protocol}) and the passive--active gap (Figure~\ref{fig:passive-active-gap}) one piece at a time and ask what the learnable class, or the established separation, does in response.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The boxes are types, the arrows are literature.} Read the three nodes as the objects the kernel actually owns. This is the figure's defining instance. The exact-learning criterion (\leanname{FLT_Proofs.Criterion.PAC.ExactLearnable}, \cref{def:exact-learning-formal}), the PAC criterion (\leanname{FLT_Proofs.Criterion.PAC.PACLearnable}), and the witness type (\leanname{FLT_Proofs.Computation.DFA'}) are all verified, sorry-free definitions, so the boxes are solid; but neither separation leg is a kernel theorem, so the arrows between them are dashed and carry citations, not handles.
+\item \textbf{The table is the right congruence.} Read the observation table as the object being learned. Two access strings share a row exactly when they are indistinguishable by the suffixes in $E$, a finite slice of the Myhill--Nerode relation $s_1 \sim s_2 \iff (\forall w,\ s_1 w \in L \Leftrightarrow s_2 w \in L)$ (\cref{rmk:table-intuition}), so the distinct rows are the equivalence classes discovered so far and the conjecture DFA is their quotient.
 
-\item \textbf{The reverse direction remains open.} Add to the figure the arrow ``PAC $\not\Rightarrow$ exact'' as if it were proven. This boundary exposes the figure's former over-claim. The chapter flags the reverse as an open problem, ``exhibit a class efficiently PAC-learnable but not efficiently exactly learnable'' (\cref{op:reverse-separation}), so no witness class is known and the second arrow has no content; drawing it symmetrically to the first banks an open problem as a theorem. Drawn correctly, the reverse is a dashed question-mark edge, never a not-implies arrow.
+\item \textbf{Closedness and consistency are the quotient's well-definedness.} Toggle off closedness: let some $\mathrm{row}(s\cdot a)$ match no representative in $S$. Then the transition $\delta(\mathrm{row}(s),a)=\mathrm{row}(s\cdot a)$ has no target state, and without consistency it depends on the chosen representative (\cref{def:closed-consistent}). The two conditions are precisely what licenses the quotient automaton; dropping one leaves the conjecture without a legal transition function.
 
-\item \textbf{The established separation is conditional.} Remove the cryptographic hypothesis from the hardness leg. This frontier re-grades the established direction. The non-PAC-learnability of DFAs holds only under the hardness of RSA or factoring (\cref{thm:dfa-pac-hard}, \cref{rmk:crypto-assumption}, \cite{KearnsValiant1994}); without that assumption the PAC-hardness of DFAs is itself open, so even the surviving direction is a conditional literature edge with no unconditional version proved, and the figure must say so.
+\item \textbf{A counterexample is a new-class witness.} Replace the teacher's \textsc{yes}/counterexample reply by a bare ``correct or not'' bit. The equivalence oracle's counterexample $z$ is a point where the conjecture and target disagree, and adding $z$ with its prefixes forces at least one new distinct row, splitting a Myhill--Nerode class. A bare bit removes the witness, and the loop can no longer discover the missing state.
 
-\item \textbf{The gap is computational.} Ask whether DFAs are PAC-learnable at all, ignoring efficiency. This boundary pins down what the gap rules out. DFAs have finite VC dimension, so by the fundamental theorem of statistical learning they are PAC-learnable with polynomially many samples (\cref{thm:dfa-pac-hard} blocks only the polynomial-time computation while leaving the sample complexity intact); the separation is therefore qualitative and computational, and an information-theoretic reading of it is a category error.
+\item \textbf{The $n-1$ bound is the index of the congruence.} The minimal DFA has $n$ states, so the congruence has index $n$ (\cref{rmk:table-intuition}, uniqueness by \cite{RabinScott1959}); the table starts at one class and gains at least one per counterexample, so termination after $\le n-1$ rounds is the finiteness of the index (\cref{thm:lstar-complexity}). Formalizing this bound on top of the typed teacher is \cref{op:lstar-formal}.
 
-\item \textbf{The easy side is cited, not verified.} Ask the kernel for the statement ``$L^*$ exactly learns the minimal DFA.'' This is the figure's first principal frontier. The algorithm object exists as a verified type (\leanname{LStar}, fields only, sorry-free) but with no correctness lemma, so the ``exactly learnable'' leg of Direction~1 rests on Angluin's theorem (\cref{thm:lstar-complexity}, \cite{Angluin1987}), open in the kernel (\cref{op:lstar-formal}); it is drawn dashed.
+\item \textbf{Drop membership queries and the query count blows up.} Run the cycle with equivalence queries alone. Without membership queries the learner cannot place a string in its Myhill--Nerode class, so each equivalence query removes only one candidate from the version space, and an $N$-concept class costs $N-1$ queries in the worst case (\cref{prop:eq-lower}, \cite{Angluin1988}); membership queries collapse this to the linear $n-1$ of \cref{thm:lstar-complexity}.
 
-\item \textbf{The hard side has no kernel theorem.} Search the verified library for a DFA-PAC-hardness result. The search comes up empty, the figure's second principal frontier. There is none; the only hardness-named theorem about a finite-VC class concerns the statistical-query dimension, not DFAs and not PAC intractability, so the ``not efficiently PAC-learnable'' leg is entirely literature (\cref{thm:dfa-pac-hard}, \cite{KearnsValiant1994}) and is drawn dashed, with both legs of Direction~1 unverified in the kernel.
+\item \textbf{Counterexample length is a hidden cost.} The equivalence oracle may return an adversarially long counterexample (\cref{rmk:counterexample-length}), so the membership-query count carries a factor $m$ (\cref{thm:lstar-complexity}). Whether a learner can binary-search the counterexample to remove the linear dependence on $m$ is open (\cref{op:counterexample-length}, \cite{RivestSchapire1993}).
 
-\item \textbf{The witness is the only thing forcing the gap.} Replace DFAs by a class learnable both passively and actively, such as a class of small VC dimension with a polynomial-time PAC learner. This is the instance where the gap collapses. The separation is carried by the witness type (\leanname{FLT_Proofs.Computation.DFA'}), and only because that class is simultaneously exact-easy (\cref{thm:lstar-complexity}) and PAC-hard (\cref{thm:dfa-pac-hard}); change the witness and Direction~1 no longer holds, so the figure asserts a property of a particular class seen under two presentations, leaving the paradigms in the abstract incomparable.
+\item \textbf{Passive data cannot drive the loop.} Replace the active teacher with random labelled examples from a distribution. DFAs are exactly learnable by the loop (\cref{thm:lstar-complexity}) yet not PAC-learnable under cryptographic assumptions (\cref{thm:dfa-pac-hard}, \cite{KearnsValiant1994}), so the passive--active edge is qualitative. The reverse direction, a class PAC-easy yet exact-hard, is open (\cref{op:reverse-separation}).
 
-\item \textbf{The teacher is the mechanism knob, passive and active are its settings.} Read the membership and equivalence oracles as the do-structured interface and turn them off. This boundary collapses the gap onto a single mechanism. A minimally adequate teacher is exactly a membership oracle plus an equivalence oracle on one target (\leanname{FLT_Proofs.Learner.Active.MinimallyAdequateTeacher}, \cref{def:mat}; oracles \leanname{FLT_Proofs.Data.MembershipOracle}, \leanname{FLT_Proofs.Data.EquivalenceOracle}), and the passive setting is the same target presented by random examples; passive and active are two settings of one oracle knob, so the figure records what learnability does as that knob moves, with the appearance of two incomparable primitives an artifact of stopping the knob at its endpoints.
+\item \textbf{The gap is computational, not information-theoretic.} Ask whether DFAs are PAC-learnable at all, ignoring efficiency. They have finite VC dimension, so by the fundamental theorem of statistical learning they are PAC-learnable with polynomially many samples; \cref{thm:dfa-pac-hard} blocks only the polynomial-time computation, leaving the sample complexity intact. The separation is therefore computational.
 
-\item \textbf{Drop membership queries and the active side degrades.} Keep only equivalence queries on the active side. This is a boundary internal to Direction~1. With equivalence queries alone an $N$-concept class costs $N-1$ queries in the worst case (\cref{prop:eq-lower}, \cite{Angluin1988}), whereas membership queries collapse the count to the linear $n-1$ of \cref{thm:lstar-complexity}; the ``active learning succeeds'' leg depends on which oracle the teacher provides, so the active node is not atomic.
-
-\item \textbf{The most general witness is any queryable function.} Replace the unknown regular language by the binary string function of a trained attention model, answering membership by a forward pass and equivalence by sampling. This is the figure's most general instance. The model is a legitimate minimally adequate teacher (\cref{prop:transformer-extraction}, \cite{WeissGoldbergYahav2018}), so the established direction transports verbatim, but whether the model has a finite regular core, so that extraction is exact rather than heuristic, is itself open (\cref{op:transformer-regular}); the general object carries its own open frontier even on the established side.
+\item \textbf{Any queryable function is an $L^*$ target.} Replace the unknown regular language by the binary string function of a trained attention model, answering membership by a forward pass and equivalence by sampling. The model is a legitimate minimally adequate teacher (\cref{prop:transformer-extraction}, \cite{WeissGoldbergYahav2018}), so the loop extracts a DFA exact on the queried strings. Whether the model's function has a finite Myhill--Nerode index, so that extraction is exact rather than heuristic, is open (\cref{op:transformer-regular}), as is the soundness of an unreliable oracle such as an LLM critic (\cref{op:llm-teacher}).
 \end{enumerate}
