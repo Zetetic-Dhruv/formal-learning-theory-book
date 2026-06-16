@@ -7,9 +7,9 @@
 \chapter{Online Learning and the Littlestone Dimension}
 \label{ch:online}
 
-In PAC learning, nature is indifferent: training data arrives as a random sample from a fixed distribution, and the learner's task is to generalize from this benign source. In online learning, nature is replaced by an adversary. There is no distribution. There is no training phase followed by a test phase. Instead, learning unfolds as a \emph{game}: at each round, the adversary presents an instance, the learner predicts a label, the adversary reveals the true label, and the game continues. The learner's goal is to bound the total number of mistakes, no matter what the adversary does.
+PAC learning can afford to be patient: nature draws training examples from a fixed distribution, the learner observes and generalizes, and the worst the world can do is an unlucky sample. That patience is a luxury. In online learning the luxury is revoked. There is no distribution to average over, no training phase to hide behind. At each round an adversary presents an instance, the learner commits to a label, and the adversary reveals the truth; every disagreement is a recorded mistake. The question is not ``what does the learner achieve in expectation?'' but ``how many mistakes can a clever adversary force, no matter what the learner does?''
 
-This change, from distribution to adversary, from batch to sequential, from probabilistic to combinatorial, transforms the mathematics entirely. PAC learning is characterized by a number (the VC dimension) through a probabilistic argument (concentration inequalities). Online learning is characterized by a \emph{tree} (the mistake tree) through a combinatorial argument (an explicit algorithm). The key theorem of this chapter, that the optimal mistake bound equals the Littlestone dimension, is proved by \emph{constructing an algorithm} that plays the game optimally. No tail probability is bounded anywhere in the proof; the entire argument is an explicit strategy and a matching adversary.
+This shift from distribution to adversary, from batch to sequential, from probabilistic to combinatorial, transforms the mathematics from the ground up. PAC learning is characterized by a number, the VC dimension, extracted through probabilistic concentration arguments. Online learning is characterized by a \emph{tree}, the mistake tree, whose depth the adversary can trace root-to-leaf to force exactly that many mistakes. The central result of this chapter, $\mathrm{Opt}(\mathcal{H}) = \Ldim(\mathcal{H})$, is proved by constructing both sides: an algorithm that limits mistakes to $\Ldim(\mathcal{H})$, and an adversary that forces at least $\Ldim(\mathcal{H})$. No tail probability appears anywhere; the entire argument is an explicit strategy meeting an explicit counter-strategy.
 
 % ================================================================
 % SECTION 1: THE ONLINE LEARNING GAME
@@ -19,7 +19,7 @@ This change, from distribution to adversary, from batch to sequential, from prob
 \section{The Online Learning Game}
 \label{sec:online-game}
 
-Online learning is best understood as a protocol between two players: a \emph{learner} and an \emph{adversary}. The game is played over a domain $X$, a label set $Y = \{0,1\}$, and a hypothesis class $\mathcal{H} \subseteq \{0,1\}^X$. The adversary is constrained to be \emph{realizable}: there must exist some $h^* \in \mathcal{H}$ consistent with all of the adversary's labels. Beyond this, the adversary is unconstrained; in particular, the adversary may be \emph{adaptive}, choosing $x_t$ based on the learner's previous predictions.
+The setup is a protocol between two players, a \emph{learner} and an \emph{adversary}, competing over a domain $X$, a label set $Y = \{0,1\}$, and a hypothesis class $\mathcal{H} \subseteq \{0,1\}^X$. One constraint ties the adversary's hands: \emph{realizability}, the requirement that some $h^* \in \mathcal{H}$ must be consistent with every label the adversary has assigned. Apart from that, the adversary is free to adapt, watching the learner's prior predictions before choosing the next instance $x_t$.
 
 \begin{defn}[Online Learning Protocol]
 \label{def:online-protocol}
@@ -75,22 +75,18 @@ The game continues for as many rounds as the adversary chooses. The adversary mu
 \node[hdl] at (0.05,-3.45) {\leanname{littlestone_characterization}};
 \node[hdl, text=edgeorange!75!black] at (3.55,-3.45) {\leanname{online_strictly_stronger_pac}};
 \end{tikzpicture}
-\caption[The online learning game, whose value is the Littlestone dimension]{The online learning game: each
-round the adversary presents an instance, the learner predicts, and the adversary reveals the truth,
-charging a mistake on disagreement, subject only to realizability. The optimal mistake bound equals the
-Littlestone dimension (\leanname{optimal_mistake_bound_eq_ldim}), and the adaptive adversary makes the game
-strictly harder than PAC, with thresholds on the reals (VC one, Littlestone infinite) as witness.}
+\caption[The online learning game, whose value is the Littlestone dimension]{The online learning game: round by round the adversary presents an instance, the learner predicts, and the adversary reveals the truth, recording a mistake on every disagreement, with realizability as the only constraint on the adversary. The lower chain shows what the game is worth: the optimal mistake bound equals the Littlestone dimension (\leanname{optimal_mistake_bound_eq_ldim}), the class is online learnable if and only if that dimension is finite, and the one-way implication to PAC learnability is strict, with thresholds on $\R$ (VC dimension one, Littlestone dimension infinite) as the separating witness.}
 \label{fig:online-protocol}
 \end{figure}
 
-Three features distinguish this game from the PAC framework of \Cref{ch:pac}:
+Three features separate this game from the PAC framework of \Cref{ch:pac}, and each one tightens the screws:
 
 \begin{enumerate}[leftmargin=*, itemsep=3pt]
-\item \textbf{No distribution.} In PAC learning, performance is measured with respect to an unknown but fixed distribution $D$. In online learning, there is no distribution at all. The adversary's choices need not be drawn from any probability measure.
+\item \textbf{No distribution.} PAC learning grades the learner against a fixed, unknown distribution $D$; averaging over randomness is baked in. Here there is no distribution. The adversary's choices need not come from any probability measure.
 
-\item \textbf{The adversary is adaptive.} The adversary sees the learner's predictions and can choose future instances to exploit the learner's weaknesses. This is strictly harder than random sampling: an adaptive adversary can do everything that a random distribution can, and more.
+\item \textbf{The adversary adapts.} The adversary watches the learner's predictions and targets the next instance accordingly. This is strictly harder than random sampling: an adaptive adversary can simulate any distribution and then do worse, exploiting whatever the learner just revealed.
 
-\item \textbf{Performance is worst-case over sequences.} The mistake bound must hold for \emph{every} sequence of instances and labels the adversary might produce, subject to realizability. There is no averaging.
+\item \textbf{Worst-case over every sequence.} The mistake bound must hold for every sequence the adversary might produce, subject only to realizability. Averaging is off the table.
 \end{enumerate}
 
 \begin{defn}[Mistake Bound]
@@ -98,7 +94,7 @@ Three features distinguish this game from the PAC framework of \Cref{ch:pac}:
 A learner $A$ is \emph{mistake-bounded} with bound $M$ on $\mathcal{H}$ if, for every adversary strategy consistent with some $h^* \in \mathcal{H}$, the total number of mistakes made by $A$ is at most $M$. The \emph{optimal mistake bound} of $\mathcal{H}$ is $\mathrm{Opt}(\mathcal{H}) = \min_A \max_{\mathrm{adversary}} \#\{\text{mistakes of } A\}$.
 \end{defn}
 
-The central question of online learning theory is: what determines $\mathrm{Opt}(\mathcal{H})$? The answer is a combinatorial object called the Littlestone dimension.
+The central question is: what pins $\mathrm{Opt}(\mathcal{H})$? The answer is a combinatorial object, the Littlestone dimension, and it is a tree, not a set.
 
 % ================================================================
 % SECTION 2: MISTAKE TREES AND THE LITTLESTONE DIMENSION
@@ -108,7 +104,7 @@ The central question of online learning theory is: what determines $\mathrm{Opt}
 \section{Mistake Trees and the Littlestone Dimension}
 \label{sec:mistake-trees}
 
-The VC dimension counts the size of the largest \emph{set} that $\mathcal{H}$ can shatter. The Littlestone dimension counts the depth of the largest \emph{tree} that $\mathcal{H}$ can shatter. This shift, from sets to trees, is what captures the adversary's adaptive power.
+The VC dimension asks: how large a \emph{set} can $\mathcal{H}$ shatter? The Littlestone dimension asks a harder question: how deep a \emph{tree} can $\mathcal{H}$ shatter? The difference is adaptivity. A shattered set fixes its points before asking whether the class can realize all labelings. A shattered tree lets the points at each depth depend on the labels above, which is exactly the power an adaptive adversary exercises. Replacing sets with trees is the move that captures the right object.
 
 \begin{defn}[Mistake Tree]
 \label{def:mistake-tree}
@@ -121,7 +117,7 @@ A \emph{mistake tree} for $\mathcal{H}$ over $X$ is a complete binary tree $T$ i
 The \emph{depth} of the tree is the number of internal nodes on any root-to-leaf path (all paths have the same length since the tree is complete).\formal{FLT_Proofs.Complexity.GameInfra.LTree.isShattered}
 \end{defn}
 
-The key idea is that a mistake tree encodes an adversary strategy. Starting at the root, the adversary presents $x_{v_1}$. Whatever the learner predicts, the adversary can label $x_{v_1}$ to make the prediction wrong and descend to the corresponding child. Realizability is maintained because every root-to-leaf path is consistent with some $h \in \mathcal{H}$. Thus a mistake tree of depth $d$ represents an adversary strategy that forces \emph{any} learner to make at least $d$ mistakes.
+A mistake tree is precisely an adversary strategy written down as a tree. Starting at the root, the adversary presents $x_{v_1}$. Whatever the learner predicts, the adversary labels $x_{v_1}$ to contradict that prediction and descends to the corresponding child. Because every root-to-leaf path is consistent with some $h \in \mathcal{H}$, realizability holds throughout. A tree shattered at depth $d$ therefore witnesses an adversary strategy that forces \emph{any} learner to make at least $d$ mistakes.
 
 \begin{defn}[Littlestone Dimension {\cite{Littlestone1988}}]
 \label{def:ldim}
@@ -188,11 +184,7 @@ The \emph{Littlestone dimension} of a hypothesis class $\mathcal{H}$, denoted $\
   \textcolor{notegray}{$=\lceil\log_2 8\rceil$\quad(\cite{Littlestone1988})}
 };
 \end{tikzpicture}
-\caption[A shattered mistake tree, the witness for the Littlestone dimension]{A complete mistake tree of
-depth $3$ for thresholds on $\{1,\ldots,8\}$. Each internal node presents an instance, its two edges are
-the labels, and every root-to-leaf path is realized by the threshold at its leaf. A tree shattered at depth
-$d$ forces any learner to make at least $d$ mistakes (highlighted: one run forcing $3$), and the Littlestone
-dimension is the depth of the deepest shattered tree (\leanname{LittlestoneDim}).}
+\caption[A shattered mistake tree of depth three witnessing $\Ldim=3$ for thresholds on eight points]{A complete mistake tree of depth $3$ for thresholds on $\{1,\ldots,8\}$, witnessing $\Ldim(\mathcal{H}) \geq 3$ (\leanname{thresholdTree_shattered}). Each internal node is an instance; each edge is a label; every root-to-leaf path is realized by the threshold named at its leaf. The highlighted run shows the adversary executing binary search: at each node it assigns the label opposite to the learner's prediction and descends, forcing $3$ mistakes in $3$ rounds while maintaining realizability throughout (\leanname{adversary_core}). The Littlestone dimension is the maximum depth of any such shattered tree (\leanname{LittlestoneDim}); the fact that this tree has depth $\lceil\log_2 8\rceil = 3$ confirms the threshold bound.}
 \label{fig:mistake-tree}
 \end{figure}
 
@@ -224,9 +216,9 @@ Shattering a \emph{set} $\{x_1, \ldots, x_d\}$ means $\mathcal{H}$ can produce a
 \section{The Standard Optimal Algorithm}
 \label{sec:soa}
 
-The Halving algorithm is the simplest reasonable strategy for online learning: maintain the version space (the set of hypotheses consistent with all observations so far), and predict the majority vote of the version space. Each mistake eliminates at least half of the surviving hypotheses, so Halving makes at most $\lfloor \log_2 |\mathcal{H}| \rfloor$ mistakes when $\mathcal{H}$ is finite.
+The simplest reasonable strategy is Halving: maintain the version space (all hypotheses consistent with everything seen so far), predict the majority vote. Every mistake eliminates at least half the surviving hypotheses, so Halving makes at most $\lfloor \log_2 |\mathcal{H}| \rfloor$ mistakes when $\mathcal{H}$ is finite.
 
-But Halving is not optimal for infinite hypothesis classes. The Standard Optimal Algorithm (SOA), due to Littlestone~\cite{Littlestone1988}, refines the Halving idea by replacing ``majority vote'' with a more subtle criterion: predict the label whose version space has the larger \emph{Littlestone dimension}.
+For infinite classes, cardinality collapses and Halving offers nothing. The Standard Optimal Algorithm (SOA), due to Littlestone~\cite{Littlestone1988}, replaces ``majority vote'' with a sharper criterion: predict the label whose sub-version-space carries the larger \emph{Littlestone dimension}. The switch from counting hypotheses to measuring mistake-tree depth is what makes the algorithm optimal for every hypothesis class, finite or infinite.
 
 \begin{defn}[Standard Optimal Algorithm (\SOA)]
 \label{def:soa}
@@ -239,7 +231,7 @@ Given a hypothesis class $\mathcal{H}$, the $\SOA$ maintains a version space $V_
 Ties in step 2 are broken arbitrarily.\formal{FLT_Proofs.Complexity.GameInfra.SOA}
 \end{defn}
 
-The intuition behind the $\SOA$ is a tree-based version of binary search. At each round, the algorithm asks: ``If I predict $0$ and am wrong, what is the worst the adversary can do to $V_t^1$? And if I predict $1$ and am wrong, what can the adversary do to $V_t^0$?'' By choosing the side with the larger Littlestone dimension, the $\SOA$ ensures that every mistake reduces the Littlestone dimension of the version space by at least one.
+The SOA reasons about future adversarial damage. At each round it asks: if this prediction is wrong, which sub-version-space does the adversary inherit, and how deeply can they search from there? By predicting the label whose sub-version-space has the larger Littlestone dimension, the algorithm guarantees that every mistake lands it in the smaller sub-version-space, reducing the Littlestone dimension by at least one. The game ends when the dimension reaches zero.
 
 \begin{thm}[Upper Bound: $\SOA$ achieves $\Ldim(\mathcal{H})$ mistakes {\cite{Littlestone1988}}]
 \label{thm:soa-upper}
@@ -281,7 +273,7 @@ The $\SOA$ is an \emph{information-theoretically} optimal algorithm, but it is n
 \section{The Lower Bound: The Adversary Strategy}
 \label{sec:lower-bound}
 
-The upper bound shows that the $\SOA$ can limit mistakes to $\Ldim(\mathcal{H})$. The lower bound shows that no learner can do better: for any learner, there exists an adversary that forces at least $\Ldim(\mathcal{H})$ mistakes.
+The SOA limits the learner's mistakes to $\Ldim(\mathcal{H})$. That is the ceiling. The lower bound closes the gap: no learner can stay below that ceiling, because for any learner an adversary exists that forces at least $\Ldim(\mathcal{H})$ mistakes. Together the two bounds pin $\mathrm{Opt}(\mathcal{H})$ exactly.
 
 \begin{thm}[Lower Bound: Any learner makes at least $\Ldim(\mathcal{H})$ mistakes {\cite{Littlestone1988}}]
 \label{thm:lower-bound}
@@ -327,9 +319,9 @@ Littlestone proved this characterization in 1988~\cite{Littlestone1988}, just fo
 \section{Regret Bounds and the Multiplicative Weights Framework}
 \label{sec:regret}
 
-The mistake-bound framework requires that the adversary be realizable: some $h^* \in \mathcal{H}$ must be consistent with all labels. This is a strong assumption. What happens when we drop it?
+The mistake-bound framework rests on realizability: some $h^* \in \mathcal{H}$ must be consistent with every label. That is a substantial assumption. When it fails, the optimal mistake count is infinite and the framework offers no useful bound.
 
-In the \emph{regret} framework, the adversary is unrestricted. The benchmark is now the \emph{best fixed hypothesis in hindsight}: the learner is graded against whichever single $h \in \mathcal{H}$ turned out to fit the realized sequence best, with no claim that any hypothesis fits it perfectly.
+The \emph{regret} framework drops realizability and changes the benchmark. Rather than asking for an absolute mistake count, it grades the learner against the \emph{best fixed hypothesis in hindsight}: whoever single $h \in \mathcal{H}$ would have made the fewest errors on the realized sequence, even if that $h$ errs constantly. The learner's job is to stay close to that benchmark, not to be right.
 
 \begin{defn}[Regret]
 \label{def:regret}
@@ -339,7 +331,7 @@ Given a sequence $(x_1, y_1), \ldots, (x_T, y_T)$ and the learner's predictions 
 \]
 \end{defn}
 
-This definition contains a conceptual surprise: the regret can be small even when the learner makes many mistakes. The figure of merit is the learner's error count measured against the best fixed hypothesis in $\mathcal{H}$, with the absolute error count carrying no weight on its own. If every hypothesis in $\mathcal{H}$ also makes many mistakes (because the adversary is not realizable), then a learner with many mistakes but low regret is performing well.
+The definition holds a conceptual surprise. Regret can be small even when the learner makes many mistakes, because the benchmark also makes many mistakes. If the adversary is unrealizable and every hypothesis in $\mathcal{H}$ errs frequently, then keeping pace with the best of them is a genuine achievement, even with a large absolute error count. What the regret framework measures is the \emph{cost of not knowing which hypothesis is best}, not the absolute cost of prediction.
 
 \begin{remark}[Mistake bound vs.\ regret bound]
 \label{rmk:mistake-vs-regret}
@@ -395,7 +387,7 @@ A tempered attention router's hard route is stable: away from a score tie, a sma
 \section{The PAC--Online Gap}
 \label{sec:pac-online-gap}
 
-The VC dimension and the Littlestone dimension both measure the complexity of a hypothesis class, but they measure different things. How do they relate?
+Both the VC dimension and the Littlestone dimension measure the complexity of a hypothesis class, but each captures a different aspect. The VC dimension asks what the class can do to a fixed set of points; the Littlestone dimension asks what an adaptive adversary can do when the points are chosen sequentially in response to the learner. The two measures agree on some classes and diverge wildly on others.
 
 \begin{prop}[$\VC \leq \Ldim$]
 \label{prop:vc-leq-ldim}
@@ -450,15 +442,11 @@ Let $S = \{x_1, \ldots, x_d\}$ be a set shattered by $\mathcal{H}$, so $\VC(\mat
 \node[font=\scriptsize\itshape, text=notegray, align=center, anchor=north, text width=10.5cm] at (-0.3,-3.5)
   {Non-adaptive: the same instance at each depth, so the tree \emph{is} the set; dropping that constraint is adaptivity, which is what lets $\Ldim$ exceed $\VC$.};
 \end{tikzpicture}
-\caption[A shattered set embeds as a non-adaptive mistake tree: $\VC\le\Ldim$]{Freezing the instances at
-every depth turns a shattered set of size $d$ into a non-adaptive mistake tree of depth $d$, so
-$\VC(\mathcal{H})\le\Ldim(\mathcal{H})$ always (\leanname{BranchWiseLittlestoneDim_ge_VCDim}). The inclusion
-is one-way: an adaptive tree need not come from any set, and thresholds on $\R$ exhibit the gap with $\VC=1$
-but $\Ldim=\infty$, so the slack $\Ldim-\VC$ measures adaptivity.}
+\caption[Shattered set embeds as a non-adaptive tree, proving $\VC\le\Ldim$; thresholds on $\R$ show the gap is infinite]{The argument for $\VC(\mathcal{H})\le\Ldim(\mathcal{H})$ made visible: a shattered set $\{x_1,x_2\}$ becomes a non-adaptive mistake tree of the same depth by placing the same instance at every node of each level (\leanname{BranchWiseLittlestoneDim_ge_VCDim}). Every root-to-leaf path is realized because shattering supplies a consistent hypothesis for each labeling. The embedding is one-way: an adaptive tree lets the instances vary with the labels, escaping the image of any shattered set. Thresholds on $\R$ demonstrate that the gap is unbounded, with $\VC=1$ and $\Ldim=\infty$ (\leanname{ldim_threshold_top}, \leanname{online_strictly_stronger_pac}). The slack $\Ldim - \VC$ is the precise measure of what adaptivity adds.}
 \label{fig:vc-leq-ldim}
 \end{figure}
 
-The inequality $\VC \leq \Ldim$ is often tight (e.g., for halfspaces, where both equal the ambient dimension). But the gap can be infinite.
+The inequality $\VC \leq \Ldim$ is tight for some classes: for halfspaces in $\R^d$, both dimensions equal $d$. But the gap can be infinite, and a single class witnesses it.
 
 \begin{prop}[The PAC--Online separation: thresholds on $\R$]
 \label{prop:pac-online-sep}
@@ -474,18 +462,18 @@ $\Ldim = \infty$: We construct mistake trees of arbitrary depth. For any $d$, co
 This separation is the most important non-implication in the concept graph. It witnesses the edge $\nde{pac\_learning} \xrightarrow{\rel{does\_not\_imply}} \nde{online\_learning}$: a class can be PAC learnable (finite VC dimension) yet not online learnable (infinite Littlestone dimension). The converse implication does hold: $\Ldim < \infty$ implies $\VC < \infty$ (by $\VC \leq \Ldim$), so online learnability implies PAC learnability.\formal{FLT_Proofs.Theorem.Separation.online_imp_pac}
 
 \begin{separation}
-\textbf{PAC $\not\Rightarrow$ Online.} Witness: $\mathcal{H}_{\mathrm{thr}}$ on $\R$. The adversary in the online game can exploit the \emph{order structure} of $\R$ by performing binary search on the threshold. A random sample from a fixed distribution cannot exploit this ordering; with high probability, the sample reveals the threshold's location to within $\varepsilon$. The gap between PAC and online learnability is not a technicality: it reflects a fundamental difference between random and adversarial data.
+\textbf{PAC $\not\Rightarrow$ Online.} Witness: $\mathcal{H}_{\mathrm{thr}}$ on $\R$. In the online game, the adversary uses the order structure of $\R$ to perform binary search on the threshold, forcing a mistake at every round. A random sample from a fixed distribution cannot exploit this structure; with high probability, the sample locates the threshold to within $\varepsilon$. The gap between PAC and online learnability reflects the difference between a world that is fixed and a world that watches you.
 \end{separation}
 
 \begin{remark}[Why the gap arises]
 \label{rmk:gap-intuition}
-In PAC learning, the distribution $D$ is fixed before the game begins; the learner faces a \emph{static} environment. In online learning, the adversary \emph{adapts} to the learner's behavior. Adaptivity is the source of the gap. A threshold on $\R$ is easy to learn from random data (one sample suffices, approximately) but impossible to learn from adversarial data (the adversary can always present a point that bisects the remaining uncertainty). The Littlestone dimension measures the depth of the adversary's adaptive search, which can exceed the VC dimension's non-adaptive combinatorics by an arbitrary amount. A full treatment of this and related separations appears in \Cref{ch:separations}.
+In PAC learning the distribution $D$ is fixed before the game begins; the learner faces a static environment. In online learning the adversary adapts to the learner's behavior, and adaptivity is the source of the gap. A threshold on $\R$ is easy to learn from random data: one sample locates it approximately. Against an adaptive adversary the same class is impossible to learn: the adversary always presents a point that bisects the remaining uncertainty, and the bisection never ends. The Littlestone dimension measures the depth of that adaptive search, and it can exceed the VC dimension by an unbounded amount. A full treatment of this and related separations appears in \Cref{ch:separations}.
 \end{remark}
 
 \section{What This Chapter Established}
 \label{sec:ch6-summary}
 
-The online learning model replaces PAC's probabilistic framework with a game between learner and adversary. The key structural results are:
+The sequential game between learner and adversary pins its value to a single combinatorial quantity:
 
 \begin{enumerate}[leftmargin=*, itemsep=3pt]
 \item \textbf{The Littlestone characterization.} The optimal mistake bound for online learning equals the Littlestone dimension $\Ldim(\mathcal{H})$, the maximum depth of a complete mistake tree. This is a \emph{combinatorial} characterization, in contrast to the VC dimension's \emph{set-combinatorial} characterization of PAC learning.
@@ -499,7 +487,7 @@ The online learning model replaces PAC's probabilistic framework with a game bet
 \item \textbf{The regret framework.} Regret bounds, measuring performance relative to the best fixed hypothesis, extend online learning beyond the realizable setting. The Littlestone dimension governs optimal regret rates even in the agnostic case.
 \end{enumerate}
 
-The combinatorial and algorithmic flavor of this chapter is not accidental. Online learning theory is fundamentally about trees and algorithms, where PAC learning theory is about sets and probabilities. Both paradigms measure the complexity of the same object (a hypothesis class $\mathcal{H}$), but through different instruments, and the instruments are not interchangeable.
+The combinatorial and algorithmic character of these results is structural. Online learning theory runs on trees and explicit strategies; PAC learning theory runs on sets and tail probabilities. Both measure the complexity of the same object, a hypothesis class $\mathcal{H}$, but the instruments are genuinely different: the adversary adapts to the learner's behavior round by round, while a fixed distribution cannot.
 
 \section{Open Problems}
 \label{sec:ch6-open}
@@ -559,7 +547,7 @@ The implication online $\Rightarrow$ PAC is verified (\leanname{FLT_Proofs.Theor
 
 \subsection*{Counterfactual exercises}
 
-Each exercise changes one feature of the online game and asks how the value $\mathrm{Opt}=\Ldim$ moves with it.
+The characterization $\mathrm{Opt}(\mathcal{H})=\Ldim(\mathcal{H})$ rests on several interlocking assumptions. Each exercise below removes or modifies one feature of the game and asks what survives. Each exercise asks you to locate which piece of the argument a given assumption is carrying.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The value is two-sided.} The equality $\mathrm{Opt}=\Ldim$ is a conjunction of two theorems: the Standard Optimal Algorithm makes at most $\Ldim$ mistakes (\leanname{soa_mistakes_bounded}) and the adversary forces at least $\Ldim$ (\leanname{adversary_lower_bound}). Show that either half alone gives only a one-sided bound, and that the matching of the two is what makes the value exact.

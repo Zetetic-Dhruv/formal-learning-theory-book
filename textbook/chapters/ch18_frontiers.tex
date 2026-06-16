@@ -9,29 +9,15 @@
 \chapter{Frontiers and Open Problems}
 \label{ch:frontiers}
 
-Every preceding chapter has presented established results: definitions,
-characterization theorems, separation witnesses, and tight bounds.  This
-chapter presents none of these.  Its subject is the boundary of what we know,
-and its organizing principle is the open question rather than the proven
-theorem.
+Every preceding chapter has rested on something the reader could hold onto: a definition that settled a concept, a theorem that finished an argument, a characterization that turned a class of questions into a single combinatorial parameter.  This chapter offers no such resting place.
 
-Each section leads with a question to which no complete answer is known,
-presents the best partial results, identifies the precise gap between what is
-known and what is conjectured, and asks what kind of argument might close it.
+Its subject is what the theory cannot yet say, and the right way to read it is as a map of where the methods of Chapters~1--17 run out.  Each method runs out at a specific point: Sauer--Shelah gives exponential compression, not the conjectured linear; classical complexity bounds give vacuous generalization certificates for the networks that actually work; the trichotomy applies to binary classification and not yet to the real-valued losses that practitioners use.  These are not gaps waiting to be filled by routine extension.  They are places where a fundamentally new argument is required.
 
-The problems chosen are those that
-connect most tightly to the concept graph of this book: the compression
-conjecture (Chapter~\ref{ch:compression}), deep network generalization
-(Chapter~\ref{ch:generalization}), universal learning beyond countable classes
-(Chapter~\ref{ch:universal}), computational--statistical tradeoffs
-(Chapter~\ref{ch:computational}), and the role of Kolmogorov complexity in
-learning.  Other important open problems (online multiclass learnability,
-private agnostic learning, quantum sample complexity gaps) are noted but not
-developed.
+Each section leads with the specific question that remains open, presents the best partial results, identifies the precise gap between what is known and what is conjectured, and asks what kind of argument might close it.
+
+The problems chosen are those that connect most tightly to the concept graph of this book: the compression conjecture (Chapter~\ref{ch:compression}), deep network generalization (Chapter~\ref{ch:generalization}), universal learning beyond countable classes (Chapter~\ref{ch:universal}), computational--statistical tradeoffs (Chapter~\ref{ch:computational}), and the role of Kolmogorov complexity in learning.  Other important open problems (online multiclass learnability, private agnostic learning, quantum sample complexity gaps) are noted but not developed.
 
 \medskip
-
-The chapter has five sections.
 
 \begin{enumerate}[leftmargin=*,itemsep=2pt]
 \item \textbf{The Compression Conjecture} (\Cref{sec:compression-conjecture}):
@@ -64,12 +50,7 @@ Does there exist a sample compression scheme for $\mathcal{H}$ of size
 $O(d)$?
 \end{openprob}
 
-This conjecture, stated by Littlestone and Warmuth in 1986, is among the
-oldest major open problems in computational learning theory.  It asks whether
-the sample complexity of PAC learning (which is $\Theta(d/\varepsilon)$) is
-explained by compression: whether every learnable class can be learned by
-storing only $O(d)$ examples from the training set and reconstructing a
-consistent hypothesis from those examples alone.
+Stated by Littlestone and Warmuth in 1986, this is among the oldest major open problems in computational learning theory.  The PAC sample complexity of a class with VC dimension $d$ is $\Theta(d/\varepsilon)$.  The conjecture asks whether that bound is explained by compression: whether it suffices, always, to store only $O(d)$ of the training points and reconstruct a consistent hypothesis from those alone.  If the answer is yes, the fundamental theorem of PAC learning would gain a structural companion, revealing that a small certificate inside every training set carries the guarantee.  Four decades have not settled the question either way.
 
 \subsection{What is Known}
 
@@ -179,10 +160,7 @@ Why does the trained network generalize, i.e., why is $\risk(\hat{h})
 \approx \emprisk(\hat{h})$, despite $\VC(\mathcal{H}) \geq p$?
 \end{openprob}
 
-This is among the most practically urgent open problems in learning theory.
-Classical generalization bounds predict that a model with more parameters than
-training examples should overfit catastrophically.  Deep networks routinely
-violate this prediction.
+Classical generalization bounds give a clear prediction: a model with more parameters than training examples should overfit catastrophically.  Deep networks routinely falsify that prediction.  The bounds are not vacuously wrong; they are wrong in a specific, reproducible, architecturally systematic way, and the existing theories of VC dimension, Rademacher complexity, and parameter count cannot explain the pattern.  This is among the most practically urgent open problems in learning theory precisely because the phenomenon is real and the explanation is missing.
 
 \subsection{What is Known}
 
@@ -387,12 +365,7 @@ the sample complexity achievable by any polynomial-time algorithm?
 Can such gaps be characterized combinatorially?
 \end{openprob}
 
-The results of Chapter~\ref{ch:computational} show that computational
-hardness can prevent efficient PAC learning even when the VC dimension is
-finite.  But those results are conditional: they assume the hardness of
-specific cryptographic problems (factoring, LWE, discrete cube root).  The
-deeper question is whether the computational--statistical gap is a structural
-feature of learning or an artifact of our inability to prove $P \neq NP$.
+Chapter~\ref{ch:computational} shows that computational hardness can prevent efficient PAC learning even when the VC dimension is finite.  But every one of those results is conditional: the hardness assumption names a specific cryptographic problem, factoring or LWE or discrete cube root, and the gap disappears if that assumption fails.  The question the field has not answered is whether the computational--statistical gap is a structural feature of learning itself, or whether it is an artifact of what we cannot yet prove unconditionally.  That distinction matters: a structural gap would mean that some learnable concept classes are simply inaccessible to any efficient algorithm, regardless of how cryptography turns out.
 
 \subsection{What is Known}
 
@@ -504,8 +477,7 @@ approximations to $M$ achieve the learning-theoretic properties of the ideal
 learner?
 \end{openprob}
 
-This section concerns the deepest stratum of the theory: the connection
-between algorithmic information theory and learning.
+The previous four sections concern classes, dimensions, and optimization algorithms: entities that a learner can, in principle, compute with.  This section concerns what happens when the ideal learner is one that cannot be computed at all.  Solomonoff's universal prior $M$ converges to any computable environment, at a rate depending only on the Kolmogorov complexity of that environment; it is the learner that wins against any computable opponent.  The cost is that $M$ is itself uncomputable.  The question is how much of that convergence survives when $M$ is approximated by something a machine can actually run.
 
 \subsection{What is Known}
 
@@ -620,10 +592,7 @@ good generalization) holds at the tightest possible quantitative level.
 \section{Further Frontiers}
 \label{sec:further-frontiers}
 
-The five problems above are those most tightly connected to the conceptual
-framework of this book.  We note several other directions where the theory is
-actively expanding, each involving mathematical structures that do not reduce
-to the types established in Chapters~1--17.
+The five problems above share a common property: each has a partial answer, and the gap between that partial answer and the full resolution is precisely locatable.  The problems that follow are in a somewhat different position.  Each involves a setting where the characterization theorems of Chapters~1--17 do not yet reach, and where new combinatorial objects may be required, not just new proofs of existing ones.
 
 \begin{openprob}[Private agnostic learning]
 \label{op:private}
@@ -712,9 +681,4 @@ of these problems would reshape the others.
 
 \bigskip
 
-This chapter has surveyed what we do not know.  The theory developed in
-Chapters~1--17 provides a rigorous, interconnected framework for what we do
-know: characterization theorems, tight bounds, separation results, and
-structural analogies.  The open problems of this chapter mark the places
-where that framework reaches its current limits, and where the next results
-will be found.
+The theory of Chapters~1--17 is a rigorous, interconnected framework: characterization theorems, tight bounds, separation results, structural analogies across dimensions.  The framework's limits are not arbitrary; they form a connected subgraph, with each gap bearing on the others.  Resolving any one of these problems would reshape the rest.  That is where the work continues.

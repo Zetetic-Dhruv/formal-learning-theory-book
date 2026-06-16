@@ -12,27 +12,33 @@
 \chapter{Sample Complexity, Compression, and Occam's Razor}
 \label{ch:compression}
 
-The Fundamental Theorem of \Cref{ch:pac} answers the qualitative question:
-\emph{which} classes are PAC learnable?  This chapter turns to the quantitative
-question: \emph{how many samples} does learning require, and what structural
-properties of the hypothesis class control the answer?
+A learner that processes a thousand training examples may ultimately lean on
+three.  The Fundamental Theorem of \Cref{ch:pac} tells us \emph{which} classes
+are PAC learnable, but it says nothing about what the learner actually needs to
+retain.  The sharper question is: \emph{how little of the data must survive
+for learning to succeed?}
 
-The quantitative question leads, unexpectedly, to an open problem.  The tight
-sample complexity bounds (\Cref{sec:sample-bounds}) show that the VC dimension
-$d$ determines the sample complexity up to constant factors.  Compression
-schemes (\Cref{sec:compression}) provide a different explanation of
-learnability: a class is learnable if and only if the training data can be
-``compressed'' to a \emph{bounded} subset that determines the hypothesis, though
-\emph{how} small that subset can be is precisely the open question.  The natural
-conjecture (that compression of size $O(d)$ always suffices) has been open
-since 1986.  It is one of the oldest and most embarrassing open problems in
-learning theory, and it is the centerpiece of this chapter.
+The tight sample complexity bounds of \Cref{sec:sample-bounds} establish that
+the VC dimension $d$ determines how many examples are needed, up to constant
+factors.  Compression schemes (\Cref{sec:compression}) then reframe the same
+question from the learner's side: a class is learnable if and only if any
+training sample can be reduced to a bounded subsample that fully determines the
+hypothesis.  The size of that subsample is what the chapter is really about.
+The natural conjecture, that $O(d)$ points always suffice, was stated by
+Littlestone and Warmuth in 1986.  It has not been resolved in the forty years
+since.  Every known learnable class compresses to $O(d)$ points; no one can
+prove that all of them do.
+
+Two landmarks bracket the frontier.  Moran and Yehudayoff proved in 2016 that
+compression to $2^{O(d)}$ points always exists: a fact unknown before their
+work.  For $d = 20$, that bound is roughly $10^6$ points; the conjecture asks
+for $20$.  That distance is the gap the conjecture has not closed in forty years.
 
 Occam's razor (\Cref{sec:occam}) provides the bridge between compression and
-generalization: any algorithm that finds a ``short'' description of the data
-generalizes.  The information-theoretic notions of
-\Cref{sec:info-foundations} (description length, Kolmogorov complexity,
-covering numbers) supply the vocabulary for making ``short'' precise.
+generalization: any algorithm that finds a description of the data short enough
+relative to the sample size generalizes.  The information-theoretic foundations
+of \Cref{sec:info-foundations} (description length, Kolmogorov complexity,
+covering numbers) give precise meaning to ``short enough.''
 
 \medskip
 
@@ -135,9 +141,9 @@ matches.
 \section{Compression Schemes}
 \label{sec:compression}
 
-Sample complexity tells us \emph{how much data} learning requires.  Compression
-asks a different question: \emph{how little of the data does the learner
-actually need to remember?}
+Sample complexity tells us how much data learning requires.  Compression asks
+what happens once the data has arrived: \emph{how little of it does the learner
+actually need to keep?}
 
 \begin{defn}[Sample Compression Scheme {\cite{LittlestoneWarmuth1986,FloydWarmuth1995}}]
 \label{def:compression-scheme}
@@ -466,11 +472,11 @@ incompressible.
 \subsection{Why the Conjecture Resists Resolution}
 \label{sec:why-hard}
 
-The compression conjecture has resisted attack for four decades.  There
-is no shortage of techniques; the difficulty is a \emph{gap between two
-regimes}: techniques that work for structured classes but cannot
-generalize, and techniques that work for all classes but cannot achieve
-polynomial bounds.
+The compression conjecture has resisted attack for four decades.  Techniques
+are not scarce: the difficulty is structural.  Every known approach either
+works for specific, well-structured class families but cannot reach arbitrary
+VC classes, or works for all VC classes but pays an exponential price in scheme
+size.  The two regimes do not overlap, and no method yet bridges them.
 
 \begin{obstbox}
 \textbf{Three approaches and their failure modes.}
@@ -527,7 +533,9 @@ that current methods do not.
 \label{sec:unlabeled-compression}
 
 In \Cref{def:compression-scheme}, the compressed subsample $\kappa(S)$ retains
-both the points and their labels.  One can ask whether labels are necessary.
+both the points and their labels.  Labels carry information, and a natural
+question is whether the labels are doing real work: can the reconstruction
+function recover from the point positions alone?
 
 \begin{defn}[Unlabeled Compression Scheme]
 \label{def:unlabeled-compression}
@@ -570,10 +578,12 @@ whether it costs more than a constant factor in scheme size is unknown.
 \section{Occam's Razor}
 \label{sec:occam}
 
-Compression schemes are a combinatorial form of Occam's razor: prefer the
-hypothesis determined by the fewest data points.  The information-theoretic
-form (prefer the hypothesis with the shortest description) was formalized by
-Blumer, Ehrenfeucht, Haussler, and Warmuth.
+Compression schemes embody one form of Occam's razor: prefer the hypothesis
+determined by the fewest data points.  A description-length version of the same
+principle, formalized by Blumer, Ehrenfeucht, Haussler, and Warmuth, shifts the
+criterion from subsample size to the length of the binary encoding: the output
+hypothesis should be shorter than the sample itself.  Both forms connect
+simplicity to generalization, and the formal connection runs precisely.
 
 \begin{defn}[Occam Algorithm {\cite{BlumerEhrenfeuchtHausslerWarmuth1987}}]
 \label{def:occam}
@@ -654,8 +664,9 @@ work of producing it outruns any polynomial-time algorithm.
 \section{Information-Theoretic Foundations}
 \label{sec:info-foundations}
 
-The notions of ``description length'' and ``covering'' that underlie Occam's
-razor and compression have precise information-theoretic formulations.
+``Short description'' and ``efficiently coverable function class'' are the
+informal language Occam's razor and compression schemes both rely on.  This
+section gives each notion a precise, computable (or at least formal) definition.
 
 \subsection{Description Length}
 
@@ -744,8 +755,12 @@ sample complexity bounds.
 \section{The State of the Art}
 \label{sec:compression-summary}
 
-The landscape of this chapter is dominated by the compression conjecture.
-\Cref{fig:compression-landscape} summarizes the logical dependencies.
+The chapter's results cluster around a single qualitative fact and a single open
+question.  The qualitative fact is settled and kernel-verified: PAC learnability,
+finite VC dimension, and the existence of a finite compression scheme with side
+information are equivalent.  The open question is how short the scheme can be
+made.  \Cref{fig:compression-landscape} shows where each result sits and which
+descent steps remain unproven.
 
 \begin{figure}[ht]
 \centering
@@ -801,12 +816,17 @@ The landscape of this chapter is dominated by the compression conjecture.
   \node[font=\scriptsize, anchor=west] at (0.72,-1.0) {open};
 \end{scope}
 \end{tikzpicture}
-\caption[Compression and learnability.]{The qualitative core: a class is PAC learnable
-  if and only if its VC dimension is finite if and only if it admits a finite compression
-  scheme with side information (\leanname{fundamental_vc_compression}). How short the summary
-  can be is the open frontier: a bound of size $2^{O(d)}$ is known, while $O(d)$ and even
-  $\mathrm{poly}(d)$ remain open. Unlabeled compression of bounded size also exists; whether it
-  reaches $O(d)$ is open.}
+\caption[Compression and learnability.]{The top row is settled and kernel-verified
+  (\leanname{fundamental_vc_compression}): PAC learnability, finite VC dimension, and
+  the existence of a finite compression scheme with side information are all equivalent.
+  This three-way equivalence is the qualitative core; it certifies that a short summary
+  exists but says nothing about its length. The vertical descent tracks how short. A
+  compression of size $2^{O(d)}$ is known, a result that was open until Moran and
+  Yehudayoff established it in 2016; whether the size can reach $\mathrm{poly}(d)$ or
+  the conjectured $O(d)$ is unresolved. The right branch asks whether the side information
+  can be dropped at the same size, also open. Unlabeled compression of bounded size exists
+  for every VC class; whether it reaches $O(d)$ is the Kuzmin--Warmuth question, open in
+  general and settled only for maximum classes.}
 \label{fig:compression-landscape}
 \end{figure}
 
@@ -837,11 +857,11 @@ size $\mathrm{poly}(d)$?  Even this weaker form of the compression conjecture
 remains open.
 \end{openprob}
 
-The chapter's three main themes (tight sample complexity, compression, and
-Occam's razor) are unified by a single idea: \emph{learnability is equivalent
-to the existence of a short summary of the evidence}.  The VC dimension tells
-us \emph{that} a short summary exists; the compression conjecture asks
-\emph{how short}.  The answer, after forty years, remains: we do not know.
+Tight sample complexity, compression, and Occam's razor all express a single
+structural fact: \emph{learnability is equivalent to the existence of a short
+summary of the evidence}.  The VC dimension certifies that such a summary
+exists.  The compression conjecture asks how short it can be.  After forty
+years, that question stands unanswered.
 
 
 % ================================================================
@@ -1020,8 +1040,12 @@ compression schemes has not been formulated~\cite{MoranYehudayoff2016}.
 
 \subsection*{Counterfactual exercises}
 
-Each exercise below perturbs \Cref{fig:compression-landscape} and asks where the
-perturbation lands on the verified core, on a known rung, or out on the open frontier.
+\Cref{fig:compression-landscape} encodes an argument: each node carries a claim
+at a specific evidence grade (kernel-verified, literature-cited, or open).  The exercises below stress-test that structure: take a known result,
+vary one of its hypotheses or conclusions, and track exactly where the shifted
+claim lands.  Each variation reveals why a rung on the size ladder is a real
+boundary, why the side-information qualifier matters, and why the distance from
+$2^{O(d)}$ to $O(d)$ has resisted forty years of effort.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The qualitative core.} Show that the top row is a single three-way equivalence: PAC learnability, finite VC dimension, and the existence of \emph{some} finite compression scheme with side information (\cref{thm:fundamental}, \leanname{fundamental_vc_compression}). Explain why this asserts \emph{that} a short summary exists but says nothing about its length.

@@ -7,26 +7,30 @@
 \chapter{Universal Learning and the Trichotomy}
 \label{ch:universal}
 
-The Fundamental Theorem of \Cref{ch:pac} answers a binary question: \emph{is}
-$\mathcal{H}$ learnable?  The answer is yes if and only if
-$\VC(\mathcal{H}) < \infty$.  But the binary answer hides a quantitative
-question.  Among all learnable classes, some are learned faster than others.
-How fast?
+Knowing that $\mathcal{H}$ is learnable is only the beginning of a harder
+question.  The Fundamental Theorem of \Cref{ch:pac} settles learnability:
+yes if and only if $\VC(\mathcal{H}) < \infty$.  But learnability is a
+binary verdict, and two classes can both clear the VC gate while converging
+at completely different speeds.  Once you know learning is possible, what
+you need to know next is \emph{how fast}.
 
-PAC learning theory phrases this quantitatively through the sample complexity
+PAC theory offers a partial answer through the sample complexity
 $m(\varepsilon, \delta)$: how many samples suffice for accuracy $\varepsilon$
-with confidence $1 - \delta$?  But the answer, $\Theta(d/\varepsilon)$ in
-the realizable case, is a function of the \emph{accuracy parameter}.  It
-describes how accuracy improves as data grows, with $d$ as a constant.  It
-does not describe the \emph{rate} at which the risk itself decreases as a
-function of the sample size $n$.
+with confidence $1 - \delta$?  The bound, $\Theta(d/\varepsilon)$ in
+the realizable case, describes how accuracy improves as data grows, with the
+VC dimension $d$ as a constant.  What it does not tell you is the
+\emph{rate} at which the risk itself decreases as a function of the sample
+size $n$.  Fix $n$ and ask: how small can $\risk_D(A(S))$ be forced, for
+every realizable distribution simultaneously?  That is the rate question,
+and the PAC bound does not answer it.
 
-This chapter asks the rate question directly: given $n$ samples from an
-unknown distribution $D$, how fast can the risk $\risk_D(A(S))$ be driven to
-zero, \emph{uniformly over all distributions $D$ for which learning is
-possible}?  The answer is the trichotomy theorem, which classifies every
-hypothesis class into exactly one of three rate regimes.  The classification
-involves a combinatorial object from an unexpected source.
+The answer is a trichotomy: every hypothesis class
+with $|\mathcal{H}| \geq 3$ falls into exactly one of three regimes,
+$\Theta(e^{-n})$, $\Theta(1/n)$, or arbitrarily slow, with no intermediate
+rates.  The boundary between the first two regimes is drawn by the Littlestone
+dimension, a combinatorial quantity from the adversarial online setting.
+That it controls statistical convergence rates was not predicted by either
+learning tradition; the trichotomy theorem revealed it.
 
 
 % ================================================================
@@ -43,10 +47,11 @@ distribution $D$ and any $\varepsilon, \delta > 0$, drawing
 $m \geq m(\varepsilon, \delta)$ samples ensures
 $\Pr[\risk_D(A(S)) > \varepsilon] \leq \delta$.
 
-Now invert the perspective.  Instead of asking ``how many samples for
-accuracy $\varepsilon$?'', ask: ``given $n$ samples, what is the best
-accuracy achievable?''  More precisely, define the \emph{learning rate} of a
-class $\mathcal{H}$ as follows.
+The PAC guarantee fixes an accuracy target $\varepsilon$ and asks how many
+samples are needed to clear it.  Invert that: fix the sample count $n$ and
+ask what accuracy is achievable.  This shift in viewpoint produces a
+different and finer measure of a class's learnability.  Define the
+\emph{learning rate} of $\mathcal{H}$ as follows.
 
 \begin{defn}[Universal Learning Rate]
 \label{def:universal-rate}
@@ -79,13 +84,12 @@ Three features distinguish this from the PAC formulation:
 \end{enumerate}
 
 For a class with $\VC(\mathcal{H}) = d < \infty$, the PAC upper bound gives
-$R(n) = O(d/n)$: a $\Theta(1/n)$ rate.  But is $1/n$ always achievable?
-Can some classes be learned faster, exponentially fast?  And are there
-learnable classes where no uniform $1/n$ rate is possible, so that the rate
-degrades depending on the distribution?
-
-All three phenomena occur.  The trichotomy theorem says these are the
-\emph{only} three possibilities.
+$R(n) = O(d/n)$, a $\Theta(1/n)$ rate.  Three questions follow at once:
+is $1/n$ always achievable, or can some classes converge exponentially fast?
+And are there learnable classes where no uniform rate holds at all, where the
+convergence speed depends irreducibly on which distribution is in play?
+All three phenomena occur, and the trichotomy theorem says they are the
+\emph{only} three.
 
 
 % ================================================================
@@ -95,12 +99,15 @@ All three phenomena occur.  The trichotomy theorem says these are the
 \section{The Trichotomy Theorem}
 \label{sec:trichotomy}
 
-The classification involves a combinatorial object that generalizes the
+The classification uses a combinatorial object that generalizes the
 Littlestone tree of \Cref{ch:online}.  Recall that a mistake tree
 (\Cref{def:mistake-tree}) is a complete binary tree whose internal nodes are
 labeled with instances $x \in X$, such that every root-to-leaf path is
-realized by some $h \in \mathcal{H}$.  We now define a variant with a
-weaker consistency requirement.
+realized by some $h \in \mathcal{H}$.  What the trichotomy needs is a
+variant where the consistency requirement on each path is not just
+``one hypothesis passes'' but ``the full shattering condition holds.''
+That demand, strictly weaker globally yet decisive for the rate question,
+defines the VCL tree.
 
 \begin{defn}[VCL Tree]
 \label{def:vcl-tree}
@@ -207,41 +214,42 @@ $1/n^2$.
 \node[font=\scriptsize\itshape, text=thmred!75!black, align=center, anchor=north, text width=11cm] at (1.4,-7.5)
    {Solid: the decisions are verified thresholds, and \leanname{littlestone_characterization} is the one verified rate boundary. Dashed: the $\Theta$-rates and the trichotomy are \cite{BousquetHannekeMoranVanHandelYehudayoff2021}, typed but not yet machine-checked (\cref{op:trichotomy-formal}).};
 \end{tikzpicture}
-\caption[The universal-rate trichotomy: two tree-conditions, three regimes]{The trichotomy decision tree.
-Two combinatorial questions, whether $\mathcal{H}$ admits an infinite Littlestone tree and whether it
-admits an infinite VCL tree (\cref{def:vcl-tree}), partition every class with $|\mathcal{H}|\geq 3$ into
-exactly three rate regimes: exponential, linear, and arbitrarily slow. The first boundary is exactly
-online learnability (\leanname{littlestone_characterization}). There is no fourth regime and no
-intermediate rate.}
+\caption[The universal-rate trichotomy: two tree-conditions, three regimes]{Two questions settle every
+class's fate. Does $\mathcal{H}$ admit an infinite Littlestone tree? If no, the rate is exponential
+$\Theta(e^{-n})$; this boundary is exactly online learnability
+(\leanname{littlestone_characterization}), verified. If yes, does $\mathcal{H}$ admit an infinite VCL
+tree (\cref{def:vcl-tree})? If no, the rate is linear $\Theta(1/n)$; if yes, no uniform rate holds
+at all. Every class with $|\mathcal{H}|\geq 3$ lands in exactly one of these three regimes. There is
+no fourth, and no intermediate rate such as $1/\sqrt{n}$. Solid edges carry verified decisions;
+dashed boxes mark the $\Theta$-rates, which are literature results not yet machine-checked; see the
+annotation inside the figure.}
 \label{fig:trichotomy-tree}
 \end{figure}
 
 \subsection{An Online Concept in a Statistical Theorem}
 \label{sec:surprise}
 
-The trichotomy theorem is the structural capstone of this book.  To
-appreciate what it says, consider the expectations each tradition brought
-to the table.
+The trichotomy is the structural capstone of this book.  To read it clearly,
+track what each learning tradition expected and where that expectation breaks.
 
 The PAC tradition (\Cref{ch:pac}) characterized learnability through the VC
-dimension and established the sample complexity
-$\Theta(d/\varepsilon)$.  The natural expectation: the VC dimension should
-also determine the learning rate.  It does not.
-Two classes with the same VC dimension can have different optimal
-rates: one exponential, one $1/n$.  So what draws the boundary?
+dimension and established sample complexity $\Theta(d/\varepsilon)$.  The
+natural continuation: the VC dimension should also determine the rate.
+It does not.  Two classes with identical VC dimension can sit in different
+rate regimes, one converging exponentially, the other only at $1/n$.
 
 The online learning tradition (\Cref{ch:online}) introduced the Littlestone
-dimension to characterize mistake-bounded learning against an adversary.
-A worst-case combinatorial quantity, built for a worst-case adversarial
-game.  No connection to statistical convergence rates.  None expected.
+dimension to characterize mistake-bounded learning against an adversary: a
+worst-case combinatorial quantity, built entirely for a worst-case adversarial
+game.  No one imported it into the statistical setting.  There was no apparent
+reason to.
 
-And yet.  The Littlestone dimension, this adversarial, combinatorial
-object, is exactly what governs the boundary between exponential and
-polynomial convergence in the i.i.d.\ setting.
-
-Neither tradition predicted this.  The trichotomy does not merely classify
-rates; it reveals that the deepest structural boundary in statistical
-learning theory is drawn by a quantity from a different paradigm entirely.
+The trichotomy theorem reveals that the Littlestone dimension is exactly what
+draws the boundary between exponential and polynomial convergence in the
+i.i.d.\ setting.  The same object that counts the worst-case depth of an
+adversarial tree controls the rate at which an i.i.d.\ learner closes in on
+zero risk.  Neither tradition anticipated this.  The deepest structural divide
+in statistical learning is drawn by a quantity from a different paradigm entirely.
 
 \subsection{Examples}
 \label{sec:trichotomy-examples}
@@ -397,8 +405,9 @@ confronts.
 \section{The Cross-Paradigm Map}
 \label{sec:cross-paradigm}
 
-The trichotomy theorem connects three chapters of this book through a single
-combinatorial object.
+The trichotomy connects three paradigms through one combinatorial ladder.
+The spectrum below lays out the three rate regimes in order, each separated
+by a boundary drawn by a different dimension from a different chapter.
 
 \begin{figure}[ht]
 \centering
@@ -448,17 +457,20 @@ combinatorial object.
 \node[font=\scriptsize\itshape, text=black!65, align=center, text width=12cm, anchor=north] at (0,-4.15)
    {Solid bars: verified or typed boundaries. Dashed rate tags: the values $\Theta(e^{-n})$, $\Theta(1/n)$, arbitrarily slow are \cite{BousquetHannekeMoranVanHandelYehudayoff2021}, cited not yet machine-checked (\cref{op:trichotomy-formal}).};
 \end{tikzpicture}
-\caption[The universal-rate spectrum: one cross-paradigm dimensional ladder]{The same trichotomy as a
-totally ordered spectrum, with the VC dimension (\Cref{ch:pac}) gating whether a class is learnable, the
-Littlestone dimension (\Cref{ch:online}) drawing the exponential/linear bar, and the VCL tree
-(\cref{def:vcl-tree}) drawing the linear/arbitrarily-slow bar. The left bar is exactly online learnability
-(\leanname{littlestone_characterization}). The structural surprise is that an adversarial online quantity
-governs the i.i.d.\ statistical convergence rate.}
+\caption[The universal-rate spectrum: one cross-paradigm dimensional ladder]{The trichotomy as a totally
+ordered spectrum. The VC gate (\Cref{ch:pac}) decides whether learning is possible at all. Among the learnable
+classes, the left bar, exactly online learnability (\leanname{littlestone_characterization}), separates
+exponential from linear convergence: the Littlestone dimension (\Cref{ch:online}), invented for adversarial
+mistake-counting, draws this statistical rate boundary. The right bar, defined by the VCL tree
+(\cref{def:vcl-tree}), separates uniform linear convergence from classes where no rate holds. Each bar
+comes from a different chapter and a different paradigm; the trichotomy shows they form one coherent ladder.
+Rate values are literature results; the evidence-grade legend is inside the figure.}
 \label{fig:rate-regimes}
 \end{figure}
 
-The structural lesson is a hierarchy of three combinatorial conditions,
-each finer than the last:
+Reading the trichotomy through all three chapters at once, a clean hierarchy
+emerges: three combinatorial conditions, each one finer than the last, each
+from a different paradigm:
 
 \begin{center}\small
 \renewcommand{\arraystretch}{1.3}
@@ -473,23 +485,24 @@ No infinite VCL tree & Rate: $1/n$ vs.\ arb.\ slow & This chapter & Universal \\
 \end{tabular}
 \end{center}
 
-Each row refines the previous one.  The VC dimension draws the coarsest
-line (learnable vs.\ not).  The Littlestone dimension draws a finer line
-within the learnable classes (fast vs.\ slow).  The VCL tree draws the
-finest line (uniformly slow vs.\ hopelessly slow).
-
-This hierarchy was not predicted by any single tradition.  It emerged from
-the trichotomy theorem's proof, which required techniques from both the PAC
-and online learning literatures.  The result is a unified picture in which
-the three paradigms (PAC, online, and universal) are not separate theories
-with accidental parallels, but different projections of a single
-combinatorial landscape.
+Each row refines the previous.  The VC dimension draws the coarsest line:
+learnable or not.  Within the learnable classes, the Littlestone dimension
+draws a finer line: exponential or merely polynomial.  The VCL tree draws the
+finest: uniformly polynomial or arbitrarily slow.  This three-rung ladder
+was not predicted by any single tradition; it emerged from the trichotomy
+proof, which required tools from both the PAC and online learning literatures.
+The three paradigms share one combinatorial landscape; the trichotomy is its
+map.
 
 
 \subsection{Where attention sits in the trichotomy}
 \label{sec:attention-trichotomy}
 
-The trichotomy classifies every fixed-architecture attention class, and the classification turns on a single question carried over from \Cref{ch:online}: is the Littlestone dimension of the attention class finite?
+The trichotomy classifies every fixed-architecture attention class.
+The classification turns on one question, carried forward from \Cref{ch:online}:
+is the Littlestone dimension of the attention class finite?  The answer to
+that question decides whether the class converges exponentially or only linearly.
+The answer is open.
 
 \begin{prop}[A fixed attention class is not arbitrarily slow]
 \label{prop:attention-trichotomy}
@@ -585,7 +598,12 @@ The trichotomy's central surprise is that the Littlestone dimension, an adversar
 
 \subsection*{Counterfactual exercises}
 
-Each exercise routes a class to its regime, toggles a tree-condition so the regime jumps, or pushes on the boundary between a verified threshold and a literature rate.
+The trichotomy theorem hands you a procedure: two tree-conditions, three
+regimes, no in-between.  The exercises below make that procedure active.
+Each one places a class, shifts a tree-condition so the regime changes,
+or presses on the seam between a verified boundary and a literature rate
+that is cited but not yet machine-checked.  Working through them converts
+the trichotomy from a result you have read into a tool you can apply.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item ``No infinite Littlestone tree'' is exactly $\Ldim(\mathcal{H}) < \infty$, which is exactly online learnability by the Littlestone characterization (\cref{thm:littlestone-characterization}, \leanname{littlestone_characterization}). Show that this is the only one of the trichotomy's two boundaries that reduces to a single known dimensional threshold.

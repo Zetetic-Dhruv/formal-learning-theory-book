@@ -6,19 +6,26 @@
 \chapter{What Does Not Imply What}
 \label{ch:separations}
 
-Most textbooks in learning theory treat separation results as scattered
-remarks: brief asides after a characterization theorem, noting that
-some plausible implication fails. This chapter reverses that convention.
-Here, the separations are first-class citizens: each one receives a
-formal statement, a witness construction, and an analysis of what
-structural feature the witness exploits.
+If a learner could carry over the tools of one paradigm into any other,
+theoretical learning would have a single axis, a uniform ordering from
+weaker to stronger, and the question ``can this class be learned?'' would
+have a single answer independent of how you ask it. It does not. What PAC
+learnability guarantees breaks in the online adversarial setting, what
+finite VC dimension buys computationally vanishes under a cryptographic
+assumption, and what works for binary classification stops working once
+the loss takes real values. The gap between what one paradigm promises
+and what another demands is not a gap in the proofs. It is a structural
+feature of the landscape, and the only way to see it clearly is through
+an explicit witness: a concrete mathematical object that demonstrates,
+by construction, that the missing implication cannot be recovered.
 
 A separation result has two components. The \emph{statement} asserts
 that some implication $A \Rightarrow B$ does not hold. The
 \emph{witness} is a concrete mathematical object (a concept class,
 a dimension pair, a computational reduction) that demonstrates the
 failure. Throughout this chapter we privilege the construction over the
-claim.
+claim: a witness that exists carries more information than a theorem that
+merely states the failure.
 
 We organize the chapter's 13 edges into two groups: 9
 \rel{does\_not\_imply} edges, where the non-implication is the content,
@@ -40,12 +47,17 @@ the label naming the witness; blue arrows denote \rel{strictly\_stronger}
 edges. \emph{Line style} marks the evidence grade: solid for
 machine-checked, dashed for classical.
 
-The lattice is \emph{sparse}. Thirteen edges connect concepts drawn from
-six paradigms and a dozen complexity measures, and most paradigm pairs
-are simply incomparable, because they operate on different mathematical
-objects. Learning theory is a partially ordered collection of largely
-independent formalisms, with no single axis from weak to strong threading
-them all.
+Read the lattice and notice what it does not contain. Thirteen edges
+among seventeen concepts are far fewer than the $\binom{17}{2} = 136$
+pairs the concepts could in principle exhibit, yet the sparsity is not
+a symptom of incomplete research. Most paradigm pairs simply operate on
+different mathematical objects: incomparable data models, incomparable
+success criteria, incomparable adversarial protocols. Between such
+concepts a clean implication is often not the right question to ask.
+Where it is the right question, this chapter either witnesses the
+non-implication or witnesses the strict containment. Learning theory
+is a partially ordered collection of largely independent formalisms,
+with no single axis from weak to strong threading them all.
 
 \begin{figure}[ht]
 \centering
@@ -118,11 +130,15 @@ them all.
 \end{tikzpicture}
 
 \caption[The separation lattice: learning theory as a sparse partial order.]{The
-separation lattice: thirteen witnessed edges among seventeen concepts, color marking
-relationship type (red for non-implication, blue for strict containment) and line style
-marking evidence (solid kernel-checked, dashed classical). The order is sparse, far below the
-$\binom{k}{2}$ pairs a priori possible (\Cref{thm:sparsity}), because most paradigms measure
-different mathematical objects and admit no implication to witness.}
+separation lattice: thirteen witnessed edges among seventeen concepts. Color marks the
+relationship type (red = non-implication, blue = strict containment); line style marks
+the evidence grade (solid = kernel-checked, dashed = classical). Reading the diagram,
+notice that the order is sparse: far fewer than the $\binom{k}{2}$ relations the concepts
+could in principle exhibit (\Cref{thm:sparsity}). The sparsity reflects genuine structural
+incomparability: most paradigm pairs measure different mathematical objects and cannot be simply compared; where
+a comparison makes sense, this chapter either witnesses the failure or verifies the containment.
+The two independent codes make it possible to ask two separate questions from a single glance:
+what is the relationship, and how well is it established.}
 \label{fig:separation-lattice}
 \end{figure}
 
@@ -134,11 +150,13 @@ different mathematical objects and admit no implication to witness.}
 \section{Separations Between Paradigms}
 \label{sec:separations}
 
-We now present the 9 \rel{does\_not\_imply} edges in the graph, each
-with its witness construction. The order moves from the most elementary
-witness (a one-parameter family on $\R$) to the most conceptually
-involved (the breakdown of the fundamental theorem beyond binary
-classification).
+Each of the 9 \rel{does\_not\_imply} edges in this section fails a
+plausible-sounding transfer: the kind of implication a student might
+conjecture after seeing the first positive result. Each failure is
+established by an explicit construction. The simplest witness is a
+one-parameter family on $\R$; the most involved is the breakdown of the
+fundamental theorem beyond binary classification, where construction
+complexity tracks the depth of the mismatch it exposes.
 
 % --- Separation 1 ---
 
@@ -431,11 +449,13 @@ Fundamental Theorem is \emph{local} to the 0-1 loss.
 \section{Strict Strength Hierarchy}
 \label{sec:strict-hierarchy}
 
-The 4 \rel{strictly\_stronger} edges assert that one concept
-\emph{does} imply another, but the reverse fails: the stronger concept
-is a proper generalization. Each edge requires two proofs: one for the
-forward implication, and one (the witness) for the strictness of the
-gap.
+The 4 \rel{strictly\_stronger} edges carry a different burden. For a
+non-implication it suffices to exhibit one counterexample. For a strict
+containment the argument must close on both sides: the forward implication
+must hold for all classes in the stronger paradigm, and the witness must
+show a class that the weaker paradigm reaches but the stronger paradigm
+cannot. Each edge therefore requires two proofs: one for the forward
+implication, and one (the witness) for the strictness of the gap.
 
 % --- Strict 1 ---
 
@@ -577,9 +597,12 @@ the Natarajan dimension it dominates stays pinned at one.
 \section{What the Negative Layer Reveals}
 \label{sec:neg-layer-summary}
 
-The separation lattice of \Cref{fig:separation-lattice} carries a
-meta-theorem about the structure of formal learning theory, which we
-can now state explicitly.
+With all 13 edges in place, the separation lattice of
+\Cref{fig:separation-lattice} says something beyond any individual
+witness. Taken together, the 13 edges carry a structural claim about
+what formal learning theory is: a collection of paradigms that partially
+order by containment in some directions and are simply incomparable in
+others. We can now state that claim explicitly.
 
 \begin{remark}[The separation lattice is sparse]
 \label{thm:sparsity}
@@ -648,12 +671,13 @@ edge; whether it is is \Cref{op:attention-littlestone}.
 \section{Open Problems}
 \label{sec:separations-open}
 
-A separation chapter generates two kinds of open problem: the missing
-\emph{reverse} of a one-sided non-implication, and the missing
-\emph{formal proof} of a separation so far only cited. Each is tagged a
-\emph{known unknown} (KU), sharply posed but unresolved, or an
-\emph{unknown known} (UK), where the right object or invariant is still
-missing.
+The 13 witnesses leave two kinds of gap. The first is the missing \emph{reverse}
+of a one-sided non-implication (where one direction is witnessed but the
+other is not), and the second is the missing \emph{formal proof} of a separation so far
+established only in the classical literature. Each open problem below is
+tagged a \emph{known unknown} (KU), sharply posed but unresolved, or an
+\emph{unknown known} (UK), where the right object or invariant for a
+machine-checked proof is still missing.
 
 \begin{openprob}[The Littlestone dimension of attention]
 \label{op:attention-littlestone}
@@ -744,7 +768,15 @@ transformer side (\leanname{softAttention_wellBehaved}).
 
 \subsection*{Counterfactual exercises}
 
-Each exercise perturbs one feature of \Cref{fig:separation-lattice} and asks where the perturbation lands. The references point to the relevant separation, open problem, or verified result.
+The lattice is a fixed object, but understanding it requires moving inside
+it: removing an edge and checking what collapses, asking which edges would
+need to change if a classical result were formalized, reading the entire
+diagram through a single lens and discovering whether that lens is
+consistent. Each exercise below does exactly this: it perturbs one feature
+of \Cref{fig:separation-lattice} and asks where the perturbation lands.
+This is the chapter's argument continued, now with the reader doing the
+navigation. The references point to the relevant separation, open problem,
+or verified result.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item Verify that the four machine-checked edges form a single connected component touching the cluster $\{\text{PAC}, \text{Ex}, \text{online}, \text{FIN}\}$: the separations \leanname{pac_not_implies_online} and \leanname{ex_not_implies_pac} and the containments \leanname{ex_strictly_stronger_finite} and \leanname{online_strictly_stronger_pac}. Why does deleting the classical edges leave one small component rather than four isolated facts?

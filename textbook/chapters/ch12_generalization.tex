@@ -13,36 +13,33 @@
 \chapter{Generalization Bounds}
 \label{ch:generalization}
 
-\Cref{ch:pac} established \emph{that} finite VC dimension characterizes PAC
-learnability.  \Cref{ch:compression} refined the quantitative dependence
-through compression.  This chapter asks a different question: given a
-specific learning algorithm~$A$ and a specific training sample~$S$, what
-can we say about the generalization error of the hypothesis~$A(S)$?
+Training error goes to zero. That is easy: memorize the data. The hard question is whether a trained hypothesis performs well on examples it has never seen. Without a quantitative answer, every reported accuracy is an artifact of the test set, and every deployed model is a bet made without odds.
 
-The answer is not unique.  Five distinct research traditions have developed
-bounds on the same quantity (the gap between true and empirical
-risk), each using different information about the learner:
+\Cref{ch:pac} established \emph{that} finite VC dimension characterizes PAC learnability. \Cref{ch:compression} refined the quantitative dependence through compression. This chapter asks a sharper question: given a specific learning algorithm~$A$ running on a specific training sample~$S$, how large can the gap between the true risk of~$A(S)$ and its training error actually be?
+
+Five distinct research traditions answer this question, all bounding the same quantity but reading different information about the learner:
 
 \begin{enumerate}[leftmargin=*, itemsep=3pt]
-\item \textbf{VC/uniform convergence} measures the combinatorial richness
+\item \textbf{VC/uniform convergence} reads the combinatorial richness
   of the hypothesis class through the growth function.
 \item \textbf{Rademacher complexity} refines this to a data-dependent
-  measure of how well the class correlates with random noise.
-\item \textbf{PAC-Bayes bounds} measure the ``distance'' of a learned
+  measure of how well the class correlates with random noise on the actual
+  training sample.
+\item \textbf{PAC-Bayes bounds} measure the KL divergence of a learned
   posterior from a data-independent prior.
 \item \textbf{Algorithmic stability} measures how much the output changes
-  when a single training example is perturbed.
-\item \textbf{Margin theory} measures the ``confidence'' of predictions
+  when a single training example is replaced.
+\item \textbf{Margin theory} measures the confidence of predictions
   and connects to scale-sensitive dimensions.
 \end{enumerate}
 
 \noindent
-We also discuss information-theoretic bounds, which measure the mutual
+A sixth thread, information-theoretic bounds, measures the mutual
 information between the training sample and the learned hypothesis.
 
-Each framework produces a bound on the same quantity but requires
-different structural assumptions and succeeds in different regimes.  The
-centerpiece of this chapter is twofold: (i)~the \emph{symmetrization
+Six answers to one question. The sharpest fact about the landscape is that no single answer dominates: on a two-layer ReLU network with $m = 10^4$ training points, the VC bound exceeds~$3$ (vacuous), the Rademacher bound reaches~$0.3$ with norm control, and the PAC-Bayes bound touches~$0.05$ with a well-chosen prior, all for the identical network. Which framework gives you a number you can act on depends entirely on what you can measure.
+
+Two results carry the weight here: (i)~the \emph{symmetrization
 argument} that powers uniform convergence (\Cref{sec:uniform-convergence}),
 proved in full as the engine behind classical generalization theory; and
 (ii)~the \emph{comparison} among the five frameworks
@@ -93,11 +90,7 @@ the core technical challenge that each framework addresses differently.
 \section{Uniform Convergence: The Engine}
 \label{sec:uniform-convergence}
 
-The classical approach to generalization does not look at the algorithm at
-all.  Instead, it asks: does the empirical risk converge to the true risk
-\emph{uniformly over all hypotheses}?  If so, any hypothesis with small
-empirical risk automatically has small true risk, including the one the
-algorithm selects.
+The classical approach ignores the algorithm entirely. It asks instead: does empirical risk converge to true risk \emph{uniformly over all hypotheses in the class}? If it does, then any algorithm that finds a low-training-error hypothesis automatically inherits low true risk. The algorithm does not need to be analyzed; it rides for free on the class structure. This is the content of uniform convergence, and the symmetrization argument is the mechanism that makes it computable.
 
 \begin{defn}[Uniform Convergence]
 \label{def:uniform-convergence}
@@ -459,11 +452,7 @@ The dichotomy is sharp: either $\growth_\mathcal{H}(m) = 2^m$ for all~$m$
 \section{PAC-Bayes Bounds}
 \label{sec:pac-bayes}
 
-The PAC-Bayes framework replaces the worst-case uniform convergence of
-Rademacher bounds with a \emph{distribution over hypotheses}.  Instead of
-bounding the risk of every $h \in \mathcal{H}$ simultaneously, it bounds
-the expected risk of a hypothesis drawn from a learned posterior~$\rho$,
-measured relative to a data-independent prior~$\pi$.
+Uniform convergence and Rademacher bounds hold simultaneously for every hypothesis in a class. That simultaneity is expensive: the bound must be pessimistic enough to cover the worst case. The PAC-Bayes framework trades universality for precision. It bounds not every hypothesis at once but the expected risk of a hypothesis drawn from a learned posterior~$\rho$, and it measures that posterior's distance from a data-independent prior~$\pi$. The tighter the posterior sits to the prior, the stronger the guarantee. The price is that the prior must be committed to before seeing data.
 
 \begin{defn}[PAC-Bayes Setting]
 \label{def:pac-bayes-setting}
@@ -603,9 +592,7 @@ correct but loose bound.
 \section{Algorithmic Stability}
 \label{sec:stability}
 
-Stability bounds abandon the hypothesis class entirely and focus on the
-\emph{algorithm}: if replacing a single training example changes the
-output hypothesis only slightly, the algorithm generalizes.
+Stability bounds abandon the hypothesis class entirely. The question they ask is simpler and more direct: if you removed one training example and retrained, how different would the output be? An algorithm whose output barely moves under single-example perturbations cannot be memorizing; it must be capturing something about the distribution. That intuition has a precise quantitative form, and it yields generalization guarantees that hold for algorithms where Rademacher and VC bounds are vacuous.
 
 \begin{defn}[Uniform Stability {\cite{BousquetElisseeff2002}}]
 \label{def:uniform-stability}
@@ -692,9 +679,7 @@ the cited paper.
 \section{Information-Theoretic Bounds}
 \label{sec:info-bound}
 
-The most recent entry in the generalization-bound landscape connects
-generalization to the mutual information between the training sample and
-the learned hypothesis.
+An algorithm that learns nothing from its training data cannot overfit. The information-theoretic bound makes this precise: the generalization gap is controlled by how much the learned hypothesis $W = A(S)$ depends on~$S$, measured as the mutual information $I(S; W)$. The less information the algorithm extracts, the less it can memorize, and the better it generalizes. This is the youngest of the five traditions, but it offers the clearest conceptual picture of why noisy algorithms can outperform their deterministic counterparts.
 
 \begin{thm}[Information-Theoretic Generalization Bound
 {\cite{XuRaginsky2017}}]
@@ -752,9 +737,7 @@ information-theoretic language.
 \section{Margin Theory}
 \label{sec:margin}
 
-Margin-based bounds were the original motivation for support vector
-machines and remain the primary tool for analyzing neural network
-generalization.
+A classifier that places a training point just barely on the correct side has learned less than one that places it far from the decision boundary. Margin-based bounds make this intuition precise: the confidence of correct predictions on the training set controls how badly the class can fit arbitrary labels, which in turn controls generalization. This was the original motivation for support vector machines, and it remains the primary analytic tool for neural network generalization, even where the bounds are currently loose.
 
 \begin{defn}[Margin]
 \label{def:margin}
@@ -888,9 +871,7 @@ at the meta level with a VC bound within each task~\cite{Baxter2000}.
 \section{Five Frameworks Compared}
 \label{sec:comparison}
 
-The five frameworks bound the same quantity but use different information
-and succeed in different regimes.  \Cref{tab:five-frameworks} compares
-them along five axes.
+Five frameworks, one quantity. The gap $|\risk_D(h) - \emprisk_S(h)|$ is what every bound here controls; the frameworks differ in which property of the learning problem they can see. \Cref{tab:five-frameworks} compares them along five axes: what each reads, what it bounds, where it is tight, and where it collapses to a vacuous guarantee. Reading the failure column is as instructive as reading the bound column.
 
 \begin{table}[ht]
 \centering\small
@@ -940,11 +921,7 @@ Margin
 
 \subsection{The Parallax Diagram}
 
-\Cref{fig:five-frameworks} displays the implication and obstruction
-relationships among the five frameworks.  The diagram should be read as a
-\emph{parallax}: five views of the same phenomenon (generalization),
-each projecting the three-way interaction between data, class, and
-algorithm onto a different axis.
+\Cref{fig:five-frameworks} shows which frameworks imply which others, and where the implications break. Reading it as a \emph{parallax} is the right frame: the five views are projections of the three-way interaction between data, class, and algorithm onto five different measurement axes. An implication arrow says one projection subsumes another; an obstruction arrow says two projections land on coordinates with no common ground.
 
 \begin{figure}[ht]
 \centering
@@ -996,13 +973,7 @@ algorithm onto a different axis.
   \node[font=\scriptsize, anchor=west] at (8.85,-0.52) {literature-only};
 \end{scope}
 \end{tikzpicture}
-\caption[Six generalization frameworks: one risk gap, many certificates.]{The
-six frameworks all bound the same quantity, the gap between true and empirical risk, but each
-reads a different slice of the data, class, and algorithm interaction.  The class-based bounds
-(VC, Rademacher, PAC-Bayes) are kernel-verified; the single verified cross-framework bridge is
-that VC dimension controls Rademacher complexity through Sauer--Shelah
-(\leanname{vcdim_bounds_rademacher_quantitative}).  The remaining links are literature
-implications or conceptual orthogonalities between the algorithm-based and class-based readings.}
+\caption[Six generalization frameworks: one risk gap, many certificates.]{Six frameworks bound one quantity: the gap between true and empirical risk. They agree on what to bound and disagree on what to measure. The class-based frameworks (VC, Rademacher, PAC-Bayes) carry kernel-verified bounds; the single verified cross-framework link is that VC dimension controls Rademacher complexity via Sauer--Shelah (\leanname{vcdim_bounds_rademacher_quantitative}), which is why these two are not independent. The remaining arrows are literature implications or argued orthogonalities. The obstructions (dotted, bidirectional) mark where algorithm-based and class-based readings land on incompatible coordinates, so no single implication can cross them.}
 \label{fig:five-frameworks}
 \end{figure}
 
@@ -1102,13 +1073,7 @@ and obstruction relationships connect them:
   \node[font=\scriptsize, anchor=west] at (4.15,0) {literature-only};
 \end{scope}
 \end{tikzpicture}
-\caption[Generalization is read from three sources: data, class, or algorithm.]{Every
-generalization bound reads one of three sources, the data, the hypothesis class, or the
-algorithm, drawn here as the corners of a triangle, so the choice of framework is the choice
-of which source one can measure.  VC and Rademacher sit at the class corner and PAC-Bayes on
-the algorithm--class edge; stability, information, and margin read the algorithm and class
-geometry from the edges and interior.  The obstructions of \Cref{fig:five-frameworks} reappear
-here as projections landing on different corners, making the two figures spatial complements.}
+\caption[Generalization is read from three sources: data, class, or algorithm.]{Every generalization bound reads exactly one of three information sources: the hypothesis class, the algorithm, or the channel between training data and output hypothesis. Placing those three sources at the corners of a triangle, the choice of framework becomes a choice of position: VC and Rademacher sit at the class corner; stability sits on the algorithm--data edge; PAC-Bayes on the algorithm--class edge; the information-theoretic bound at the interior, reading the $I(S;W)$ channel directly. The obstructions in \Cref{fig:five-frameworks} reappear here as frameworks placed at distant corners with no path between them. The two figures are spatial complements: the first grades the links, the second shows why links between far corners are hard to certify.}
 \label{fig:triangle}
 \end{figure}
 
@@ -1441,7 +1406,7 @@ are as informative as the implications.
 
 \subsection*{Counterfactual exercises}
 
-Figures~\ref{fig:five-frameworks} and~\ref{fig:triangle} present the six frameworks as projections of one risk-gap quantity: the first grades the cross-framework links, the second the geometry of the three information sources.  The following exercises push on that structure.
+Five frameworks certify one quantity (the risk gap) by reading different information sources. The frameworks are recoverable from each other wherever their information sources overlap, and obstruct each other where those sources are orthogonal. Each exercise below stress-tests a specific link or gap in Figures~\ref{fig:five-frameworks} and~\ref{fig:triangle}: why the verified frameworks are exactly the class-based ones, what the Sauer--Shelah bridge actually does, why the algorithm--class boundary resists certification, and what a unifying CMI master inequality would require.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item The three class-based frameworks have kernel-verified bounds: VC uniform convergence (\cref{thm:vc-uniform}), Rademacher complexity (\cref{def:rademacher}), and PAC-Bayes (\cref{thm:pac-bayes}).  The other three (stability, information, margin) are literature results (\cref{thm:stability-bound}, \cref{thm:xu-raginsky}, \cref{thm:margin-bound}).  Explain why the verified frameworks are exactly the ones whose complexity measure is intrinsic to the class.
@@ -1450,7 +1415,7 @@ Figures~\ref{fig:five-frameworks} and~\ref{fig:triangle} present the six framewo
 
 \item Every framework bounds the same quantity $|\risk - \emprisk|$ (or its expectation); the rows of \cref{tab:five-frameworks} differ only in the key quantity each reads (noise correlation, posterior--prior divergence, one-sample sensitivity, mutual information, margin).  Argue that generalization is one quantity admitting many certificates rather than six distinct theories.
 
-\item Information-theoretic bounds depend on the algorithm and Rademacher bounds on the class: a deterministic ERM can carry $I(S;W)=H(W)$ on a class of small Rademacher complexity (\cref{sec:comparison}).  Show that this is an orthogonality of information sources, not a separation theorem, and that reversing either direction does not produce a new bound.
+\item Information-theoretic bounds depend on the algorithm and Rademacher bounds on the class: a deterministic ERM can carry $I(S;W)=H(W)$ on a class of small Rademacher complexity (\cref{sec:comparison}).  Show that this is an orthogonality of information sources and that reversing either direction does not produce a new bound.
 
 \item A $\beta$-uniformly stable randomized algorithm satisfies $I(S;W)=O(m\beta^2)$ (\cref{thm:stability-bound}), so stability implies an information bound.  Show that the converse fails, and explain why an edge between two algorithm-based frameworks is harder to certify than the class-based Sauer--Shelah bridge.
 

@@ -13,30 +13,25 @@
 \chapter{Mind-Change Ordinals and Transfinite Hierarchies}
 \label{ch:ordinals}
 
-How many times must a learner change its mind before converging to a correct
-hypothesis?  In \Cref{ch:gold} we saw that $\Ex$-learners are permitted
-finitely many mind changes, but the number may be unbounded: no single
-integer $n$ suffices to bound the mind changes across all target functions in
-the class.  This observation raises a natural question: can one \emph{measure}
-the mind-change complexity of a class, and does that measure yield a strict
-hierarchy of learning power?
+A learner that always converges is still not fully pinned down: it may change
+its mind ten times, or a hundred, or a number that grows without bound as the
+target function changes.  In \Cref{ch:gold} we saw that $\Ex$-learners are
+permitted finitely many mind changes, but no single integer $n$ need bound
+that count across all targets in a class.  The natural response is to measure
+the mind-change complexity of a class and ask whether the measure stratifies
+learning power into a strict hierarchy.
 
-The answer, due to Freivalds and Smith~\cite{FreivaldsSmith1993}, is that
-the correct measure is a \emph{constructive ordinal}.  An integer cannot do
-the job: the class $\{f_n : n \in \N\}$ below is $\Ex$-learnable yet its
-mind-change count outruns every fixed $k$, so a counter that can be set to
-$\omega$ and then spent down is exactly what the integer counter lacks.
-The mind-change ordinal of a class assigns to each learnable class a
-position in a transfinite hierarchy that refines the gap between finite
-learning ($\FIN$) and identification in the limit ($\Ex$).  The hierarchy
-is strict at every level, and its union does not exhaust $\Ex$.
-
-This chapter develops the ordinal mind-change hierarchy in full.  We begin
-with the minimal ordinal vocabulary needed (\Cref{sec:constructive-ordinals}),
-then tell the story of how ordinals entered learning theory
-(\Cref{sec:mco-revelation}), prove that the hierarchy is strict
-(\Cref{sec:ordinal-hierarchy}), and close with the separation between
-behaviorally correct and explanatory learning (\Cref{sec:bc-separation}).
+The integer counter fails this task.  A class can be $\Ex$-learnable and yet
+require the learner to revise its hypothesis a number of times that grows with
+the target, outrunning every fixed $k$.  What the integer lacks, and what
+Freivalds and Smith~\cite{FreivaldsSmith1993} found, is a counter that can be
+set to $\omega$ and then \emph{spent down adaptively}: a constructive ordinal.
+That counter carries the learner past every finite threshold because its first
+move can land anywhere in $\N$, the landing point chosen from the data.  The
+resulting mind-change ordinal assigns each learnable class a position in a
+transfinite hierarchy that fills the gap between finite learning ($\FIN$) and
+identification in the limit ($\Ex$).  The hierarchy is strict at every level,
+and even its entire union falls short of $\Ex$.
 
 \medskip
 
@@ -63,9 +58,10 @@ behaviorally correct and explanatory learning (\Cref{sec:bc-separation}).
 \section{Constructive Ordinals}
 \label{sec:constructive-ordinals}
 
-We need ordinals that a Turing machine can manipulate.  The full class of
-countable ordinals is too large: many have no computable description.  Kleene's
-system~$\mathcal{O}$ provides the computable fragment.
+The transfinite counter a learner carries must be something a Turing machine
+can actually manipulate: a constructive ordinal, one with an explicit
+computable description.  Kleene's system~$\mathcal{O}$ carves out
+exactly that fragment.
 
 \begin{defn}[Kleene's System $\mathcal{O}$]
 \label{def:system-O}
@@ -112,8 +108,6 @@ arbitrary number belongs to $\mathcal{O}$.
 
 \section{The Mind-Change Ordinal: How Ordinals Entered Learning Theory}
 \label{sec:mco-revelation}
-
-The story begins with a natural frustration.
 
 \subsection*{The problem that was stuck}
 
@@ -166,19 +160,17 @@ No $\Ex_k$ contains $\mathcal{C}$.
 
 \subsection*{The obvious approach that fails}
 
-Allowing $\Ex_\omega$ as a ``catch-all'' for classes learnable with
-finitely many but unbounded mind changes merely relabels the gap; it does
-not give a \emph{refined} hierarchy.  The gap between $\bigcup_n \Ex_n$ and
-$\Ex$ contains structure: some classes require mind changes that depend on
-mind changes, a kind of second-order revision.  Is there a hierarchy that
-captures this structure?
+Calling $\Ex_\omega$ a ``catch-all'' for classes learnable with finitely
+many but unbounded mind changes merely relabels the gap; it does not expose
+the structure inside it.  That gap is not flat: some classes require mind
+changes that depend on prior mind changes, a second-order revision.
+The question is whether any hierarchy tracks this.
 
 \subsection*{The Freivalds--Smith construction}
 
 In 1993, Freivalds and Smith~\cite{FreivaldsSmith1993} answered this
-question with a construction that remains surprising.  They observed
-that the \emph{ordinal arithmetic of mind changes} is the correct
-framework.
+question with a construction that still reads as a surprise: the
+\emph{ordinal arithmetic of mind changes} is the correct framework.
 
 \begin{defn}[Ordinal Mind-Change Bound]
 \label{def:ordinal-mc}
@@ -266,8 +258,8 @@ of transfinite mind changes.
 \section{The Ordinal Mind-Change Hierarchy}
 \label{sec:ordinal-hierarchy}
 
-The central theorem of this chapter asserts that the ordinal-indexed
-hierarchy is strict at every level.
+The hierarchy the ordinal index produces is strict at every level, and
+its union still does not reach $\Ex$.
 
 \begin{thm}[Freivalds--Smith 1993; Ambainis--Jain--Sharma 1999]
 \label{thm:ordinal-hierarchy}
@@ -487,11 +479,13 @@ showed that it yields a strict partial order under inclusion.
 \section{Behaviorally Correct Learning and the Separation $\BC \setminus \Ex$}
 \label{sec:bc-separation}
 
-In $\Ex$-learning, convergence is \emph{syntactic}: the learner must
-eventually output the same hypothesis index forever.  $\BC$-learning
-relaxes this to \emph{semantic} convergence: the learner must eventually
-output hypotheses that are all extensionally correct, but the index
-may keep changing.
+The gap between program and function widens the criterion.  In
+$\Ex$-learning, convergence is \emph{syntactic}: the learner must eventually
+stabilize on the same hypothesis \emph{index} forever.  $\BC$-learning asks
+only for \emph{semantic} convergence: every hypothesis output past some
+point must compute the right function, but the index may keep changing.
+That relaxation opens real space: there are classes a $\BC$-learner can
+handle that no $\Ex$-learner can touch.
 
 \begin{defn}[$\BC$-Learning {\cite{CaseSmith1983}}]
 \label{def:bc-learning-ord}
@@ -502,10 +496,9 @@ to change.  The class $\BC$ consists of all concept classes
 $\BC$-identifiable by some learner.
 \end{defn}
 
-The separation $\BC \setminus \Ex \neq \emptyset$ is a \emph{negative
-result about $\Ex$}: there are classes where semantic convergence is
-achievable but syntactic convergence is not.  The witness construction
-is the content.
+The theorem below makes this precise: $\BC \setminus \Ex \neq \emptyset$
+establishes a limit of $\Ex$, and the weight of the proof falls on
+constructing the witness class.
 
 \begin{thm}[Case--Smith 1983]
 \label{thm:bc-separation}
@@ -681,19 +674,24 @@ mind-change-bounded and anomaly-bounded learning criteria.
 \node[font=\scriptsize, anchor=west] at ([xshift=0.62cm, yshift=-0.42cm]leg)
   {open: not yet machine-checked (\cref{op:formalize-ordinal-hierarchy}, \cref{op:formalize-bc})};
 \end{tikzpicture}
-\caption[The ordinal complexity spine of limit identification.]{The mind-change count
-of a limit learner (left column) or its anomaly tolerance (right column) is a constructive
-ordinal that stratifies the identification criteria into a strict tower, from $\FIN = \Ex_0$
-through the transfinite levels $\Ex_\alpha$ into $\Ex$, and on through the anomaly levels
-$\Ex_a^*$ into $\BC$.  The lower box records a separate measure on the dimension side: the
-embedding \leanname{withTopNatToOrdinal} sends an infinite VC dimension to $\omega$ and fixes
-every finite dimension below it, so finite-capacity classes such as softmax attention sit at
-the bottom and the transfinite tower becomes necessary only for the exact identification of
-programs.}
+\caption[The ordinal complexity spine of limit identification.]{Two strict towers,
+one ordinal-valued measure each.  Left column: the mind-change ordinal of a limit
+learner stratifies $\Ex$ into levels $\Ex_\alpha$ that rise through every constructive
+ordinal without ever reaching $\Ex$ itself; successive rungs are strict by the
+Freivalds--Smith and Ambainis--Jain--Sharma constructions, and the integer fragment
+$\FIN = \Ex_0 \subsetneq \Ex_1 \subsetneq \cdots$ (Velauthapillai) is this tower's
+finite base.  Right column: an orthogonal axis relaxes the final hypothesis rather than
+the revision count, producing the anomaly levels $\Ex_a^*$ that continue through $\BC_0$
+to $\BC$ (Case--Smith).  Every arrow is a classical literature result, none yet
+machine-checked.  Lower box: a separate, verified measure on the dimension side.  The
+embedding \leanname{withTopNatToOrdinal} is machine-checked; it fixes each finite VC
+dimension and sends the infinite value to $\omega$, placing softmax attention and all
+other finite-capacity classes at the bottom of the ordinal picture.  The transfinite
+levels above $\omega$ arise only when the objects learned are programs and the criterion
+is exact identification, a recursion-theoretic regime that no finite-capacity class
+can reach.}
 \label{fig:ordinal-hierarchy}
 \end{figure}
-
-We summarize the key structural facts.
 
 \begin{thm}[Summary of Inclusions]
 \label{thm:summary}
@@ -827,9 +825,10 @@ finite-capacity concept class can reach.
 \section{Open Problems}
 \label{sec:ordinals-open}
 
-The mind-change hierarchy is classically complete in its main lines, but
-its formalization, its interaction with the verified online rank, and its
-two-dimensional refinement remain open.
+The classical lines of the hierarchy are settled, but three fronts remain
+genuinely open: formalizing what is classically proved, connecting the
+mind-change ordinal to the verified dimension-side rank, and mapping the
+two-dimensional mind-change-by-anomaly lattice.
 
 \begin{openprob}[The mind-change/anomaly lattice]
 \label{op:two-dim-lattice}
@@ -991,7 +990,11 @@ pattern language unions for $\omega^n$) remains an open question.
 
 \subsection*{Counterfactual exercises}
 
-Each exercise perturbs one part of \Cref{fig:ordinal-hierarchy} and asks where the change lands in the tower.
+The figure in \Cref{fig:ordinal-hierarchy} encodes an argument.
+Each exercise below isolates one rung or one architectural choice and asks
+what the picture would look like if that choice had been made differently,
+or if one component were taken away.  Working through them tests
+whether you can reconstruct the hierarchy's reasoning.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item Restrict the left column to the finite fragment $\FIN = \Ex_0 \subsetneq \Ex_1 \subsetneq \cdots \subsetneq \Ex_n$. Show that this is the integer instance of the ordinal spine: a learner bounded to $n$ revisions sits at the finite ordinal $n$, the strict inclusions hold (\cref{thm:summary}~(i), \cite{Velauthapillai1989}), and the transfinite picture is the closure of this fragment under limits.

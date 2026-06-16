@@ -9,24 +9,31 @@
 \chapter{Extensions Beyond Binary Classification}
 \label{ch:extensions}
 
-The PAC theory of \Cref{ch:pac} and its characterization through VC dimension
-apply to binary classification: the label set is $\{0,1\}$, the hypothesis
-class is $\mathcal{H} \subseteq \{0,1\}^X$, and the loss is $0$-$1$.  This is
-the setting where the theory is cleanest and most complete.  But most learning
-problems are not binary classification.  Labels may come from a finite set of
-$k > 2$ classes; the target may be a real-valued function; the data may be
-noisy; the realizability assumption may fail.
+Binary PAC theory is as clean as learning theory gets: one condition, finite
+VC dimension, characterizes learnability, and the sample complexity is tight.
+That cleanliness has a price.  The theory is built for a label set of size two,
+and the moment you leave that setting, the language breaks.  Not bends: breaks.
+Multiclass labels, real-valued targets, corrupted observations, absent
+realizability, restricted hypothesis outputs: in each case, simply substituting
+richer structure into the binary definitions produces a condition that is
+necessary but not sufficient, or sufficient but not necessary, or both.
 
-This chapter asks: how does the binary theory extend to these richer settings?
-The answer is not ``straightforwardly.''  Each extension requires
-\emph{new mathematical primitives}: new notions of shattering, new complexity
-measures, new assumptions.  The binary theory generalizes by \emph{grammar
-growth}: substituting richer labels into the old definitions is never enough,
-because each setting forces a primitive the old language cannot name.  In the
-concept graph,
-this is captured by edges of type \rel{extends\_grammar}: the source dimension
-extends the grammar of the VC dimension by introducing primitives that have no
-analogue in the binary case.
+Why?  Because each extension forces a new \emph{mathematical primitive}: a
+concept the binary language has no word for.  You cannot describe a
+``threshold vector'' in a theory whose outputs are already $\{0,1\}$.  You
+cannot define a ``noise rate'' in a world with no noise.  You cannot name the
+``one-inclusion witness'' with a single bit flip.  The binary theory generalizes
+by \emph{grammar growth}: each extension is irreducible because each setting
+adds vocabulary to the theory.
+
+The irreducibility is the structure of the problem.  The multiclass case is
+the sharpest illustration.  Natarajan's 1989 extension seemed right for thirty
+years; the counterexample showing it was wrong for infinite label sets arrived
+in 2022.  The gap closed only with the DS dimension, a combinatorial measure
+encoding global hypergraph structure that the binary definitions, and
+Natarajan's two-function primitive, simply could not express.  The sections
+below trace that trajectory and the analogous ones in the real-valued,
+agnostic, noisy, and computational settings.
 
 \medskip
 
@@ -106,14 +113,14 @@ The chapter has six sections.
 
 \end{tikzpicture}
 
-\caption[Concept map: binary PAC generalizes by grammar growth]{Concept map for
-the chapter: color marks the relationship type and line style the evidence grade.
-Binary PAC theory generalizes by grammar growth, each extension adding a
-shattering primitive with no binary analogue, so substituting richer labels into
-the binary definitions never suffices.  The one solid edge is VC dimension
-characterizing binary PAC learning (\leanname{fundamental_theorem}); the
-multiclass, real-valued, agnostic, and proper-versus-improper characterizations
-are literature results.}
+\caption[Concept map: binary PAC generalizes by grammar growth]{Color encodes
+relationship type; line style encodes evidence grade.  One edge is solid: VC
+dimension characterizing binary PAC
+learning (\leanname{fundamental_theorem}), machine-checked.  Every other arrow
+is dashed or dotted, a literature result, because each setting extends the
+binary theory by adding a primitive the binary language cannot name.  The
+graph's structure is the chapter's thesis: grammar growth, not label
+substitution, is how binary PAC generalizes.}
 \label{fig:ch17-concept-map}
 \end{figure}
 
@@ -129,10 +136,14 @@ Let $Y = [k] = \{1, 2, \ldots, k\}$ for some $k \geq 2$, and let
 $\mathcal{H} \subseteq Y^X$ be a multiclass hypothesis class.  The question
 is: what characterizes PAC learnability of $\mathcal{H}$?
 
-For $k = 2$, the answer is the VC dimension.  For $k > 2$, the answer was only
-fully resolved in 2022, after a thirty-year journey through two competing
-dimensions, each introducing a new shattering primitive.  That journey, and its
-resolution, is the narrative backbone of this section.
+For $k = 2$, the answer is the VC dimension.  For $k > 2$, the field tried
+the natural extension first: Natarajan's 1989 two-function shattering
+primitive.  It worked for finite label sets.  For three decades it appeared
+to be the right answer.  Then Brukhim et al.\ showed in 2022 that a class
+with $\Ndim = 1$ is not PAC learnable.  The right answer requires a global
+hypergraph measure, the DS dimension, whose finiteness Natarajan's local
+two-function condition cannot imply.  That thirty-year trajectory, and its
+2022 resolution, is the backbone of this section.
 
 
 \subsection{The Natarajan Dimension}
@@ -307,13 +318,17 @@ one-inclusion hypergraph of $\mathcal{H}$.
 
 \end{tikzpicture}
 \caption[DS-shattering and its star in the one-inclusion hypergraph]{%
-DS-shattering of a $d$-element set (here $d = 3$), drawn twice.  On the left a
-default labeling $f$ assigns $a, b, c$ to $x_1, x_2, x_3$, and each witness $h_i$
-agrees with $f$ except at coordinate $i$; on the right the same data is the star
-joining $f$ to each $h_i$ along edge $i$ in the one-inclusion hypergraph
-(\Cref{def:oig}).  Finiteness of the largest such set, the DS dimension,
-characterizes multiclass PAC learnability (\Cref{thm:multiclass-char}, Brukhim et
-al.\ 2022), where Natarajan shattering does not when the label set is infinite.}
+The same object, drawn twice.  Left: a witness table for DS-shattering with
+$d = 3$.  A default labeling $f$ assigns $a, b, c$ to $x_1, x_2, x_3$; each
+hypothesis $h_i$ agrees with $f$ everywhere except at coordinate $i$, where it
+deviates.  Right: that table \emph{is} the star joining $f$ to each $h_i$
+along edge $i$ in the one-inclusion hypergraph (\Cref{def:oig}).  The
+equivalence is not cosmetic: the finiteness of the largest DS-shattered set
+characterizes multiclass PAC learnability (\Cref{thm:multiclass-char}, Brukhim
+et al.\ 2022), while Natarajan's two-function shattering, a strictly stronger
+condition, fails to characterize it when the label set is infinite.  The
+global connectivity of the hypergraph is what the binary language cannot
+express, and the star is where that global structure sits.}
 \label{fig:ds-shattering}
 \end{figure}
 
@@ -454,8 +469,11 @@ $y_i \approx f(x_i)$ in the noisy case) and aims to approximate $f$.
 The $0$-$1$ loss is replaced by the squared loss or absolute loss, and the
 question becomes: what is the analogue of VC dimension?
 
-Two dimensions extend the binary theory.  Both introduce \emph{thresholds} as
-a new primitive.
+The problem with VC dimension here is immediate.  Outputs are real numbers,
+not bits; shattering requires a binary condition; so the theory needs a way
+to convert continuous outputs into a binary combinatorial question.  That
+conversion requires a new primitive: a threshold.  Two dimensions emerge from
+it, one for the realizable case and one for the agnostic.
 
 
 \subsection{Pseudodimension}
@@ -580,13 +598,19 @@ pseudodimension.
   \node[analogypurple, font=\scriptsize] at (4.6,3.6) {$f_B\colon b{=}010$};
 \end{tikzpicture}
 \caption[$\gamma$-fat-shattering: curves realizing labelings against shared
-thresholds]{$\gamma$-fat-shattering of $d=3$ points: the set is
-$\gamma$-fat-shattered when thresholds $t_1,t_2,t_3$ admit, for every labeling, a
-function clearing the margin (at least $t_i+\gamma$ where the label is $1$, at most
-$t_i-\gamma$ where it is $0$).  The forbidden band of width $2\gamma$ makes the
-notion scale-sensitive; the two curves realize $101$ and $010$ against a shared
-threshold vector.  Finiteness for every $\gamma$ (\leanname{FatShatteringDim})
-characterizes agnostic real-valued PAC learnability (Alon et al.\ 1997).}
+thresholds]{What the margin adds that the threshold alone cannot provide.
+The set $\{x_1, x_2, x_3\}$ is $\gamma$-fat-shattered when shared thresholds
+$t_1, t_2, t_3$ admit, for every binary labeling, a function that clears
+the margin: at least $t_i + \gamma$ where the label is $1$, at most
+$t_i - \gamma$ where it is $0$.  The forbidden band of width $2\gamma$ is the
+scale primitive: it has no binary analogue, makes the notion scale-sensitive,
+and forces the characterization of agnostic real-valued learnability to be a
+whole \emph{family} of finiteness conditions, one per $\gamma$, rather than a
+single number.  The two curves realize labelings $101$ and $010$ against the
+shared threshold vector; their existence for all eight labelings is exactly the
+definition.  Finiteness of the fat-shattering dimension at every $\gamma >0$
+(\leanname{FatShatteringDim}) characterizes agnostic real-valued PAC
+learnability (Alon et al.\ 1997, \Cref{thm:real-valued-char}).}
 \label{fig:fat-shattering}
 \end{figure}
 
@@ -632,10 +656,15 @@ margins are harder to maintain, so fewer points can be fat-shattered.
 \section{Agnostic Learning: Dropping Realizability}
 \label{sec:agnostic-ext}
 
-All results so far have assumed \emph{realizability}: there exists some
-$h^* \in \mathcal{H}$ with $\risk_D(h^*) = 0$.  In practice, models are
-always wrong; the question is how wrong.  The agnostic setting, introduced
-by Haussler~\cite{Haussler1992}, removes the realizability assumption entirely.
+Every result so far has assumed \emph{realizability}: some $h^* \in
+\mathcal{H}$ perfectly fits the target.  That assumption is almost always
+false in practice.  Removing it feels like it should change the characterization.
+It does not: the condition for agnostic PAC learnability is still finite VC
+dimension.  What changes is the cost.  The sample complexity goes from
+$\Theta(d/\varepsilon)$ to $\Theta(d/\varepsilon^2)$; the $1/\varepsilon^2$ dependence
+is tight, forced by a matching lower bound, and no sharper analysis can remove
+it.  The agnostic setting, introduced by Haussler~\cite{Haussler1992}, is the
+extension where the grammar stays the same and the price doubles.
 
 \begin{defn}[Agnostic PAC Learning {\cite{Haussler1992}}]
 \label{def:agnostic-pac-ext}
@@ -811,10 +840,16 @@ hard under a promise constraint.
 \section{Proper Versus Improper Learning}
 \label{sec:proper-improper}
 
-All PAC definitions permit the learner to output \emph{any} efficiently
-evaluatable hypothesis, not just one from the target class $\mathcal{H}$.
-When the learner is restricted to output a hypothesis from $\mathcal{H}$
-itself, we call it a \emph{proper} learner.
+All PAC definitions so far permit the learner to output \emph{any}
+efficiently evaluatable hypothesis, including hypotheses outside the target
+class $\mathcal{H}$.  This freedom is easy to overlook, but it is the source of the
+most striking computational separation in the chapter: a hypothesis class that
+is information-theoretically indistinguishable in the proper and improper
+settings, needing $\Theta(d/\varepsilon)$ samples either way, is NP-hard to
+learn when the learner must stay inside $\mathcal{H}$ and polynomial-time
+tractable the moment it can step outside.  When the learner is restricted to
+output a hypothesis from $\mathcal{H}$ itself, we call it a \emph{proper}
+learner.
 
 \begin{defn}[Proper and Improper PAC Learning]
 \label{def:proper-improper-ext}
@@ -956,12 +991,16 @@ improper.
    yet NP-hard to learn properly and polynomial-time improperly (as $3$-CNF).};
 \end{tikzpicture}
 \caption[Proper versus improper learning: no statistical gap, a computational
-gap]{Proper versus improper PAC learning across two layers.  In the statistical
-layer (top row) there is no separation: proper and improper learning are both
-characterized by finite VC dimension and both need $\Theta(d/\varepsilon)$ samples
-(\leanname{fundamental_theorem}).  The gap appears only in the computational layer
-(bottom row), where $3$-term DNF is NP-hard properly (Pitt and Valiant 1988,
-\Cref{thm:pitt-valiant}) yet polynomial-time improperly as $3$-CNF.}
+gap]{Two layers, one separation.  The statistical layer (top row) shows no
+gap: proper and improper learning both need exactly $\Theta(d/\varepsilon)$
+samples, because both are characterized by finite VC dimension
+(\leanname{fundamental_theorem}, machine-checked, solid border).  Move to the
+computational layer (bottom row, dashed border, literature) and the same class
+splits: $3$-term DNF is polynomial-time improperly via $3$-CNF, yet NP-hard
+to learn properly, by a direct reduction from graph $3$-coloring (Pitt and
+Valiant 1988, \Cref{thm:pitt-valiant}).  The lesson is that the restriction
+arrow in the top row, ``proper $\subseteq$ improper,'' costs nothing
+statistically and can cost everything computationally.}
 \label{fig:proper-improper}
 \end{figure}
 
@@ -1077,15 +1116,18 @@ binary theory loses information.
   {$+$ noise rate\\$\eta$} (no);
 
 \end{tikzpicture}
-\caption[Grammar growth from binary PAC learning]{Binary PAC learning sits at the
-hub, characterized by finite VC dimension (\leanname{fundamental_theorem}).  Each
-wavy arrow is an \rel{extends\_grammar} edge that grows the binary theory by
-adding a primitive with no binary analogue: a one-inclusion witness for
-multiclass learning, thresholds then a margin for real-valued learning, a relative
-benchmark for agnostic learning, and a noise rate $\eta$.  The extension is
-irreducible because reduction to the binary theory loses information
-(\Cref{rmk:non-reduction}), proved in the multiclass case by the class with
-$\Ndim=1$ and $\DSdim=\infty$ (\Cref{prop:ds-vs-nat}).}
+\caption[Grammar growth from binary PAC learning]{What you cannot say in the
+binary language.  Binary PAC learning, the machine-checked hub
+(\leanname{fundamental_theorem}), has a complete characterization in a single
+condition.  Each wavy arrow adds one primitive the binary language cannot
+name: a one-inclusion witness for the multiclass setting; thresholds then a
+margin for real-valued; a relative benchmark for the agnostic setting; and a
+noise rate $\eta$ for classification noise.  The extensions are irreducible: no
+reduction to the binary theory recovers them (\Cref{rmk:non-reduction}).  In
+the multiclass case, irreducibility is a theorem: the class with $\Ndim = 1$
+and $\DSdim = \infty$ (\Cref{prop:ds-vs-nat}) proves that no two-function
+primitive can replace the global hypergraph condition.  For the remaining
+settings, no simpler characterization is known.}
 \label{fig:grammar-growth}
 \end{figure}
 
@@ -1223,8 +1265,12 @@ complexity?  A known unknown.
 
 \subsection*{Counterfactual exercises}
 
-These exercises generalize the chapter's figures, each widening a concrete picture
-into the chapter's argument that binary PAC theory extends only by grammar growth.
+Each extension of binary PAC theory requires a new primitive that the binary
+language cannot express, and no reduction to the binary theory eliminates that
+requirement.  The figures show individual instances; the exercises below ask
+you to stress-test and complete them.  Each one takes a concrete picture and
+asks: does the argument generalize, what does it depend on, and where does it
+fail?
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The one verified rung.} The fundamental theorem, that finite VC
@@ -1282,10 +1328,9 @@ beyond the one multiclass instance.
 
 \bigskip
 
-This chapter has traced the grammar growth required to extend binary PAC
-learning theory to multiclass, real-valued, agnostic, noise-tolerant, and
-computationally constrained settings.  Each extension introduces irreducible
-new primitives and yields its own characterization theorem or separation
-result.  The next chapter examines what lies beyond these
-characterizations: the application-layer concepts, the open problems, and the
-scope boundaries of the theory.
+Extending binary PAC learning to multiclass, real-valued, agnostic,
+noise-tolerant, and computationally constrained settings requires grammar
+growth: each setting introduces irreducible new primitives and yields its own
+characterization theorem or separation result.  The next chapter turns to
+what lies beyond these characterizations: application-layer concepts, the
+remaining open problems, and the scope boundaries of the theory.

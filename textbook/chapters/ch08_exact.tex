@@ -6,9 +6,9 @@
 \chapter{Exact Learning and Query Models}
 \label{ch:exact}
 
-The previous chapters study learners that receive data passively: drawn from a distribution (PAC), or presented by an adversary (online), or enumerated by nature (Gold). This chapter studies what happens when the learner can \emph{ask questions}.
+The previous chapters impose a constraint so familiar it is easy to overlook: the learner waits. Data arrives drawn from a distribution, or delivered by an adversary, or enumerated by nature; in every case the environment decides what the learner sees. The learner has no say. This chapter removes that constraint and asks what changes.
 
-The exact learning model, introduced by Angluin~\cite{Angluin1987}, equips the learner with two oracles: a membership query oracle and an equivalence query oracle. The learner's goal is \emph{exact identification}: the game ends when the learner proposes a hypothesis the equivalence oracle accepts; approximate generalization is no longer enough to win. The central result of this chapter is that DFAs, computationally intractable under passive data~\cite{KearnsValiant1994}, become efficiently learnable with query access. This gap between passive and active learning is one of the sharpest structural results in the field.
+The answer is sharper than most results in this book. Angluin's exact learning model~\cite{Angluin1987} gives the learner two oracles: a membership oracle that answers any labelling query $\mathrm{MQ}(x) = c(x)$ on demand, and an equivalence oracle that either confirms a proposed hypothesis or returns a counterexample. The goal is not approximate generalization but \emph{exact identification}: the game ends only when the learner's hypothesis is accepted on every string, not merely on most of them. With these two instruments a learner can identify the minimal DFA for any regular language in polynomially many queries. Without them, the same task is computationally intractable under cryptographic assumptions~\cite{KearnsValiant1994}. The gap is qualitative: no quantity of random examples bridges it, and the barrier is computational rather than statistical, since DFAs have finite VC dimension and are sample-efficiently learnable in principle.
 
 % ================================================================
 % SECTION 1: THE EXACT LEARNING FRAMEWORK
@@ -116,12 +116,7 @@ Closedness ensures that every one-step extension of a state representative is eq
 \node[lit, text width=3.5cm, anchor=north] at (7.9,-2.9)
    {\textbf{Correctness \& the $n-1$ bound:} converges to the minimal DFA in $\le n-1$ equivalence queries ($n=$ Myhill--Nerode index). Angluin 1987 (\cref{thm:lstar-complexity}); open in the kernel (\cref{op:lstar-formal}).};
 \end{tikzpicture}
-\caption[The $L^*$ exact-learning loop]{The $L^*$ protocol: a learner and a minimally adequate teacher
-(\leanname{MinimallyAdequateTeacher}) cooperate to identify the minimal DFA for an unknown regular
-language. The observation table $(S,E,T)$ is a finite approximation of the target's Myhill--Nerode
-right-congruence; membership queries fill it cell by cell, and each equivalence query returns a
-counterexample that forces a new state class. Termination in at most $n-1$ equivalence queries is the
-index of the congruence (Angluin's theorem, \cref{thm:lstar-complexity}).}
+\caption[The $L^*$ exact-learning loop]{Each cycle of the $L^*$ loop either refines the learner's model of the target or ends the game. The learner interacts with a minimally adequate teacher (\leanname{MinimallyAdequateTeacher}): the observation table $(S,E,T)$ is a finite slice of the target's Myhill--Nerode right-congruence, membership queries fill it string by string, and when a closed, consistent table licences a DFA conjecture, an equivalence query either confirms it or hands back a counterexample that splits at least one equivalence class. Because the minimal DFA has $n$ states, the congruence has index $n$; the table starts with one class and gains at least one per counterexample, so the loop terminates in at most $n-1$ equivalence queries. This bound is Angluin's theorem (\cref{thm:lstar-complexity}), literature-cited and open in the kernel (\cref{op:lstar-formal}).}
 \label{fig:lstar-protocol}
 \end{figure}
 
@@ -181,7 +176,7 @@ The observation table is a finite approximation to the Myhill--Nerode equivalenc
 \section{The Passive--Active Gap}
 \label{sec:passive-active-gap}
 
-The structural significance of $L^*$ lies in what it implies once it is set beside a hardness result; the algorithm by itself is only half the story.
+The $L^*$ algorithm is only half the argument. To see what it costs the learner to go passive, set it beside the hardness result it was built to contrast.
 
 \begin{thm}[DFAs are not PAC-learnable {\cite{KearnsValiant1994}}]
 \label{thm:dfa-pac-hard}
@@ -240,12 +235,7 @@ The Kearns--Valiant result is \emph{conditional}: it assumes that certain crypto
 \node[font=\tiny, text=notegray, align=center, anchor=north] at (4.1,-1.05)
    {DFAs have finite VC (\leanname{vc_characterization}): the gap is computational, not information-theoretic};
 \end{tikzpicture}
-\caption[The passive--active gap on DFAs]{The passive--active gap. Exact learning with membership and
-equivalence queries does not imply efficient PAC learning from random examples: DFAs witness it, being
-exactly identifiable by $L^*$ in polynomially many queries yet not efficiently PAC-learnable under the
-hardness of RSA or factoring (Kearns--Valiant, \cref{rmk:crypto-assumption}). The gap is computational,
-not information-theoretic, since DFAs have finite VC dimension; the reverse direction is open
-(\cref{op:reverse-separation}).}
+\caption[The passive--active gap on DFAs]{DFAs prove that query access and random examples are not interchangeable. $L^*$ identifies any $n$-state DFA exactly with polynomially many queries (\cref{thm:lstar-complexity}), yet no polynomial-time algorithm PAC-learns DFAs from random examples under the cryptographic hardness of RSA or factoring (Kearns--Valiant, \cref{rmk:crypto-assumption}). The separation is conditional on the cryptographic assumption and holds in one direction only: a class that is PAC-easy but exact-hard has not been exhibited (\cref{op:reverse-separation}). The gap is computational, not information-theoretic: DFAs have finite VC dimension, so sample-efficient passive learning is possible in principle; polynomial-time passive learning is what the cryptographic assumption rules out.}
 \label{fig:passive-active-gap}
 \end{figure}
 
@@ -272,7 +262,7 @@ This is how Weiss, Goldberg, and Yahav~\cite{WeissGoldbergYahav2018} extract int
 \section{Query Complexity}
 \label{sec:query-complexity}
 
-The $L^*$ algorithm's complexity is measured in \emph{query complexity}: the number of membership and equivalence queries as a function of the target's representation size. This measure is the exact learning analogue of sample complexity in PAC learning.
+The natural complexity measure for exact learning is not time or space but \emph{query complexity}: how many questions must the learner ask in the worst case to pin down a target of representation size $n$. Query complexity is the active-learning analogue of sample complexity; it measures how much the learner must interrogate, not how much data the environment supplies.
 
 \begin{defn}[Query Complexity]
 \label{def:query-complexity}
@@ -295,7 +285,7 @@ Maintain the version space $V$ of candidates consistent with every counterexampl
 The exact learning framework connects to \emph{certificate complexity} in Boolean function theory: the minimum number of input bits that must be queried to certify a function's value. Teaching dimension (\Cref{ch:dimensions}), which measures the minimum number of examples a teacher must provide to uniquely identify a concept, provides a lower bound on the number of equivalence queries. The connections among query complexity, teaching dimension, and certificate complexity are explored in \Cref{ch:dimensions,ch:computational}.
 \end{remark}
 
-\section{What This Chapter Established}
+\section{Results and Structure}
 \label{sec:ch8-summary}
 
 \begin{enumerate}[leftmargin=*, itemsep=3pt]
@@ -368,7 +358,7 @@ The development types an LLM critic as a teacher (\leanname{FLT_Proofs.Learner.A
 
 \subsection*{Counterfactual exercises}
 
-These exercises perturb the $L^*$ loop (Figure~\ref{fig:lstar-protocol}) and the passive--active gap (Figure~\ref{fig:passive-active-gap}) one piece at a time and ask what the learnable class, or the established separation, does in response.
+The argument of this chapter rests on a specific combination of parts: an observation table that approximates the Myhill--Nerode congruence, closedness and consistency conditions that licence a quotient DFA, counterexamples that split classes, and a teacher that can answer both membership and equivalence queries. Each exercise below removes or replaces one of those parts. The question in each case is the same: what breaks, and why does it break exactly there? Work through the $L^*$ loop (Figure~\ref{fig:lstar-protocol}) and the passive--active gap (Figure~\ref{fig:passive-active-gap}) as the object being disassembled.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The table is the right congruence.} Read the observation table as the object being learned. Two access strings share a row exactly when they are indistinguishable by the suffixes in $E$, a finite slice of the Myhill--Nerode relation $s_1 \sim s_2 \iff (\forall w,\ s_1 w \in L \Leftrightarrow s_2 w \in L)$ (\cref{rmk:table-intuition}), so the distinct rows are the equivalence classes discovered so far and the conjecture DFA is their quotient.

@@ -11,19 +11,24 @@
 \label{ch:pac}
 
 This is the central chapter of the book.  Every paradigm that follows (online
-learning, Gold-style identification, universal learning) will be understood
-partly by how it resembles and partly by how it differs from what is
-established here.  The chapter builds toward a single destination: the
-Fundamental Theorem of Statistical Learning, which characterizes PAC
-learnability through a web of nine equivalent conditions.
+learning, Gold-style identification, universal learning) earns its meaning by
+comparison: what it shares with what is proved here, and where it breaks away.
+
+Before this chapter, the reader has no answer to the most basic question a
+learner can ask: \emph{is there enough signal in this class for any algorithm
+to succeed?}  The question has weight.  Without an answer, one cannot tell
+whether a learning failure comes from the algorithm, the data, or from the
+class being fundamentally unlearnable by any procedure.  This chapter provides
+the answer, and its form is surprising: learnability is controlled by a single
+combinatorial quantity, the VC dimension, which turns out to be the hub of nine
+independently motivated conditions that all turn out to be the same condition.
+The destination is the Fundamental Theorem of Statistical Learning.
 
 \medskip
 
-The chapter is organized as an ascent.
-
 \begin{enumerate}[leftmargin=*,itemsep=2pt]
 \item \textbf{The PAC framework} (\Cref{sec:pac-def}): the definition and its
-  moving parts.  Brief: the definition is not the centerpiece.
+  moving parts.
 \item \textbf{The VC characterization proof} (\Cref{sec:vc-char}): the full
   proof that $\VC(\mathcal{H}) < \infty$ if and only if $\mathcal{H}$ is PAC
   learnable, built in four stages through Sauer--Shelah, uniform convergence,
@@ -188,7 +193,7 @@ succeed, and when is PAC learning possible at all?}
 \section{The VC Characterization}
 \label{sec:vc-char}
 
-The main result of this section is:
+PAC learnability is characterized by a single combinatorial condition:
 
 \begin{thm}[VC Characterization of PAC Learnability {\cite{BlumerEhrenfeuchtHausslerWarmuth1989,VapnikChervonenkis1971}}]
 \label{thm:vc-char-pac}
@@ -493,7 +498,7 @@ shatter, controls everything.
 
 The VC characterization (\Cref{thm:vc-char-pac}) is the core equivalence.  But the
 full picture is richer: PAC learnability is equivalent to \emph{nine}
-conditions, not just three.  The Fundamental Theorem packages them all.
+conditions.  The Fundamental Theorem packages them all.
 
 \begin{thm}[The Fundamental Theorem of Statistical Learning
 {\cite{BlumerEhrenfeuchtHausslerWarmuth1989,ShalevShwartzBenDavid2014}}]
@@ -579,11 +584,15 @@ equivalence web: this is where the PAC--online separation begins.
   \draw[spstrict] (4.0,-0.34) -- (4.4,-0.34); \node[anchor=west, inner sep=1pt] at (4.45,-0.34) {strict, one-way};
 \end{scope}
 \end{tikzpicture}
-\caption[The equivalence web of the Fundamental Theorem: VC dimension as the hub]{Several a priori
-unrelated descriptions of ``learnable'' collapse into one equivalence class, with finite VC dimension as
-the central hub (\leanname{fundamental_theorem}). The single outside node, finite Littlestone dimension,
-implies PAC learnability but the converse fails (thresholds on $\R$ have $\VC=1$ and $\Ldim=\infty$), the
-one place where the equivalence breaks into the online separation of \Cref{ch:separations}.}
+\caption[The equivalence web of the Fundamental Theorem: VC dimension as the hub]{Nine conditions
+arrive from different directions, PAC learnability, uniform convergence, growth function collapse,
+compression, Rademacher complexity, and more, and collapse into a single equivalence class.  Finite VC
+dimension sits at the hub because it is what all of them are measuring (\leanname{fundamental_theorem}).
+Solid spokes are verified in the formal development; dashed spokes are classical results in the cited
+literature.  The single outside node, finite Littlestone dimension, is not an equivalence: it implies
+PAC learnability (via finite VC dimension), but the converse fails.  Thresholds on $\R$ have $\VC=1$
+yet $\Ldim=\infty$, which is the first crack where the PAC and online landscapes separate
+(\Cref{ch:separations}).}
 \label{fig:equivalence-web}
 \end{figure}
 
@@ -962,8 +971,8 @@ Finite compression scheme & Moran--Yehudayoff (2016) & \Cref{sec:compression-dir
 Four structural lessons emerge:
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{VC dimension is the right measure.}  Not because it was first, but
-  because it sits at the center of a seven-way equivalence.
+\item \textbf{VC dimension is the right measure.}  It sits at the center of a
+  seven-way equivalence.
 
 \item \textbf{The $\varepsilon^2$ price is real.}  The agnostic setting costs
   $1/\varepsilon^2$ where the realizable setting costs $1/\varepsilon$.  This is
@@ -1122,7 +1131,10 @@ The optimal expected-error predictor in the realizable case is the one-inclusion
 
 \subsection*{Counterfactual exercises}
 
-Each exercise adds, replaces, or refines one spoke of the equivalence web in \Cref{fig:equivalence-web}.
+The equivalence web in \Cref{fig:equivalence-web} is not a finished object: its spokes can be sharpened,
+its hub replaced by a tighter representing object, its outside nodes brought inside or shown to be
+genuinely external.  Each exercise takes one of those moves seriously.  The web is the argument; these
+are the next steps in it.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The Rademacher face.} Add finite Rademacher complexity as a satellite of the hub, and show it is equivalent to PAC learnability: PAC learnability and uniform vanishing of the Rademacher complexity coincide (\leanname{fundamental_rademacher}).

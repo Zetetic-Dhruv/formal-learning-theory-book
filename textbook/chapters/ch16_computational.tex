@@ -7,25 +7,20 @@
 \chapter{Computational vs.\ Information-Theoretic Learnability}
 \label{ch:computational}
 
-The Fundamental Theorem of \Cref{ch:pac} characterizes learnability in
-information-theoretic terms: $\mathcal{H}$ is PAC learnable if and only if
-$\VC(\mathcal{H}) < \infty$.  The characterization is silent about
-\emph{computation}.  It guarantees the \emph{existence} of a sample size
-$m(\varepsilon, \delta)$ and a learner $A$ that achieves accuracy $\varepsilon$
-with confidence $1 - \delta$, but it says nothing about how long $A$ takes to
-run.
+The Fundamental Theorem of \Cref{ch:pac} settles a question and leaves a
+second one completely open.  It settles existence: $\mathcal{H}$ is PAC
+learnable if and only if $\VC(\mathcal{H}) < \infty$, a sample size
+$m(\varepsilon, \delta)$ and a learner $A$ are guaranteed.  What it leaves
+open, without comment, is \emph{time}.  A learner $A$ that runs for a
+trillion years satisfies the theorem's conditions.  A practitioner cannot use
+that learner.
 
-This silence conceals a gap.  There exist hypothesis classes with finite VC
-dimension, hence information-theoretically learnable, that no polynomial-time
-algorithm can PAC learn, unless widely believed cryptographic assumptions are
-false.  The gap between what is \emph{learnable} and what is \emph{efficiently
-learnable} is the subject of this chapter.  It is a negative result, but a
-structurally important one: it shows that information-theoretic
-characterizations, however elegant, do not tell the whole story.
-
-\medskip
-
-The chapter has three sections.
+Finite VC dimension guarantees a learner, but says nothing about that
+learner's running time.  There exist hypothesis classes with finite VC
+dimension, information-theoretically PAC learnable, that no polynomial-time
+algorithm can PAC learn unless widely believed cryptographic assumptions are
+false.  A fast learner for such a class would break modern public-key
+cryptography; the gap is one of conditional impossibility.
 
 \begin{enumerate}[leftmargin=*,itemsep=2pt]
 \item \textbf{The information--computation gap} (\Cref{sec:gap}): the
@@ -88,8 +83,9 @@ problem on random instances.  The hardness therefore lives in the
 
 \subsection{Why P $\neq$ NP Does Not Suffice}
 
-One might hope that the information--computation gap follows from
-$\mathrm{P} \neq \mathrm{NP}$.  It does not.  Applebaum, Barak, and
+The most natural escape route would be to ground the gap in $\mathrm{P} \neq
+\mathrm{NP}$: a familiar, widely conjectured separation that already implies
+hard learning problems exist.  The route is blocked.  Applebaum, Barak, and
 Xiao~\cite{ApplebaumBarakXiao2008} showed the following.
 
 \begin{thm}[Applebaum--Barak--Xiao 2008]
@@ -100,11 +96,13 @@ is hard, this hardness cannot be established by a reduction that treats the
 learner as an oracle, unless $\mathrm{NP} \subseteq \mathrm{coAM}$.
 \end{thm}
 
-The reason is structural.  PAC learning is an \emph{average-case} problem: the
-learner receives random examples from a distribution and must generalize.
-$\mathrm{NP}$-hardness is a \emph{worst-case} notion.  Reductions from
-worst-case to average-case problems are notoriously difficult and, in many
-settings, provably impossible via relativizing techniques.
+The block is structural.  PAC learning is an \emph{average-case} problem: the
+learner sees random examples drawn from a distribution and must generalize from
+them.  $\mathrm{NP}$-hardness is worst-case: one hard instance suffices.
+Connecting these two worlds requires a reduction that turns one hard
+worst-case instance into a hard average-case problem over random examples, and
+in many settings that reduction is provably unavailable through relativizing
+techniques.
 
 \subsection{The Necessary Assumptions}
 
@@ -148,8 +146,10 @@ one concrete instance of the gap in the SQ model.
 \section{Proper vs.\ Improper Learning}
 \label{sec:proper-improper-comput}
 
-The information--computation gap has a subtler cousin: the gap between
-\emph{proper} and \emph{improper} learning.
+The information--computation gap has a subtler cousin.  Even among classes that
+\emph{are} efficiently learnable, the learner's obligation to stay inside the
+hypothesis class can matter: the gap between \emph{proper} and \emph{improper}
+learning.
 
 \begin{defn}[Proper and Improper Learning]
 \label{def:proper-improper}
@@ -158,8 +158,9 @@ hypothesis $h \in \mathcal{H}$.  It is \emph{improper} if it may output any
 efficiently evaluable function $h$, not necessarily in $\mathcal{H}$.
 \end{defn}
 
-The distinction matters because the \emph{representation} of hypotheses affects
-computational complexity.
+The distinction matters because two algorithms can compute the same set of
+functions from different representations, and the representation, not the set,
+governs whether efficient learning is possible.
 
 \begin{thm}[Proper--Improper Separation]
 \label{thm:proper-improper}
@@ -233,10 +234,11 @@ large models is an improper-learning enterprise.
 \section{The \rel{requires\_assumption} Edges}
 \label{sec:requires-assumption}
 
-The concept graph contains several edges of type \rel{requires\_assumption}.
-These edges encode a specific logical structure: the source node's validity
-depends on an assumption that is not provable from the axioms of the theory
-alone.
+The results of this chapter do not stand on their own: each one holds only if a
+cryptographic assumption holds.  The concept graph makes this dependence
+explicit through edges of type \rel{requires\_assumption}.  Each such edge
+records that the source node's validity is conditional on an assumption that
+the axioms of the theory alone cannot supply.
 
 \begin{defn}[The \rel{requires\_assumption} edge type]
 \label{def:requires-assumption}
@@ -283,9 +285,10 @@ that pervades computational learning theory.
 \section{Open Problems}
 \label{sec:computational-open}
 
-The computational layer is where formal learning theory is least complete:
-its central hardness results are conditional, and its central
-characterization question is open.
+The computational layer is where formal learning theory leaves the most
+unfinished: its central hardness results are conditional on assumptions that
+may fall, and the basic characterization question, the one that would give VC
+dimension its computational analogue, remains open.
 
 \begin{openprob}[A dimension for efficient learnability]
 \label{op:efficient-dimension}
@@ -370,7 +373,8 @@ improperly?  (\leanname{softAttention_wellBehaved},
 \bigskip
 
 The structural gap between information-theoretic and computational
-learnability is real: it produces classes that are provably learnable but
-(conditionally) not efficiently learnable.  The next chapter examines a
-different kind of gap: the distance between binary classification and the
-richer learning settings that require new mathematical primitives.
+learnability is real: it produces classes that are provably learnable but,
+conditionally on cryptographic assumptions, not efficiently learnable.  The
+next chapter examines a different kind of gap: the distance between binary
+classification and the richer learning settings that require new mathematical
+primitives.

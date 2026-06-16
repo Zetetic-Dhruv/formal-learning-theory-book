@@ -9,16 +9,16 @@
 \chapter{The Objects of Learning}
 \label{ch:objects}
 
-Every learning problem begins with the same question: given data drawn from an unknown source, find a rule that predicts well on future data. This chapter introduces the mathematical vocabulary for making that question precise.
+A learner facing data from an unknown source needs to know what it is even asking. Without the right vocabulary, the question ``find a rule that predicts well'' remains unanswerable: not hard, unanswerable. No algorithm, however clever, generalizes without a prior commitment to which functions are candidates. Without that vocabulary the central results of learning theory cannot even be stated, let alone proved.
 
-The vocabulary divides into three groups of unequal importance. The first group, domain, label, concept, hypothesis, is atomic: these are the sets and functions from which everything else is built. They require only brief definitions. The second group, concept class, hypothesis space, version space, inductive bias, carries genuine mathematical content, because the relationships between these objects determine what is learnable; we prove the load-bearing facts in full. The third group, Bayesian inference, minimum description length, minimum message length, appears to be vocabulary but is actually a network of near-miss analogies, each encoding a different answer to the same question about model selection.
+The vocabulary divides into three groups of unequal importance. The first group, domain, label, concept, hypothesis, is atomic: these are the sets and functions from which everything else is built. They require only brief definitions. The second group, concept class, hypothesis space, version space, inductive bias, carries the genuine mathematical weight, because the relationships among these objects determine what is learnable; we prove the load-bearing facts in full. The third group, Bayesian inference, minimum description length, minimum message length, looks like vocabulary but is actually a network of near-miss analogies, each encoding a different answer to the same question about model selection. Treating them as interchangeable is the standard mistake; the obstructions are visible only when each is stated precisely.
 
 Every typed object in this chapter has a machine-checked counterpart, named where one exists.
 
 \section{Atomic Vocabulary}
 \label{sec:atoms}
 
-The following objects are the type-level substrate of learning theory. They are presented together because none of them, individually, contains any mathematical surprise.
+The following objects are the type-level substrate of learning theory. None of them, individually, contains any mathematical surprise; the surprise arrives only when we ask how they compose.
 
 \begin{defn}[Domain, Label, Concept]
 \label{def:domain-label-concept}
@@ -41,7 +41,7 @@ An \emph{alphabet} $\Sigma$ is a finite symbol set; it appears only in the forma
 
 \medskip
 
-These definitions are unremarkable individually. The mathematical content begins when we ask how they compose.
+These definitions are unremarkable individually. The mathematical content begins when they are placed together and asked to answer for learnability.
 
 % ================================================================
 % CONCEPT CLASS: Hub Node, Profile G (Framework Bridge)
@@ -56,7 +56,7 @@ These definitions are unremarkable individually. The mathematical content begins
 A \emph{concept class} $\mathcal{C} \subseteq Y^X$ is a collection of concepts over a common domain; as a type, $\leanname{ConceptClass X Y} := \mathrm{Set}\,(\leanname{Concept X Y})$.\formal{FLT_Proofs.Basic.ConceptClass} The class is the primary object of study: every major question in learning theory is a question about concept classes.
 \end{defn}
 
-This definition is simple. Its importance is not. The concept class is the single object on which the chapter's deepest theorem turns: a family of apparently different demands one might place on it (learnability from few examples, finite shattering, bounded compression, vanishing correlation with noise, sub-exponential growth, finite sample size) are secretly one condition, and the class is the vertex at which they coincide (Figure~\ref{fig:concept-class-hub}).\formal{FLT_Proofs.Theorem.PAC.fundamental_theorem}
+This definition is simple. Its importance is not. The concept class is the single object on which the chapter's deepest theorem turns: a family of apparently different demands one might place on it, learnability from few examples, finite shattering, bounded compression, vanishing correlation with noise, sub-exponential growth, finite sample size, all reduce to the same condition. The class is the vertex at which they coincide (Figure~\ref{fig:concept-class-hub}).\formal{FLT_Proofs.Theorem.PAC.fundamental_theorem}
 
 \begin{figure}[ht]
 \centering
@@ -116,7 +116,7 @@ This definition is simple. Its importance is not. The concept class is the singl
   \textcolor{edgeorange!85!black}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~literature / open \quad
   \textcolor{onlineblue!75!black}{\rule[0.45ex]{0.5cm}{0.8pt}}~strict one-way};
 \end{tikzpicture}
-\caption[The concept class as the vertex of an equivalence]{\textbf{The concept class as the vertex of an equivalence.} Several demands on a class of concepts (PAC learnability, finite shattering, bounded compression, vanishing Rademacher correlation, sub-exponential growth, finite sample complexity) are one property wearing several faces, and the class is the object on which they coincide. A tighter wheel for online learning sits inside, joined by a one-way bridge since the online demand implies the statistical one but not conversely; the whole rests on a measurability gate, and a dashed frontier marks coincidences expected but not yet verified, with the edge for partial concepts known to break.}
+\caption[The concept class as the hub of five equivalent characterizations]{\textbf{Five conditions, one concept class.} PAC learnability, finite shattering dimension, bounded sample compression, vanishing Rademacher correlation, and sub-exponential growth are the same condition: each holds if and only if the others do. The figure makes that equivalence visible by placing the concept class at the center and each characterization at a spoke. A tighter wheel for online learning sits inside, connected to the outer ring by a one-way bridge: the online demand implies the statistical one, but not conversely, and the threshold class witnesses that gap. The measurability gate is the condition the theory assumes; the dashed frontier marks extensions that are expected but not yet verified; and the edge for partial concepts is drawn in red because the equivalence there is known to break.}
 \label{fig:concept-class-hub}
 \end{figure}
 
@@ -217,7 +217,7 @@ After the update the interval $(a,b)$ remains nonempty (the midpoint strictly se
 A \emph{hypothesis space} $\mathcal{H} \subseteq Y^X$ is the set of functions available to the learner as candidate outputs. As a type it is structurally identical to a concept class, $\leanname{HypothesisSpace X Y} := \mathrm{Set}\,(\leanname{Concept X Y})$, and semantically distinct: $\mathcal{C}$ is the ground-truth collection, $\mathcal{H}$ is what the learner may return. When $\mathcal{H} = \mathcal{C}$, learning is \emph{proper}; when $\mathcal{H} \supsetneq \mathcal{C}$, learning is \emph{improper}.
 \end{defn}
 
-The proper--improper distinction carries real weight. Its computational consequences are among the sharpest in the theory:
+The proper--improper distinction carries real weight. A learner that can only return answers from the target class faces harder constraints than one free to use a richer representation. The computational consequences of this difference are among the sharpest in the theory:
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{Improper learning can be exponentially cheaper.} There exist concept classes where proper learning requires exponentially more samples or computation than improper learning~\cite{PittValiant1988}. The graph records this as a \rel{does\_not\_imply} edge from \nde{pac\_learning} to \nde{exact\_learning} (\Cref{ch:separations}).
@@ -299,7 +299,7 @@ It is tempting to believe that finiteness of the star number is \emph{equivalent
 The \emph{inductive bias} of a learner is the set of assumptions, explicit or implicit, that it uses to generalize from training data to unseen instances.
 \end{defn}
 
-This informal definition is the one usually given, and it suggests that inductive bias is not a single mathematical object. That suggestion is half right. The \emph{content} of a bias does change across paradigms, as the table below records. But the \emph{form} is uniform, and can be typed: a bias is a hypothesis space together with a real-valued preference ranking on concepts, structured so that nothing outside the space is preferred to anything inside it.
+This informal definition is the one usually given, and it suggests that inductive bias is not a single mathematical object. That suggestion is half right. The \emph{content} of a bias does change across paradigms, as the table below records. But the \emph{form} is uniform and can be typed: a bias is a hypothesis space together with a real-valued preference ranking on concepts, structured so that nothing outside the space is preferred to anything inside it. Giving it a type matters because, as the No-Free-Lunch theorem forces into the open, bias is not optional. The learner that refuses to commit to a concept class has already committed to failing.
 
 \begin{defn}[Inductive bias, typed]
 \label{def:inductive-bias-typed}
@@ -321,7 +321,7 @@ Computational & Cryptographic assumption restricting efficient search & \rel{req
 \end{tabularx}
 \end{center}
 
-Inductive bias is a \emph{mathematical necessity}, forced on every learner, and the reason is the No-Free-Lunch theorem. We prove it through its combinatorial engine, then read off the classical statement and the necessity of bias as corollaries.
+Inductive bias is a \emph{mathematical necessity}, forced on every learner without exception. The No-Free-Lunch theorem is the proof: any learner that tries to generalize without committing to a class can be made to fail, regardless of how many examples it sees, on a target drawn from the class it refused to commit to. We prove this through the combinatorial engine that makes the failure explicit, then read off the classical statement and the necessity of bias as corollaries.
 
 \begin{lemma}[Shattering forces a hard concept]
 \label{lem:nfl-engine}
@@ -380,7 +380,7 @@ If $\VC(\mathcal{C}) = \infty$, then $\mathcal{C}$ shatters sets of every size, 
 \section{Three Faces of Model Selection}
 \label{sec:model-selection}
 
-Bayesian inference, minimum description length, and minimum message length are often described informally as ``the same idea.'' They are not. Each formalizes a different answer to the question ``which hypothesis should I prefer?''; the differences between them are more instructive than any individual definition. Each is, in the sense of \cref{def:inductive-bias-typed}, a choice of preference score; the analogies among them are analogies among scores, and the obstructions are precisely where the scores fail to agree.
+Bayesian inference, minimum description length, and minimum message length are often described informally as ``the same idea.'' They are not. Each answers the question ``which hypothesis should I prefer?'' and each gives a different answer for a different reason. The differences between them are more instructive than any individual definition. Each is, in the sense of \cref{def:inductive-bias-typed}, a choice of preference score; the analogies among them are analogies among scores; and the obstructions are precisely where the scores fail to agree. What passes for a unified principle in many treatments is actually three methods with three distinct obstruction types between them, and the table of obstructions is the content.
 
 \subsection{The Definitions}
 
@@ -448,7 +448,7 @@ These three methods are usually treated as one idea. The deeper structure, made 
   \textcolor{edgeorange!85!black}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~literature \quad
   \textcolor{thmred!75!black}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~open};
 \end{tikzpicture}
-\caption[The compression core of model selection]{\textbf{The compression core of model selection.} Bayesian inference, minimum description length, and minimum message length are usually treated as one idea. The figure separates them around the fact the chapter proves: a class is learnable exactly when its data admit a bounded summary reconstructing every consistent labelling. That equivalence is the spine; the three principles hang off it as approximations, with every link among them unproven. Whether the auxiliary tag can be removed while keeping the summary short is open (\cref{op:compression-objects}).}
+\caption[Three model-selection principles organized around a proven compression equivalence]{\textbf{What ``prefer the simpler hypothesis'' actually means.} The chapter proves one thing cleanly: a class is learnable exactly when its data admit a bounded summary that reconstructs every consistent labelling, the machine-checked Moran--Yehudayoff equivalence. That equivalence is the spine of the figure. Bayesian inference, MDL, and MML each approach the same compression intuition from a different direction, and every direct link among the three is blocked: the Bayesian-MML link has no equivalence theorem beyond the constant-Fisher-information case; the MML-MDL link lacks a finite-sample witness; the MDL-Bayesian link fails when the prior is improper. One genuine bridge exists: the PAC-Bayes bound connects prior-weighted complexity to generalization. Whether the side-information tag on the compression spine can be removed without losing the summary size bound is the Littlestone--Warmuth conjecture, still open (\cref{op:compression-objects}).}
 \label{fig:model-selection-triangle}
 \end{figure}
 
@@ -466,13 +466,13 @@ These three methods are usually treated as one idea. The deeper structure, made 
 \textbf{MDL $\leftrightarrow$ Bayesian:} obstruction type \emph{type\_mismatch}. MDL uses description lengths (integers under a code); Bayesian inference uses probability densities (reals under a measure). The connection $L(h) = -\log P(h)$ identifies description lengths with log-probabilities, but this identification breaks down when the code is not prefix-free or the prior is improper.
 \end{obstbox}
 
-That three different formalizations of ``prefer the simpler hypothesis'' are \emph{not} equivalent, and that the reasons for non-equivalence are themselves different (missing witness, missing witness, and type mismatch), is a structural feature of learning theory that no single definition can convey. It is visible only in the graph.
+Three different formalizations of ``prefer the simpler hypothesis'' are \emph{not} equivalent, and the reasons for non-equivalence differ pair by pair: missing witness, missing witness, and type mismatch. That each obstruction is distinct is a structural feature of learning theory that no single definition can convey. It requires placing all three side by side.
 
 One bridge across this network is an actual theorem. The preference score of a Bayesian or MDL learner controls generalization through the PAC-Bayes bound: for any prior fixed before seeing the data and any posterior, the expected risk is bounded by the empirical risk plus a complexity term governed by the $\KL$ divergence from prior to posterior~\cite{McAllester1999}, proved here for finite hypothesis spaces.\formal{FLT_Proofs.Theorem.PACBayes.pac_bayes_finite} The obstruction boxes concern the three \emph{procedures}, which are not interchangeable; PAC-Bayes concerns the \emph{quantity} they share, a prior-weighted complexity, and shows it bounds error.
 
 \subsection{Compression, Occam, and the Fundamental Theorem}
 
-The MDL idea (prefer the hypothesis that compresses the data) connects directly to \cref{thm:vc-char}. A \emph{sample compression scheme} of size $k$ reconstructs any consistent labeling from a subsequence of at most $k$ of its own examples. Compression and finite VC dimension are equivalent.
+The MDL idea, prefer the hypothesis that compresses the data, connects directly to \cref{thm:vc-char}, and the connection is an equivalence, not an analogy. A \emph{sample compression scheme} of size $k$ reconstructs any consistent labeling from a subsequence of at most $k$ of its own examples. Compression to a bounded summary and finite VC dimension are the same condition.
 
 \begin{thm}[Compression characterizes finite VC dimension {\cite{MoranYehudayoff2016}}]
 \label{thm:compression-char}
@@ -525,7 +525,7 @@ These patterns recur throughout the book: hub nodes, negative results as content
 \section{The Objects of a Transformer}
 \label{sec:ch1-transformer}
 
-The vocabulary of this chapter is not confined to the classical examples. A single softmax-attention head, read as a binary predictor, is a concept in the sense of \cref{def:domain-label-concept}, a function $X \to \{0,1\}$, and letting its parameters vary produces a concept class in the sense of \cref{def:concept-class}. The question returns with a sharp answer for the central object of modern machine learning: \emph{is the attention class a legitimate concept class, one to which the VC characterization applies?} Answering it requires exactly the measurability that \cref{thm:vc-char} deferred to \Cref{ch:generalization}; this section makes those ``mild measurability conditions'' concrete and shows them non-vacuous.
+A single softmax-attention head, read as a binary predictor, is a concept in the sense of \cref{def:domain-label-concept}, a function $X \to \{0,1\}$, and letting its parameters vary produces a concept class in the sense of \cref{def:concept-class}. The question of the chapter applies directly to the central object of modern machine learning: \emph{is the attention class a legitimate concept class, one to which the VC characterization applies?} The answer depends entirely on whether the ``mild measurability conditions'' of \cref{thm:vc-char}, stated precisely in \Cref{ch:generalization}, are satisfied. This section makes those conditions concrete. They are satisfied for softmax attention and violated for hard attention, and the line between them is a boundary in descriptive set theory.
 
 \begin{defn}[The softmax-attention concept class]
 \label{def:attention-concept-class}
@@ -566,7 +566,7 @@ The first conjunct is \cref{prop:attention-wellbehaved}.  For the second, replac
 \section{Exercises and Open Problems}
 \label{sec:ch1-open}
 
-The following thirteen problems are research-grade, each anchored to a concept introduced above and tagged by its epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated question awaiting an answer; an \emph{unknown known} (\textsc{uk}) is a regularity in the development or literature not yet absorbed into a clean statement.
+A single object, the concept class, carries five equivalent characterizations of learnability; inductive bias is forced on every learner; three standard model-selection principles are distinct, with different obstructions pair by pair; and the measurability conditions of the fundamental theorem are not vacuous. The following thirteen problems extend these observations. Each is anchored to a concept introduced above and tagged by its epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated question awaiting an answer; an \emph{unknown known} (\textsc{uk}) is a regularity in the development or literature not yet absorbed into a clean statement. Resolving any one of them would tighten a claim made in the body of this chapter.
 
 \begin{openprob}[Sample compression conjecture, \textsc{ku}]
 \label{op:compression-objects}
@@ -635,7 +635,7 @@ The coding theorem $K(x) = -\log M(x) + O(1)$ (\cref{def:alg-prob}) hides an add
 
 \subsection*{Counterfactual exercises}
 
-Each exercise perturbs the wheel of \Cref{fig:concept-class-hub} or the compression spine of \Cref{fig:model-selection-triangle} and asks where the perturbed claim lands. State for each whether the listed conditions still coincide, and name the result that settles it.
+The hub diagram of \Cref{fig:concept-class-hub} and the compression spine of \Cref{fig:model-selection-triangle} rest on specific conditions. Each exercise removes or replaces exactly one condition and asks what survives. In some cases the equivalence persists under a different characterizing object; in others the edge breaks outright. For each, state which conditions still coincide and name the result that settles it.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{Infinite label space.} Let labels range over many classes, so the hub measure becomes the DS dimension and the criterion multiclass PAC learnability. Show that finiteness of the Natarajan dimension no longer suffices, and that the characterizing quantity is the DS dimension: a class is multiclass PAC learnable iff its DS dimension is finite (Brukhim et al., 2022).

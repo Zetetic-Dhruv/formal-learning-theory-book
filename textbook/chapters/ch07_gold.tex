@@ -10,11 +10,11 @@
 \chapter{Identification in the Limit}
 \label{ch:gold}
 
-In 1967, seventeen years before Valiant introduced PAC learning, E.\ Mark Gold posed a question that remains the oldest open research programme in computational learning theory: which classes of recursive functions can a machine identify from examples?
+In 1967, seventeen years before Valiant introduced PAC learning, E.\ Mark Gold asked a question that has driven the oldest open research programme in computational learning theory: which classes of recursive functions can a machine identify from examples? The question looks deceptively simple. What makes it hard is that the learner gets no deadline, no error tolerance, no probability distribution. It receives a stream of data, produces a sequence of guesses, and must eventually guess correctly and stay there. The stream never ends. The learner never gets to announce that it is done. Whether it has converged is not a fact the learner can read off the data; it is a fact about the entire infinite future.
 
-Gold's framework differs from PAC and online learning at the level of its \emph{proof technique}, well below the level of its definitions. PAC theory rests on concentration inequalities: the probabilistic convergence of empirical risk to true risk. Online learning rests on combinatorial game trees: the Littlestone dimension measures the depth of a binary tree that the adversary can force. Gold-style identification rests on \emph{diagonalization}: the recursion-theoretic technique of defeating every candidate learner by constructing an adversarial input that forces failure. The proof method shapes the entire chapter.
+That structure, the infinite horizon with no convergence signal, is why this chapter's proof technique is \emph{diagonalization} rather than the concentration inequalities of PAC theory or the combinatorial game trees of online learning. The adversary in Gold's setting has infinite time and no distribution to work with. It defeats every candidate learner by constructing a stream that forces the learner to keep changing its mind, using only one tool: switching the true target whenever the learner commits. The proof method shapes every result in this chapter, and it is fundamentally unlike anything in Chapters 5 or 6.
 
-Three features distinguish this paradigm from everything that precedes it in this book:
+Three features follow from this structure, each one a departure from the preceding paradigms:
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{Infinite horizon.} The learner receives an infinite stream of data and must eventually converge. There is no sample complexity bound, no $\varepsilon$, no $\delta$. The question is whether the learner converges, not how fast.
@@ -127,7 +127,7 @@ The proof technique of Theorem~\ref{thm:gold} is a \emph{priority argument} in t
 \section{The Identification Hierarchy}
 \label{sec:hierarchy}
 
-Gold's impossibility theorem says that $\Ex$-identification is limited. Two natural responses: strengthen the success criterion (demand faster convergence) or weaken it (demand less of the final hypothesis). Both directions are fruitful.
+Gold's impossibility theorem closes one door and opens two. If $\Ex$-identification cannot handle any class containing all finite languages and one infinite language, what can it handle? Two responses follow directly from the geometry of the definition: tighten the convergence requirement and learn less, or loosen it and learn more. Both directions yield strict separations.
 
 \subsection{Finite Identification}
 \label{sec:fin-learning}
@@ -203,12 +203,7 @@ The essential point is that $\BC$-identification does not require the \emph{inde
 \draw[weak] (vac) -- node[witlabel, above right, xshift=-3pt]{\rel{restricts}} (bc);
 \draw[weak] (bc) -- node[witlabel, above right, xshift=-3pt]{$\Delta^0_2$\\(Putnam--Gold)} (trial);
 \end{tikzpicture}
-\caption[The identification hierarchy as a chain of separations]{The identification hierarchy:
-the spine $\FIN\subsetneq\Ex\subsetneq\BC$ of success criteria, refined by single-constraint
-relaxations of $\Ex$ (anomalous, monotonic, vacillatory, trial-and-error). Each spine edge is a
-separation theorem witnessed by a class one criterion learns and the next cannot; the bottom rung
-$\FIN\subsetneq\Ex$ is witnessed by the class of all finite languages
-(\leanname{ex_strictly_stronger_finite}).}
+\caption[The identification hierarchy as a chain of separations]{Each edge in this diagram records a theorem. The spine $\FIN\subsetneq\Ex\subsetneq\BC$ records what is gained by relaxing the convergence requirement: $\FIN$ demands a single irreversible guess, $\Ex$ allows revision but requires the index to stabilize, $\BC$ requires only the computed language to stabilize. The bottom rung $\FIN\subsetneq\Ex$ is verified in Lean and witnessed by the class of all finite languages (\leanname{ex_strictly_stronger_finite}): a learner cannot commit without revision to a finite language, because it cannot read off from the data when the last element has arrived. The Case--Smith separation $\Ex\subsetneq\BC$ is literature, not yet in the kernel. The branches off $\Ex$ record the effect of toggling a single clause: anomalous relaxes zero-error, monotonic adds no-retraction, vacillatory allows a finite oscillation among correct indices, trial-and-error connects to the $\Delta^0_2$ level of the arithmetical hierarchy.}
 \label{fig:identification-hierarchy}
 \end{figure}
 
@@ -273,7 +268,7 @@ Trial-and-error learning connects identification in the limit to the arithmetica
 \section{Mind-Change Complexity}
 \label{sec:mind-change}
 
-Gold's impossibility theorem tells us that certain classes cannot be identified at all. For classes that \emph{can} be identified, a natural quantitative question arises: how many times must the learner change its mind before converging?
+Gold's impossibility theorem draws the outer boundary: certain classes cannot be identified at all. But the theorem also raises a sharper question for the classes inside that boundary. Among the classes a learner can identify, identification is not free: the learner must change its mind some number of times before settling. How many times? The answer turns out to require a number system larger than the integers.
 
 \begin{defn}[Mind Change]
 \label{def:mind-change}
@@ -331,9 +326,9 @@ The proposition turns a practical question (does in-context learning ``converge'
 \section{Three Paradigms: Online Inside PAC, Gold Apart}
 \label{sec:three-paradigm}
 
-We now have three learning paradigms: PAC (\Cref{ch:pac}), online (\Cref{ch:online}), and Gold. Each defines ``learnable'' differently. The question is: what is the relationship?
+Three learning paradigms are now in play: PAC (\Cref{ch:pac}), online (\Cref{ch:online}), and Gold. Each defines ``learnable'' by a different question, using a different proof technique and a different complexity measure. The natural question is how their notions of learnability relate.
 
-The answer is a partial order, not an antichain. Online learnability is \emph{strictly contained} in PAC learnability: every online-learnable class is PAC-learnable, and the converse fails. Gold-style identification is incomparable to both: it identifies classes of unbounded VC and Littlestone dimension that no statistical learner handles, while it fails on classes with no convergence signal that PAC and online learners handle easily. Statistical capacity (PAC and online) and convergence in the limit (Gold) are orthogonal axes; a finite Littlestone dimension forces a finite VC dimension, so online sits properly inside PAC.
+The answer is a partial order with one strict containment and one incomparability. Online learnability sits strictly inside PAC learnability: every online-learnable class is PAC-learnable, and the converse fails. Gold-style identification is incomparable to both. It identifies classes of unbounded VC and Littlestone dimension that no statistical learner handles, because identification in the limit requires no generalization guarantee; and it fails on classes with no convergence signal that PAC and online learners handle easily, because those classes give the adversary no way to fix a target. Statistical capacity and convergence in the limit measure orthogonal things, and the partial order reflects that. A finite Littlestone dimension forces a finite VC dimension, so online sits properly inside PAC; nothing analogous connects either statistical dimension to the mind-change ordinal.
 
 \begin{separation}
 \textbf{Theorem} (PAC, online, and Gold).\formal{FLT_Proofs.Theorem.Separation.online_pac_gold_separation} \textit{Online learnability is strictly contained in PAC learnability; Gold-style identification is incomparable to both. Separation (a) below and the threshold separation are verified; separations (b)--(d) are classical:}
@@ -386,11 +381,7 @@ $\Ex$-identification succeeds because on any \emph{fixed} finite set the learner
 \draw[sepl] (6.0,-1.4) -- (1.95,-1.4);
 \node[wit, fill=white] at (4.3,-1.4) {patterns: $\Ex$ yes, Online no\\{\tiny\cite{Angluin1980}}};
 \end{tikzpicture}
-\caption[The three paradigms: online strictly inside PAC, Gold incomparable to both]{The three paradigms
-form a partial order, not an antichain. Online learnability is strictly contained in PAC learnability
-(\leanname{online_imp_pac}; strict via the threshold class), so the Online region sits inside the PAC
-region. Gold-style identification is incomparable to both: it identifies the finite languages, which
-have infinite VC dimension, yet fails on classes with no convergence signal.}
+\caption[The three paradigms: online strictly inside PAC, Gold incomparable to both]{This figure makes an argument: the three paradigms do not form a containment chain, and two of the four possible comparison arrows do not exist. Online learnability sits strictly inside PAC learnability (\leanname{online_imp_pac}; the threshold class has $\VC{=}1$ and $\Ldim{=}\infty$, so PAC does not imply Online). The Gold region sits entirely outside PAC: the class of all finite languages is $\Ex$-identifiable from text yet has infinite VC dimension, so no statistical learner handles it (\leanname{ex_not_implies_pac}). Conversely, the threshold class is PAC-learnable but not $\Ex$-identifiable, so the Gold region does not contain the PAC region either. The incomparability is not a gap in the theory; it reflects that statistical capacity and convergence in the limit are orthogonal questions.}
 \label{fig:three-paradigm}
 \end{figure}
 
@@ -406,7 +397,7 @@ The three-paradigm separation is not a deficiency of the definitions. It reflect
 \section{What This Chapter Established}
 \label{sec:ch7-summary}
 
-This chapter introduced Gold-style identification in the limit, the oldest paradigm in formal learning theory, and established five structural facts:
+Gold-style identification in the limit, the oldest paradigm in formal learning theory, yields five structural facts:
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{Gold's impossibility theorem} (\Cref{thm:gold}): any class containing all finite languages and at least one infinite language is not $\Ex$-identifiable from text. The proof is by diagonalization, the first impossibility result in learning theory and one whose proof technique (adversarial stream construction) has no analogue in PAC or online theory.
@@ -541,7 +532,7 @@ The three-paradigm separation produces its witnesses existentially.  Give a sing
 
 \subsection*{Counterfactual exercises}
 
-Each exercise perturbs one of the chapter's two figures and asks what the corresponding separation, relaxation, or limit becomes.
+The two figures above are not illustrations of the chapter's results; they are the results, compressed into edges and evidence grades. Each exercise below takes one edge, one node, or one structural feature of those figures and asks what happens when you read it more carefully: what the theorem actually says, what its proof actually uses, where the boundary of the argument sits. Working through them is not a drill. It is the same move the chapter made in building the figures, done at the level of a single claim at a time.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{The verified rung.} Read $\FIN \subsetneq \Ex$ as a theorem rather than a containment of definitions. $\FIN$-learnability implies $\Ex$-learnability by dropping the no-mind-change conjunct (\leanname{ex_strictly_stronger_finite}), and the class of all finite languages supplies the strict separation (\Cref{ex:finite-languages}).
@@ -556,7 +547,7 @@ Each exercise perturbs one of the chapter's two figures and asks what the corres
 
 \item \textbf{Mind changes grade the bottom rung.} Refine the $\FIN$-to-$\Ex$ gap by counting retractions rather than forbidding them: $\FIN$ is zero mind changes, $\Ex$ is finitely many, and the intermediate measure is ordinal-valued (\leanname{MindChangeOrdinal}). State the transfinite strictness (\cite{FreivaldsSmith1993}, \cref{op:fs-ordinal}) that the integer counts cannot capture.
 
-\item \textbf{An edge that does not exist.} Try to draw ``online-learnable but not PAC-learnable'', certified by ``finite Littlestone, infinite VC''. Show that $\VC \le \Ldim$ (\leanname{BranchWiseLittlestoneDim_ge_VCDim}) makes that certificate an empty predicate and \leanname{online_imp_pac} makes the class empty, so the edge is removed, not merely unproven.
+\item \textbf{An edge that does not exist.} Try to draw ``online-learnable but not PAC-learnable'', certified by ``finite Littlestone, infinite VC''. Show that $\VC \le \Ldim$ (\leanname{BranchWiseLittlestoneDim_ge_VCDim}) makes that certificate an empty predicate and \leanname{online_imp_pac} makes the class empty, so the edge is ruled out.
 
 \item \textbf{One arrow certifies two separations.} The finite-languages class is $\Ex$-identifiable but has $\VC = \infty$ (\leanname{ex_not_implies_pac}). Show that because Online lies inside PAC, the same class is a fortiori not online-learnable, so $\Ex \not\Rightarrow \mathrm{PAC}$ alone certifies $\Ex \not\Rightarrow \text{Online}$ with no separate theorem.
 

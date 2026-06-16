@@ -13,6 +13,17 @@ identification, the teaching dimension for exact learning.  This chapter and
 the three that follow develop these numbers (and the two dozen others in the
 concept graph) as objects of study in their own right.
 
+A learner facing a hypothesis class needs one piece of information before
+anything else: does the class contain enough hypotheses to memorize arbitrary
+finite configurations, or does it eventually run out of room?  If it can
+memorize any finite set of any size, no finite sample can distinguish it from
+the true concept, and learning is hopeless.  If it cannot, the sample
+complexity is finite and learning is possible.  The VC dimension is the
+precise measure of that boundary: it counts the largest set the class can
+fully shatter, and the Sauer--Shelah lemma converts a finite VC dimension
+into a polynomial bound on the class's complexity, which is the combinatorial
+step the Fundamental Theorem turns into PAC guarantees.
+
 The present chapter treats \emph{combinatorial dimensions}: quantities defined
 by asking how richly a hypothesis class can label finite configurations of
 points.  The simplest such quantity, the VC dimension, asks how many points
@@ -25,8 +36,6 @@ narrative centerpiece: the thirty-year search for the correct combinatorial
 dimension characterizing multiclass learnability, which ended only in 2022.
 
 \medskip
-
-The chapter is organized as follows.
 
 \begin{enumerate}[leftmargin=*,itemsep=2pt]
 \item \textbf{VC dimension and shattering} (\Cref{sec:vc-dim}): the
@@ -54,7 +63,10 @@ The chapter is organized as follows.
 
 The definitions in this section were introduced informally in \Cref{ch:objects}
 and used without proof in \Cref{ch:pac}.  We now state them precisely and prove
-the combinatorial backbone that supports the Fundamental Theorem.
+the combinatorial backbone that supports the Fundamental Theorem.  Two steps
+connect the geometry to learning: first, shattering pins down how much freedom
+the class actually has; second, the Sauer--Shelah lemma shows that once that
+freedom is finite, the class's entire complexity collapses to a polynomial.
 
 \begin{defn}[Restriction and Shattering]
 \label{def:shattering}
@@ -162,7 +174,7 @@ realized by a halfplane.  Hence $\VC(\mathcal{H}) = 3$.
       {No four points are shattered: the inner point lies in the hull of the others, so the\\labeling isolating it is unrealizable by a halfplane (Radon). Hence $\VC<4$, so $\VC=3$.};
   \end{scope}
 \end{tikzpicture}
-\caption[Three points shattered by halfplanes; no four are, so the VC dimension is three.]{Each of the eight labelings of three non-collinear points is realized by a separating halfplane, so the points are shattered (\leanname{Shatters}) and $\VC \ge 3$. The lower panel shows that no four points can be shattered, since one always lies in the convex hull of the others (Radon), giving $\VC = 3 = d+1$ for halfspaces in $d$ dimensions.}
+\caption[Three points shattered by halfplanes; no four are, so the VC dimension is three.]{All eight labelings of three non-collinear points are realized by a separating halfplane, so the points are shattered (\leanname{Shatters}) and $\VC \ge 3$: these are the eight witnesses that prove the lower bound. The lower panel closes the argument: any fourth point lies inside the convex hull of the other three (Radon), so the labeling that flips it against the rest has no halfplane separator, giving $\VC < 4$ and therefore $\VC = 3 = d+1$ for halfspaces in $d$ dimensions. The two panels together constitute a complete proof.}
 \label{fig:shatter-halfplane}
 \end{figure}
 
@@ -359,11 +371,13 @@ Frankl.
 \end{axis}
 \end{tikzpicture}
 \caption[The growth function: exponential while the class shatters, then polynomial of degree~$\VC$.]{The
-growth function $\growth_\mathcal{H}(n)$ (\leanname{GrowthFunction}) equals $2^n$ (the dashed ray)
-exactly while the class shatters a set of that size, $n \le d = \VC(\mathcal{H})$. At $n = d+1$
-it peels permanently into the Sauer--Shelah bound $\sum_{i=0}^{d}\binom{n}{i}$
-(\leanname{sauer_shelah_quantitative}), a polynomial of degree~$\VC$; the drop is immediate.
-This collapse is the combinatorial step the Fundamental Theorem turns into PAC learnability.}
+growth function $\growth_\mathcal{H}(n)$ (\leanname{GrowthFunction}) rides the exponential ceiling
+$2^n$ (dashed ray) as long as the class can still shatter a set of size $n$. At $n = d+1$, the first
+size that cannot be shattered, the function peels off immediately into the Sauer--Shelah bound
+$\sum_{i=0}^{d}\binom{n}{i}$ (\leanname{sauer_shelah_quantitative}), a polynomial of degree $d$,
+and never returns to the exponential. There is no intermediate regime: the transition is a cliff.
+This cliff is the combinatorial fact the Fundamental Theorem converts into PAC learnability: a
+polynomial growth function gives uniform convergence; an exponential one prevents it.}
 \label{fig:growth-function}
 \end{figure}
 
@@ -385,7 +399,12 @@ The VC dimension measures shatterability of \emph{sets}: it asks for the
 largest set whose every labeling is realized.  The Littlestone dimension,
 introduced in \Cref{ch:online} and fully characterized there, measures
 shatterability of \emph{trees}: it asks for the deepest complete binary tree
-whose every root-to-leaf path is realized.  We recall the definition for
+whose every root-to-leaf path is realized.  The distinction matters because
+the online adversary acts sequentially, adapting to the learner's responses;
+the VC game fixes all instances at once.  The Littlestone dimension is
+therefore strictly larger, and knowing the gap is infinite (threshold
+classifiers: $\VC = 1$, $\Ldim = \infty$) explains why online learnability
+is a strictly stronger demand than PAC learnability.  We recall the definition for
 reference.
 
 \begin{defn}[Mistake Tree, Recall]
@@ -437,8 +456,15 @@ dimension considers all labelings of a fixed set simultaneously.
 
 When the hypothesis class consists of real-valued functions
 $\mathcal{F} \subseteq \R^X$ rather than binary classifiers, shattering must
-be redefined.  Two progressively refined notions capture the relevant
-complexity.
+be redefined.  The trouble is that real-valued functions can differ on a point
+without disagreeing on any binary labeling, so the VC dimension misses
+complexity that matters for regression and margin-based learning.
+Two progressively refined notions capture what VC misses.  Pseudodimension
+introduces thresholds that reduce the real-valued problem to a binary one;
+fat-shattering adds a margin, making the notion scale-sensitive.  The margin
+turns out to be essential: pseudodimension alone cannot characterize agnostic
+real-valued learnability, but finite fat-shattering dimension at every scale
+does, as the characterization theorem below shows.
 
 \begin{defn}[Pseudodimension]
 \label{def:pseudodim}
@@ -518,10 +544,16 @@ quantities coincide with $\VC(\mathcal{F})$.
 Binary classification has a clean answer: a class $\mathcal{H} \subseteq
 \{0,1\}^X$ is PAC learnable if and only if $\VC(\mathcal{H}) < \infty$.
 What is the corresponding answer when the label set $Y$ has $k \geq 3$
-elements?  This question, first posed in the 1980s, was open for thirty
-years.  Its resolution demanded a new combinatorial dimension, because the
-obvious candidate, the Natarajan dimension, turned out not to characterize
-learnability.
+elements?  This question, first posed in the 1980s, stayed open for thirty
+years.  The field had a candidate, the Natarajan dimension, which
+generalizes VC naturally and was supported by partial results for bounded
+label sets.  It was wrong.  A class of Natarajan dimension one can be
+unlearnable, and the gap between ``Natarajan dimension finite'' and
+``PAC learnable'' is not a failure of proof strategy but a genuine
+mathematical fact: the Natarajan dimension does not look at enough of
+the labeling structure.  The resolution required a new dimension, the DS
+dimension, defined through pseudo-cubes in the one-inclusion hypergraph,
+and the proof arrived only in 2022.
 
 
 \subsection{The Natarajan Dimension: The Obvious Candidate}
@@ -682,11 +714,16 @@ The dimension hierarchy for multiclass problems is:
   \end{scope}
 \end{tikzpicture}
 \caption[The multiclass dimension ladder $\mathrm{StrongShattering} \le \Ndim \le \DSdim$.]{The
-multiclass dimension ladder. For binary classes ($|Y|=2$) the VC dimension characterizes PAC
-learnability: a class is learnable iff its VC dimension is finite. The obvious generalization to
-$k \ge 3$ labels, the Natarajan dimension (\leanname{NatarajanDim}), fails: a class of Natarajan
-dimension one over an infinite label set is not learnable (Brukhim et al.\ 2022). The genuine
-characterization is the DS dimension, defined through pseudo-cubes in the one-inclusion hypergraph.}
+multiclass dimension ladder, with evidence grades encoded by line style. For binary classes
+($|Y|=2$) the VC dimension characterizes PAC learnability (solid arrow: kernel-verified). The
+natural generalization to $k \ge 3$ labels, the Natarajan dimension (\leanname{NatarajanDim}),
+fails: a class with $\Ndim = 1$ over an infinite label set is not learnable, because the
+Natarajan condition checks only pairs of opposing functions and misses the full labeling
+complexity when $|Y| = \infty$ (Brukhim et al.\ 2022). The DS dimension, defined through
+pseudo-cubes in the one-inclusion hypergraph, is the correct characterization (dashed arrow:
+literature, not yet formalized). The diagram makes the correction visible: one arrow is
+solid, one is dashed, and the red failure annotation marks exactly where the thirty-year
+conjecture broke.}
 \label{fig:dimension-hierarchy}
 \end{figure}
 
@@ -767,7 +804,7 @@ because a shattered set is in particular a set on which each point can be
 isolated; but the reverse fails, and fails infinitely.  The class of
 singletons on an infinite domain has $\VC = 1$ yet $\mathfrak{s} = \infty$
 (\Cref{rmk:star-not-equiv}).\formal{FLT_Proofs.Complexity.VCDimension.StarNumber} Finiteness of the star number is therefore
-\emph{strictly stronger} than PAC learnability, not equivalent to it; its
+\emph{strictly stronger} than PAC learnability; its
 proper role is in active learning, where it controls the label
 complexity~\cite{HannekeYang2015}.
 \end{remark}
@@ -868,7 +905,11 @@ The development types the dual class and proves a dual-to-primal shattering tran
 
 \subsection*{Counterfactual exercises}
 
-Each exercise takes the concrete halfplane, growth-function, or multiclass-ladder picture as a special case of a wider family and asks you to supply the general statement.
+The figures above prove specific facts: that three non-collinear points are shattered by halfplanes,
+that the growth function bends at $n = d+1$ and nowhere else, that Natarajan dimension one can
+coexist with unlearnability.  Each exercise below asks you to take one of those specific proofs and
+determine which step carries the load: remove it, and the argument fails.  That is the counterfactual
+discipline.  Working through these is how the general claims become yours.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{Shattering is a full cube.} A separating halfplane in every cell of the $2^3$ grid says exactly $\mathcal{H}|_S = \{0,1\}^{|S|}$, which is the definition of shattering (\cref{def:shattering}, \leanname{Shatters}). Show that the eight halfplanes are the constructive content of ``$S$ is shattered'', so removing any one leaves the statement unproved.

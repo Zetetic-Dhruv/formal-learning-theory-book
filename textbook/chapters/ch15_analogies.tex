@@ -5,11 +5,19 @@
 \chapter{Analogies and Their Obstructions}
 \label{ch:analogies}
 
-The concept graph contains 32 edges of type \rel{analogy}. In most
-treatments of learning theory, such analogies appear as informal remarks:
-``compression is like VC dimension,'' or ``stability is related to
-PAC-Bayes.'' This chapter treats each analogy as a formal object with
-three components:
+When you read that ``compression is like VC dimension'' or that ``stability
+is related to PAC-Bayes,'' you are being handed an analogy without its
+expiry date. The remark could mean that both quantities measure the same
+underlying thing; it could mean that one bounds the other in one direction
+only; or it could mean that the objects involved belong to different parts
+of the type system and no formal connection will ever hold. Without knowing
+which, you cannot tell whether to try proving the equivalence, whether to
+expect a counterexample, or whether to search for a new bridging concept
+entirely. The analogy, stated informally, is a map with the legend missing.
+
+This chapter supplies the legend. The concept graph contains 32 edges of
+type \rel{analogy}, and each is treated here as a formal object with three
+components:
 
 \begin{enumerate}[leftmargin=*, nosep]
 \item A \emph{source} and \emph{target}: two concepts that share a
@@ -20,12 +28,13 @@ makes the analogy plausible.
 a theorem, classified by \emph{type}.
 \end{enumerate}
 
-The obstruction type is more informative than the analogy itself. Two
-analogies may look similar (``X is like Y because both measure complexity'')
-but fail for entirely different reasons: one because the objects live in
-different type systems, another because a conjectured equivalence remains
-unproved. The obstruction type tells you \emph{why} the analogy fails, and
-this determines whether it can become a theorem or is structurally blocked.
+The obstruction type carries more information than the analogy itself. Two
+analogies can look identical at the surface level (``X is like Y because
+both measure complexity'') while failing for entirely different reasons:
+one because the objects live in different type systems, another because the
+conjectured equivalence is plausible but still unproved. The type identifies the reason the analogy fails, and that
+determines whether the gap is a research target, a structural impossibility,
+or something in between.
 
 The 32 analogy edges distribute across six obstruction types:
 
@@ -44,11 +53,13 @@ Success criterion mismatch & Different optimization objectives & 1 \\
 \end{tabular}
 \end{center}
 
-The plurality of obstructions are type mismatches: analogies that fail
-because the objects being compared belong to different formal categories.
-The second largest group, missing equivalence witnesses, represents the
-frontier: analogies that become theorems if someone proves the right
-conjecture.
+The plurality are type mismatches: the objects being compared belong to
+different formal categories, and making the analogy a theorem would require
+new bridging concepts that do not yet exist. The second largest group, 9
+missing equivalence witnesses, is the frontier: analogies where someone
+proving the right conjecture would convert an informal remark into a
+theorem. The sample compression conjecture sits here. So does the
+MML--MDL relationship. These are not structurally blocked; they are open.
 
 
 % ================================================================
@@ -58,21 +69,25 @@ conjecture.
 \section{Type Mismatch}
 \label{sec:type-mismatch}
 
-A type mismatch obstruction arises when the source and target of an
-analogy belong to different formal categories in the concept graph.
-The analogy is structurally plausible (both concepts ``do something
-similar''), but they operate on different mathematical objects, and no
-bridging theorem connects the two type systems.
+A type mismatch arises when the source and target of an analogy belong
+to different formal categories in the concept graph. The structural
+parallel is real: both concepts do something similar. But they operate on
+different mathematical objects, and no bridging theorem connects the two
+type systems.
 
-Type mismatches are the most common obstruction (12 of 32 edges) and
-generally the least likely to be resolved. They are not open problems
-waiting for a clever proof; they are structural incompatibilities in the
-formalism.
+These are the most common obstruction, accounting for 12 of the 32 edges,
+and the least likely to be resolved. The gap is not waiting for a clever
+proof; it is a mismatch in the formalism itself. The analogy is not a
+conjecture. It is a description of two things that happen to resemble each
+other across a category boundary.
 
 \begin{table}[ht]
 \centering\small
-\caption{Type mismatch analogies. The ``type gap'' column identifies
-the category mismatch that blocks a formal theorem.}
+\caption{Twelve analogies that fail because the source and target live in
+different formal categories. The ``type gap'' column names the specific
+category boundary that blocks a formal theorem. For each pair, the shared
+structure is real; the gap is why that shared structure cannot be stated
+as an equivalence without a bridging concept that does not yet exist.}
 \label{tab:type-mismatch}
 \begin{tabularx}{\textwidth}{@{}p{4.2cm}p{3.2cm}X@{}}
 \toprule
@@ -156,13 +171,14 @@ examples to reconstruct $h$). The notion of shortness differs. \\
 \end{tabularx}
 \end{table}
 
-Across these 12 edges the analogy identifies a genuine structural parallel,
-but source and target live in different parts of the type system, and making
-the analogy formal would require a bridging theorem relating the two types.
-No impossibility result rules out such a bridge for any individual pair, and
-one (information-theoretic bounds versus PAC-Bayes) already has partial
-bridges~\cite{HellstromDurisi2020}. The classification records where bridges
-are currently absent, not where they are provably impossible.
+In each of these 12 cases, the analogy identifies something real: a
+structural parallel that is not an accident. But the source and target live
+in different parts of the type system, and formalizing the parallel requires
+a bridging theorem relating the two types. No impossibility result rules out
+such a bridge for any individual pair. One pair, information-theoretic
+bounds versus PAC-Bayes, already has a partial bridge via change-of-measure
+\cite{HellstromDurisi2020}. The table records where bridges are currently
+absent, not where they are provably out of reach.
 
 
 % ================================================================
@@ -172,17 +188,21 @@ are currently absent, not where they are provably impossible.
 \section{Missing Equivalence Witness}
 \label{sec:missing-equiv}
 
-A missing equivalence witness obstruction marks analogies where a formal
-equivalence is plausible but unproved. These represent the active frontier
-of the field.
+A missing equivalence witness marks an analogy where the formal equivalence
+looks plausible but has no proof. These are the active frontier of the
+field: the places where a theorem is conceivably available, and where
+finding one would matter.
 
-Not all nine edges are genuinely open. Three are settled and appear here
-only because the analogy is commonly drawn as an equivalence: the
-mistake-bound/Littlestone pair \emph{is} an equivalence (Littlestone's
-theorem, below), and the Rademacher/VC and label-complexity/sample-complexity
-pairs are established \emph{non}-equivalences (the separations below are
-known, not conjectural). The genuinely open conjectures are compression/VC
-and the two MML edges.
+Not all nine edges here are genuinely open. Three are settled and appear in
+this section only because the analogy is commonly stated as if it were an
+equivalence. The mistake-bound/Littlestone pair \emph{is} an equivalence
+(Littlestone's theorem, proved below). The Rademacher/VC and
+label-complexity/sample-complexity pairs are established
+\emph{non}-equivalences: the separations are known, not conjectural.
+The genuinely open conjectures are compression/VC and the two MML edges.
+The distinction between ``open conjecture'' and ``known separation carrying
+the same color'' is load-bearing; the exercises at the end of the chapter
+press directly on it.
 
 \begin{obstbox}
 \textbf{Compression $\leftrightarrow$ VC dimension.}
@@ -322,10 +342,11 @@ the two frameworks.
 \section{One-Way Theorem Only}
 \label{sec:one-way}
 
-In these analogies, one direction of the relationship has been proved as
-a theorem, but the reverse direction is either open or known to be
-false. The analogy is ``half-true'': the structural parallel exists, but
-it is asymmetric.
+In these four analogies, one direction has been proved and the other has
+not. The structural parallel is real, but it runs one way. What is at stake
+here is whether the learner conflates a proved implication with a
+biconditional: assuming symmetry that the mathematics does not support, and
+then treating the converse as obvious when it is either open or false.
 
 \begin{obstbox}
 \textbf{Sample complexity $\leftrightarrow$ VC dimension}
@@ -394,10 +415,14 @@ numbers.
 \section{Data Model Mismatch}
 \label{sec:data-model}
 
-These analogies fail because the source and target assume incompatible
-data-generating processes. The structural parallel is real, but the
-mathematical assumptions about how data arrives are fundamentally
-different.
+These three analogies fail at the level of assumptions about how data
+arrives. The structural parallel is real: the results look similar and the
+intuitions transfer. But the data-generating processes are incompatible.
+A result proved under i.i.d.\ sampling does not migrate to adversarial
+sequences, and a result that assumes stationarity cannot be directly applied
+where non-stationarity is the explicit object of study. The analogy works
+as intuition; it breaks as a formal argument the moment the data model is
+stated precisely.
 
 \begin{obstbox}
 \textbf{Concept drift $\leftrightarrow$ online learning.}
@@ -449,9 +474,15 @@ its absence.
 \section{Proof Method Mismatch}
 \label{sec:proof-method}
 
-In these analogies, the source and target have the same theorem
-structure (the ``shape'' of the result is parallel), but the proof
-techniques from one do not transfer to the other.
+These three analogies have identical theorem structure. The result shapes
+are parallel and the logical form is the same. But the proofs inhabit
+different mathematical worlds: concentration inequalities in one case,
+change-of-measure arguments in another, Ramsey theory in a third. The
+analogy holds at the level of what is proved; the obstruction is that
+proving one tells you nothing about how to prove the other. Knowing that
+stability gives a generalization bound does not, by itself, give you a
+proof technique for information-theoretic bounds, even though the conclusion
+has the same form.
 
 \begin{obstbox}
 \textbf{Information-theoretic bound $\leftrightarrow$ algorithmic
@@ -511,7 +542,9 @@ inhabit different mathematical worlds.
 \section{Success Criterion Mismatch}
 \label{sec:criterion-mismatch}
 
-A single analogy edge has this obstruction type.
+A single analogy edge in the graph carries this obstruction. The type does not
+reduce to the others: the two concepts share a setting and a procedure, but
+they answer different questions about that setting.
 
 \begin{obstbox}
 \textbf{Granger causality $\leftrightarrow$ online learning.}
@@ -537,10 +570,12 @@ answer different questions about the same sequential data.
 \section{The Obstruction Map}
 \label{sec:obstruction-map}
 
-\Cref{fig:obstruction-map} displays all 32 analogy edges, colored by
-obstruction type, with a filled dot marking the five edges that carry a
-verified bridge. The pattern is a taxonomy of why analogies fail, and the
-short list of places where formalization has bridged one anyway.
+\Cref{fig:obstruction-map} puts all 32 analogy edges in one place, colored
+by obstruction type, with a filled dot marking the five edges where
+formalization has already produced a verified bridge. Reading the color
+distribution is reading the map of what formal learning theory does not yet
+know how to unify, and the five dots mark exactly where that effort has
+succeeded so far.
 
 \begin{figure}[ht]
 \centering
@@ -660,19 +695,22 @@ short list of places where formalization has bridged one anyway.
 
 \end{tikzpicture}
 
-\caption[The obstruction map: thirty-two analogies, six failure types, five
-verified bridges]{The obstruction map. Thirty-two cross-paradigm analogies,
-none of them a theorem, fail for six classifiable reasons shown by color and
-line style. A filled dot marks the five edges where formalization has proved a
-one-way bridge or an equivalence (\leanname{fundamental_theorem}). The
-distribution of colors is the lesson: analogy-failure is taxonomic. Key:
+\caption[Obstruction map: thirty-two analogies, six failure types, five
+verified bridges]{Thirty-two cross-paradigm analogies, none of them a
+theorem, fail for six classifiable reasons. Color and line style name the
+obstruction type; a filled dot marks the five edges where formalization has
+already produced a verified one-way bridge or equivalence
+(\leanname{fundamental_theorem}). The argument the figure makes is that
+analogy-failure is not case-by-case: it is taxonomic, and the six types
+exhaust what the field currently has names for. The five dots show the
+frontier where the taxonomy has been broken by a proof. Key:
 \textcolor{edgeorange}{\rule[0.4ex]{1.1em}{0.9pt}} type mismatch (12);
 \textcolor{defblue}{\textbf{-\,-\,-}} missing equivalence witness (9);
 \textcolor{sepgreen}{\textbf{$\cdots$}} one-way theorem (4);
 \textcolor{thmred}{\textbf{-$\cdot$-}} data-model mismatch (3);
 \textcolor{analogypurple}{\textbf{-\,-}} proof-method mismatch (3);
 \textcolor{boundbrown}{\textbf{$\cdots$}} success-criterion mismatch (1);
-$\bullet$~verified one-way handle (5).
+$\bullet$~verified bridge handle (5).
 One proof-method edge (ordinal VC dimension $\leftrightarrow$ mind-change
 ordinal) is omitted for clarity.}
 \label{fig:obstruction-map}
@@ -683,34 +721,33 @@ ordinal) is omitted for clarity.}
 The obstruction type distribution reveals three structural facts about
 formal learning theory.
 
-\emph{First}, the dominance of type mismatches (12 of 32) means that
-the field's most common cross-paradigm analogies fail for the most
-basic possible reason: the objects being compared are not the same kind
-of thing. This is not a failure of proof technique; it is a failure of
-type compatibility. It suggests that future unification results will
-require new bridging concepts that mediate between the existing type
-systems.
+\emph{First}, 12 of the 32 failures are type mismatches: the objects being
+compared are not the same kind of thing. This is not a failure of proof
+technique. The proofs have not simply not been found; the objects live in
+different categories. Future unification will require new bridging concepts
+that mediate between the existing type systems.
 
-\emph{Second}, the 9 missing equivalence witnesses represent the field's
-open frontier. The sample compression conjecture (compression
-$\leftrightarrow$ VC dimension) is the most prominent, but the
-Rademacher--VC relationship and the characterization-theorem parallel
-(VC $\leftrightarrow$ Littlestone) are equally fundamental. Progress on
-any of these would restructure the analogy map, converting a conjectured
-edge into a theorem.
+\emph{Second}, 9 missing equivalence witnesses mark the open frontier.
+The sample compression conjecture (compression $\leftrightarrow$ VC
+dimension) is the most prominent: Moran and Yehudayoff proved the
+exponential-size direction in 2016, and the $O(d)$ conjecture remains open.
+The Rademacher--VC relationship and the characterization-theorem parallel
+(VC $\leftrightarrow$ Littlestone) are equally fundamental. A proof on any
+of these would restructure the analogy map.
 
 \emph{Third}, the 4 one-way theorems show where the asymmetry is built into
-the objects. Covering numbers bound Rademacher complexity
-(Dudley) and are bounded by VC dimension (Sauer--Shelah), but these
-bounds flow in one direction only. The asymmetry reflects the
-generality hierarchy: covering numbers apply to metric spaces,
-Rademacher to function classes, VC dimension to binary classes. Each
-step downward in generality tightens the bound but loses applicability.
+the objects themselves. Covering numbers bound Rademacher complexity via
+Dudley's entropy integral, and covering numbers are bounded by VC dimension
+via Sauer--Shelah. Both directions flow one way only. The asymmetry is not
+an artifact of proof technique; it reflects a generality hierarchy: covering
+numbers apply to metric spaces, Rademacher complexity to function classes,
+VC dimension to binary classes. Each step downward tightens the bound and
+loses applicability.
 
-Together, the 32 analogy edges and their obstructions form a map of what
-formal learning theory does \emph{not yet} know how to unify. Understanding
-why an analogy fails is, in this field, as valuable as understanding why a
-theorem holds.
+The 32 edges and their obstructions together form a map of what formal
+learning theory does not yet know how to unify. Understanding why an analogy
+fails is, in this field, as informative as understanding why a theorem
+holds.
 
 
 % ================================================================
@@ -721,16 +758,16 @@ theorem holds.
 \label{sec:realized-analogies}
 
 Some analogies carry no obstruction at all. They began as loose parallels
-and were discharged into theorems, and the cleanest is now machine-checked.
+and someone proved them. The cleanest is now machine-checked.
 
 The flagship is the correspondence \emph{online learning
 $\leftrightarrow$ zero-sum games}. A learner facing an adversary and a row
-player in a matrix game are, at first glance, only analogous: both react
-to a worst-case opponent. The analogy is realized by the
-multiplicative-weights (Hedge) algorithm: run on the game matrix, it
+player in a matrix game look, at first glance, merely analogous: both react
+to a worst-case opponent. The analogy is discharged by the
+multiplicative-weights (Hedge) algorithm. Run on the game matrix, it
 produces a distribution over rows whose guaranteed payoff is within
-$\varepsilon$ of the game's value. No-regret online play \emph{is}
-approximate game solving.
+$\varepsilon$ of the game's value. No-regret online play is not
+\emph{like} approximate game solving; it \emph{is} approximate game solving.
 
 \begin{thm}[Multiplicative weights solve the game]
 \label{thm:mwu-minimax}
@@ -781,11 +818,14 @@ center. The obstruction types classify only the analogies not yet discharged.
 \section{Open Problems}
 \label{sec:analogies-open}
 
-An analogy chapter's open problems are of two kinds: \emph{discharge} a
-parallel into a theorem, or \emph{prove} that no such theorem can exist.
-Each problem below is tagged a \emph{known unknown} (KU), sharply posed but
-unresolved, or an \emph{unknown known} (UK), where the right bridging
-object is still missing.
+The open problems here come in two varieties. The first is to discharge a
+parallel into a theorem: find the proof that converts a blue dashed edge
+into a verified bridge. The second is harder: prove that no such theorem
+can exist, that a specific type mismatch is permanently blocked and not
+merely waiting for the right idea. Each problem below is tagged a
+\emph{known unknown} (KU), sharply posed but unresolved, or an
+\emph{unknown known} (UK), where the right bridging object has not yet
+been named.
 
 \begin{openprob}[The sample compression conjecture]
 \label{op:compression-vc-analogy}
@@ -877,10 +917,14 @@ prediction game?  An unknown known on the transformer side
 
 \subsection*{Counterfactual exercises}
 
-Each edge carries two codes: color and line style record the obstruction type
-(why the analogy is not a theorem), and a filled dot marks the five edges
-backed by a verified bridge. The exercises probe one code at a time, especially
-where the two disagree.
+The figure's central claim is that analogy-failure is taxonomic: thirty-two
+independent failures collapse to six types. The exercises that follow probe
+whether you can read that claim off the figure itself, using only the two
+codes each edge carries. The color and line style name the obstruction type
+(why the analogy is not a theorem). The filled dot marks the five edges
+where a verified bridge already exists. The exercises work these codes
+against each other, especially the cases where both codes apply to the same
+edge and appear to conflict.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item Count colors and ignore node identities. Thirty-two analogies fail across

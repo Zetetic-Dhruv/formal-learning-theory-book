@@ -13,9 +13,13 @@
 \chapter{Learners and Teachers}
 \label{ch:agents}
 
-Chapters~\ref{ch:objects} and~\ref{ch:data} established what is learned (concept classes) and how data arrives (i.i.d.\ samples, texts, queries, streams). This chapter introduces the agents that do the learning and, in some settings, the agents that provide the data.
+Chapters~\ref{ch:objects} and~\ref{ch:data} fixed the objects of study and settled how data arrives. What they left open is who receives the data and acts on it. Without a typed account of agents, every result in the statistical and algorithmic chapters floats free: it refers to ``a learner'' without saying what that means as an object whose properties can be imposed, verified, and compared.
 
-Much of the vocabulary here is taxonomic: a learner is a function from data to hypotheses, and the field has named a dozen variants distinguished by which constraints they satisfy. These are best presented as a table. The chapter's mathematical content lies in three places: the type mismatch between Bayesian posteriors and PAC hypotheses, resolved by the Gibbs posterior, whose optimality we prove; the power of team learning; and the teacher models that connect to the teaching dimension and to Angluin's $L^\ast$. We close the opening section with a modern instance, a finite-head attention learner, that satisfies the measurability condition the PAC theory requires.
+The vocabulary here is largely taxonomic: a learner is a function from data to hypotheses, and the field has named a dozen variants distinguished by which constraints they satisfy. These constraints are not equally consequential in all paradigms. The same four predicates, consistency, conservativeness, set-drivenness, and iterativeness, turn out to be free in PAC learning and costly in Gold's framework: imposing them in PAC changes nothing about what is learnable, while imposing them in Gold produces strict separations in learning power. The taxonomy matters because the paradigm determines the cost.
+
+Three constructions go deeper than naming. First, the Bayesian learner outputs a probability measure over hypotheses, and PAC learning wants a single hypothesis: resolving this type mismatch requires not just discarding the posterior but finding the posterior that provably minimizes the complexity-penalized empirical risk. That posterior is the Gibbs posterior, and its optimality is a variational fact proved here. Second, two learners with access to the same data, communicating nothing, can identify classes that no single learner can: the team model is strictly more powerful, and the mechanism is the disjunctive success criterion alone. Third, when the source of data is itself an agent, the learner's complexity is shaped by the teacher's strategy, and the teaching dimension captures the cooperative communication cost of learning.
+
+A finite-head attention learner satisfies the measurability condition (\cref{def:measurable-learner}) that makes the PAC success probability well-defined, placing transformer architectures inside the abstraction on which the statistical theory operates.
 
 % ================================================================
 % SECTION 1: The Learner Abstraction
@@ -114,12 +118,14 @@ The same holds for the softmax-top-1 and multi-head argmax routers, and for the 
   {Solid green: free in PAC (kernel-verified).\quad Dashed orange: biting in Gold (literature).\quad
    Boxes: verified predicates.};
 \end{tikzpicture}
-\caption[Lattice of learner constraints: free in PAC, biting in Gold]{The learner taxonomy as a
-lattice of typed constraints on the base learner of \cref{def:learner}. The same four predicates read
-two ways: in PAC they are free, since every PAC-learnable class is learnable by a consistent, proper
-empirical-risk minimizer (\leanname{erm_consistent_realizable}) and the i.i.d.\ assumption makes order
-irrelevant; in Gold's framework they bite, separating conservative from text-only learners and forcing
-unbounded memory on iterative ones. The named data-access and randomness variants are in
+\caption[Lattice of learner constraints: free in PAC, biting in Gold]{The argument of this figure:
+the same four constraints on a learner cost nothing in one paradigm and separate what can be learned in
+another. In PAC, consistency, conservativeness, set-drivenness, and iterativeness are all free: every
+PAC-learnable class is learnable by a consistent, proper empirical-risk minimizer
+(\leanname{erm_consistent_realizable}), and because examples arrive i.i.d.\ their order is irrelevant,
+so set-drivenness and iterativeness collapse too. Move to Gold's framework and the same predicates bite:
+conservative learners identify classes from informant that they cannot identify from text, and
+set-driven learners can solve tasks that force any iterative learner into unbounded memory. The paradigm determines the cost. Named data-access and randomness variants are catalogued in
 \cref{tab:learner-types}.}
 \label{fig:learner-taxonomy}
 \end{figure}
@@ -371,7 +377,7 @@ Three agent concepts in the knowledge graph, \nde{synthesizer} (a program-synthe
 % SECTION 7: Summary
 % ================================================================
 
-\section{What This Chapter Established}
+\section{Learners, Teams, and Teachers}
 \label{sec:ch4-summary}
 
 The taxonomy rests on three substantive points.
@@ -443,7 +449,7 @@ Combine \cref{thm:team-power,prop:attention-mbl}: does a team of finite-head att
 
 \subsection*{Counterfactual exercises}
 
-Each exercise imposes a constraint from Figure~\ref{fig:learner-taxonomy} on the base learner and asks how its effect differs between the PAC and Gold paradigms.
+Figure~\ref{fig:learner-taxonomy} makes a claim: the paradigm determines the cost of each constraint. The exercises below put that claim under pressure. Each one takes a single predicate from the lattice and asks what happens when you move it from one paradigm to the other. Some collapse into equivalence; some stay strict. Tracking which do which, and why, is the concrete test of whether the taxonomy is understood.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item Impose consistency (\leanname{FLT_Proofs.Learner.Properties.IsConsistent}) on a PAC learner. Show it costs nothing: every PAC-learnable class is learnable by a consistent, proper empirical-risk minimizer. Trace the result through \leanname{erm_consistent_realizable}, \leanname{empError_zero_iff_consistent}, and \leanname{fundamental_theorem}.

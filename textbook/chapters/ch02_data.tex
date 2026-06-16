@@ -12,9 +12,11 @@
 \chapter{Data Presentations and Oracles}
 \label{ch:data}
 
-Chapter~\ref{ch:objects} established \emph{what} is learned: concept classes, hypotheses, the objects on which complexity measures act. This chapter asks a prior question: \emph{how does data reach the learner?}
+Chapter~\ref{ch:objects} established \emph{what} is learned: concept classes, hypotheses, the objects on which complexity measures act. This chapter asks the question that comes before: \emph{how does data reach the learner?}
 
-The answer is load-bearing. Four different data models (i.i.d.\ samples, enumerative texts, query oracles, and adversarial streams) give rise to four different theories of learnability, characterized by four different complexity measures, and separated by explicit impossibility results. The data model is not a parameter of a single theory; it is the axis along which the field divides into distinct paradigms.
+The answer cuts deep. A learner given i.i.d.\ samples from an unknown distribution operates in a setting where empirical frequencies converge reliably to true probabilities; the VC dimension decides whether learning is possible. Give the same class to a learner facing an adversarially chosen sequence and the VC dimension becomes silent: thresholds on $\R$ have VC dimension one, yet no algorithm bounds its mistakes against an adversary. Supply positive-only data and the class of all finite languages collapses into the unlearnable. Switch to interactive queries and a class that resists passive learning (deterministic finite automata, under cryptographic hardness) becomes learnable in polynomial query time. Same class, same learner, four outcomes: what changed is the data model.
+
+The data model is the axis along which the field divides into four distinct theories, each with its own characterization theorem, its own complexity measure, and its own impossibility result. Same class, same learner, four outcomes: the variable is the data model.
 
 We begin with vocabulary shared across all paradigms (\S\ref{sec:data-vocab}), then develop each data model in turn, organized by the mathematical content each one carries. Each data model is a type in the companion Lean~4 development, and the three results we prove in full (the text/informant separation, the inequality between the VC and Littlestone dimensions, and the passage from uniform convergence to PAC learnability) are mirrored there.
 
@@ -25,7 +27,7 @@ We begin with vocabulary shared across all paradigms (\S\ref{sec:data-vocab}), t
 \section{Shared Vocabulary}
 \label{sec:data-vocab}
 
-The following terms appear across paradigms and require only brief definition.
+Before each paradigm goes its own way, it needs a few shared tools: terms for the mechanical skeleton of any learner-environment interaction. The definitions below are brief because their content is thin; they do real work later as types in the formal development and as building blocks for the richer stream definitions that follow.
 
 A \emph{time index} $t \in \N$ is the discrete step indexing rounds of interaction between learner and environment. A \emph{counterexample} to a hypothesis $h$ with respect to target $c$ is a point $x \in X$ where $h(x) \neq c(x)$, witnessing disagreement; as a type it is the subtype $\{x : h(x) \neq c(x)\}$.\formal{FLT_Proofs.Data.Counterexample} \emph{Advice} is any additional information given to a learner beyond its primary data source; its formal role is explored in the advice reductions of \Cref{ch:exact}.
 
@@ -47,7 +49,7 @@ The forward direction is the substance: a clean learner is recovered from a nois
 
 \medskip
 
-With vocabulary in place, we turn to the four data models. Each gets treatment proportional to its mathematical content.
+With these shared pieces in hand, the four data models can be developed in turn. Each receives treatment proportional to its mathematical content.
 
 % ================================================================
 % SECTION 2: The i.i.d. Assumption (Profile G: Framework Bridge)
@@ -61,11 +63,11 @@ With vocabulary in place, we turn to the four data models. Each gets treatment p
 An \emph{i.i.d.\ sample} of size $m$ from a distribution $D$ over $X \times Y$ is a sequence $S = ((x_1, y_1), \ldots, (x_m, y_m))$ with each $(x_i, y_i)$ drawn independently from $D$. As a type it bundles a probability measure $D$ on $X \times Y$, a size $m$, and a function $\text{Fin } m \to X \times Y$; the learner knows $m$ but learns about $D$ only through $S$.\formal{FLT_Proofs.Data.IIDSample}
 \end{defn}
 
-The i.i.d.\ assumption is the most consequential modeling choice in the field. It is the foundation on which all of statistical learning theory (PAC learning, VC theory, generalization bounds, uniform convergence) is built, and what it buys, set against what it costs, is why the field has several paradigms instead of one.
+The i.i.d.\ assumption is the most consequential modeling choice in the field. Everything that makes statistical learning theory work, PAC learnability, uniform convergence, the VC characterization, all of it rests on this single hypothesis about how data arrives. The payoff is uniform convergence; the price is three specific fragilities, each one a door into a different paradigm, and that is why the field has several theories.
 
 \subsection{What i.i.d.\ buys: uniform convergence}
 
-The power of the i.i.d.\ assumption is \emph{uniform convergence}: empirical frequencies converge to true probabilities simultaneously across all hypotheses. The qualifier ``uniform'' is precise and load-bearing: the sample size at which the guarantee kicks in must be chosen \emph{before}, and hence independently of, the distribution and the target.
+The payoff of the i.i.d.\ assumption is \emph{uniform convergence}: empirical frequencies converge to true probabilities simultaneously across the entire hypothesis class. The word ``uniform'' carries weight here. The required sample size must be fixed before the distribution is chosen and before the target is revealed, which means the same $m_0$ works for every distribution and every target at once. This single-$m_0$ uniformity is what lets a learner pick a hypothesis without knowing the distribution it will be tested against.
 
 \begin{defn}[Uniform convergence]
 \label{def:uc}
@@ -102,7 +104,7 @@ on that event, so $\Pr_{S \sim D^{m}}[\risk(L(S)) \leq \varepsilon] \geq 1 - \de
 \subsection{What i.i.d.\ costs: three fragilities}
 \label{subsec:iid-costs}
 
-The i.i.d.\ assumption purchases uniform convergence at the cost of three fragilities.
+Independence and identical distribution buy uniform convergence. The price is three specific breakdowns, each one a door into a different paradigm.
 
 \begin{enumerate}[leftmargin=*,itemsep=4pt]
 \item \textbf{No adversarial robustness.} If an adversary chooses the data sequence, independence fails and uniform convergence no longer implies sequential learnability. The obstruction is a theorem, with thresholds as its witness: there are classes with uniform convergence that are not online learnable (\cref{prop:uc-not-online}). The VC dimension cedes jurisdiction to the Littlestone dimension (\S\ref{sec:streams}).
@@ -133,7 +135,9 @@ Thresholds have $\VC = 1$ (\cref{prop:threshold-vc}), so by \cref{thm:uc-vc} the
 \section{Enumerative Data: Text and Informant}
 \label{sec:text-informant}
 
-In Gold's model of identification in the limit~\cite{Gold1967}, data arrives as an enumeration, one element at a time, forever, and the learner must eventually converge to a correct hypothesis. There is no random sample here: the order is fixed by an adversary who may withhold any element arbitrarily long. Two variants of this process, \emph{text} and \emph{informant}, differ in a way that appears minor but produces a sharp separation.
+Remove the distribution. Remove the sample. Instead, let data arrive as an endless enumeration, one element at a time, with an adversary controlling the order and permitted to withhold any element for as long as it chooses. The learner must eventually commit to a correct hypothesis and stop changing it. This is Gold's model of identification in the limit~\cite{Gold1967}, and it strips away the statistical scaffolding entirely.
+
+Within this stripped setting, a difference that looks quantitative turns out to be qualitative. A \emph{text} shows the learner only positive evidence; an \emph{informant} adds negative evidence as well. One might expect that the second model is just a richer version of the first. The separation proved below shows it is a different paradigm: there is a class identifiable from informant that cannot be identified from any text.
 
 \begin{defn}[Text Presentation]
 \label{def:text}
@@ -145,7 +149,7 @@ A \emph{text} for a language $L \subseteq \N$ is a data stream $t_1, t_2, \ldots
 An \emph{informant} for $L$ is a stream of pairs $(x_i, \ell_i)$ with $\ell_i = \ind[x_i \in L]$ in which every natural number eventually appears. As a type it extends a data stream with two conditions: labels are correct, and every point of $X$ eventually appears.\formal{FLT_Proofs.Data.InformantPresentation}
 \end{defn}
 
-A text provides \emph{positive data only}; an informant provides the membership status of every point. The distinction looks quantitative: an informant gives more. The following separation shows it is qualitative.
+A text reports what is in the language; an informant reports membership for every point. The informant gives more, and what it gives is not just quantity: the following theorem shows the gap is qualitative.
 
 \begin{thm}[Text $<$ Informant {\cite{Gold1967}}]
 \label{thm:text-informant}
@@ -186,7 +190,7 @@ Gold's 1967 paper~\cite{Gold1967} introduced both data models and proved the sep
 \section{Query Access: Membership and Equivalence Oracles}
 \label{sec:queries}
 
-The i.i.d.\ and enumerative models share a limitation: the learner is passive. Angluin's query model~\cite{Angluin1988} removes it by granting oracle access.
+Both models so far, statistical and enumerative, leave the learner as a passive recipient of data that arrives on someone else's schedule. Angluin's query model~\cite{Angluin1988} breaks that constraint: it grants oracle access, letting the learner ask the questions it needs rather than wait for relevant data to arrive.
 
 \begin{defn}[Membership Oracle]
 \label{def:mq}
@@ -203,11 +207,11 @@ An \emph{equivalence oracle} $\mathrm{EQ}$ for $c$ answers ``does $h = c$?'': it
 A class $\mathcal{C}$ is \emph{exactly learnable} from membership and equivalence queries if some algorithm, for every target $c \in \mathcal{C}$, outputs an $h$ with $h = c$ after a number of queries polynomial in the representation size of $c$ and the size of counterexamples received.\formal{FLT_Proofs.Criterion.PAC.ExactLearnable}
 \end{defn}
 
-The force of these definitions lies in the comparison with passive models.
+What these oracles do becomes clear only against what passive data cannot.
 
 \subsection{The power of queries: DFAs as witness}
 
-Regular languages, represented as deterministic finite automata (DFAs), give the clearest illustration of what query access buys.
+The comparison is sharpest for DFAs. Passive, distributional data cannot efficiently learn them under standard cryptographic assumptions. With both oracles, Angluin's algorithm learns every $n$-state automaton in polynomial time. The class did not change; the data model did.
 
 \begin{thm}[Angluin's $L^\ast$ algorithm {\cite{Angluin1988}}]
 \label{thm:lstar}
@@ -228,7 +232,7 @@ The DFA example witnesses a genuine paradigm separation: the same class is compu
 
 \subsection{Neither oracle suffices alone}
 
-The combination $\mathrm{MQ} + \mathrm{EQ}$ is essential: each oracle compensates for a specific weakness of the other, and the two propositions below make the weaknesses precise.
+The combination $\mathrm{MQ} + \mathrm{EQ}$ is necessary because each oracle has a specific weakness the other supplies. Membership queries explore structure but cannot certify global correctness; equivalence queries certify correctness but cannot probe structure efficiently. The two propositions below make each weakness precise.
 
 \begin{prop}[Membership queries alone cannot verify]
 \label{prop:mq-alone}
@@ -259,7 +263,7 @@ Maintain the version space of candidates consistent with all counterexamples rec
 In the \emph{online protocol}, data arrives as an adversarially chosen stream. At each round $t = 1, 2, \ldots$: the adversary selects $x_t \in X$ (possibly depending on the learner's past predictions); the learner predicts $\hat{y}_t$; the true label $y_t = c(x_t)$ is revealed. The learner minimizes the total mistake count $|\{t : \hat{y}_t \neq y_t\}|$, and there is \emph{no distributional assumption}. A class is \emph{online learnable} if some learner has a finite worst-case mistake bound over all targets in the class and all adversarial sequences.\formal{FLT_Proofs.Learner.Core.OnlineLearner}
 \end{defn}
 
-The online protocol removes every comfort the i.i.d.\ model provides: no distribution, no independence, no convergence of empirical frequencies. The learner plays a sequential game against an adversary, and the performance measure is worst-case mistake count. This austerity has a precise consequence for complexity.
+Strip away everything the i.i.d.\ model provides: the distribution, the independence, the convergence of frequencies. What remains is a sequential game: the adversary places instances one by one, adapting to the learner's past predictions; the learner must predict each label before seeing it; the running score is mistakes. No distributional guarantee softens the adversary's choices. This austerity is not just philosophical severity; it forces a different complexity measure, one the VC dimension cannot see.
 
 \begin{defn}[Mistake tree and Littlestone dimension]
 \label{def:mistake-tree-data}
@@ -303,7 +307,7 @@ A mistake-bounded online learner guarantees its bound against \emph{any} sequenc
 \section{Taxonomy: Four Data Models, Four Theories}
 \label{sec:taxonomy}
 
-The preceding sections developed each data model individually. The four stand in definite relation: each is pinned by a characterizing dimension, and the paradigms they generate are separated by machine-checked witnesses (Figure~\ref{fig:data-taxonomy}).\formal{FLT_Proofs.Theorem.Separation.online_strictly_stronger_pac}
+The four data models have now been developed individually. Placed side by side, they form a definite structure: each is characterized by a distinct combinatorial dimension, the paradigms are ordered by strict containment in some directions and separated by verified impossibility in others, and every claim in Figure~\ref{fig:data-taxonomy} is backed by a machine-checked proof.\formal{FLT_Proofs.Theorem.Separation.online_strictly_stronger_pac}
 
 \begin{figure}[ht]
 \centering
@@ -337,7 +341,7 @@ The preceding sections developed each data model individually. The four stand in
   \textcolor{thmred}{\rule[0.45ex]{0.5cm}{0.9pt}}~$\not\Rightarrow$ strict separation (verified) \quad
   \textcolor{notegray}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~literature / open};
 \end{tikzpicture}
-\caption[The four data models, their characterizing dimensions, and the proven separations]{The four data models, each paired with the combinatorial quantity that decides its learnability: i.i.d.\ samples with the VC dimension, adversarial streams with the Littlestone dimension, enumerative texts with the mind-change ordinal, and interactive queries with query complexity. The chapter's lesson is the thresholds case, where one class has VC dimension one yet Littlestone dimension infinite: a complexity measure belongs to a class together with a data model, not to the class alone.}
+\caption[The four data models, their characterizing dimensions, and the proven separations]{Each node pairs a data model with the combinatorial quantity that decides learnability within it: the VC dimension for i.i.d.\ samples, the Littlestone dimension for adversarial streams, the mind-change ordinal for enumerative texts, query complexity for oracle access. The edges prove what the nodes cannot say alone. The red arrows are verified separations: the same class, thresholds on $\R$, has VC dimension one yet Littlestone dimension infinite, so finite VC dimension does not carry over to the adversarial setting. This is the chapter's argument in diagram form: a complexity measure is not a property of the class in isolation; it is a property of the class under a specific data model.}
 \label{fig:data-taxonomy}
 \end{figure}
 
@@ -346,7 +350,7 @@ The preceding sections developed each data model individually. The four stand in
 \begin{table}[ht]
 \centering
 \small
-\caption{How the choice of data model determines the theory. Each row is a paradigm: the complexity measure, the characterization theorem, and the impossibility result all co-vary with the data model.}
+\caption{Each row is a complete paradigm: the data model fixes the complexity measure, which fixes the characterization theorem, which fixes the impossibility result. Change the data model and every column changes with it.}
 \label{tab:data-comparison}
 \begin{tabularx}{\textwidth}{>{\bfseries\small}l X X X X}
 \toprule
@@ -382,7 +386,7 @@ $\VC < \infty \not\Rightarrow \Ldim < \infty$ \\
 \section{Cross-Paradigm Separations}
 \label{sec:data-separations}
 
-The \emph{separations} between data models are this chapter's principal content. The three below are proved in full in \Cref{ch:separations}, and each has a verified companion.
+The three separations below are the chapter's principal content. Each one names a class that is learnable under one data model and not another, together with the explicit mechanism blocking transfer. Each has a verified proof in the Lean~4 development, developed in full in \Cref{ch:separations}.
 
 \begin{center}\small
 \begin{tabular}{llll}
@@ -397,7 +401,7 @@ Passive $\not\Rightarrow$ Exact & DFAs & Crypto.\ hardness of PAC; & \cite{Anglu
 \end{tabular}
 \end{center}
 
-Each separation has the same logical structure: a witness class learnable under one data model but not another, together with an explicit obstruction. The PAC/online separation is verified directly (some class is PAC learnable but not online learnable\formal{FLT_Proofs.Theorem.Separation.pac_not_implies_online}) and extends to a three-way separation of PAC, online, and Gold identification.\formal{FLT_Proofs.Theorem.Separation.online_pac_gold_separation} The witnesses (thresholds, finite sets, finite automata) are among the simplest classes in the theory. Their simplicity is the signature of a genuine paradigm boundary rather than a parameter difference: even the simplest classes distinguish the paradigms.
+Each separation has the same logical structure: a witness class learnable under one data model but not another, together with an explicit obstruction. The PAC/online separation is verified directly (some class is PAC learnable but not online learnable\formal{FLT_Proofs.Theorem.Separation.pac_not_implies_online}) and extends to a three-way separation of PAC, online, and Gold identification.\formal{FLT_Proofs.Theorem.Separation.online_pac_gold_separation} The witnesses (thresholds, finite sets, finite automata) are among the simplest classes in the theory. Their simplicity is the signature of a genuine paradigm boundary: even the simplest classes distinguish the paradigms.
 
 \section{What This Chapter Established}
 \label{sec:ch2-summary}
@@ -423,7 +427,7 @@ Chapters~\ref{ch:pac}--\ref{ch:universal} develop each paradigm in full. The pre
 \section{The Data of a Transformer}
 \label{sec:ch2-transformer}
 
-This chapter has been about how data reaches a learner; it has left the learner itself implicit.  The consistent learner of \cref{thm:uc-pac} was defined inline (``output any $h \in \mathcal{H}$ agreeing with $S$'') with no $\sigma$-algebra on $\mathcal{H}$ and no requirement that the map $S \mapsto L(S)$ be measurable.  For the simplest classes that omission is harmless.  For a parametric attention model it is the structure that must be supplied, and supplying it exposes two data-axes the classical model suppresses: the \emph{measurability} of the data-to-hypothesis map, and the \emph{finite precision} in which data is actually read.
+The consistent learner of \cref{thm:uc-pac} was defined inline: ``output any $h \in \mathcal{H}$ agreeing with $S$,'' with no $\sigma$-algebra on $\mathcal{H}$ and no requirement that $S \mapsto L(S)$ be measurable. For the simplest classes that omission is harmless. For a parametric attention model it is not free, and making it explicit reveals two axes the classical model suppresses: the \emph{measurability} of the data-to-hypothesis map, and the \emph{finite precision} in which data is actually read by a real machine.
 
 \begin{prop}[Attention routing is a measurable partition]
 \label{prop:attention-measurable-routing}
@@ -457,7 +461,7 @@ Each addition in the fold commits a relative rounding error of at most the unit 
 \section{Exercises and Open Problems}
 \label{sec:ch2-open}
 
-Each problem is anchored to a concept above and tagged by epistemic character: a \emph{known unknown} (\textsc{ku}) is an articulated open question; an \emph{unknown known} (\textsc{uk}) is a result present in the literature but not yet absorbed into a clean general statement.
+These problems sit at the edges where the chapter's argument is not yet complete. Each is anchored to a specific construct above. The tags signal what kind of incompleteness you face: a \emph{known unknown} (\textsc{ku}) is a question whose answer is open; an \emph{unknown known} (\textsc{uk}) is a result the literature already contains, but one not yet formalized or absorbed into a clean general statement in this framework. In both cases the question is real, the difficulty is genuine, and the answer, if you find one, changes something.
 
 \begin{openprob}[Formalizing noise robustness, \textsc{uk}]
 \label{op:noise}
@@ -526,7 +530,7 @@ The mapping of \cref{sec:ch2-transformer} is i.i.d.\ (batch).  Where does attent
 
 \subsection*{Counterfactual exercises}
 
-Each exercise perturbs one data model and asks how the perturbation changes the characterizing dimension and the learnability it decides.
+The chapter's argument is that the data model determines everything downstream: the complexity measure, the characterization, the impossibility. The exercises below press on that claim directly. Each one takes a single feature of a data model, corrupts it, weakens it, or swaps it for an adversarial counterpart, and asks what breaks. The answer in each case either confirms the paradigm boundary or locates the exact condition that holds the theory together.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{Noisy oracle.} Corrupt labels at a rate below one half. Show that the VC dimension is invariant under the noise, so PAC learnability is preserved (\cref{thm:noise-robust}).

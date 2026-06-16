@@ -11,9 +11,11 @@
 \chapter{Automata, Languages, and Computability}
 \label{ch:automata}
 
-This chapter assembles the automata-theoretic and computability-theoretic vocabulary required by Gold's model of identification in the limit (\Cref{ch:gold}). Much of the material is standard; the reader who needs the full classical development should consult Hopcroft and Ullman~\cite{HopcroftUllman1979} or Sipser~\cite{Sipser2013}. Every model defined here is typed in the companion Lean~4 development's computability substrate, and three results (the pumping separation of regular from context-free languages, the subset construction, and one direction of the limit lemma) are proved in full.
+A learner reading data and emitting conjectures is, at bottom, a computable procedure operating on a formal language. Without the right vocabulary, this claim stays metaphorical: you cannot ask whether a learner is powerful enough to identify a class, or whether adding a resource makes it strictly more powerful, until the objects are precisely typed. This chapter builds that vocabulary.
 
-Two things here are not standard vocabulary. First, the distinction between \emph{restricts} and \emph{extends\_grammar} edges (two ways one computational model can generalize another, one conservative and one genuinely new) is illustrated through the NFA/DFA and PDA/DFA pairs (\S\ref{sec:restricts-extends}); the distinction pervades the entire knowledge graph. Second, limiting recursion connects computability to learning by placing Gold's identification in the limit at a precise level of the arithmetical hierarchy (\S\ref{sec:bridge}).
+The material is largely classical, and the reader who wants the full treatment should consult Hopcroft and Ullman~\cite{HopcroftUllman1979} or Sipser~\cite{Sipser2013}. What the chapter adds is a precise place for learning inside the resulting picture. Every model is typed in the companion Lean~4 computability substrate, and three results are proved in full: the pumping separation of regular from context-free languages, the subset construction, and one direction of the limit lemma.
+
+Two departures from standard vocabulary appear here. First, the distinction between \emph{restricts} and \emph{extends\_grammar} edges: two ways one computational model can generalize another, one conservative and one genuinely new. The NFA/DFA and PDA/DFA pairs illustrate each case concretely (\S\ref{sec:restricts-extends}), and the distinction reappears at every level of the knowledge graph. Second, limiting recursion places Gold's identification in the limit at a precise level of the arithmetical hierarchy (\S\ref{sec:bridge}): not approximately ``computably approximable'' but exactly $\Delta^0_2$, fixed by an equivalence that the chapter proves.
 
 % ================================================================
 % SECTION 1: The Chomsky Hierarchy
@@ -22,7 +24,7 @@ Two things here are not standard vocabulary. First, the distinction between \emp
 \section{The Chomsky Hierarchy}
 \label{sec:chomsky}
 
-The Chomsky hierarchy classifies formal languages by the computational resources needed to recognize them. Figure~\ref{fig:chomsky} displays the containment structure together with the bridge, made precise later in this chapter, that places identification in the limit at a definite level of the computability hierarchy;\formal{FLT_Proofs.Theorem.Gold.mind_change_characterization} the definitions follow. A \emph{formal language} over an alphabet $\Sigma$ is a set of finite words, $L \subseteq \Sigma^\ast$.\formal{FLT_Proofs.Computation.FormalLanguage}
+Every formal language is a set of finite words over some alphabet. The question is which sets require which computational resources to recognize: a finite state machine suffices for some, an unbounded stack for others, a full Turing machine for others still, and some remain outside any effective recognition procedure at all. The Chomsky hierarchy records this stratification precisely. Figure~\ref{fig:chomsky} displays the containment structure together with the bridge, made precise later in this chapter, that places identification in the limit at a definite level of the computability hierarchy;\formal{FLT_Proofs.Theorem.Gold.mind_change_characterization} the definitions follow. A \emph{formal language} over an alphabet $\Sigma$ is a set of finite words, $L \subseteq \Sigma^\ast$.\formal{FLT_Proofs.Computation.FormalLanguage}
 
 \begin{figure}[ht]
 \centering
@@ -78,7 +80,7 @@ The Chomsky hierarchy classifies formal languages by the computational resources
   \textcolor{notegray}{\rule[0.45ex]{0.15cm}{0.8pt}\,\rule[0.45ex]{0.15cm}{0.8pt}}~dashed $=$ literature / open};
 \end{tikzpicture}%
 }
-\caption[The language hierarchy lifted to the computability hierarchy, with learning inside it]{The Chomsky language hierarchy, lifted by G\"odel numbering to the arithmetical hierarchy of computability, with learning placed inside it. A class is identifiable in the limit exactly when a learner converges after finitely many mind changes (\leanname{FLT_Proofs.Theorem.Gold.mind_change_characterization}), which fixes Gold identification at the limit-computable level $\Delta^0_2$ and no higher.}
+\caption[The language hierarchy lifted to the computability hierarchy, with learning inside it]{The Chomsky language hierarchy, lifted by G\"odel numbering to the arithmetical hierarchy of computability, with learning placed inside it. The two sides are not merely analogous: G\"odel numbering sends the r.e.\ languages to the $\Sigma^0_1$ level, so the hierarchy on the left embeds directly into the hierarchy on the right. Gold identification occupies a precise address in that embedding: a class is identifiable in the limit exactly when a learner converges after finitely many mind changes (\leanname{FLT_Proofs.Theorem.Gold.mind_change_characterization}), which fixes identification at $\Delta^0_2$ and no higher. The figure makes that address visible by placing Gold's criterion on the $\Delta^0_2$ rung rather than leaving it floating above the language classes.}
 \label{fig:chomsky}
 \end{figure}
 
@@ -153,7 +155,7 @@ The classes differ sharply in closure. Table~\ref{tab:closure} records the facts
 \begin{table}[ht]
 \centering
 \small
-\caption{Closure properties of the Chomsky hierarchy classes. $\checkmark$ = closed, $\times$ = not closed. Union for regular and intersection for context-free are proved in \cref{prop:closure}; the remaining entries are standard~\cite{HopcroftUllman1979}.}
+\caption{Closure properties of the Chomsky hierarchy classes. $\checkmark$ = closed, $\times$ = not closed. The $\times$ entries are where a class stops behaving like an algebra: context-free languages lose closure under intersection and complement, and the r.e.\ languages lose closure under complement. These gaps matter because they mark exactly where the structure-preserving arguments from a lower level break down and new proofs are needed. Union for regular and intersection for context-free are proved in \cref{prop:closure}; the remaining entries are standard~\cite{HopcroftUllman1979}.}
 \label{tab:closure}
 \begin{tabular}{lccccc}
 \toprule
@@ -174,7 +176,7 @@ R.E.          & $\checkmark$ & $\checkmark$ & $\times$     & $\checkmark$ & $\ch
 \section{Two Kinds of Generalization: Restricts vs.\ Extends}
 \label{sec:restricts-extends}
 
-The Chomsky hierarchy is a containment chain, but its edges are not all of one type. Moving between levels sometimes removes a constraint (a more flexible model with no new primitive) and sometimes adds a genuinely new resource (a model with a mechanism it lacked). This distinction, conservative versus generative generalization, is a recurring structural motif of the knowledge graph, and the automata hierarchy provides its first concrete instance.
+The Chomsky hierarchy is a containment chain, but its edges are not all of one type. One edge type removes a constraint: the new model is more flexible, but every member of the original class is already a member of the extended one, and the two recognize exactly the same languages. A second edge type adds a genuinely new computational primitive: the extended model can recognize languages the original cannot. The distinction matters because it predicts what theory carries over. When a generalization is of the first type, existing characterizations, closure properties, and complexity measures transfer intact. When it is of the second type, they can and often do fail. The automata hierarchy provides the chapter's first concrete instances of each.
 
 \begin{defn}[Restricts]
 \label{def:restricts}
@@ -249,8 +251,7 @@ The DFA is the anchor for both edges. Figure~\ref{fig:restricts-extends} display
 \draw[sep] (3.0,2.6) -- (3.0,-3.0);
 \draw[sep] (-2.55,-0.25) -- (8.9,-0.25);
 \end{tikzpicture}
-\caption[Restricts versus extends: conservative equivalences and generative separations]{The
-\rel{restricts} and \rel{extends\_grammar} edge types as one pattern, with an automata instance and a learning instance. A restricts edge (green) removes a constraint and preserves power, appearing as an equivalence (NFA to DFA, \cref{thm:nfa-dfa}); an extends edge (orange) adds a primitive and recognizes a strictly larger class, appearing as a separation (PDA over DFA, \cref{prop:anbn}). The learning column shows the same split: criteria pinned to dimensions by equivalences and the strict online-over-PAC separation (\leanname{online_strictly_stronger_pac}).}
+\caption[Restricts versus extends: conservative equivalences and generative separations]{Two edge types, two columns, one argument. A \rel{restricts} edge (green) removes a constraint without adding a primitive: the NFA relaxes DFA determinism and gains nothing in expressive power, so the two are equivalent (\cref{thm:nfa-dfa}); on the learning side, PAC learnability is equivalent to having finite VC dimension and online learnability is equivalent to having finite Littlestone dimension, two further equivalences of exactly this shape. An \rel{extends\_grammar} edge (orange) adds a primitive and opens a strict gap: the PDA's stack places $\{a^n b^n\}$ inside context-free languages but outside regular languages (\cref{prop:anbn}); on the learning side, online learnability sits strictly inside PAC learnability (\leanname{online_strictly_stronger_pac}), and exact identification is not implied by PAC learnability (\leanname{ex_not_implies_pac}). The automata and learning columns run in parallel because the underlying structure is the same: one edge type is an equivalence, the other is a separation, and knowing which you are facing determines what the theory of the source model can tell you about the target.}
 \label{fig:restricts-extends}
 \end{figure}
 
@@ -281,7 +282,7 @@ When $B$ \rel{restricts} $A$, the theory of $A$ transfers intact: same character
 \section{Computability Foundations for Learning}
 \label{sec:computability}
 
-Gold's model requires learners to be effective procedures that output hypotheses from an effective enumeration. This section fixes the computability vocabulary; each notion is typed in the verified development's computability substrate.
+Gold's model requires learners to be effective procedures: programs that read data and output hypothesis indices drawn from a uniform enumeration of all partial computable functions. Without a G\"odel numbering, there is no such enumeration; without the enumeration, there are no hypothesis indices; without the indices, the conjecture sequence that must stabilize has no content. This section fixes the computability vocabulary that makes the model work. Each notion is typed in the verified development's computability substrate.
 
 \begin{defn}[G\"odel Numbering]
 \label{def:godel-numbering}
@@ -297,7 +298,7 @@ In Gold's framework a learner reading a text for $L$ outputs at each step a numb
 \section{The Learning-Theoretic Bridge: Limiting Recursion and $\Delta^0_2$}
 \label{sec:bridge}
 
-The connection between computability and learning is an equivalence that identifies Gold's criterion with a precise level of the arithmetical hierarchy.
+The connection between computability and learning is an equivalence. Gold's criterion for identification in the limit turns out to describe exactly the functions that are limiting recursive, and those are exactly the $\Delta^0_2$ functions. This section establishes the equivalence, proves one direction in full, and states Shoenfield's limit lemma for the other direction. The result is what makes the arithmetical address in \cref{fig:chomsky} precise rather than approximate.
 
 \begin{defn}[Limiting Recursion]
 \label{def:limiting-recursion}
@@ -447,7 +448,7 @@ The softmax-to-$\arg\max$ move is the difference between a \rel{restricts} and a
 \section{Exercises and Open Problems}
 \label{sec:ch3-open}
 
-Each problem is anchored to a concept above and tagged \textsc{ku} (an articulated open question) or \textsc{uk} (a result in the literature or the development not yet absorbed into a clean general statement).
+The problems below extend the structure of the two figures and the bridge theorem. They ask you to complete the formalization of results stated but not fully verified, to tighten stated bounds, and to locate in the arithmetical hierarchy results placed informally. Each problem is anchored to a specific concept above and tagged \textsc{ku} (an articulated open question the field has not settled) or \textsc{uk} (a result in the literature or the development not yet assembled into a clean general statement in the formalization).
 
 \begin{openprob}[Formalizing the limit-lemma bridge, \textsc{uk}]
 \label{op:bridge-formal}
@@ -516,7 +517,7 @@ The soft/hard boundary reads as a \rel{restricts} versus \rel{extends\_grammar} 
 
 \subsection*{Counterfactual exercises}
 
-Each exercise perturbs one rung or edge of \cref{fig:chomsky} or \cref{fig:restricts-extends}. Work out what changes and where the result sits relative to the structure the chapter has fixed.
+The open problems above ask you to build new pieces of the chapter's structure. These exercises ask a different question: if you moved one rung, changed one edge type, or replaced one criterion, what would break and where would the break appear in the structure \cref{fig:chomsky} and \cref{fig:restricts-extends} have fixed? Each exercise modifies exactly one element; the task is to trace the consequences through both figures.
 
 \begin{enumerate}[leftmargin=*,itemsep=3pt]
 \item \textbf{Relativization to an oracle.} Rebuild the arithmetical ladder over a halting-problem oracle instead of the computable base. Show that this slides every level up one Turing degree, and that Gold's level reappears at the oracle base (\cref{thm:shoenfield}).
